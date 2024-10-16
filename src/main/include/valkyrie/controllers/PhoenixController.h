@@ -56,6 +56,9 @@ public:
     void setMotorInversion(bool);
     bool getMotorInversion();
 
+    void setVoltage(units::volt_t);
+    units::volt_t getVoltage();
+
 
     float getRevBusUtil();
     float getCANivoreBusUtil();

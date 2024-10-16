@@ -316,6 +316,16 @@ void PhoenixController::setPower(double speed)
     if (_status.IsError()) status = _status;
 }
 
+void PhoenixController::setVoltage(units::volt_t voltage)
+{
+    auto _status = motor->SetControl(voltage);
+    if(_status.IsError()) status = _status;
+}
+
+units::volt_t PhoenixController::getVoltage(){
+    return units::make_unit<units::volt_t>(motor->GetMotorVoltage().GetValueAsDouble());
+}
+
 void PhoenixController::setProfile(int profile)
 {
     currentProfile = profile;

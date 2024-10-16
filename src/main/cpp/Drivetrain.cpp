@@ -23,6 +23,7 @@
 #include "frc/geometry/Pose3d.h"
 #include "frc/geometry/Rotation3d.h"
 #include "units/angle.h"
+#include <frc/sysid/SysIdRoutineLog.h>
 
 using namespace pathplanner;
 
@@ -93,7 +94,19 @@ Drivetrain::Drivetrain(frc::TimedRobot *_robot, valor::CANdleSensor *_leds) : va
                         teleopStart(999999999999),
                         unfilteredPoseTracker(5),
                         swerveNoError(true),
-                        leds(_leds)
+                        leds(_leds),
+                        sysid(frc2::sysid::Config{std::nullopt,std::nullopt,std::nullopt, std::nullopt},
+                            frc2::sysid::Mechanism{
+                                [this](units::volt_t driveVoltage){
+                                    setSysIdVoltage(driveVoltage);
+                                },
+                                [this](frc::sysid::SysIdRoutineLog* log){
+                                    logSysId(log);
+                                },
+                                this
+                            }
+                        ),
+                        sysIdRunner(dynamicSysid(frc2::sysid::Direction::kForward))
 {
     frc2::CommandScheduler::GetInstance().RegisterSubsystem(this);
     init();
@@ -145,6 +158,38 @@ Drivetrain::~Drivetrain()
 
     delete estimator;
     delete calculatedEstimator;
+}
+
+void Drivetrain::setSysIdVoltage(units::volt_t voltage){
+    for(size_t i = 0; i < driveControllers.size(); i++){
+        driveControllers[i]->setVoltage(voltage);
+    }
+}
+
+void Drivetrain::logSysId(frc::sysid::SysIdRoutineLog* log){
+    if(log == nullptr) return;
+    for(size_t i = 0; i < driveControllers.size(); i++){
+        log->Motor("module" + std::to_string(i))
+        .voltage(driveControllers[i]->getVoltage())
+        .position(units::meter_t{driveControllers[i]->getPosition()})
+        .velocity(units::meters_per_second_t{driveControllers[i]->getSpeed()});
+    }
+}
+
+frc2::CommandPtr Drivetrain::quaistaticSysid(frc2::sysid::Direction direction){
+    return frc2::cmd::Sequence(
+        frc2::InstantCommand([this]() {setSysIdVoltage(0_V);}).ToPtr(),
+        frc2::cmd::Wait(0.5_s),
+        sysid.Quasistatic(direction)
+    );
+}
+
+frc2::CommandPtr Drivetrain::dynamicSysid(frc2::sysid::Direction direction){
+    return frc2::cmd::Sequence(
+        frc2::InstantCommand([this]() {setSysIdVoltage(0_V);}).ToPtr(),
+        frc2::cmd::Wait(0.5_s),
+        sysid.Dynamic(direction)
+    );
 }
 
 void Drivetrain::configSwerveModule(int i)
@@ -266,6 +311,11 @@ void Drivetrain::init()
 
     table->PutBoolean("Accepting Vision Measurements", true);
     table->PutBoolean("Pit Mode", false);
+
+    table->PutBoolean("Run SysId Quasistatic Forward", false);
+    table->PutBoolean("Run SysId Quasistatic Backward", false);
+    table->PutBoolean("Run SysId Dynamic Forward", false);
+    table->PutBoolean("Run SysId Dynamic Backward", false);
 
 
     resetState();
@@ -414,9 +464,37 @@ void Drivetrain::calculateCarpetPose()
     );
     previousPose = calculatedEstimator->GetEstimatedPosition();
 }
-//1.313793103448276*
+
 void Drivetrain::analyzeDashboard()
 {
+    if(table->GetBoolean("Run SysId Quasistatic Forward", false)){
+        if(!sysIdRunner.IsScheduled()){
+            sysIdRunner = quaistaticSysid(frc2::sysid::Direction::kForward);
+            sysIdRunner.Schedule();
+        }
+    }
+    else if(table->GetBoolean("Run SysId Quasistatic Backward", false)){
+        if(!sysIdRunner.IsScheduled()){
+            sysIdRunner = quaistaticSysid(frc2::sysid::Direction::kReverse);
+            sysIdRunner.Schedule();
+        }
+    }
+    else if(table->GetBoolean("Run SysId Dynamic Forward", false)){
+        if(!sysIdRunner.IsScheduled()){
+            sysIdRunner = dynamicSysid(frc2::sysid::Direction::kForward);
+            sysIdRunner.Schedule();
+        }
+    }
+    else if(table->GetBoolean("Run SysId Dynamic Backward", false)){
+        if(!sysIdRunner.IsScheduled()){
+            sysIdRunner = dynamicSysid(frc2::sysid::Direction::kReverse);
+            sysIdRunner.Schedule();
+        }
+    }
+    else if(sysIdRunner.IsScheduled()){
+        sysIdRunner.Cancel();
+    }
+
     table->PutBoolean("Calculated estimator?", state.useCalculatedEstimator);
     state.pitMode = table->GetBoolean("Pit Mode", false);
 
