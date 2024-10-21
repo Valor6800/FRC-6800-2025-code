@@ -28,9 +28,9 @@ void VisionSensor::setCameraPose(frc::Pose3d camPose){
 }
 
 void VisionSensor::reset() {
-    tx = 0;
+    tx = 0_deg;
     tv = 0;
-    ty = 0;
+    ty = 0_deg;
     pipe = 0;
 }
 
@@ -65,8 +65,8 @@ void VisionSensor::calculate(){
     }
 
     tv = limeTable->GetNumber("tv", 0.0);
-    tx = limeTable->GetNumber("tx", 0.0);
-    ty = limeTable->GetNumber("ty", 0.0);
+    tx = units::degree_t{limeTable->GetNumber("tx", 0.0)};
+    ty = units::degree_t{limeTable->GetNumber("ty", 0.0)};
     pipe = limeTable->GetNumber("pipeline", 0);
     
     currState = getSensor();

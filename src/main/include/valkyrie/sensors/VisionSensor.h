@@ -1,6 +1,7 @@
 #pragma once
 
 #include "networktables/NetworkTableInstance.h"
+#include "units/angle.h"
 #include "units/time.h"
 #include "units/velocity.h"
 #include "valkyrie/sensors/BaseSensor.h"
@@ -10,7 +11,7 @@
 
 namespace valor{
 
-#define KLIMELIGHT -29.8f // degrees; TODO: Make Modular
+#define KLIMELIGHT -29.8_deg // degrees; TODO: Make Modular
 
 class VisionSensor : public valor::BaseSensor<frc::Pose3d> {
     public:
@@ -49,7 +50,8 @@ class VisionSensor : public valor::BaseSensor<frc::Pose3d> {
         
 
     protected:
-        double tx, ty, tv;
+        units::degree_t tx, ty;
+        int tv;
         int pipe;
 
         units::millisecond_t getTotalLatency();

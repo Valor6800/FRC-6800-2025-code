@@ -160,8 +160,8 @@ void AprilTagsSensor::InitSendable(wpi::SendableBuilder& builder) {
         },
         nullptr
     );
-    builder.AddDoubleProperty("tx", [this]{ return tx;}, nullptr);
-    builder.AddDoubleProperty("ty", [this]{ return ty;}, nullptr);
+    builder.AddDoubleProperty("tx", [this]{ return tx.to<double>();}, nullptr);
+    builder.AddDoubleProperty("ty", [this]{ return ty.to<double>();}, nullptr);
     builder.AddBooleanProperty("hasTarget", [this]{ return hasTarget();}, nullptr);
     builder.AddBooleanProperty("limeTableExist", [this] {return limeTable != nullptr;}, nullptr);
     builder.AddDoubleArrayProperty(
