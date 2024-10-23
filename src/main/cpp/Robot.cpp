@@ -59,8 +59,6 @@ void Robot::RobotInit() {
     frc::DataLogManager::Start();
 
     valorAuto.fillAutoList();
-    valorAuto.preloadAuto("A1-");
-    valorAuto.preloadAuto("A1-2");
 }
 /**
  * This function is called every robot packet, no matter the mode. Use

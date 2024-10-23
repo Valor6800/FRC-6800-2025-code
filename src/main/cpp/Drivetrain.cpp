@@ -4,13 +4,12 @@
 #include <iostream>
 #include <math.h>
 #include <pathplanner/lib/auto/AutoBuilder.h>
-#include <pathplanner/lib/util/HolonomicPathFollowerConfig.h>
-#include <pathplanner/lib/util/PIDConstants.h>
-#include <pathplanner/lib/util/ReplanningConfig.h>
+#include <pathplanner/lib/controllers/PPHolonomicDriveController.h>
 #include <string>
 #include "Constants.h"
 #include "frc2/command/FunctionalCommand.h"
 #include "frc2/command/SequentialCommandGroup.h"
+#include "pathplanner/lib/config/RobotConfig.h"
 #include "units/acceleration.h"
 #include "units/length.h"
 #include "units/velocity.h"
@@ -275,28 +274,22 @@ void Drivetrain::init()
     /*
      * 3.8m/s, 5m/s^2, ~125lbs Apr. 2
      */
-    AutoBuilder::configureHolonomic(
+
+    AutoBuilder::configure(
         [this](){ 
             if (state.useCalculatedEstimator) {
-                // estimator->ResetPosition(getPigeon(), getModuleStates(), {
-                //     calculatedEstimator->GetEstimatedPosition().X(),
-                //     calculatedEstimator->GetEstimatedPosition().Y(),
-                //     estimator->GetEstimatedPosition().Rotation()
-                // });
                 return calculatedEstimator->GetEstimatedPosition();
             }
             return getPose_m();
         }, // Robot pose supplier
         [this](frc::Pose2d pose){ resetOdometry(pose); }, // Method to reset odometry (will be called if your auto has a starting pose)
-        [this](){ return getRobotRelativeSpeeds(); table->PutNumber("timestamp of retrieving speeds", frc::Timer::GetFPGATimestamp().to<double>()); }, // ChassisSpeeds supplier. MUST BE ROBOT RELATIVE
-        [this](frc::ChassisSpeeds speeds){ driveRobotRelative(speeds); }, // Method that will drive the robot given ROBOT RELATIVE ChassisSpeeds
-        HolonomicPathFollowerConfig( // HolonomicPathFollowerConfig, this should likely live in your Constants class
+        [this](){ return getRobotRelativeSpeeds(); }, // ChassisSpeeds supplier. MUST BE ROBOT RELATIVE
+        [this](frc::ChassisSpeeds speeds, auto _){ driveRobotRelative(speeds); }, // Method that will drive the robot given ROBOT RELATIVE ChassisSpeeds
+        std::shared_ptr<PPHolonomicDriveController>(new PPHolonomicDriveController(
             PIDConstants(xPIDF.P, xPIDF.I, xPIDF.D), // Translation PID constants
-            PIDConstants(thetaPIDF.P, thetaPIDF.I, thetaPIDF.D), // Rotation PID constants
-            units::meters_per_second_t{driveMaxSpeed}, // Max module speed, in m/s
-            Constants::driveBaseRadius(), // Drive base radius in meters. Distance from robot center to furthest module.
-            ReplanningConfig(true, false, .1_m, .25_m) // Default path replanning config. See the API for the options here
-        ),
+            PIDConstants(thetaPIDF.P, thetaPIDF.I, thetaPIDF.D) // Rotation PID constants
+        )),
+        RobotConfig::fromGUISettings(),
         []() {
             // Boolean supplier that controls when the path will be mirrored for the red alliance
             // This will flip the path being followed to the red side of the field.
@@ -368,13 +361,13 @@ void Drivetrain::assessInputs()
     if (driverGamepad->GetBackButtonPressed()) {
         resetGyro();
     }
-    if (driverGamepad->DPadDown()){ // All 4 back buttons are mapped to this as of 3/8/2024
-        state.manualFlag = true; 
-    } else {
-        state.manualFlag = false;
-    }
+    // if (driverGamepad->DPadDown()){ // All 4 back buttons are mapped to this as of 3/8/2024
+    //     state.manualFlag = true; 
+    // } else {
+    //     state.manualFlag = false;
+    // }
     
-    state.backshot = driverGamepad->DPadRight();
+    // state.backshot = driverGamepad->DPadRight();
 
     state.ampAlign = driverGamepad->GetBButton();
     state.isHeadingTrack = (driverGamepad->leftTriggerActive() && !driverGamepad->GetAButton());
