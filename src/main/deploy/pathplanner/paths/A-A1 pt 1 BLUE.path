@@ -1,0 +1,52 @@
+{
+  "version": 1.0,
+  "waypoints": [
+    {
+      "anchor": {
+        "x": 5.013154236884284,
+        "y": 6.297874277208335
+      },
+      "prevControl": null,
+      "nextControl": {
+        "x": 6.580427669680571,
+        "y": 6.945396895821281
+      },
+      "isLocked": false,
+      "linkedName": "Score amp"
+    },
+    {
+      "anchor": {
+        "x": 8.15760832429724,
+        "y": 7.427770587663763
+      },
+      "prevControl": {
+        "x": 7.741418452471995,
+        "y": 7.262432810152351
+      },
+      "nextControl": null,
+      "isLocked": false,
+      "linkedName": null
+    }
+  ],
+  "rotationTargets": [],
+  "constraintZones": [],
+  "eventMarkers": [],
+  "globalConstraints": {
+    "maxVelocity": 3.8,
+    "maxAcceleration": 5.0,
+    "maxAngularVelocity": 720.0,
+    "maxAngularAcceleration": 1600.0
+  },
+  "goalEndState": {
+    "velocity": 0.0,
+    "rotation": 17.89,
+    "rotateFast": false
+  },
+  "reversed": false,
+  "folder": "Pick chain",
+  "previewStartingState": {
+    "rotation": 7.5,
+    "velocity": 0
+  },
+  "useDefaultConstraints": true
+}

@@ -1,0 +1,213 @@
+{
+  "version": 1.0,
+  "waypoints": [
+    {
+      "anchor": {
+        "x": 3.624360552251197,
+        "y": 2.5833531311883227
+      },
+      "prevControl": null,
+      "nextControl": {
+        "x": 2.399192032542051,
+        "y": 3.05515561362069
+      },
+      "isLocked": false,
+      "linkedName": "Score wall"
+    },
+    {
+      "anchor": {
+        "x": 1.9826159779445227,
+        "y": 4.136631496140412
+      },
+      "prevControl": {
+        "x": 1.9815351121425981,
+        "y": 4.084029295650993
+      },
+      "nextControl": {
+        "x": 1.9838583821311786,
+        "y": 4.19709524103733
+      },
+      "isLocked": false,
+      "linkedName": "Score stage near"
+    },
+    {
+      "anchor": {
+        "x": 2.68,
+        "y": 4.080337362063614
+      },
+      "prevControl": {
+        "x": 2.6800073655967425,
+        "y": 3.980337362334874
+      },
+      "nextControl": {
+        "x": 2.6799879954476586,
+        "y": 4.243318756907785
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 1.9826159779445227,
+        "y": 4.136631496140412
+      },
+      "prevControl": {
+        "x": 2.522074493476244,
+        "y": 4.099056153570206
+      },
+      "nextControl": null,
+      "isLocked": false,
+      "linkedName": null
+    }
+  ],
+  "rotationTargets": [
+    {
+      "waypointRelativePos": 1.0,
+      "rotationDegrees": -33.75,
+      "rotateFast": true
+    },
+    {
+      "waypointRelativePos": 1.5,
+      "rotationDegrees": 0,
+      "rotateFast": false
+    },
+    {
+      "waypointRelativePos": 2.0,
+      "rotationDegrees": 0,
+      "rotateFast": false
+    }
+  ],
+  "constraintZones": [
+    {
+      "name": "Shoot",
+      "minWaypointRelativePos": 0.85,
+      "maxWaypointRelativePos": 1.05,
+      "constraints": {
+        "maxVelocity": 0.2,
+        "maxAcceleration": 4.0,
+        "maxAngularVelocity": 720.0,
+        "maxAngularAcceleration": 1600.0
+      }
+    },
+    {
+      "name": "Allow pick n shoot",
+      "minWaypointRelativePos": 1.0,
+      "maxWaypointRelativePos": 2.0,
+      "constraints": {
+        "maxVelocity": 3.8,
+        "maxAcceleration": 1.0,
+        "maxAngularVelocity": 720.0,
+        "maxAngularAcceleration": 1600.0
+      }
+    }
+  ],
+  "eventMarkers": [
+    {
+      "name": "Intake",
+      "waypointRelativePos": 0.2,
+      "command": {
+        "type": "parallel",
+        "data": {
+          "commands": [
+            {
+              "type": "named",
+              "data": {
+                "name": "Enable intake"
+              }
+            },
+            {
+              "type": "named",
+              "data": {
+                "name": "Set pivot load"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "Shoot held",
+      "waypointRelativePos": 1.0,
+      "command": {
+        "type": "sequential",
+        "data": {
+          "commands": [
+            {
+              "type": "named",
+              "data": {
+                "name": "Enable full feeder"
+              }
+            },
+            {
+              "type": "wait",
+              "data": {
+                "waitTime": 0.2
+              }
+            },
+            {
+              "type": "named",
+              "data": {
+                "name": "Enable intake"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "Enable shooter",
+      "waypointRelativePos": 0,
+      "command": {
+        "type": "parallel",
+        "data": {
+          "commands": [
+            {
+              "type": "named",
+              "data": {
+                "name": "Enable shooter"
+              }
+            },
+            {
+              "type": "named",
+              "data": {
+                "name": "Set pivot load"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "Enable vision",
+      "waypointRelativePos": 0,
+      "command": {
+        "type": "parallel",
+        "data": {
+          "commands": [
+            {
+              "type": "named",
+              "data": {
+                "name": "Set Camera Estimator"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "globalConstraints": {
+    "maxVelocity": 3.8,
+    "maxAcceleration": 4.5,
+    "maxAngularVelocity": 720.0,
+    "maxAngularAcceleration": 1600.0
+  },
+  "goalEndState": {
+    "velocity": 0.0,
+    "rotation": -33.75,
+    "rotateFast": false
+  },
+  "reversed": false,
+  "folder": "FirstPick",
+  "previewStartingState": null,
+  "useDefaultConstraints": false
+}

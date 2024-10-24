@@ -1,0 +1,25 @@
+{
+  "version": 1.0,
+  "startingPose": {
+    "position": {
+      "x": 1.8745188405044506,
+      "y": 6.9447244827450705
+    },
+    "rotation": -142.25825420361997
+  },
+  "command": {
+    "type": "sequential",
+    "data": {
+      "commands": [
+        {
+          "type": "path",
+          "data": {
+            "pathName": "SplineTest Path"
+          }
+        }
+      ]
+    }
+  },
+  "folder": "VisionTest",
+  "choreoAuto": false
+}

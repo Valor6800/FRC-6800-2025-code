@@ -1,0 +1,194 @@
+{
+  "version": 1.0,
+  "waypoints": [
+    {
+      "anchor": {
+        "x": 1.4,
+        "y": 5.572019226189894
+      },
+      "prevControl": null,
+      "nextControl": {
+        "x": 1.4498739175292006,
+        "y": 5.568470656014387
+      },
+      "isLocked": false,
+      "linkedName": "Start speaker"
+    },
+    {
+      "anchor": {
+        "x": 2.890018068152122,
+        "y": 5.572019226189894
+      },
+      "prevControl": {
+        "x": 2.5900180681521223,
+        "y": 5.572019226189894
+      },
+      "nextControl": {
+        "x": 3.190018068152122,
+        "y": 5.572019226189894
+      },
+      "isLocked": false,
+      "linkedName": "Rex"
+    },
+    {
+      "anchor": {
+        "x": 2.266979347833117,
+        "y": 4.109903726751899
+      },
+      "prevControl": {
+        "x": 1.7346004081272022,
+        "y": 4.109903726751899
+      },
+      "nextControl": {
+        "x": 2.4669793478331172,
+        "y": 4.109903726751899
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 2.762268721549886,
+        "y": 4.109903726751899
+      },
+      "prevControl": {
+        "x": 2.595301655736414,
+        "y": 4.116751487843254
+      },
+      "nextControl": {
+        "x": 2.994733094520359,
+        "y": 4.100369747816605
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 1.9926160982964327,
+        "y": 4.476462151057984
+      },
+      "prevControl": {
+        "x": 2.0187428872304016,
+        "y": 4.446406718486214
+      },
+      "nextControl": null,
+      "isLocked": false,
+      "linkedName": null
+    }
+  ],
+  "rotationTargets": [
+    {
+      "waypointRelativePos": 3.25,
+      "rotationDegrees": 0,
+      "rotateFast": false
+    }
+  ],
+  "constraintZones": [],
+  "eventMarkers": [
+    {
+      "name": "Enable shooter",
+      "waypointRelativePos": 0.0,
+      "command": {
+        "type": "sequential",
+        "data": {
+          "commands": [
+            {
+              "type": "named",
+              "data": {
+                "name": "Enable shooter"
+              }
+            },
+            {
+              "type": "named",
+              "data": {
+                "name": "Set pivot near"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "Feed",
+      "waypointRelativePos": 0.55,
+      "command": {
+        "type": "sequential",
+        "data": {
+          "commands": [
+            {
+              "type": "named",
+              "data": {
+                "name": "Enable full feeder"
+              }
+            },
+            {
+              "type": "wait",
+              "data": {
+                "waitTime": 0.2
+              }
+            },
+            {
+              "type": "named",
+              "data": {
+                "name": "Enable intake"
+              }
+            },
+            {
+              "type": "named",
+              "data": {
+                "name": "Set pivot load"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "Shoot 1",
+      "waypointRelativePos": 1.15,
+      "command": {
+        "type": "sequential",
+        "data": {
+          "commands": [
+            {
+              "type": "named",
+              "data": {
+                "name": "Enable full feeder"
+              }
+            },
+            {
+              "type": "wait",
+              "data": {
+                "waitTime": 0.2
+              }
+            },
+            {
+              "type": "named",
+              "data": {
+                "name": "Enable intake"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "globalConstraints": {
+    "maxVelocity": 1.5,
+    "maxAcceleration": 3.0,
+    "maxAngularVelocity": 720.0,
+    "maxAngularAcceleration": 1600.0
+  },
+  "goalEndState": {
+    "velocity": 0.0,
+    "rotation": -27.78350013827036,
+    "rotateFast": false
+  },
+  "reversed": false,
+  "folder": "FirstPick",
+  "previewStartingState": {
+    "rotation": 0.0,
+    "velocity": 0
+  },
+  "useDefaultConstraints": false
+}

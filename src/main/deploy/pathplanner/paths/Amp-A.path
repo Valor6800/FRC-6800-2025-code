@@ -1,0 +1,76 @@
+{
+  "version": 1.0,
+  "waypoints": [
+    {
+      "anchor": {
+        "x": 3.598991360381448,
+        "y": 7.435728601853616
+      },
+      "prevControl": null,
+      "nextControl": {
+        "x": 3.296792611525038,
+        "y": 7.2116272692108465
+      },
+      "isLocked": false,
+      "linkedName": "Af park"
+    },
+    {
+      "anchor": {
+        "x": 2.8950916257590618,
+        "y": 7.006764155346888
+      },
+      "prevControl": {
+        "x": 3.420833586892868,
+        "y": 7.393345785678841
+      },
+      "nextControl": null,
+      "isLocked": false,
+      "linkedName": null
+    }
+  ],
+  "rotationTargets": [],
+  "constraintZones": [],
+  "eventMarkers": [
+    {
+      "name": "Intake",
+      "waypointRelativePos": 0.0,
+      "command": {
+        "type": "parallel",
+        "data": {
+          "commands": [
+            {
+              "type": "named",
+              "data": {
+                "name": "Enable intake"
+              }
+            },
+            {
+              "type": "named",
+              "data": {
+                "name": "Set pivot load"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "globalConstraints": {
+    "maxVelocity": 4.0,
+    "maxAcceleration": 1.5,
+    "maxAngularVelocity": 720.0,
+    "maxAngularAcceleration": 1600.0
+  },
+  "goalEndState": {
+    "velocity": 0,
+    "rotation": 30.0,
+    "rotateFast": false
+  },
+  "reversed": false,
+  "folder": "FirstPick",
+  "previewStartingState": {
+    "rotation": 28.162179395364873,
+    "velocity": 0
+  },
+  "useDefaultConstraints": false
+}

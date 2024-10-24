@@ -1,0 +1,25 @@
+{
+  "version": 1.0,
+  "startingPose": {
+    "position": {
+      "x": 7.43317420407398,
+      "y": 6.205106299338369
+    },
+    "rotation": -138.05805098233472
+  },
+  "command": {
+    "type": "sequential",
+    "data": {
+      "commands": [
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Example2 Path"
+          }
+        }
+      ]
+    }
+  },
+  "folder": "VisionTest",
+  "choreoAuto": false
+}

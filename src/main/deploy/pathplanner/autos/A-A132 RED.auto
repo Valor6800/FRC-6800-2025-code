@@ -1,0 +1,122 @@
+{
+  "version": 1.0,
+  "startingPose": {
+    "position": {
+      "x": 1.35,
+      "y": 6.467440337441439
+    },
+    "rotation": 0.0
+  },
+  "command": {
+    "type": "sequential",
+    "data": {
+      "commands": [
+        {
+          "type": "named",
+          "data": {
+            "name": "Set pivot load"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Set Estimator"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Af RED"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Enable full feeder"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Set Camera Estimator"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Override flywheels"
+          }
+        },
+        {
+          "type": "parallel",
+          "data": {
+            "commands": [
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "Af-A1-A RED"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Enable full feeder"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "A-A3 RED"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Enable full feeder"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "A-A2 RED"
+          }
+        },
+        {
+          "type": "wait",
+          "data": {
+            "waitTime": 0.2
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Enable full feeder"
+          }
+        },
+        {
+          "type": "wait",
+          "data": {
+            "waitTime": 0.2
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Disable full feeder"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Set pivot load"
+          }
+        }
+      ]
+    }
+  },
+  "folder": "Comp",
+  "choreoAuto": false
+}

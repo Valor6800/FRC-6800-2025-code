@@ -1,0 +1,352 @@
+{
+  "version": 1.0,
+  "waypoints": [
+    {
+      "anchor": {
+        "x": 1.3367291599448063,
+        "y": 4.122540536820079
+      },
+      "prevControl": null,
+      "nextControl": {
+        "x": 1.835943131345722,
+        "y": 4.160116428340965
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 1.9826159779445227,
+        "y": 4.136631496140412
+      },
+      "prevControl": {
+        "x": 1.9092795546451224,
+        "y": 4.148373962240688
+      },
+      "nextControl": {
+        "x": 2.055952401243923,
+        "y": 4.124889030040135
+      },
+      "isLocked": false,
+      "linkedName": "Score stage near"
+    },
+    {
+      "anchor": {
+        "x": 2.601089776832332,
+        "y": 4.122540536820079
+      },
+      "prevControl": {
+        "x": 2.138426497580626,
+        "y": 4.122540536820079
+      },
+      "nextControl": {
+        "x": 2.9236545652313373,
+        "y": 4.122540536820079
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 1.868981998706185,
+        "y": 4.587948897758328
+      },
+      "prevControl": {
+        "x": 1.838360747753467,
+        "y": 4.134701526972936
+      },
+      "nextControl": {
+        "x": 1.9347775698589593,
+        "y": 5.561836923442367
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 2.8990839963661905,
+        "y": 5.546821904454621
+      },
+      "prevControl": {
+        "x": 1.8789098604672905,
+        "y": 5.545280744424336
+      },
+      "nextControl": {
+        "x": 2.9490839393121857,
+        "y": 5.546897438533435
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 3.108658262527752,
+        "y": 7.080577081473897
+      },
+      "prevControl": {
+        "x": 1.5247210165282605,
+        "y": 6.597402120874843
+      },
+      "nextControl": null,
+      "isLocked": false,
+      "linkedName": "Acrid"
+    }
+  ],
+  "rotationTargets": [
+    {
+      "waypointRelativePos": 2.25,
+      "rotationDegrees": 0,
+      "rotateFast": false
+    },
+    {
+      "waypointRelativePos": 3.0,
+      "rotationDegrees": -33.60118029290833,
+      "rotateFast": false
+    },
+    {
+      "waypointRelativePos": 4.0,
+      "rotationDegrees": 0,
+      "rotateFast": false
+    },
+    {
+      "waypointRelativePos": 3.5999999999999996,
+      "rotationDegrees": 0.0,
+      "rotateFast": false
+    },
+    {
+      "waypointRelativePos": 4.65,
+      "rotationDegrees": 25.860683915512123,
+      "rotateFast": false
+    },
+    {
+      "waypointRelativePos": 1.0,
+      "rotationDegrees": -33.75382526978235,
+      "rotateFast": false
+    },
+    {
+      "waypointRelativePos": 1.5,
+      "rotationDegrees": 0,
+      "rotateFast": false
+    }
+  ],
+  "constraintZones": [
+    {
+      "name": "Shot 1",
+      "minWaypointRelativePos": 2.95,
+      "maxWaypointRelativePos": 3.05,
+      "constraints": {
+        "maxVelocity": 0.4,
+        "maxAcceleration": 4.0,
+        "maxAngularVelocity": 720.0,
+        "maxAngularAcceleration": 1600.0
+      }
+    },
+    {
+      "name": "Shot 2",
+      "minWaypointRelativePos": 3.95,
+      "maxWaypointRelativePos": 4.05,
+      "constraints": {
+        "maxVelocity": 0.5,
+        "maxAcceleration": 4.0,
+        "maxAngularVelocity": 720.0,
+        "maxAngularAcceleration": 1600.0
+      }
+    },
+    {
+      "name": "Shot pre",
+      "minWaypointRelativePos": 0.9,
+      "maxWaypointRelativePos": 1.1,
+      "constraints": {
+        "maxVelocity": 0.4,
+        "maxAcceleration": 3.5,
+        "maxAngularVelocity": 720.0,
+        "maxAngularAcceleration": 1600.0
+      }
+    },
+    {
+      "name": "Allow pre rotate",
+      "minWaypointRelativePos": 0.0,
+      "maxWaypointRelativePos": 1.0,
+      "constraints": {
+        "maxVelocity": 0.7,
+        "maxAcceleration": 3.5,
+        "maxAngularVelocity": 720.0,
+        "maxAngularAcceleration": 1600.0
+      }
+    },
+    {
+      "name": "Allow wall pick",
+      "minWaypointRelativePos": 1.0,
+      "maxWaypointRelativePos": 2.0,
+      "constraints": {
+        "maxVelocity": 0.4,
+        "maxAcceleration": 3.5,
+        "maxAngularVelocity": 720.0,
+        "maxAngularAcceleration": 1600.0
+      }
+    },
+    {
+      "name": "Allow speaker pick",
+      "minWaypointRelativePos": 3.2,
+      "maxWaypointRelativePos": 3.75,
+      "constraints": {
+        "maxVelocity": 1.0,
+        "maxAcceleration": 3.5,
+        "maxAngularVelocity": 720.0,
+        "maxAngularAcceleration": 1600.0
+      }
+    },
+    {
+      "name": "Allow amp pick",
+      "minWaypointRelativePos": 4.0,
+      "maxWaypointRelativePos": 4.75,
+      "constraints": {
+        "maxVelocity": 1.0,
+        "maxAcceleration": 3.5,
+        "maxAngularVelocity": 720.0,
+        "maxAngularAcceleration": 1600.0
+      }
+    },
+    {
+      "name": "Allow shot 2",
+      "minWaypointRelativePos": 2.3,
+      "maxWaypointRelativePos": 3.0,
+      "constraints": {
+        "maxVelocity": 1.0,
+        "maxAcceleration": 3.5,
+        "maxAngularVelocity": 720.0,
+        "maxAngularAcceleration": 1600.0
+      }
+    }
+  ],
+  "eventMarkers": [
+    {
+      "name": "Rev",
+      "waypointRelativePos": 0,
+      "command": {
+        "type": "parallel",
+        "data": {
+          "commands": [
+            {
+              "type": "named",
+              "data": {
+                "name": "Enable shooter"
+              }
+            },
+            {
+              "type": "named",
+              "data": {
+                "name": "Enable intake"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "Shoot 1",
+      "waypointRelativePos": 3.7,
+      "command": {
+        "type": "sequential",
+        "data": {
+          "commands": [
+            {
+              "type": "named",
+              "data": {
+                "name": "Enable full feeder"
+              }
+            },
+            {
+              "type": "wait",
+              "data": {
+                "waitTime": 0.2
+              }
+            },
+            {
+              "type": "named",
+              "data": {
+                "name": "Enable intake"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "Shoot 2",
+      "waypointRelativePos": 4.45,
+      "command": {
+        "type": "sequential",
+        "data": {
+          "commands": [
+            {
+              "type": "named",
+              "data": {
+                "name": "Enable full feeder"
+              }
+            },
+            {
+              "type": "wait",
+              "data": {
+                "waitTime": 0.2
+              }
+            },
+            {
+              "type": "named",
+              "data": {
+                "name": "Enable intake"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "Shoot pre",
+      "waypointRelativePos": 1.0,
+      "command": {
+        "type": "sequential",
+        "data": {
+          "commands": [
+            {
+              "type": "named",
+              "data": {
+                "name": "Enable full feeder"
+              }
+            },
+            {
+              "type": "wait",
+              "data": {
+                "waitTime": 0.2
+              }
+            },
+            {
+              "type": "named",
+              "data": {
+                "name": "Enable intake"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "globalConstraints": {
+    "maxVelocity": 3.8,
+    "maxAcceleration": 3.5,
+    "maxAngularVelocity": 720.0,
+    "maxAngularAcceleration": 1600.0
+  },
+  "goalEndState": {
+    "velocity": 0.0,
+    "rotation": 40.53530387184141,
+    "rotateFast": false
+  },
+  "reversed": false,
+  "folder": "FirstPick",
+  "previewStartingState": {
+    "rotation": 0.0,
+    "velocity": 0
+  },
+  "useDefaultConstraints": false
+}
