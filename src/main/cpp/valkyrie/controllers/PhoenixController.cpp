@@ -38,16 +38,39 @@ PhoenixController::PhoenixController(valor::PhoenixControllerType controllerType
     init();
 }
 
+PhoenixController::PhoenixController(valor::PhoenixControllerType controllerType,
+                                    int canID,
+                                    valor::NeutralMode _mode,
+                                    bool _inverted,
+                                    units::scalar_t _rotorToSensor,
+                                    units::scalar_t _sensorToMech,
+                                    valor::PIDF pidf,
+                                    std::string canbus) :
+    BaseController(new hardware::TalonFX{canID, canbus}, _inverted, _mode, getPhoenixControllerMotorSpeed(controllerType)),
+    req_position(units::turn_t{0}),
+    req_velocity(units::turns_per_second_t{0}),
+    req_voltage(units::volt_t{0}),
+    res_position(getMotor()->GetPosition()),
+    res_velocity(getMotor()->GetVelocity())
+{
+    init(_rotorToSensor, _sensorToMech, pidf);
+}
+
 void PhoenixController::init()
 {
     valor::PIDF motionPIDF;
     motionPIDF.P = FALCON_PIDF_KP;
     motionPIDF.I = FALCON_PIDF_KI;
     motionPIDF.D = FALCON_PIDF_KD;
-    motionPIDF.error = 0;
+    motionPIDF.error = 0_tr;
     motionPIDF.maxVelocity = FALCON_PIDF_KV;
     motionPIDF.maxAcceleration = FALCON_PIDF_KA;
 
+    init(1, 1, motionPIDF);
+}
+
+void PhoenixController::init(units::scalar_t _rotorToSensor, units::scalar_t _sensorToMech, valor::PIDF pidf)
+{
     req_position.Slot = 0;
     req_position.UpdateFreqHz = 0_Hz;
     req_velocity.Slot = 0;
@@ -91,9 +114,9 @@ void PhoenixController::setupCANCoder(int deviceId, units::turn_t offset, bool c
     auto _status = getMotor()->GetConfigurator().Apply(fx_cfg);
 }
 
-double PhoenixController::getCANCoder()
+units::turn_t PhoenixController::getCANCoder()
 {
-    return cancoder ? cancoder->GetAbsolutePosition().GetValueAsDouble() : 0;
+    return cancoder ? cancoder->GetAbsolutePosition().GetValue() : 0_tr;
 }
 
 void PhoenixController::reset()
@@ -109,13 +132,6 @@ void PhoenixController::setEncoderPosition(units::turn_t position)
 void PhoenixController::setupFollower(int canID, bool followerInverted)
 {
     followerMotor = new hardware::TalonFX(canID, "baseCAN");
-    // configs::TalonFXConfiguration config;
-    //
-    // setNeutralMode(config.MotorOutput, valor::NeutralMode::Coast);
-    //
-    // setConversion(config.Feedback, rotorToSensor, sensorToMech);
-    //
-    // auto _status = followerMotor->GetConfigurator().Apply(config, units::second_t{5});
     followerMotor->SetInverted(followerInverted);
     followerMotor->SetNeutralMode(signals::NeutralModeValue::Coast);
     followerMotor->SetControl(controls::StrictFollower{getMotor()->GetDeviceID()});
@@ -151,15 +167,13 @@ void PhoenixController::setPIDF(configs::Slot0Configs & slotConfig, configs::Mot
 {
     pidf = _pidf;
 
-    // config.ClosedLoopGeneral.ContinuousWrap = true;
-
     // Generic PIDF configurations
     // Numerator for closed loop controls will be in volts
     // Feedback and feedforward gains are in volts / rpm of motor, NOT mechanism
     slotConfig.kP = pidf.P;
     slotConfig.kI = pidf.I;
     slotConfig.kD = pidf.D;
-    slotConfig.kV = voltageCompenstation / (maxMotorSpeed / 60.0 / (rotorToSensor * sensorToMech));
+    slotConfig.kV = voltageCompenstation / (maxMotorSpeed / (rotorToSensor * sensorToMech));
     slotConfig.kS = pidf.S;
 
     // Feedforward gain configuration
@@ -176,14 +190,14 @@ void PhoenixController::setPIDF(configs::Slot0Configs & slotConfig, configs::Mot
     motionMagicConfig.MotionMagicJerk = pidf.maxJerk;
 }
 
-void PhoenixController::setGearRatios(double _rotorToSensor, double _sensorToMech)
+void PhoenixController::setGearRatios(units::scalar_t _rotorToSensor, units::scalar_t _sensorToMech)
 {
     configs::FeedbackConfigs config{};
     setGearRatios(config, _rotorToSensor, _sensorToMech);
     auto _status = getMotor()->GetConfigurator().Apply(config);
 }
 
-void PhoenixController::setGearRatios(configs::FeedbackConfigs & config, double _rotorToSensor, double _sensorToMech)
+void PhoenixController::setGearRatios(configs::FeedbackConfigs & config, units::scalar_t _rotorToSensor, units::scalar_t _sensorToMech)
 {
     rotorToSensor = _rotorToSensor;
     sensorToMech = _sensorToMech;
@@ -334,17 +348,13 @@ void PhoenixController::InitSendable(wpi::SendableBuilder& builder)
         "Speed", 
         [this] { return getSpeed().to<double>(); },
         nullptr);
-    builder.AddBooleanProperty(
-        "Inverted", 
-        [this] { return inverted; },
-        nullptr);
     builder.AddDoubleProperty(
         "Out Volt", 
         [this] { return getMotor()->GetMotorVoltage().GetValueAsDouble(); },
         nullptr);
     builder.AddDoubleProperty(
         "CANCoder", 
-        [this] { return getCANCoder(); },
+        [this] { return getCANCoder().to<double>(); },
         nullptr);
     builder.AddDoubleProperty(
         "reqPosition", 
@@ -353,14 +363,6 @@ void PhoenixController::InitSendable(wpi::SendableBuilder& builder)
     builder.AddDoubleProperty(
         "reqSpeed", 
         [this] { return req_velocity.Velocity.to<double>(); },
-        nullptr);
-    builder.AddDoubleProperty(
-        "rotorToSensor", 
-        [this] { return rotorToSensor; },
-        nullptr);
-    builder.AddDoubleProperty(
-        "sensorToMech", 
-        [this] { return sensorToMech; },
         nullptr);
     builder.AddIntegerProperty(
         "Magnet Health",

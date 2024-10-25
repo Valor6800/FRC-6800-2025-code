@@ -249,7 +249,7 @@ public:
      * @param rotorToSensor The gear ratio from rotor to where the sensor is. Should be 1 if no external sensor
      * @param sensorToMech The gear ratio from the sensor to the mechanism's output shaft. Should be the gear ratio if no external sensor
      */
-    virtual void setGearRatios(double rotorToSensor, double sensorToMech) = 0;
+    virtual void setGearRatios(units::scalar_t rotorToSensor, units::scalar_t sensorToMech) = 0;
 
     /**
      * @brief Set which profile to use
@@ -275,7 +275,7 @@ public:
     virtual units::turn_t getAbsEncoderPosition() = 0;
 
     virtual void setupCANCoder(int deviceId, units::turn_t offset, bool clockwise = false, std::string canbus = "", ctre::phoenix6::signals::AbsoluteSensorRangeValue absoluteRange=ctre::phoenix6::signals::AbsoluteSensorRangeValue::Unsigned_0To1) = 0;
-    virtual double getCANCoder() = 0;
+    virtual units::turn_t getCANCoder() = 0;
 
 protected:
 
@@ -286,8 +286,8 @@ protected:
     
     bool inverted;
     valor::NeutralMode neutralMode;
-    double rotorToSensor;
-    double sensorToMech;
+    units::scalar_t rotorToSensor;
+    units::scalar_t sensorToMech;
     T* followerMotor;
 };
 }

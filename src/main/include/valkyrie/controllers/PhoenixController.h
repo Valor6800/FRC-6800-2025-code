@@ -7,9 +7,9 @@
 #include <ctre/phoenix6/CANcoder.hpp>
 #include <ctre/phoenix6/CANBus.hpp>
 
-const units::turns_per_second_t FREE_SPD_KRAKEN(5800);
-const units::turns_per_second_t FREE_SPD_KRAKEN_FOC(6000);
-const units::turns_per_second_t FREE_SPD_FALCON(6380);
+const units::revolutions_per_minute_t FREE_SPD_KRAKEN(5800);
+const units::revolutions_per_minute_t FREE_SPD_KRAKEN_FOC(6000);
+const units::revolutions_per_minute_t FREE_SPD_FALCON(6380);
 
 namespace valor {
 
@@ -24,8 +24,9 @@ class PhoenixController : public BaseController<ctre::phoenix6::hardware::TalonF
 {
 public:
     PhoenixController(valor::PhoenixControllerType, int _canID, valor::NeutralMode _mode, bool _inverted, std::string _canbus = "");
+    PhoenixController(valor::PhoenixControllerType, int _canID, valor::NeutralMode _mode, bool _inverted, units::scalar_t rotorToSensor, units::scalar_t sensorToMech, valor::PIDF pidf, std::string _canbus = "");
 
-    static units::turns_per_second_t getPhoenixControllerMotorSpeed(PhoenixControllerType controllerType)
+    static units::revolutions_per_minute_t getPhoenixControllerMotorSpeed(PhoenixControllerType controllerType)
     {
         switch (controllerType) {
             case KRAKEN_FOC:
@@ -37,6 +38,7 @@ public:
         }
     }
 
+    void init(units::scalar_t rotorToSensor, units::scalar_t sensorToMech, valor::PIDF pidf);
     void init() override;
 
     void enableFOC(bool enableFOC);
@@ -67,15 +69,15 @@ public:
     void setForwardLimit(units::turn_t forward) override;
     void setReverseLimit(units::turn_t reverse) override;
     
-    void setGearRatios(double, double) override;
-    void setGearRatios(ctre::phoenix6::configs::FeedbackConfigs&, double, double);
+    void setGearRatios(units::scalar_t, units::scalar_t) override;
+    void setGearRatios(ctre::phoenix6::configs::FeedbackConfigs&, units::scalar_t, units::scalar_t);
 
     void setProfile(int slot) override;
 
     units::turn_t getAbsEncoderPosition();
 
     void setupCANCoder(int deviceId, units::turn_t offset, bool clockwise, std::string canbus = "", ctre::phoenix6::signals::AbsoluteSensorRangeValue absoluteRange=ctre::phoenix6::signals::AbsoluteSensorRangeValue::Unsigned_0To1) override;
-    double getCANCoder() override;
+    units::turn_t getCANCoder() override;
 
     float getRevBusUtil();
     float getCANivoreBusUtil();
