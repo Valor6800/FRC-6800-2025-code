@@ -1,27 +1,27 @@
 {
-  "version": 1.0,
+  "version": "2025.0",
   "waypoints": [
     {
       "anchor": {
-        "x": 1.9124288198372834,
-        "y": 7.0
+        "x": 1.2845216878958343,
+        "y": 5.613250617601938
       },
       "prevControl": null,
       "nextControl": {
-        "x": 3.0304628085871768,
-        "y": 7.0
+        "x": 2.284521687895835,
+        "y": 5.613250617601938
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 5.7732993218929884,
-        "y": 7.0
+        "x": 2.726,
+        "y": 5.613250617601938
       },
       "prevControl": {
-        "x": 4.252608689318427,
-        "y": 7.0
+        "x": 1.726,
+        "y": 5.613250617601938
       },
       "nextControl": null,
       "isLocked": false,
@@ -30,41 +30,25 @@
   ],
   "rotationTargets": [],
   "constraintZones": [],
-  "eventMarkers": [
-    {
-      "name": "Camera Estimator",
-      "waypointRelativePos": 0.0,
-      "command": {
-        "type": "parallel",
-        "data": {
-          "commands": [
-            {
-              "type": "named",
-              "data": {
-                "name": "Set Camera Estimator"
-              }
-            }
-          ]
-        }
-      }
-    }
-  ],
+  "pointTowardsZones": [],
+  "eventMarkers": [],
   "globalConstraints": {
-    "maxVelocity": 3.0,
-    "maxAcceleration": 3.0,
-    "maxAngularVelocity": 540.0,
-    "maxAngularAcceleration": 720.0
+    "maxVelocity": 3.8,
+    "maxAcceleration": 5.0,
+    "maxAngularVelocity": 720.0,
+    "maxAngularAcceleration": 1600.0,
+    "nominalVoltage": 12.0,
+    "unlimited": false
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 135.5498415192533,
-    "rotateFast": false
+    "rotation": 0.0
   },
   "reversed": false,
-  "folder": "VisionTest",
-  "previewStartingState": {
-    "rotation": 24.93421490929995,
-    "velocity": 0
+  "folder": null,
+  "idealStartingState": {
+    "velocity": 0,
+    "rotation": 0.0
   },
-  "useDefaultConstraints": false
+  "useDefaultConstraints": true
 }

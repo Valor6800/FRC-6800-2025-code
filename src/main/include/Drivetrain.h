@@ -1,6 +1,8 @@
 #pragma once
 
 #include "frc/geometry/Pose3d.h"
+#include "frc2/command/CommandPtr.h"
+#include "pathplanner/lib/path/Waypoint.h"
 #include "units/acceleration.h"
 #include "units/length.h"
 #include "valkyrie/sensors/AprilTagsSensor.h"
@@ -174,6 +176,15 @@ public:
      } state;
      
      
+    frc2::CommandPtr driveToPoint();
+
+    struct {
+        bool createPath;
+        std::vector<pathplanner::Waypoint> path;
+    } pathStatus;
+    
+    std::vector<frc::Pose2d> targetPoints;
+
      /**
       * Drive the robot with given x, y and rotational velocities using open loop velocity control
       * @param vx_mps the desired x velocity component in meters per second

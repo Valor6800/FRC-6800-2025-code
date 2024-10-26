@@ -1,12 +1,5 @@
 {
-  "version": 1.0,
-  "startingPose": {
-    "position": {
-      "x": 1.0729400046635704,
-      "y": 7.0
-    },
-    "rotation": -129.80706044606595
-  },
+  "version": "2025.0",
   "command": {
     "type": "sequential",
     "data": {
@@ -16,10 +9,17 @@
           "data": {
             "pathName": "Example Path"
           }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Drive To Point"
+          }
         }
       ]
     }
   },
-  "folder": "VisionTest",
+  "resetOdom": true,
+  "folder": null,
   "choreoAuto": false
 }

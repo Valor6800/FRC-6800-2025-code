@@ -1,15 +1,24 @@
 #include "Drivetrain.h"
 #include <cmath>
 #include <frc/DriverStation.h>
+#include <memory>
+#include <optional>
+#include <pathplanner/lib/path/PathPoint.h>
 #include <iostream>
 #include <math.h>
 #include <pathplanner/lib/auto/AutoBuilder.h>
 #include <pathplanner/lib/controllers/PPHolonomicDriveController.h>
 #include <string>
 #include "Constants.h"
+#include "frc/geometry/Rotation2d.h"
+#include "frc2/command/CommandPtr.h"
 #include "frc2/command/FunctionalCommand.h"
 #include "frc2/command/SequentialCommandGroup.h"
 #include "pathplanner/lib/config/RobotConfig.h"
+#include "pathplanner/lib/path/GoalEndState.h"
+#include "pathplanner/lib/path/PathConstraints.h"
+#include "pathplanner/lib/path/PathPlannerPath.h"
+#include "pathplanner/lib/path/Waypoint.h"
 #include "units/acceleration.h"
 #include "units/length.h"
 #include "units/velocity.h"
@@ -24,6 +33,12 @@
 #include "units/angle.h"
 
 using namespace pathplanner;
+
+#define MAX_VELOCITY 3.8_mps
+#define MAX_ACCELERATION 5_mps_sq
+
+#define MAX_ANGULAR_VELOCITY 720_deg_per_s
+#define MAX_ANGULAR_ACCELERATION 1600_deg_per_s_sq
 
 #define SPEAKER_Y 5.543042_m
 #define SPEAKER_BLUE_X 0.0_m
@@ -331,7 +346,50 @@ void Drivetrain::init()
             }
         )
     ).ToPtr());
+
+    pathplanner::NamedCommands::registerCommand("Start Path Gen", std::move(
+        frc2::InstantCommand(
+            [this]() {
+                pathStatus.createPath = true;
+            }
+        )
+    ).ToPtr());
+
+    pathplanner::NamedCommands::registerCommand("Drive To Point", driveToPoint()); 
 }
+
+frc2::CommandPtr Drivetrain::driveToPoint() {
+
+    std::vector<frc::Pose2d> targetPose {
+
+        frc::Pose2d(4.058_m, 5.584_m, frc::Rotation2d(0_deg))
+    };
+
+    targetPoints = targetPose;
+
+    std::vector<Waypoint> points = PathPlannerPath::waypointsFromPoses(targetPose);
+
+    // Create the constraints to use while pathfinding
+    PathConstraints constraints = PathConstraints(
+        MAX_VELOCITY / 10.0, MAX_ACCELERATION / 10.0,
+        MAX_ANGULAR_VELOCITY / 10.0, MAX_ANGULAR_ACCELERATION / 10.0
+    );
+
+    std::shared_ptr<PathPlannerPath> path = std::make_shared<PathPlannerPath>(
+        points,
+        constraints,
+        std::nullopt,
+        GoalEndState(0.0_mps, frc::Rotation2d(0_deg))
+    );
+
+
+    // Since AutoBuilder is configured, we can use it to build pathfinding commands
+    return AutoBuilder::pathfindThenFollowPath(
+        path,
+        constraints
+    );
+}
+
 
 std::vector<valor::Swerve<Drivetrain::SwerveAzimuthMotor, Drivetrain::SwerveDriveMotor> *> Drivetrain::getSwerveModules()
 {
@@ -379,6 +437,10 @@ void Drivetrain::assessInputs()
     state.ySpeed = driverGamepad->leftStickX(2);
 
     state.rot = driverGamepad->rightStickX(3);
+
+    if (frc::DriverStation::IsAutonomousEnabled()) {
+        
+    }
 }
 
 void Drivetrain::calculateCarpetPose()
@@ -844,6 +906,17 @@ void Drivetrain::InitSendable(wpi::SendableBuilder& builder)
     {
         builder.SetSmartDashboardType("Subsystem");
 
+        builder.AddDoubleArrayProperty(
+            "Starting Pose",
+            [this] {
+                return std::vector<double>{
+                    targetPoints[0].X().to<double>(),
+                    targetPoints[0].Y().to<double>(),
+                    targetPoints[0].Rotation().Degrees().to<double>()
+                };
+        },
+        nullptr
+        );
         builder.AddDoubleProperty(
             "xSpeed",
             [this] { return state.xSpeed; },
