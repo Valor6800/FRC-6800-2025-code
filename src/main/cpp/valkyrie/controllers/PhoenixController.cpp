@@ -114,6 +114,11 @@ void PhoenixController::setupCANCoder(int deviceId, units::turn_t offset, bool c
     getMotor()->GetConfigurator().Apply(fx_cfg);
 }
 
+void PhoenixController::applyConfig()
+{
+    //used to apply current config to pheonix device
+}
+
 units::turn_t PhoenixController::getCANCoder()
 {
     return cancoder ? cancoder->GetAbsolutePosition().GetValue() : 0_tr;
