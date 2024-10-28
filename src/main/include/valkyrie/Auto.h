@@ -4,6 +4,8 @@
 #include <unordered_map>
 #include <frc2/command/Command.h>
 #include <frc2/command/Commands.h>
+#include <frc/smartdashboard/SendableChooser.h>
+#include <networktables/NetworkTable.h>
 
 namespace valor {
 

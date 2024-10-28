@@ -1,6 +1,9 @@
 #include "valkyrie/Auto.h"
 #include "pathplanner/lib/auto/AutoBuilder.h"
 // #include <frc/Filesystem.h>
+#include <networktables/NetworkTableInstance.h>
+#include <networktables/NetworkTable.h>
+#include <frc/smartdashboard/SmartDashboard.h>
 #include <pathplanner/lib/commands/PathPlannerAuto.h>
 #include <pathplanner/lib/auto/NamedCommands.h>
 #include <frc2/command/SequentialCommandGroup.h>

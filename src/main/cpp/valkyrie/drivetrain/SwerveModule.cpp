@@ -25,10 +25,9 @@ SwerveModule<AzimuthMotor, DriveMotor>::SwerveModule(AzimuthMotor* _azimuthMotor
                                                     frc::Translation2d _wheelLocation,
                                                     units::meter_t wheelDiameter) :
     azimuthMotor(_azimuthMotor),
-    driveMotor(_driveMotor)
+    driveMotor(_driveMotor),
+    wheelConversion(M_PI * wheelDiameter / 1_tr)
 {
-    meters_per_turn = M_PI * wheelDiameter;
-
     if (_wheelLocation.X() > 0_m && _wheelLocation.Y() > 0_m) wheelIdx = 0;
     else if (_wheelLocation.X() > 0_m && _wheelLocation.Y() < 0_m) wheelIdx = 1;
     else if (_wheelLocation.X() < 0_m && _wheelLocation.Y() > 0_m) wheelIdx = 3;
@@ -47,19 +46,19 @@ frc::Rotation2d SwerveModule<AzimuthMotor, DriveMotor>::getAzimuthPosition()
 template<class AzimuthMotor, class DriveMotor>
 units::meter_t SwerveModule<AzimuthMotor, DriveMotor>::getDrivePosition()
 {
-    return driveMotor->getPosition() * meters_per_turn;
+    return driveMotor->getPosition() * wheelConversion;
 }
 
 template<class AzimuthMotor, class DriveMotor>
 units::meters_per_second_t SwerveModule<AzimuthMotor, DriveMotor>::getDriveSpeed()
 {
-    return driveMotor->getSpeed() * meters_per_turn;
+    return driveMotor->getSpeed() * wheelConversion;
 }
 
 template<class AzimuthMotor, class DriveMotor>
 units::meters_per_second_t SwerveModule<AzimuthMotor, DriveMotor>::getMaxDriveSpeed()
 {
-    return driveMotor->getMaxMotorSpeed() * meters_per_turn;
+    return driveMotor->getMaxMotorSpeed() * wheelConversion;
 }
 
 template<class AzimuthMotor, class DriveMotor>
@@ -86,14 +85,14 @@ void SwerveModule<AzimuthMotor, DriveMotor>::setDesiredState(frc::SwerveModuleSt
 
     // Get current angle, optimize drive state
     frc::Rotation2d currentAngle = getAzimuthPosition();
-    frc::SwerveModuleState optimizedState = frc::SwerveModuleState::Optimize(desiredState, currentAngle);
+    desiredState.Optimize(currentAngle);
 
     // Output optimized rotation and speed
-    setAzimuthPosition(optimizedState.angle);
+    setAzimuthPosition(desiredState.angle);
     if (isDriveOpenLoop)
-        setDriveOpenLoop(optimizedState.speed);
+        setDriveOpenLoop(desiredState.speed);
     else
-        setDriveClosedLoop(optimizedState.speed);
+        setDriveClosedLoop(desiredState.speed);
 }
 
 template<class AzimuthMotor, class DriveMotor>
@@ -129,7 +128,7 @@ template<class AzimuthMotor, class DriveMotor>
 units::turn_t SwerveModule<AzimuthMotor, DriveMotor>::getMagEncoderCount()
 {
     units::turn_t readValue = azimuthMotor->getAbsEncoderPosition();
-    if (initialMagEncoderValue == 0 && readValue != 0)
+    if (initialMagEncoderValue == 0_tr && readValue != 0_tr)
         initialMagEncoderValue = readValue;
     if (readValue != initialMagEncoderValue)
         return readValue;
@@ -143,20 +142,21 @@ void SwerveModule<AzimuthMotor, DriveMotor>::setAzimuthPosition(frc::Rotation2d 
     frc::Rotation2d currentAngle = getAzimuthPosition();
     frc::Rotation2d deltaAngle = desiredAngle - currentAngle;
     units::turn_t deltaRotations = deltaAngle.Radians() / (2.0 * M_PI);
-    units::turn_t desiredRotations = currentAngle.Radians() / (2.0 * M_PI) + deltaRotations
+    units::turn_t desiredRotations = currentAngle.Radians() / (2.0 * M_PI) + deltaRotations;
     azimuthMotor->setPosition(desiredRotations);
 }
 
 template<class AzimuthMotor, class DriveMotor>
 void SwerveModule<AzimuthMotor, DriveMotor>::setDriveOpenLoop(units::meters_per_second_t mps)
 {
-    driveMotor->setPower((mps / getMaxDriveSpeed()) * 12_v);
+    driveMotor->setPower(mps / getMaxDriveSpeed() * units::volt_t{12});
 }
 
 template<class AzimuthMotor, class DriveMotor>
 void SwerveModule<AzimuthMotor, DriveMotor>::setDriveClosedLoop(units::meters_per_second_t speed)
 {
-    driveMotor->setSpeed(speed / meters_per_turn);
+    auto outSpeed = units::turns_per_second_t{speed.value() / wheelConversion.value()};
+    driveMotor->setSpeed(outSpeed);
 }
 
 template<class AzimuthMotor, class DriveMotor>
@@ -165,7 +165,7 @@ void SwerveModule<AzimuthMotor, DriveMotor>::InitSendable(wpi::SendableBuilder& 
     builder.SetSmartDashboardType("Subsystem");
     builder.AddDoubleProperty(
         "magEncoderRotatons",
-        [this] { return getMagEncoderCount(); },
+        [this] { return getMagEncoderCount().template to<double>(); },
         nullptr
     );
     builder.AddDoubleProperty

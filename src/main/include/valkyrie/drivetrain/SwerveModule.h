@@ -13,6 +13,8 @@
 
 namespace valor {
 
+using meters_per_turn_t = units::unit_t<units::compound_unit<units::meters, units::inverse<units::turn>>>;
+
 /**
  * @brief SwerveModule
  * @tparam AzimuthMotor Azimuth motor on the swerve module (Neo or Falcon)
@@ -102,7 +104,6 @@ private:
 
     int wheelIdx;
     units::turn_t initialMagEncoderValue;
-    units::scalar_t meters_per_turn;
-
+    meters_per_turn_t wheelConversion;
 };
 }

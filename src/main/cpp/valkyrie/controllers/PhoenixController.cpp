@@ -181,7 +181,7 @@ void PhoenixController::setPIDF(configs::Slot0Configs & slotConfig, configs::Mot
     slotConfig.kP = pidf.P;
     slotConfig.kI = pidf.I;
     slotConfig.kD = pidf.D;
-    slotConfig.kV = voltageCompenstation.to<double>() / (maxMotorSpeed / (rotorToSensor * sensorToMech)).to<double>();
+    slotConfig.kV = (voltageCompenstation / (maxMotorSpeed / (rotorToSensor * sensorToMech))).value();
     slotConfig.kS = pidf.S;
 
     // Feedforward gain configuration
@@ -268,7 +268,7 @@ void PhoenixController::enableFOC(bool enableFOC)
 
 void PhoenixController::setSpeed(units::turns_per_second_t speed)
 {
-    req_velocity.Velocity = speed; // Mechanism rotations
+    req_velocity.Velocity = speed;
     getMotor()->SetControl(req_velocity);
 }
 
@@ -293,7 +293,7 @@ void PhoenixController::setNeutralMode(configs::MotorOutputConfigs & config, val
     neutralMode = mode;
 
     // Deadband configuration
-    config.DutyCycleNeutralDeadband = DEADBAND.to<double>();
+    config.DutyCycleNeutralDeadband = DEADBAND.value();
     config.Inverted = inverted;
     config.NeutralMode = neutralMode == valor::NeutralMode::Brake ?
         signals::NeutralModeValue::Brake :
