@@ -118,6 +118,7 @@ void PhoenixController::applyConfig()
 {
     //used to apply current config to pheonix device
     //new comment
+    //this is a new comment
 }
 
 units::turn_t PhoenixController::getCANCoder()
