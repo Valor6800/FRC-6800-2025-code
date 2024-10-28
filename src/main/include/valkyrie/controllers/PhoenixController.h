@@ -24,7 +24,7 @@ class PhoenixController : public BaseController<ctre::phoenix6::hardware::TalonF
 {
 public:
     PhoenixController(valor::PhoenixControllerType, int _canID, valor::NeutralMode _mode, bool _inverted, std::string _canbus = "");
-    PhoenixController(valor::PhoenixControllerType, int _canID, valor::NeutralMode _mode, bool _inverted, units::scalar_t rotorToSensor, units::scalar_t sensorToMech, valor::PIDF pidf, std::string _canbus = "");
+    PhoenixController(valor::PhoenixControllerType, int _canID, valor::NeutralMode _mode, bool _inverted, double rotorToSensor, double sensorToMech, valor::PIDF pidf, std::string _canbus = "");
 
     static units::revolutions_per_minute_t getPhoenixControllerMotorSpeed(PhoenixControllerType controllerType)
     {
@@ -38,7 +38,7 @@ public:
         }
     }
 
-    void init(units::scalar_t rotorToSensor, units::scalar_t sensorToMech, valor::PIDF pidf);
+    void init(double rotorToSensor, double sensorToMech, valor::PIDF pidf);
     void init() override;
 
     void enableFOC(bool enableFOC);
@@ -69,8 +69,8 @@ public:
     void setForwardLimit(units::turn_t forward) override;
     void setReverseLimit(units::turn_t reverse) override;
     
-    void setGearRatios(units::scalar_t, units::scalar_t) override;
-    void setGearRatios(ctre::phoenix6::configs::FeedbackConfigs&, units::scalar_t, units::scalar_t);
+    void setGearRatios(double, double) override;
+    void setGearRatios(ctre::phoenix6::configs::FeedbackConfigs&, double, double);
 
     void setProfile(int slot) override;
 

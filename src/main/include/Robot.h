@@ -10,9 +10,9 @@
 #include "valkyrie/Gamepad.h"
 
 #include "valkyrie/drivetrain/Swerve.h"
-#include "valkyrie/sensors/CANdleSensor.h"
 
 #include "valkyrie/Auto.h"
+#include "Drivetrain.h"
 
 #include <frc/DriverStation.h>
 #include <frc/DataLogManager.h>
@@ -25,6 +25,7 @@
 class Robot : public frc::TimedRobot {
     public:
         Robot();
+        ~Robot() {}
 
         void RobotInit() override;
         void RobotPeriodic() override;
@@ -42,8 +43,7 @@ class Robot : public frc::TimedRobot {
 
         std::vector<frc2::CommandPtr> autoCommands;
 
-        valor::CANdleSensor leds;
-        valor::Swerve<4> drivetrain;
+        Drivetrain drivetrain;
         valor::Auto valorAuto;
         frc::AnalogTrigger feederBeamBreak;
         frc::AnalogTrigger stageBeamBreak;

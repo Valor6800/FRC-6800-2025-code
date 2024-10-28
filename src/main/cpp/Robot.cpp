@@ -17,8 +17,7 @@
 #define LED_COUNT 86
 #define SEGMENTS 2
 
-Robot::Robot() : 
-    leds(this, LED_COUNT, SEGMENTS, CANIDs::CANDLE, ""),
+Robot::Robot() :
     drivetrain(this),
     valorAuto(),
     feederBeamBreak(AnalogPorts::FEEDER_BEAM_BREAK_PORT),
@@ -88,16 +87,6 @@ void Robot::AutonomousExit() {
 }
 
 void Robot::AutonomousPeriodic() {
-}
-
-void Robot::TeleopInit() {
-    // drivetrain.setDriveMotorNeutralMode(valor::NeutralMode::Coast);
-    // drivetrain.teleopStart = frc::Timer::GetFPGATimestamp().to<double>();
-    // drivetrain.doubtX = TELE_DOUBTX;
-    // drivetrain.doubtY = TELE_DOUBTY;
-
-    if (autoCommands.size() > 0)
-        autoCommands.back().Cancel();
 }
 
 /**

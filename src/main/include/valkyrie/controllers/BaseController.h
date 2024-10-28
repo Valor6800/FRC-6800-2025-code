@@ -13,6 +13,11 @@
 #include <ctre/phoenix6/CANcoder.hpp>
 #include <ctre/phoenix6/CANBus.hpp>
 
+#include <units/angle.h>
+#include <units/angular_velocity.h>
+#include <units/voltage.h>
+#include <units/current.h>
+
 namespace valor {
 
 /**
@@ -249,7 +254,7 @@ public:
      * @param rotorToSensor The gear ratio from rotor to where the sensor is. Should be 1 if no external sensor
      * @param sensorToMech The gear ratio from the sensor to the mechanism's output shaft. Should be the gear ratio if no external sensor
      */
-    virtual void setGearRatios(units::scalar_t rotorToSensor, units::scalar_t sensorToMech) = 0;
+    virtual void setGearRatios(double rotorToSensor, double sensorToMech) = 0;
 
     /**
      * @brief Set which profile to use
@@ -280,14 +285,14 @@ public:
 protected:
 
     units::turns_per_second_t maxMotorSpeed;
-    units::volt_t voltageCompenstation
+    units::volt_t voltageCompenstation;
     
     T* motor;
     
     bool inverted;
     valor::NeutralMode neutralMode;
-    units::scalar_t rotorToSensor;
-    units::scalar_t sensorToMech;
+    double rotorToSensor;
+    double sensorToMech;
     T* followerMotor;
 };
 }

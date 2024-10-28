@@ -5,6 +5,7 @@
 #include "units/length.h"
 #include "units/time.h"
 #include "units/velocity.h"
+#include <frc/Timer.h>
 #include <cmath>
 #include <math.h>
 #include <span>
