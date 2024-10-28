@@ -1,7 +1,6 @@
 #pragma once
 
 #include "valkyrie/controllers/BaseController.h"
-
 #include <ctre/phoenix6/TalonFX.hpp>
 #include <string>
 #include <ctre/phoenix6/CANcoder.hpp>
@@ -17,8 +16,10 @@ const units::revolutions_per_minute_t FREE_SPD_FALCON_FOC(6080);
 namespace valor {
 
 enum PhoenixControllerType {
-    KRAKEN_FOC,
-    KRAKEN,
+    KRAKEN_X60_FOC,
+    KRAKEN_X60,
+    KRAKEN_X44_FOC,
+    KRAKEN_X44,
     FALCON_FOC,
     FALCON
 }; 
@@ -32,12 +33,20 @@ public:
     static units::revolutions_per_minute_t getPhoenixControllerMotorSpeed(PhoenixControllerType controllerType)
     {
         switch (controllerType) {
-            case KRAKEN_FOC:
-                return FREE_SPD_KRAKEN;
-            case KRAKEN:
-                return FREE_SPD_KRAKEN_FOC;
-            default:
+            case KRAKEN_X60_FOC:
+                return FREE_SPD_KRAKEN_X60_FOC;
+            case KRAKEN_X60:
+                return FREE_SPD_KRAKEN_X60;
+            case KRAKEN_X44_FOC:
+                return FREE_SPD_KRAKEN_X44_FOC;
+            case KRAKEN_X44:
+                return FREE_SPD_KRAKEN_X44;
+            case FALCON_FOC:
+                return FREE_SPD_FALCON_FOC;
+            case FALCON:
                 return FREE_SPD_FALCON;
+            default:
+                return FREE_SPD_KRAKEN_X60;
         }
     }
 
