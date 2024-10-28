@@ -1,6 +1,5 @@
 #include "valkyrie/drivetrain/Swerve.h"
 #include "valkyrie/controllers/PhoenixController.h"
-#include "valkyrie/controllers/NeoController.h"
 
 #include <frc/estimator/SwerveDrivePoseEstimator.h>
 
@@ -15,9 +14,6 @@ using namespace valor;
 // Explicit template instantiation
 // This is needed for linking
 template class valor::SwerveModule<valor::PhoenixController, valor::PhoenixController>;
-template class valor::SwerveModule<valor::NeoController, valor::NeoController>;
-template class valor::SwerveModule<valor::PhoenixController, valor::NeoController>;
-template class valor::SwerveModule<valor::NeoController, valor::PhoenixController>;
 
 template<class AzimuthMotor, class DriveMotor>
 Swerve<AzimuthMotor, DriveMotor>::Swerve(frc::TimedRobot *_robot,

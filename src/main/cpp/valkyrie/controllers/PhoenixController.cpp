@@ -137,8 +137,11 @@ void PhoenixController::setEncoderPosition(units::turn_t position)
 void PhoenixController::setupFollower(int canID, bool followerInverted)
 {
     followerMotor = new hardware::TalonFX(canID, "baseCAN");
-    followerMotor->SetInverted(followerInverted);
-    followerMotor->SetNeutralMode(signals::NeutralModeValue::Coast);
+    configs::MotorOutputConfigs config{};
+    config.Inverted = followerInverted;
+    config.NeutralMode = signals::NeutralModeValue::Coast;
+    followerMotor->GetConfigurator().Apply(config);
+
     followerMotor->SetControl(controls::StrictFollower{getMotor()->GetDeviceID()});
 }
 
@@ -178,7 +181,7 @@ void PhoenixController::setPIDF(configs::Slot0Configs & slotConfig, configs::Mot
     slotConfig.kP = pidf.P;
     slotConfig.kI = pidf.I;
     slotConfig.kD = pidf.D;
-    slotConfig.kV = voltageCompenstation / (maxMotorSpeed / (rotorToSensor * sensorToMech));
+    slotConfig.kV = voltageCompenstation.to<double>() / (maxMotorSpeed / (rotorToSensor * sensorToMech)).to<double>();
     slotConfig.kS = pidf.S;
 
     // Feedforward gain configuration
@@ -290,7 +293,7 @@ void PhoenixController::setNeutralMode(configs::MotorOutputConfigs & config, val
     neutralMode = mode;
 
     // Deadband configuration
-    config.DutyCycleNeutralDeadband = DEADBAND;
+    config.DutyCycleNeutralDeadband = DEADBAND.to<double>();
     config.Inverted = inverted;
     config.NeutralMode = neutralMode == valor::NeutralMode::Brake ?
         signals::NeutralModeValue::Brake :
@@ -311,14 +314,10 @@ void PhoenixController::setOpenLoopRamp(units::second_t time)
     getMotor()->GetConfigurator().Apply(config);
 }
 
-float PhoenixController::getRevBusUtil()
+float PhoenixController::getBusUtil(const char* canBusName)
 {
-    return CANBus::GetStatus("").BusUtilization;
-}
-
-float PhoenixController::getCANivoreBusUtil()
-{
-    return CANBus::GetStatus("baseCAN").BusUtilization;
+    // @todo Initialize a CANBus, and get utilization
+    return 0;
 }
 
 ctre::phoenix6::signals::MagnetHealthValue PhoenixController::getMagnetHealth()
@@ -374,13 +373,8 @@ void PhoenixController::InitSendable(wpi::SendableBuilder& builder)
         [this] { return cancoder ? cancoder->GetMagnetHealth().GetValue().value : -1; },
         nullptr);
     builder.AddFloatProperty(
-        "Rev CAN Bus Utilization",
-        [this] { return getRevBusUtil(); },
-        nullptr
-    );
-    builder.AddFloatProperty(
         "CANivore Bus Utilization",
-        [this] { return getCANivoreBusUtil(); },
+        [this] { return getBusUtil("baseCAN"); },
         nullptr
     );
     builder.AddBooleanProperty(
