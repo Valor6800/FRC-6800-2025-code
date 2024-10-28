@@ -1,4 +1,4 @@
-#include "valkyrie/SwerveModule.h"
+#include "valkyrie/drivetrain/SwerveModule.h"
 #include "valkyrie/controllers/PhoenixController.h"
 #include "valkyrie/controllers/NeoController.h"
 #include "Constants.h"
@@ -11,7 +11,7 @@
 
 #include <frc/RobotController.h>
 
-#define DRIVE_DEADBAND 0.05f
+const units::meters_per_second_t DRIVE_DEADBAND(0.05);
 #define MAG_ENCODER_TICKS_PER_REV 4096.0f
 
 using namespace valor;
@@ -26,13 +26,16 @@ template class valor::SwerveModule<valor::NeoController, valor::PhoenixControlle
 template<class AzimuthMotor, class DriveMotor>
 SwerveModule<AzimuthMotor, DriveMotor>::SwerveModule(AzimuthMotor* _azimuthMotor,
                                                     DriveMotor* _driveMotor,
-                                                    frc::Translation2d _wheelLocation) :
+                                                    frc::Translation2d _wheelLocation,
+                                                    units::meter_t wheelDiameter) :
     azimuthMotor(_azimuthMotor),
     driveMotor(_driveMotor)
 {
-    if (_wheelLocation.X() > units::meter_t{0} && _wheelLocation.Y() > units::meter_t{0}) wheelIdx = 0;
-    else if (_wheelLocation.X() > units::meter_t{0} && _wheelLocation.Y() < units::meter_t{0}) wheelIdx = 1;
-    else if (_wheelLocation.X() < units::meter_t{0} && _wheelLocation.Y() > units::meter_t{0}) wheelIdx = 3;
+    meters_per_turn = M_PI * wheelDiameter;
+
+    if (_wheelLocation.X() > 0_m && _wheelLocation.Y() > 0_m) wheelIdx = 0;
+    else if (_wheelLocation.X() > 0_m && _wheelLocation.Y() < 0_m) wheelIdx = 1;
+    else if (_wheelLocation.X() < 0_m && _wheelLocation.Y() > 0_m) wheelIdx = 3;
     else wheelIdx = 2;
 
     wpi::SendableRegistry::AddLW(this, "SwerveModule", "Module " + std::to_string(wheelIdx));
@@ -40,17 +43,39 @@ SwerveModule<AzimuthMotor, DriveMotor>::SwerveModule(AzimuthMotor* _azimuthMotor
 }
 
 template<class AzimuthMotor, class DriveMotor>
+frc::Rotation2d SwerveModule<AzimuthMotor, DriveMotor>::getAzimuthPosition()
+{
+    return frc::Rotation2d{azimuthMotor->getPosition()};
+}
+
+template<class AzimuthMotor, class DriveMotor>
+units::meter_t SwerveModule<AzimuthMotor, DriveMotor>::getDrivePosition()
+{
+    return driveMotor->getPosition() * meters_per_turn;
+}
+
+template<class AzimuthMotor, class DriveMotor>
+units::meters_per_second_t SwerveModule<AzimuthMotor, DriveMotor>::getDriveSpeed()
+{
+    return driveMotor->getSpeed() * meters_per_turn;
+}
+
+template<class AzimuthMotor, class DriveMotor>
+units::meters_per_second_t SwerveModule<AzimuthMotor, DriveMotor>::getMaxDriveSpeed()
+{
+    return driveMotor->getMaxMotorSpeed() * meters_per_turn;
+}
+
+template<class AzimuthMotor, class DriveMotor>
 frc::SwerveModulePosition SwerveModule<AzimuthMotor, DriveMotor>::getModulePosition()
 {
-    return { units::meter_t{ driveMotor->getPosition() },
-             getAzimuthPosition()
-    };
+    return { getDrivePosition(), getAzimuthPosition()};
 }
 
 template<class AzimuthMotor, class DriveMotor>
 frc::SwerveModuleState SwerveModule<AzimuthMotor, DriveMotor>::getState()
 {
-    return frc::SwerveModuleState{units::velocity::meters_per_second_t{driveMotor->getSpeed()}, getAzimuthPosition()};
+    return frc::SwerveModuleState{getDriveSpeed(), getAzimuthPosition()};
 }
 
 template<class AzimuthMotor, class DriveMotor>
@@ -58,8 +83,8 @@ void SwerveModule<AzimuthMotor, DriveMotor>::setDesiredState(frc::SwerveModuleSt
 {
 
     // Deadband
-    if (desiredState.speed < units::velocity::meters_per_second_t{DRIVE_DEADBAND}) {
-        setDriveOpenLoop(0);
+    if (desiredState.speed < DRIVE_DEADBAND) {
+        setDriveOpenLoop(0_mps);
         return;
     }
 
@@ -70,9 +95,9 @@ void SwerveModule<AzimuthMotor, DriveMotor>::setDesiredState(frc::SwerveModuleSt
     // Output optimized rotation and speed
     setAzimuthPosition(optimizedState.angle);
     if (isDriveOpenLoop)
-        setDriveOpenLoop(optimizedState.speed.to<double>());
+        setDriveOpenLoop(optimizedState.speed);
     else
-        setDriveClosedLoop(optimizedState.speed.to<double>());
+        setDriveClosedLoop(optimizedState.speed);
 }
 
 template<class AzimuthMotor, class DriveMotor>
@@ -82,18 +107,18 @@ void SwerveModule<AzimuthMotor, DriveMotor>::resetDriveEncoder()
 }
 
 template<class AzimuthMotor, class DriveMotor>
-bool SwerveModule<AzimuthMotor, DriveMotor>::loadAndSetAzimuthZeroReference(std::vector<double> offsets)
+bool SwerveModule<AzimuthMotor, DriveMotor>::loadAndSetAzimuthZeroReference(std::vector<units::turn_t> offsets)
 {
     // Read the encoder position. If the encoder position isn't returned, set the position to what the wheels
     //   are currently. The pit crew sets the wheels straight in pre-match setup. They should be close enough
     //   if the mag encoders aren't working.
     //   Protects against issues as seen in: https://www.youtube.com/watch?v=MGxpWNcv-VM
-    double currPos = getMagEncoderCount();
-    if (currPos == 0) {
+    units::turn_t currPos = getMagEncoderCount();
+    if (currPos == 0_tr) {
         return false;
     }
 
-    double storedPos = 0.0;
+    units::turn_t storedPos = 0_tr;
 
     if (wheelIdx >= 0 && wheelIdx <= 3){
         storedPos = offsets[wheelIdx];
@@ -105,21 +130,14 @@ bool SwerveModule<AzimuthMotor, DriveMotor>::loadAndSetAzimuthZeroReference(std:
 }
 
 template<class AzimuthMotor, class DriveMotor>
-double SwerveModule<AzimuthMotor, DriveMotor>::getMagEncoderCount()
+units::turn_t SwerveModule<AzimuthMotor, DriveMotor>::getMagEncoderCount()
 {
-    double readValue = azimuthMotor->getAbsEncoderPosition();
+    units::turn_t readValue = azimuthMotor->getAbsEncoderPosition();
     if (initialMagEncoderValue == 0 && readValue != 0)
         initialMagEncoderValue = readValue;
     if (readValue != initialMagEncoderValue)
         return readValue;
-    return 0;
-}
-
-template<class AzimuthMotor, class DriveMotor>
-frc::Rotation2d SwerveModule<AzimuthMotor, DriveMotor>::getAzimuthPosition()
-{
-    double radians = azimuthMotor->getPosition() * (2.0 * M_PI);
-    return frc::Rotation2d{units::radian_t{radians}};
+    return 0_tr;
 }
 
 // The angle coming in is an optimized angle. No further calcs should be done on 'angle'
@@ -127,39 +145,22 @@ template<class AzimuthMotor, class DriveMotor>
 void SwerveModule<AzimuthMotor, DriveMotor>::setAzimuthPosition(frc::Rotation2d desiredAngle)
 {
     frc::Rotation2d currentAngle = getAzimuthPosition();
-    double currentRotations = currentAngle.Radians().to<double>() / (2.0 * M_PI);
-
     frc::Rotation2d deltaAngle = desiredAngle - currentAngle;
-    double deltaRotations = deltaAngle.Radians().to<double>() / (2.0 * M_PI);
-    if (deltaRotations > 1)
-    {
-        deltaRotations = fmod(deltaRotations, 1.0);
-        if (deltaRotations > .5)
-        {
-            deltaRotations -= 1;
-        }
-    }
-    else if (deltaRotations < -1)
-    {
-        deltaRotations = fmod(deltaRotations, -1.0);
-        if (deltaRotations < -.5)
-        {
-            deltaRotations += 1;
-        }
-    }
-    azimuthMotor->setPosition(currentRotations + deltaRotations);
+    units::turn_t deltaRotations = deltaAngle.Radians() / (2.0 * M_PI);
+    units::turn_t desiredRotations = currentAngle.Radians() / (2.0 * M_PI) + deltaRotations
+    azimuthMotor->setPosition(desiredRotations);
 }
 
 template<class AzimuthMotor, class DriveMotor>
-void SwerveModule<AzimuthMotor, DriveMotor>::setDriveOpenLoop(double mps)
+void SwerveModule<AzimuthMotor, DriveMotor>::setDriveOpenLoop(units::meters_per_second_t mps)
 {
-    driveMotor->setPower(mps / maxSpeed);
+    driveMotor->setPower((mps / getMaxDriveSpeed()) * 12_v);
 }
 
 template<class AzimuthMotor, class DriveMotor>
-void SwerveModule<AzimuthMotor, DriveMotor>::setDriveClosedLoop(double mps)
+void SwerveModule<AzimuthMotor, DriveMotor>::setDriveClosedLoop(units::meters_per_second_t speed)
 {
-    driveMotor->setSpeed(mps);
+    driveMotor->setSpeed(speed / meters_per_turn);
 }
 
 template<class AzimuthMotor, class DriveMotor>

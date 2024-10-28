@@ -30,7 +30,16 @@ public:
 
     SwerveModule(AzimuthMotor* _azimuthMotor,
                 DriveMotor* _driveMotor,
-                frc::Translation2d _wheelLocation);
+                frc::Translation2d _wheelLocation,
+                units::meter_t wheelDiameter
+    );
+
+    frc::Rotation2d getAzimuthPosition();
+
+    units::meter_t getDrivePosition();
+
+    units::meters_per_second_t getDriveSpeed();
+    units::meters_per_second_t getMaxDriveSpeed();
 
     frc::SwerveModulePosition getModulePosition();
 
@@ -56,11 +65,6 @@ public:
         setDesiredState(desiredState, false);
     }
 
-    void setMaxSpeed(double _maxSpeed)
-    {
-        maxSpeed = _maxSpeed;
-    }
-
     /**
      * Resets the drive encoders to currently read a position of 0
      */
@@ -76,9 +80,7 @@ public:
      * Loads the current azimuth absolute encoder reference position and sets selected sensor encoder
      * @return if the mag encoder was successfully 
      */
-    bool loadAndSetAzimuthZeroReference(std::vector<double> offsets);
-
-    frc::Rotation2d getAzimuthPosition();
+    bool loadAndSetAzimuthZeroReference(std::vector<units::turn_t> offsets);
 
     void setAzimuthPosition(frc::Rotation2d angle);
 
@@ -90,18 +92,17 @@ private:
      * Get the encoder position reported by the mag encoder
      * @return encoder position reported by the mag encoder
      */
-    double getMagEncoderCount();
+    units::turn_t getMagEncoderCount();
 
-    double maxSpeed;
-
-    void setDriveOpenLoop(double mps);
-
-    void setDriveClosedLoop(double mps);
+    void setDriveOpenLoop(units::meters_per_second_t mps);
+    void setDriveClosedLoop(units::meters_per_second_t mps);
 
     AzimuthMotor* azimuthMotor;
     DriveMotor* driveMotor;
 
     int wheelIdx;
-    double initialMagEncoderValue;
+    units::turn_t initialMagEncoderValue;
+    units::scalar_t meters_per_turn;
+
 };
 }

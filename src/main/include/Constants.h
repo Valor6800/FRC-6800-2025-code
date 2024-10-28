@@ -98,19 +98,10 @@ namespace Constants {
         Because GetTeamNumber isn't static, team number can't be static, and therefore none of the getters can be static either. 
         */
         static int teamNumber = frc::RobotController::GetTeamNumber();;
-        // void getMacAddress(){
-        //     std::vector<std::string> v = cs::GetNetworkInterfaces();
-        //     nt::NetworkTableInstance::GetDefault().GetTable("constants maybe")
-        // }
 
         static bool roughTowardsRedAllianceWall = true;
         static double carpetGrainMultipler = 1.05;
 
-        static double shooterPivotOffset(){ switch (teamNumber) {
-            case ALPHA_TEAM_NUMBER: return 0;
-            case SIDE_SWIPE_TEAM_NUMBER: return 0;
-            default: return 51.9;
-        }};
         static units::degree_t pigeonMountPitch(){ switch (teamNumber){ 
             case ALPHA_TEAM_NUMBER: return 0_deg; 
             case SIDE_SWIPE_TEAM_NUMBER: return 0_deg;  
@@ -127,12 +118,21 @@ namespace Constants {
             default: return -90.230049133_deg; 
         }};
 
-        static std::vector<double> swerveZeros(){ switch (teamNumber){
-            case ALPHA_TEAM_NUMBER: return {0.3867, 0.8890, 0.0763, 0.610};
-            case SIDE_SWIPE_TEAM_NUMBER: return {0.3106, 0.4369, 0.4780, 0.7372};
-            default: return  {0.4240722, .85498046875, 0.471924, 0.081299}; // 0.86669921875 {0.4240722, 0.857666, 0.471924, 0.078125};
+        static std::vector<units::turn_t> swerveZeros(){ switch (teamNumber){
+            case ALPHA_TEAM_NUMBER: return {0.3867_tr, 0.8890_tr, 0.0763_tr, 0.610_tr};
+            case SIDE_SWIPE_TEAM_NUMBER: return {0.3106_tr, 0.4369_tr, 0.4780_tr, 0.7372_tr};
+            default: return {0.4240722_tr, 0.85498046875_tr, 0.471924_tr, 0.081299_tr};
         }};
-
+        static units::scalar_t driveGearRatio(){ switch (teamNumber){
+            case ALPHA_TEAM_NUMBER: return 5.51f;
+            case SIDE_SWIPE_TEAM_NUMBER: return 5.51f;
+            default: return 5.51f;
+        }};
+        static units::scalar_t azimuthGearRatio(){ switch (teamNumber){
+            case ALPHA_TEAM_NUMBER: return 13.37f;
+            case SIDE_SWIPE_TEAM_NUMBER: return 13.37f;
+            default: return 13.37f;
+        }};
         static units::meter_t moduleDiff(){ switch (teamNumber){
             case ALPHA_TEAM_NUMBER: return 0.2413_m;
             case SIDE_SWIPE_TEAM_NUMBER: return 0.2_m;
@@ -160,15 +160,15 @@ namespace Constants {
             case SIDE_SWIPE_TEAM_NUMBER: return 0.00001;
             default: return 100.0;
         }};
-        static double azimuthKVel(){ switch (teamNumber) {
-            case ALPHA_TEAM_NUMBER: return 6.983;
-            case SIDE_SWIPE_TEAM_NUMBER: return 6.983;
-            default: return 7.9;
+        static units::turns_per_second_t azimuthKVel(){ switch (teamNumber) {
+            case ALPHA_TEAM_NUMBER: return 6.983_tps;
+            case SIDE_SWIPE_TEAM_NUMBER: return 6.983_tps;
+            default: return 7.9_tps;
         }};
-        static double azimuthKAcc(){ switch (teamNumber) {
-            case ALPHA_TEAM_NUMBER: return 200.0;
-            case SIDE_SWIPE_TEAM_NUMBER: return 200.0;
-            default: return 1000.0;
+        static units::turns_per_second_squared_t azimuthKAcc() { switch (teamNumber) {
+            case ALPHA_TEAM_NUMBER: return 200_tr_per_s_sq;
+            case SIDE_SWIPE_TEAM_NUMBER: return 200_tr_per_s_sq;
+            default: return 1000_tr_per_s_sq;
         }};
 
         static double driveKP(){ switch (teamNumber) {
@@ -176,15 +176,15 @@ namespace Constants {
             case SIDE_SWIPE_TEAM_NUMBER: return 0.00001;
             default: return 5.0;
         }};
-        static double driveKVel(){ switch (teamNumber) {
-            case ALPHA_TEAM_NUMBER: return 6.0;
-            case SIDE_SWIPE_TEAM_NUMBER: return 6.0;
-            default: return 5.36;
+        static units::meters_per_second_t driveKVel(){ switch (teamNumber) {
+            case ALPHA_TEAM_NUMBER: return 6_mps;
+            case SIDE_SWIPE_TEAM_NUMBER: return 6_mps;
+            default: return 5.36_mps;
         }};
-        static double driveKAcc(){ switch (teamNumber) {
-            case ALPHA_TEAM_NUMBER: return 120.0;
-            case SIDE_SWIPE_TEAM_NUMBER: return 120.0;
-            default: return 100.0;
+        static units::meters_per_second_squared_t driveKAcc(){ switch (teamNumber) {
+            case ALPHA_TEAM_NUMBER: return 120_mps_sq;
+            case SIDE_SWIPE_TEAM_NUMBER: return 120_mps_sq;
+            default: return 100_mps_sq;
         }};
 
         static frc::Pose3d mintCameraPosition(){ switch (teamNumber) {
