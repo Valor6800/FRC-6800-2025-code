@@ -7,9 +7,12 @@
 #include <ctre/phoenix6/CANcoder.hpp>
 #include <ctre/phoenix6/CANBus.hpp>
 
-const units::revolutions_per_minute_t FREE_SPD_KRAKEN(5800);
-const units::revolutions_per_minute_t FREE_SPD_KRAKEN_FOC(6000);
+const units::revolutions_per_minute_t FREE_SPD_KRAKEN_X60(6000);
+const units::revolutions_per_minute_t FREE_SPD_KRAKEN_X60_FOC(5800);
+const units::revolutions_per_minute_t FREE_SPD_KRAKEN_X44(7530);
+const units::revolutions_per_minute_t FREE_SPD_KRAKEN_X44_FOC(7530);
 const units::revolutions_per_minute_t FREE_SPD_FALCON(6380);
+const units::revolutions_per_minute_t FREE_SPD_FALCON_FOC(6080);
 
 namespace valor {
 
