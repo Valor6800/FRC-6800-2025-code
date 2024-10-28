@@ -10,15 +10,15 @@
 #include <cmath>
 #include <iostream>
 #include <frc/RobotController.h>
-#include "frc/geometry/Rotation3d.h"
-#include "units/angle.h"
-#include "units/length.h"
-#include "units/angular_acceleration.h"
+#include <frc/geometry/Rotation3d.h>
+#include <units/angle.h>
+#include <units/length.h>
+#include <units/angular_acceleration.h>
 #include <string>
 #include <vector>
 #include <cscore.h>
 #include <frc/geometry/Pose3d.h>
-#include "networktables/NetworkTable.h"
+#include <networktables/NetworkTable.h>
 
 
 #define ALPHA_TEAM_NUMBER 6801
@@ -211,26 +211,6 @@ namespace Constants {
                 }
             };
         }};
-
-        /* Back Front Camera Mount
-         * 
-         * x: -1_in
-         * y: +0.675_in
-         * z: 23.0675_in
-         * yaw: -180_deg
-         * pitch: 32.3_deg
-         * roll: 0_deg
-         */
-
-        /* Top Front Camera Mount
-         * 
-         * x: 4_in
-         * y: -3.5_in
-         * z: 21.75_in
-         * yaw: 0_deg
-         * pitch: 32.7_deg
-         * roll: 0_deg
-         */
 
         static frc::Pose3d vanillaCameraPosition(){ switch (teamNumber) {
             case ALPHA_TEAM_NUMBER: return frc::Pose3d();
