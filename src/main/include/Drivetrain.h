@@ -40,7 +40,6 @@
 #include <frc/TimedRobot.h>
 #include <frc2/command/FunctionalCommand.h>
 
-#include <rev/CANSparkMax.h>
 #include <ctre/phoenix6/Pigeon2.hpp>
 
 #define SWERVE_COUNT 4

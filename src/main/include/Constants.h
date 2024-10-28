@@ -13,7 +13,10 @@
 #include <frc/geometry/Rotation3d.h>
 #include <units/angle.h>
 #include <units/length.h>
+#include <units/angular_velocity.h>
 #include <units/angular_acceleration.h>
+#include <units/velocity.h>
+#include <units/acceleration.h>
 #include <string>
 #include <vector>
 #include <cscore.h>

@@ -4,6 +4,8 @@
 #include <ctre/phoenix6/Pigeon2.hpp>
 #include <frc/geometry/Pose2d.h>
 #include <frc/kinematics/ChassisSpeeds.h>
+#include <frc/kinematics/SwerveDriveKinematics.h>
+#include <frc/estimator/SwerveDrivePoseEstimator.h>
 
 #include "valkyrie/BaseSubsystem.h"
 #include "valkyrie/drivetrain/SwerveModule.h"
@@ -50,9 +52,6 @@ public:
     void resetOdometry(frc::Pose2d pose);
     void resetEncoders();
 
-    void setXMode();
-    frc2::InstantCommand* cmd_XMode();
-
     wpi::array<frc::SwerveModulePosition, MODULE_COUNT> getModuleStates();
 
     /**
@@ -74,9 +73,9 @@ public:
     void InitSendable(wpi::SendableBuilder& builder) override;
 
 protected:
-    units::scalar_t xSpeed;
-    units::scalar_t ySpeed;
-    units::scalar_t rotSpeed;
+    double xSpeed;
+    double ySpeed;
+    double rotSpeed;
 
     units::meters_per_second_t xSpeedMPS;
     units::meters_per_second_t ySpeedMPS;
@@ -93,14 +92,14 @@ protected:
     bool lockingToTarget;
     units::degree_t targetAngle;
 
-    void useCarpetGrain(units::scalar_t grainMultiplier, bool roughTowardsRed);
+    void enableCarpetGrain(double grainMultiplier, bool roughTowardsRed);
     
     frc::ChassisSpeeds getRobotRelativeSpeeds();
     void setSwerveDesiredState(wpi::array<frc::SwerveModuleState, MODULE_COUNT> desiredStates, bool isDriveOpenLoop);
 
 private:
 
-    std::vector<valor::SwerveModule<SwerveAzimuthMotor, SwerveDriveMotor> *> swerveModules;
+    std::vector<valor::SwerveModule<AzimuthMotor, DriveMotor> *> swerveModules;
 
     wpi::array<frc::SwerveModuleState, MODULE_COUNT> getModuleStates(units::velocity::meters_per_second_t,
                                                                     units::velocity::meters_per_second_t,
@@ -111,7 +110,7 @@ private:
     double _drivetrain_accel;
 
     bool useCarpetGrain;
-    units::scalar_t carpetGrainMultiplier;
+    double carpetGrainMultiplier;
     bool roughTowardsRed;
     void calculateCarpetPose();
 };

@@ -2,6 +2,7 @@
 #include "valkyrie/controllers/PhoenixController.h"
 
 #include <frc/estimator/SwerveDrivePoseEstimator.h>
+#include <frc/DriverStation.h>
 
 #define MODULE_DIFF_XS {1, 1, -1, -1}
 #define MODULE_DIFF_YS {1, -1, -1, 1}
@@ -24,27 +25,26 @@ Swerve<AzimuthMotor, DriveMotor>::Swerve(frc::TimedRobot *_robot,
 ) : valor::BaseSubsystem(_robot, _name), useCarpetGrain(false), lockingToTarget(false)
 {
     frc2::CommandScheduler::GetInstance().RegisterSubsystem(this);
-    rawEstimator = std::make_unique<frc::SwerveDrivePoseEstimator<MODULE_COUNT>>();
-    calcEstimator = std::make_unique<frc::SwerveDrivePoseEstimator<MODULE_COUNT>>();
 
     int MDX[] = MODULE_DIFF_XS;
     int MDY[] = MODULE_DIFF_YS;
+    wpi::array<frc::Translation2d, MODULE_COUNT> motorLocations;
     for (size_t i = 0; i < MODULE_COUNT; i++) {
-        auto location = frc::Translation2d{_module_radius * MDX[i], _module_radius * MDY[i]};
-        swerveModules.push_back(new valor::SwerveModule<SwerveAzimuthMotor, SwerveDriveMotor>(
+        motorLocations[i] = frc::Translation2d{_module_radius * MDX[i], _module_radius * MDY[i]};
+        swerveModules.push_back(new valor::SwerveModule<AzimuthMotor, DriveMotor>(
             modules[i].first,
             modules[i].second,
-            location,
-            _wheelDiameter,
+            motorLocations[i],
+            _wheelDiameter
         ));
     }
 
     maxDriveSpeed = modules[0].first->getMaxDriveSpeed();
     maxRotationSpeed = modules[0].second->getMaxDriveSpeed() / _module_radius;
 
-    kinematics = new frc::SwerveDriveKinematics<SWERVE_COUNT>(motorLocations);
-    estimator = new frc::SwerveDrivePoseEstimator<SWERVE_COUNT>(*kinematics, getGyro(), getModuleStates(), frc::Pose2d{0_m, 0_m, 0_rad});
-    calculatedEstimator = new frc::SwerveDrivePoseEstimator<SWERVE_COUNT>(*kinematics, getGyro(), getModuleStates(), frc::Pose2d{0_m, 0_m, 0_rad});
+    kinematics = new frc::SwerveDriveKinematics<MODULE_COUNT>(motorLocations);
+    rawEstimator = new frc::SwerveDrivePoseEstimator<MODULE_COUNT>(*kinematics, getGyro(), getModuleStates(), frc::Pose2d{0_m, 0_m, 0_rad});
+    calcEstimator = new frc::SwerveDrivePoseEstimator<MODULE_COUNT>(*kinematics, getGyro(), getModuleStates(), frc::Pose2d{0_m, 0_m, 0_rad});
 
     resetState();
 }
@@ -58,7 +58,7 @@ Swerve<AzimuthMotor, DriveMotor>::~Swerve()
     }
 
     rawEstimator.release();
-    calculatedEstimator.release();
+    calcEstimator.release();
 }
 
 template<class AzimuthMotor, class DriveMotor>
@@ -93,7 +93,7 @@ void Swerve<AzimuthMotor, DriveMotor>::analyzeDashboard()
     // Rotational Speed calculations
     if (lockingToTarget) {
         units::radian_t robotRotation = getCalculatedPose().Rotation().Radians();
-        units::radian_t errorAngle = robotRotation - units::unit_cast<units::radian_t>(targetAngle);
+        units::radian_t errorAngle = robotRotation - targetAngle;
         units::radian_t error = units::math::fmod(errorAngle + units::radian_t(M_PI), 2 * units::radian_t(M_PI)) - units::radian_t(M_PI);
         static units::radian_t prevError = error;
         rotSpeedRPS = error * KP_ROTATE * maxRotationSpeed + (error - prevError) * KD_ROTATE;
@@ -180,7 +180,7 @@ void Swerve<AzimuthMotor, DriveMotor>::resetEncoders()
 }
 
 template<class AzimuthMotor, class DriveMotor>
-void useCarpetGrain(units::scalar_t _grainMultiplier, bool _roughTowardsRed)
+void Swerve<AzimuthMotor, DriveMotor>::enableCarpetGrain(double _grainMultiplier, bool _roughTowardsRed)
 {
     carpetGrainMultiplier = _grainMultiplier;
     roughTowardsRed = _roughTowardsRed;
@@ -193,7 +193,7 @@ void  Swerve<AzimuthMotor, DriveMotor>::calculateCarpetPose()
     static frc::Pose2d previousPose;
     frc::Pose2d newPose = calcEstimator->GetEstimatedPosition();
     units::meter_t deltaX = newPose.X() - previousPose.X();
-    units::scalar_t factor = 1.0;
+    double factor = 1.0;
     if (roughTowardsRed) {
         factor = deltaX < 0_m ? carpetGrainMultiplier : 1;
     } else {
@@ -288,25 +288,8 @@ template<class AzimuthMotor, class DriveMotor>
 wpi::array<frc::SwerveModuleState, MODULE_COUNT> Swerve<AzimuthMotor, DriveMotor>::getModuleStates(frc::ChassisSpeeds chassisSpeeds)
 {
     auto states = kinematics->ToSwerveModuleStates(chassisSpeeds);
-    kinematics->DesaturateWheelSpeeds(&states, units::velocity::meters_per_second_t{driveMaxSpeed});
+    kinematics->DesaturateWheelSpeeds(&states, maxDriveSpeed);
     return states;
-}
-
-template<class AzimuthMotor, class DriveMotor>
-void Swerve<AzimuthMotor, DriveMotor>::setXMode(){
-    drive(0_mps, 0_mps, 0_rad_per_s, true);
-    azimuthControllers[0]->setPosition(std::round(azimuthControllers[0]->getPosition()) + 0.125);
-    azimuthControllers[1]->setPosition(std::round(azimuthControllers[1]->getPosition()) + 0.375);
-    azimuthControllers[2]->setPosition(std::round(azimuthControllers[2]->getPosition()) - 0.375);
-    azimuthControllers[3]->setPosition(std::round(azimuthControllers[3]->getPosition()) - 0.125);
-}
-
-template<class AzimuthMotor, class DriveMotor>
-frc2::InstantCommand* Swerve<AzimuthMotor, DriveMotor>::cmd_XMode()
-{
-    return new frc2::InstantCommand([&] {
-        setXMode();
-    });
 }
 
 template<class AzimuthMotor, class DriveMotor>
@@ -345,17 +328,17 @@ void Swerve<AzimuthMotor, DriveMotor>::InitSendable(wpi::SendableBuilder& builde
     );
     builder.AddDoubleProperty(
         "Actual Raw Pose X",
-        [this] { return getRawPose().X().to<double>(); },
+        [this] { return getRawPose().X().template to<double>(); },
         nullptr
     );
     builder.AddDoubleProperty(
         "Actual Raw Pose Y",
-        [this] { return getRawPose().Y().to<double>(); },
+        [this] { return getRawPose().Y().template to<double>(); },
         nullptr
     );
     builder.AddDoubleProperty(
         "Actual Raw Pose Theta",
-        [this] { return getRawPose().Rotation().Degrees().to<double>(); },
+        [this] { return getRawPose().Rotation().Degrees().template to<double>(); },
         nullptr
     );
     builder.AddDoubleArrayProperty(
@@ -363,26 +346,26 @@ void Swerve<AzimuthMotor, DriveMotor>::InitSendable(wpi::SendableBuilder& builde
         [this] 
         { 
             std::vector<double> pose;
-            pose.push_back(getRawPose().X().to<double>());
-            pose.push_back(getRawPose().Y().to<double>());
-            pose.push_back(getRawPose().Rotation().Radians().to<double>());
+            pose.push_back(getRawPose().X().template to<double>());
+            pose.push_back(getRawPose().Y().template to<double>());
+            pose.push_back(getRawPose().Rotation().Radians().template to<double>());
             return pose;
         },
         nullptr
     );
     builder.AddDoubleProperty(
         "Actual Calculated Pose X",
-        [this] { return getCalculatedPose().X().to<double>(); },
+        [this] { return getCalculatedPose().X().template to<double>(); },
         nullptr
     );
     builder.AddDoubleProperty(
         "Actual Calculated Pose Y",
-        [this] { return getCalculatedPose().Y().to<double>(); },
+        [this] { return getCalculatedPose().Y().template to<double>(); },
         nullptr
     );
     builder.AddDoubleProperty(
         "Actual Calculated Pose Theta",
-        [this] { return getCalculatedPose().Rotation().Degrees().to<double>(); },
+        [this] { return getCalculatedPose().Rotation().Degrees().template to<double>(); },
         nullptr
     );
     builder.AddDoubleArrayProperty(
@@ -390,9 +373,9 @@ void Swerve<AzimuthMotor, DriveMotor>::InitSendable(wpi::SendableBuilder& builde
         [this] 
         { 
             std::vector<double> pose;
-            pose.push_back(getCalculatedPose().X().to<double>());
-            pose.push_back(getCalculatedPose().Y().to<double>());
-            pose.push_back(getCalculatedPose().Rotation().Radians().to<double>());
+            pose.push_back(getCalculatedPose().X().template to<double>());
+            pose.push_back(getCalculatedPose().Y().template to<double>());
+            pose.push_back(getCalculatedPose().Rotation().Radians().template to<double>());
             return pose;
         },
         nullptr
@@ -436,14 +419,14 @@ void Swerve<AzimuthMotor, DriveMotor>::InitSendable(wpi::SendableBuilder& builde
         [this] 
         { 
             std::vector<double> states;
-            states.push_back(swerveModules[0]->getState().angle.Degrees().to<double>());
-            states.push_back(swerveModules[0]->getState().speed.to<double>());
-            states.push_back(swerveModules[1]->getState().angle.Degrees().to<double>());
-            states.push_back(swerveModules[1]->getState().speed.to<double>());
-            states.push_back(swerveModules[2]->getState().angle.Degrees().to<double>());
-            states.push_back(swerveModules[2]->getState().speed.to<double>());
-            states.push_back(swerveModules[3]->getState().angle.Degrees().to<double>());
-            states.push_back(swerveModules[3]->getState().speed.to<double>());
+            states.push_back(swerveModules[0]->getState().angle.Degrees().template to<double>());
+            states.push_back(swerveModules[0]->getState().speed.template to<double>());
+            states.push_back(swerveModules[1]->getState().angle.Degrees().template to<double>());
+            states.push_back(swerveModules[1]->getState().speed.template to<double>());
+            states.push_back(swerveModules[2]->getState().angle.Degrees().template to<double>());
+            states.push_back(swerveModules[2]->getState().speed.template to<double>());
+            states.push_back(swerveModules[3]->getState().angle.Degrees().template to<double>());
+            states.push_back(swerveModules[3]->getState().speed.template to<double>());
             return states;
         },
         nullptr
@@ -453,8 +436,8 @@ void Swerve<AzimuthMotor, DriveMotor>::InitSendable(wpi::SendableBuilder& builde
         [this]
         {
             std::vector<double> states;
-            states.push_back(getRobotRelativeSpeeds().vx.to<double>());
-            states.push_back(getRobotRelativeSpeeds().vy.to<double>());
+            states.push_back(getRobotRelativeSpeeds().vx.template to<double>());
+            states.push_back(getRobotRelativeSpeeds().vy.template to<double>());
             return states;
         },
         nullptr
