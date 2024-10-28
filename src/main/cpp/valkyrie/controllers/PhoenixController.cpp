@@ -117,6 +117,7 @@ void PhoenixController::setupCANCoder(int deviceId, units::turn_t offset, bool c
 void PhoenixController::applyConfig()
 {
     //used to apply current config to pheonix device
+    //new comment
 }
 
 units::turn_t PhoenixController::getCANCoder()
