@@ -4,9 +4,6 @@
 #include <iostream>
 #include <math.h>
 #include <pathplanner/lib/auto/AutoBuilder.h>
-#include <pathplanner/lib/util/HolonomicPathFollowerConfig.h>
-#include <pathplanner/lib/util/PIDConstants.h>
-#include <pathplanner/lib/util/ReplanningConfig.h>
 #include <string>
 #include "Constants.h"
 #include "frc2/command/FunctionalCommand.h"
@@ -98,7 +95,7 @@ Drivetrain::Drivetrain(frc::TimedRobot *_robot) :
     /*
      * 3.8m/s, 5m/s^2, ~125lbs Apr. 2
      */
-    AutoBuilder::configureHolonomic(
+    /*AutoBuilder::configureHolonomic(
         [this]() { 
             if (state.useCalculatedEstimator)
                 return getCalculatedPose();
@@ -139,7 +136,7 @@ Drivetrain::Drivetrain(frc::TimedRobot *_robot) :
     pathplanner::NamedCommands::registerCommand("Reset gyro", std::move(
         frc2::InstantCommand([this]() { resetGyro(); })
     ).ToPtr());
-
+*/
     resetState();
 }
 
