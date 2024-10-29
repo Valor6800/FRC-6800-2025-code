@@ -2,19 +2,20 @@
 #include "valkyrie/controllers/PhoenixController.h"
 
 #include <frc/estimator/SwerveDrivePoseEstimator.h>
+#include <frc/geometry/Translation2d.h>
 #include <frc/DriverStation.h>
 
 #define MODULE_DIFF_XS {1, 1, -1, -1}
 #define MODULE_DIFF_YS {1, -1, -1, 1}
 
-#define KP_ROTATE -1.4f
-#define KD_ROTATE -30.0f
+const units::hertz_t KP_ROTATE(-90);
+const units::hertz_t KD_ROTATE(-30);
 
 using namespace valor;
 
 // Explicit template instantiation
 // This is needed for linking
-template class valor::SwerveModule<valor::PhoenixController, valor::PhoenixController>;
+template class valor::Swerve<valor::PhoenixController, valor::PhoenixController>;
 
 template<class AzimuthMotor, class DriveMotor>
 Swerve<AzimuthMotor, DriveMotor>::Swerve(frc::TimedRobot *_robot,
@@ -22,13 +23,13 @@ Swerve<AzimuthMotor, DriveMotor>::Swerve(frc::TimedRobot *_robot,
     std::vector<std::pair<AzimuthMotor*, DriveMotor*>> modules,
     units::meter_t _module_radius,
     units::meter_t _wheelDiameter
-) : valor::BaseSubsystem(_robot, _name), useCarpetGrain(false), lockingToTarget(false)
+) : valor::BaseSubsystem(_robot, _name), lockingToTarget(false), useCarpetGrain(false)
 {
     frc2::CommandScheduler::GetInstance().RegisterSubsystem(this);
 
     int MDX[] = MODULE_DIFF_XS;
     int MDY[] = MODULE_DIFF_YS;
-    wpi::array<frc::Translation2d, MODULE_COUNT> motorLocations;
+    wpi::array<frc::Translation2d, MODULE_COUNT> motorLocations = wpi::array<frc::Translation2d, MODULE_COUNT>(wpi::empty_array);
     for (size_t i = 0; i < MODULE_COUNT; i++) {
         motorLocations[i] = frc::Translation2d{_module_radius * MDX[i], _module_radius * MDY[i]};
         swerveModules.push_back(new valor::SwerveModule<AzimuthMotor, DriveMotor>(
@@ -39,12 +40,12 @@ Swerve<AzimuthMotor, DriveMotor>::Swerve(frc::TimedRobot *_robot,
         ));
     }
 
-    maxDriveSpeed = modules[0].first->getMaxDriveSpeed();
-    maxRotationSpeed = modules[0].second->getMaxDriveSpeed() / _module_radius;
+    maxDriveSpeed = swerveModules[0]->getMaxDriveSpeed();
+    maxRotationSpeed = units::radian_t{2.0 * M_PI} * swerveModules[0]->getMaxDriveSpeed() / _module_radius;
 
-    kinematics = new frc::SwerveDriveKinematics<MODULE_COUNT>(motorLocations);
-    rawEstimator = new frc::SwerveDrivePoseEstimator<MODULE_COUNT>(*kinematics, getGyro(), getModuleStates(), frc::Pose2d{0_m, 0_m, 0_rad});
-    calcEstimator = new frc::SwerveDrivePoseEstimator<MODULE_COUNT>(*kinematics, getGyro(), getModuleStates(), frc::Pose2d{0_m, 0_m, 0_rad});
+    kinematics = std::make_unique<frc::SwerveDriveKinematics<MODULE_COUNT>>(motorLocations);
+    rawEstimator = std::make_unique<frc::SwerveDrivePoseEstimator<MODULE_COUNT>>(*kinematics, getGyro(), getModuleStates(), frc::Pose2d{0_m, 0_m, 0_rad});
+    calcEstimator = std::make_unique<frc::SwerveDrivePoseEstimator<MODULE_COUNT>>(*kinematics, getGyro(), getModuleStates(), frc::Pose2d{0_m, 0_m, 0_rad});
 
     resetState();
 }
@@ -96,7 +97,7 @@ void Swerve<AzimuthMotor, DriveMotor>::analyzeDashboard()
         units::radian_t errorAngle = robotRotation - targetAngle;
         units::radian_t error = units::math::fmod(errorAngle + units::radian_t(M_PI), 2 * units::radian_t(M_PI)) - units::radian_t(M_PI);
         static units::radian_t prevError = error;
-        rotSpeedRPS = error * KP_ROTATE * maxRotationSpeed + (error - prevError) * KD_ROTATE;
+        rotSpeedRPS = error * KP_ROTATE + (error - prevError) * KD_ROTATE;
         prevError = error;
     } else {
         rotSpeedRPS = rotSpeed * maxRotationSpeed;
@@ -313,17 +314,17 @@ void Swerve<AzimuthMotor, DriveMotor>::InitSendable(wpi::SendableBuilder& builde
     );
     builder.AddDoubleProperty(
         "Commanded X Speed MPS",
-        [this] { return xSpeedMPS; },
+        [this] { return xSpeedMPS.value(); },
         nullptr
     );
     builder.AddDoubleProperty(
         "Commanded Y Speed MPS",
-        [this] { return ySpeedMPS; },
+        [this] { return ySpeedMPS.value(); },
         nullptr
     );
     builder.AddDoubleProperty(
         "Commanded Rot Speed MPS",
-        [this] { return rotSpeedRPS; },
+        [this] { return rotSpeedRPS.value(); },
         nullptr
     );
     builder.AddDoubleProperty(
