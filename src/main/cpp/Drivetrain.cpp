@@ -147,16 +147,14 @@ std::vector<std::pair<SwerveAzimuthMotor*, SwerveDriveMotor*>> Drivetrain::gener
     std::vector<std::pair<SwerveAzimuthMotor*, SwerveDriveMotor*>> modules;
 
     valor::PIDF azimuthPID;
-    // @todo Enable these
-    // azimuthPID.maxVelocity = Constants::azimuthKVel();
-    // azimuthPID.maxAcceleration = Constants::azimuthKAcc();
+    azimuthPID.maxVelocity = Constants::azimuthKVel();
+    azimuthPID.maxAcceleration = Constants::azimuthKAcc();
     azimuthPID.P = Constants::azimuthKP();
     azimuthPID.error = 0.0027_tr;
     
     valor::PIDF drivePID;
-    // @todo Enable these
-    // drivePID.maxVelocity = Constants::driveKVel();
-    // drivePID.maxAcceleration = Constants::driveKAcc();
+    drivePID.setMaxVelocity(Constants::driveKVel(), WHEEL_DIAMETER);
+    drivePID.setMaxAcceleration(Constants::driveKAcc(), WHEEL_DIAMETER);
     drivePID.P = Constants::driveKP();
     drivePID.error = 0.0027_tr;
 
