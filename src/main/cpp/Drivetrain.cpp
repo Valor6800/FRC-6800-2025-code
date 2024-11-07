@@ -165,26 +165,26 @@ std::vector<std::pair<SwerveAzimuthMotor*, SwerveDriveMotor*>> Drivetrain::gener
             CANIDs::AZIMUTH_CANS[i],
             valor::NeutralMode::Brake,
             Constants::swerveAzimuthsReversals()[i],
-            Constants::azimuthGearRatio(),
-            1.0,
-            azimuthPID,
             PIGEON_CAN_BUS
         );
+        azimuthMotor->setGearRatios(Constants::azimuthGearRatio(), 1.0);
+        azimuthMotor->setPIDF(azimuthPID, 0);
         azimuthMotor->enableFOC(true);
         azimuthMotor->setupCANCoder(CANIDs::CANCODER_CANS[i], Constants::swerveZeros()[i], false, PIGEON_CAN_BUS);
+        azimuthMotor->applyConfig();
 
         SwerveAzimuthMotor* driveMotor = new SwerveDriveMotor(
             valor::PhoenixControllerType::KRAKEN_X60_FOC,
             CANIDs::DRIVE_CANS[i],
             valor::NeutralMode::Coast,
             Constants::swerveDrivesReversals()[i],
-            1.0,
-            Constants::driveGearRatio(),
-            drivePID,
             PIGEON_CAN_BUS
         );
+        driveMotor->setGearRatios(1.0, Constants::driveGearRatio());
+        driveMotor->setPIDF(drivePID, 0);
         driveMotor->enableFOC(true);
         driveMotor->setOpenLoopRamp(1_s);
+        driveMotor->applyConfig();
 
         modules.push_back(std::make_pair(azimuthMotor, driveMotor));
     }
