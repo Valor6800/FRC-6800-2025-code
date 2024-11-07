@@ -20,6 +20,7 @@
 #include "frc/geometry/Pose3d.h"
 #include "frc/geometry/Rotation3d.h"
 #include "units/angle.h"
+#include <ctre/phoenix6/TalonFX.hpp>
 
 using namespace pathplanner;
 
@@ -75,14 +76,14 @@ Drivetrain::Drivetrain(frc::TimedRobot *_robot) :
     table->PutNumber("KPLIMELIGHT", KP_LIMELIGHT);
     table->PutBoolean("Accepting Vision Measurements", true);
 
-    for (std::pair<const char*, frc::Pose3d> aprilCam : Constants::aprilCameras) {
-        aprilTagSensors.push_back(new valor::AprilTagsSensor(robot, aprilCam.first, aprilCam.second));
-        aprilTagSensors.back()->setPipe(valor::VisionSensor::PIPELINE_0);
+    // for (std::pair<const char*, frc::Pose3d> aprilCam : Constants::aprilCameras) {
+    //     aprilTagSensors.push_back(new valor::AprilTagsSensor(robot, aprilCam.first, aprilCam.second));
+    //     aprilTagSensors.back()->setPipe(valor::VisionSensor::PIPELINE_0);
 
-        if (aprilTagSensors.size() == 1) {
-            aprilTagSensors.back()->normalVisionOutlier = 6.0_m;
-        }
-    }
+    //     if (aprilTagSensors.size() == 1) {
+    //         aprilTagSensors.back()->normalVisionOutlier = 6.0_m;
+    //     }
+    // }
 
     setupGyro(
         CANIDs::PIGEON_CAN,
@@ -173,7 +174,7 @@ std::vector<std::pair<SwerveAzimuthMotor*, SwerveDriveMotor*>> Drivetrain::gener
         azimuthMotor->setupCANCoder(CANIDs::CANCODER_CANS[i], Constants::swerveZeros()[i], false, PIGEON_CAN_BUS);
 
         SwerveAzimuthMotor* driveMotor = new SwerveDriveMotor(
-            valor::PhoenixControllerType::FALCON_FOC,
+            valor::PhoenixControllerType::KRAKEN_X60_FOC,
             CANIDs::DRIVE_CANS[i],
             valor::NeutralMode::Coast,
             Constants::swerveDrivesReversals()[i],
@@ -192,50 +193,58 @@ std::vector<std::pair<SwerveAzimuthMotor*, SwerveDriveMotor*>> Drivetrain::gener
 
 void Drivetrain::resetState()
 {
+    Swerve::resetState();
+
     resetEncoders();
     resetOdometry(frc::Pose2d{0_m, 0_m, 0_rad});
 }
 
 void Drivetrain::init()
 {
+    Swerve::init();
 }
 
 void Drivetrain::assessInputs()
 {
-    if (!driverGamepad || !driverGamepad->IsConnected())
+    Swerve::assessInputs();
+
+    if (!driverGamepad || !driverGamepad->IsConnected() || !operatorGamepad || !operatorGamepad->IsConnected())
         return;
 }
 
 void Drivetrain::analyzeDashboard()
 {
+    Swerve::analyzeDashboard();
+
     table->PutBoolean("Calculated estimator?", state.useCalculatedEstimator);
 
     frc::Pose2d botpose;
     
     visionAcceptanceRadius = (units::meter_t) table->GetNumber("Vision Acceptance", VISION_ACCEPTANCE.to<double>());
 
-    for (valor::AprilTagsSensor* aprilLime : aprilTagSensors) {
-        aprilLime->applyVisionMeasurement(
-            calcEstimator.get(),
-            getRobotSpeeds(),
-            table->GetBoolean("Accepting Vision Measurements", true),
-            doubtX,
-            doubtY
-        );
-    }
+    // for (valor::AprilTagsSensor* aprilLime : aprilTagSensors) {
+    //     aprilLime->applyVisionMeasurement(
+    //         calcEstimator.get(),
+    //         getRobotSpeeds(),
+    //         table->GetBoolean("Accepting Vision Measurements", true),
+    //         doubtX,
+    //         doubtY
+    //     );
+    // }
 
-    auto ppTable = nt::NetworkTableInstance::GetDefault().GetTable("PathPlanner");
-    std::vector<double> bp = ppTable->GetNumberArray("currentPose", std::array<double, 3>{0, 0, 0});
-    std::vector<double> tp = ppTable->GetNumberArray("targetPose", std::array<double, 3>{0, 0, 0});
-}
+    if (!driverGamepad || !driverGamepad->IsConnected() || !operatorGamepad || !operatorGamepad->IsConnected())
+        return;
 
-void Drivetrain::assignOutputs()
-{
     if (frc::Timer::GetFPGATimestamp().to<double>() - teleopStart > TIME_TELEOP_VERT && frc::Timer::GetFPGATimestamp().to<double>() - teleopStart < TIME_TELEOP_VERT + 3) {
         operatorGamepad->setRumble(true);
     } else {
         operatorGamepad->setRumble(false);
     }
+}
+
+void Drivetrain::assignOutputs()
+{
+    Swerve::assignOutputs();
 }
 
 units::meters_per_second_t Drivetrain::getRobotSpeeds(){
@@ -284,8 +293,9 @@ frc2::FunctionalCommand* Drivetrain::getResetOdom() {
 
 void Drivetrain::InitSendable(wpi::SendableBuilder& builder)
     {
-        builder.SetSmartDashboardType("Subsystem");
+        Swerve::InitSendable(builder);
 
+        builder.SetSmartDashboardType("Subsystem");
 
         builder.AddDoubleArrayProperty(
             "Acceleration",

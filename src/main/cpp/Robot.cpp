@@ -18,20 +18,16 @@
 #define SEGMENTS 2
 
 Robot::Robot() :
-    drivetrain(this),
-    valorAuto(),
-    feederBeamBreak(AnalogPorts::FEEDER_BEAM_BREAK_PORT),
-    stageBeamBreak(AnalogPorts::STAGE_BEAM_BREAK_PORT)
+    drivetrain(this)
+    // valorAuto()
 {
     frc::TimedRobot();
-    feederBeamBreak.SetLimitsVoltage(4, 14);
-    stageBeamBreak.SetLimitsVoltage(4, 14);
 
-    pathplanner::NamedCommands::registerCommand("Reschedule", std::move(
-        frc2::InstantCommand([this](){
-            autoCommands.back().Schedule();
-        })
-    ).ToPtr());
+    // pathplanner::NamedCommands::registerCommand("Reschedule", std::move(
+    //     frc2::InstantCommand([this](){
+    //         autoCommands.back().Schedule();
+    //     })
+    // ).ToPtr());
 }
 
 void Robot::RobotInit() {
@@ -41,9 +37,9 @@ void Robot::RobotInit() {
     frc::LiveWindow::EnableAllTelemetry();
     frc::DataLogManager::Start();
 
-    valorAuto.fillAutoList();
-    valorAuto.preloadAuto("A1-");
-    valorAuto.preloadAuto("A1-2");
+    // valorAuto.fillAutoList();
+    // valorAuto.preloadAuto("A1-");
+    // valorAuto.preloadAuto("A1-2");
 }
 /**
  * This function is called every robot packet, no matter the mode. Use
@@ -63,7 +59,7 @@ void Robot::RobotPeriodic() { frc2::CommandScheduler::GetInstance().Run(); }
 void Robot::DisabledInit() { }
 
 void Robot::DisabledPeriodic() { 
-    valorAuto.preloadSelectedAuto();
+    // valorAuto.preloadSelectedAuto();
 }
 
 /**
@@ -72,14 +68,13 @@ void Robot::DisabledPeriodic() {
  */
 void Robot::AutonomousInit() {
     drivetrain.resetState();
-    // drivetrain.state.matchStart = frc::Timer::GetFPGATimestamp().to<double>();
     // drivetrain.setDriveMotorNeutralMode(valor::NeutralMode::Brake);
     // drivetrain.doubtX = AUTO_DOUBTX;
     // drivetrain.doubtY = AUTO_DOUBTY;
 
-    autoCommands.clear();
-    autoCommands.push_back(valorAuto.getSelectedAuto());
-    autoCommands.back().Schedule();
+    // autoCommands.clear();
+    // autoCommands.push_back(valorAuto.getSelectedAuto());
+    // autoCommands.back().Schedule();
 }
 
 void Robot::AutonomousExit() {

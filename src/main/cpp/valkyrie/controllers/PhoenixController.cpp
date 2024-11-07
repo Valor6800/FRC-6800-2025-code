@@ -50,6 +50,7 @@ PhoenixController::PhoenixController(valor::PhoenixControllerType controllerType
     req_position(units::turn_t{0}),
     req_velocity(units::turns_per_second_t{0}),
     req_voltage(units::volt_t{0}),
+    cancoder(nullptr),
     res_position(getMotor()->GetPosition()),
     res_velocity(getMotor()->GetVelocity())
 {
@@ -88,7 +89,7 @@ void PhoenixController::init(double _rotorToSensor, double _sensorToMech, valor:
     config.CurrentLimits.SupplyCurrentLowerTime = SUPPLY_TIME_THRESHOLD;
     config.CurrentLimits.SupplyCurrentLowerLimit = SUPPLY_CURRENT_THRESHOLD;
 
-    setGearRatios(config.Feedback, rotorToSensor, sensorToMech);
+    setGearRatios(config.Feedback, _rotorToSensor, _sensorToMech);
     setPIDF(config.Slot0, config.MotionMagic, pidf);
 
     getMotor()->GetConfigurator().Apply(config, units::second_t{5});
@@ -384,6 +385,15 @@ void PhoenixController::InitSendable(wpi::SendableBuilder& builder)
     builder.AddIntegerProperty(
         "Device ID",
         [this] { return getMotor()->GetDeviceID(); },
+        nullptr
+        );
+    builder.AddIntegerProperty(
+        "RotorToSensor",
+        [this] { return rotorToSensor; },
+        nullptr);
+    builder.AddIntegerProperty(
+        "SensorToMech",
+        [this] { return sensorToMech; },
         nullptr
         );
 }

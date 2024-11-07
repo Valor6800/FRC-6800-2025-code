@@ -127,12 +127,12 @@ namespace Constants {
             case SIDE_SWIPE_TEAM_NUMBER: return {0.3106_tr, 0.4369_tr, 0.4780_tr, 0.7372_tr};
             default: return {0.4240722_tr, 0.85498046875_tr, 0.471924_tr, 0.081299_tr};
         }};
-        static units::scalar_t driveGearRatio(){ switch (teamNumber){
+        static double driveGearRatio(){ switch (teamNumber){
             case ALPHA_TEAM_NUMBER: return 5.51f;
             case SIDE_SWIPE_TEAM_NUMBER: return 5.51f;
             default: return 5.51f;
         }};
-        static units::scalar_t azimuthGearRatio(){ switch (teamNumber){
+        static double azimuthGearRatio(){ switch (teamNumber){
             case ALPHA_TEAM_NUMBER: return 13.37f;
             case SIDE_SWIPE_TEAM_NUMBER: return 13.37f;
             default: return 13.37f;
