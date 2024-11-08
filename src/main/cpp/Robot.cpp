@@ -31,8 +31,8 @@ Robot::Robot() :
 }
 
 void Robot::RobotInit() {
-    drivetrain.setGamepads(&gamepadOperator, &gamepadDriver);
-    drivetrain.resetState();
+    // drivetrain.setGamepads(&gamepadOperator, &gamepadDriver);
+    // drivetrain.resetState();
 
     frc::LiveWindow::EnableAllTelemetry();
     frc::DataLogManager::Start();
