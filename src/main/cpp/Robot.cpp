@@ -19,8 +19,9 @@
 
 Robot::Robot() :
     drivetrain(this)
-    // valorAuto()
+    /* valorAuto(), */
 {
+    printf("\033[2J");
     frc::TimedRobot();
 
     // pathplanner::NamedCommands::registerCommand("Reschedule", std::move(
@@ -31,8 +32,8 @@ Robot::Robot() :
 }
 
 void Robot::RobotInit() {
-    drivetrain.setGamepads(&gamepadOperator, &gamepadDriver);
-    drivetrain.resetState();
+    // drivetrain.setGamepads(&gamepadOperator, &gamepadDriver);
+    // drivetrain.resetState();
 
     frc::LiveWindow::EnableAllTelemetry();
     frc::DataLogManager::Start();
@@ -68,6 +69,8 @@ void Robot::DisabledPeriodic() {
  */
 void Robot::AutonomousInit() {
     drivetrain.resetState();
+    /* drivetrain.resetState(); */
+    // drivetrain.state.matchStart = frc::Timer::GetFPGATimestamp().to<double>();
     // drivetrain.setDriveMotorNeutralMode(valor::NeutralMode::Brake);
     // drivetrain.doubtX = AUTO_DOUBTX;
     // drivetrain.doubtY = AUTO_DOUBTY;

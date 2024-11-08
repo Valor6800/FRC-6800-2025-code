@@ -1,11 +1,13 @@
 #include "Drivetrain.h"
 #include <cmath>
+#include <cstddef>
 #include <frc/DriverStation.h>
 #include <iostream>
 #include <math.h>
 #include <pathplanner/lib/auto/AutoBuilder.h>
 #include <string>
 #include "Constants.h"
+#include "frc2/command/Commands.h"
 #include "frc2/command/FunctionalCommand.h"
 #include "frc2/command/SequentialCommandGroup.h"
 #include "units/acceleration.h"
@@ -76,14 +78,14 @@ Drivetrain::Drivetrain(frc::TimedRobot *_robot) :
     table->PutNumber("KPLIMELIGHT", KP_LIMELIGHT);
     table->PutBoolean("Accepting Vision Measurements", true);
 
-    // for (std::pair<const char*, frc::Pose3d> aprilCam : Constants::aprilCameras) {
-    //     aprilTagSensors.push_back(new valor::AprilTagsSensor(robot, aprilCam.first, aprilCam.second));
-    //     aprilTagSensors.back()->setPipe(valor::VisionSensor::PIPELINE_0);
+    for (std::pair<const char*, frc::Pose3d> aprilCam : Constants::aprilCameras) {
+        aprilTagSensors.push_back(new valor::AprilTagsSensor(robot, aprilCam.first, aprilCam.second));  
+        aprilTagSensors.back()->setPipe(valor::VisionSensor::PIPELINE_0);
 
-    //     if (aprilTagSensors.size() == 1) {
-    //         aprilTagSensors.back()->normalVisionOutlier = 6.0_m;
-    //     }
-    // }
+        if (aprilTagSensors.size() == 1) {
+            aprilTagSensors.back()->normalVisionOutlier = 6.0_m;
+        }
+    }
 
     setupGyro(
         CANIDs::PIGEON_CAN,
@@ -152,7 +154,7 @@ std::vector<std::pair<SwerveAzimuthMotor*, SwerveDriveMotor*>> Drivetrain::gener
     azimuthPID.maxAcceleration = Constants::azimuthKAcc();
     azimuthPID.P = Constants::azimuthKP();
     azimuthPID.error = 0.0027_tr;
-    
+
     valor::PIDF drivePID;
     drivePID.setMaxVelocity(Constants::driveKVel(), WHEEL_DIAMETER);
     drivePID.setMaxAcceleration(Constants::driveKAcc(), WHEEL_DIAMETER);
@@ -217,21 +219,17 @@ void Drivetrain::analyzeDashboard()
 {
     Swerve::analyzeDashboard();
 
-    table->PutBoolean("Calculated estimator?", state.useCalculatedEstimator);
-
-    frc::Pose2d botpose;
-    
     visionAcceptanceRadius = (units::meter_t) table->GetNumber("Vision Acceptance", VISION_ACCEPTANCE.to<double>());
 
-    // for (valor::AprilTagsSensor* aprilLime : aprilTagSensors) {
-    //     aprilLime->applyVisionMeasurement(
-    //         calcEstimator.get(),
-    //         getRobotSpeeds(),
-    //         table->GetBoolean("Accepting Vision Measurements", true),
-    //         doubtX,
-    //         doubtY
-    //     );
-    // }
+    for (valor::AprilTagsSensor* aprilLime : aprilTagSensors) {
+        aprilLime->applyVisionMeasurement(
+            calcEstimator.get(),
+            getRobotSpeeds(),
+            table->GetBoolean("Accepting Vision Measurements", true),
+            doubtX,
+            doubtY
+        );
+    }
 
     if (!driverGamepad || !driverGamepad->IsConnected() || !operatorGamepad || !operatorGamepad->IsConnected())
         return;
