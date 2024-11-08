@@ -7,6 +7,7 @@
 #include "units/velocity.h"
 #include <frc/Timer.h>
 #include <cmath>
+#include <limits>
 #include <math.h>
 #include <span>
 #include <vector>
@@ -19,12 +20,9 @@ using namespace valor;
 
 AprilTagsSensor::AprilTagsSensor(frc::TimedRobot* robot, const char *name, frc::Pose3d _cameraPose) : valor::VisionSensor(robot, name, _cameraPose) {
     setGetter([this](){return getGlobalPose();});
+    megaTag2Pose = frc::Pose3d();
     dp = DP;
     vp = VP;
-    limeTable->PutNumber("dp", dp);
-    limeTable->PutNumber("vp", vp);
-    limeTable->PutNumber("new doubt x", 0);
-    limeTable->PutNumber("new doubt y", 0);
 }
 
 frc::Pose3d AprilTagsSensor::getGlobalPose() {
@@ -32,6 +30,9 @@ frc::Pose3d AprilTagsSensor::getGlobalPose() {
     std::vector<double> botPose = limeTable->GetNumberArray("botpose_wpiblue", std::span<double>());
     
     std::vector<double> botToTargetPose = limeTable->GetNumberArray("botpose_targetspace", std::span<const double>());
+
+    if (botPose.size() == 0 || botToTargetPose.size() == 0) return frc::Pose3d();
+
     if (botToTargetPose.size() == 6) distance = units::meter_t(sqrtf(powf(botToTargetPose[0], 2) + powf(botToTargetPose[1], 2) + powf(botToTargetPose[2], 2)));
     else distance = 0_m;
 
@@ -52,6 +53,8 @@ frc::Pose3d AprilTagsSensor::getPoseFromAprilTag() {
 
     std::vector<double> botToTargetPose = limeTable->GetNumberArray("botpose_targetspace", std::span<const double>());
 
+    if (botToTargetPose.size() == 0) return frc::Pose3d();
+
     return frc::Pose3d(
         (units::meter_t) botToTargetPose[0],
         (units::meter_t) botToTargetPose[1],
@@ -66,8 +69,8 @@ frc::Pose3d AprilTagsSensor::getPoseFromAprilTag() {
 
 void AprilTagsSensor::applyVisionMeasurement(frc::SwerveDrivePoseEstimator<4> *estimator, units::velocity::meters_per_second_t speed, bool accept, double doubtX, double doubtY, double doubtRot) {
     if (!hasTarget() || !accept) return;
-    dp = limeTable->GetNumber("dp", dp);
-    vp = limeTable->GetNumber("vp", vp);
+    dp = DP;
+    vp = VP;
  
     //std::vector<double> botToTargetPose = limeTable->GetNumberArray("botpose_targetspace", std::span<const double>());
     //if (botToTargetPose.size() == 6) distance = units::meter_t(sqrtf(powf(botToTargetPose[0], 2) + powf(botToTargetPose[1], 2)));
@@ -90,7 +93,7 @@ void AprilTagsSensor::applyVisionMeasurement(frc::SwerveDrivePoseEstimator<4> *e
     estimator->AddVisionMeasurement(
         tGone,  
         frc::Timer::GetFPGATimestamp() - totalLatency,
-        {newDoubtX, newDoubtY, 999999999999.9}
+        {newDoubtX, newDoubtY, std::numeric_limits<double>::max()}
     );
 }
 
@@ -118,7 +121,7 @@ frc::Pose3d AprilTagsSensor::getMegaTagPose2(AprilTagsSensor::Orientation orient
 
     std::vector<double> mt2Array = limeTable->GetNumberArray("botpose_orb_wpiblue", std::span<double>());
 
-    if (!(mt2Array.size() >= 6)) return frc::Pose3d();
+    if (mt2Array.size() == 0) return frc::Pose3d();
 
     megaTag2Pose = frc::Pose3d(
         units::meter_t{mt2Array[0]},

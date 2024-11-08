@@ -1,7 +1,12 @@
 #include "valkyrie/sensors/VisionSensor.h"
+#include "networktables/NetworkTableInstance.h"
 #include "units/angle.h"
 #include "units/time.h"
 #include "valkyrie/sensors/BaseSensor.h"
+#include "wpi/array.h"
+#include <array>
+#include <span>
+#include <vector>
 
 using namespace valor;
 
@@ -10,6 +15,7 @@ VisionSensor::VisionSensor(frc::TimedRobot* robot, const char *name, frc::Pose3d
             limeTable(nt::NetworkTableInstance::GetDefault().GetTable(name))
 {
     wpi::SendableRegistry::AddLW(this, "VisionSensor", sensorName);
+    while (!limeTable->GetInstance().IsConnected()) {}; // WARN: Is it really needed? :thinking emoji:
     reset();
     setCameraPose(cameraPose);
 }
@@ -24,10 +30,12 @@ void VisionSensor::setCameraPose(frc::Pose3d camPose){
     double yaw = camPose.Rotation().Z().convert<units::angle::degrees>().to<double>();
 
     std::array<double, 6> camPosition = std::array<double, 6>{x, y, z, roll, pitch, yaw};
-    limeTable->PutNumberArray("camerapose_robotspace_set", camPosition);
+
+    limeTable->PutNumberArray("camerapose_robotspace_set", camPosition); 
 }
 
 void VisionSensor::reset() {
+    currState = frc::Pose3d();
     tx = 0;
     tv = 0;
     ty = 0;
