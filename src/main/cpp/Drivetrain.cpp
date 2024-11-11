@@ -192,6 +192,11 @@ void Drivetrain::resetState()
 void Drivetrain::init()
 {
     Swerve::init();
+
+    gamePieceCamera = new valor::GamePieceSensor(robot, Constants::gamePieceCam.first, Constants::gamePieceCam.second, calcEstimator.get());
+
+    gamePieceCamera->setPipe(valor::VisionSensor::PIPELINE_0);
+
 }
 
 void Drivetrain::assessInputs()
