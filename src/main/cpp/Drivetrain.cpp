@@ -97,34 +97,34 @@ Drivetrain::Drivetrain(frc::TimedRobot *_robot) :
     /*
      * 3.8m/s, 5m/s^2, ~125lbs Apr. 2
      */
-    // AutoBuilder::configure(
-    //     [this](){ 
-    //         if (state.useCalculatedEstimator) {
-    //             return getCalculatedPose();
-    //         }
-    //         return getRawPose();
-    //     }, // Robot pose supplier
-    //     [this](frc::Pose2d pose){ resetOdometry(pose); }, // Method to reset odometry (will be called if your auto has a starting pose)
-    //     [this](){ return getRobotRelativeSpeeds(); }, // ChassisSpeeds supplier. MUST BE ROBOT RELATIVE
-    //     [this](frc::ChassisSpeeds speeds, auto _){ driveRobotRelative(speeds); }, // Method that will drive the robot given ROBOT RELATIVE ChassisSpeeds
-    //     std::shared_ptr<PPHolonomicDriveController>(new PPHolonomicDriveController(
-    //         PIDConstants(xPIDF.P, xPIDF.I, xPIDF.D), // Translation PID constants
-    //         PIDConstants(thetaPIDF.P, thetaPIDF.I, thetaPIDF.D) // Rotation PID constants
-    //     )),
-    //     RobotConfig::fromGUISettings(),
-    //     []() {
-    //         // Boolean supplier that controls when the path will be mirrored for the red alliance
-    //         // This will flip the path being followed to the red side of the field.
-    //         // THE ORIGIN WILL REMAIN ON THE BLUE SIDE
-    //
-    //         auto alliance = frc::DriverStation::GetAlliance();
-    //         if (alliance) {
-    //             return alliance.value() == frc::DriverStation::Alliance::kRed;
-    //         }
-    //         return false;
-    //     },
-    //     this // Reference to this subsystem to set requirements
-    // );
+    AutoBuilder::configure(
+        [this](){ 
+            if (state.useCalculatedEstimator) {
+                return getCalculatedPose();
+            }
+            return getRawPose();
+        }, // Robot pose supplier
+        [this](frc::Pose2d pose){ resetOdometry(pose); }, // Method to reset odometry (will be called if your auto has a starting pose)
+        [this](){ return getRobotRelativeSpeeds(); }, // ChassisSpeeds supplier. MUST BE ROBOT RELATIVE
+        [this](frc::ChassisSpeeds speeds, auto _){ driveRobotRelative(speeds); }, // Method that will drive the robot given ROBOT RELATIVE ChassisSpeeds
+        std::shared_ptr<PPHolonomicDriveController>(new PPHolonomicDriveController(
+            PIDConstants(xPIDF.P, xPIDF.I, xPIDF.D), // Translation PID constants
+            PIDConstants(thetaPIDF.P, thetaPIDF.I, thetaPIDF.D) // Rotation PID constants
+        )),
+        RobotConfig::fromGUISettings(),
+        []() {
+            // Boolean supplier that controls when the path will be mirrored for the red alliance
+            // This will flip the path being followed to the red side of the field.
+            // THE ORIGIN WILL REMAIN ON THE BLUE SIDE
+    
+            auto alliance = frc::DriverStation::GetAlliance();
+            if (alliance) {
+                return alliance.value() == frc::DriverStation::Alliance::kRed;
+            }
+            return false;
+        },
+        this // Reference to this subsystem to set requirements
+    );
     resetState();
 }
 
