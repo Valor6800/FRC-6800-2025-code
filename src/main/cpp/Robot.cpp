@@ -32,8 +32,8 @@ Robot::Robot() :
 }
 
 void Robot::RobotInit() {
-    // drivetrain.setGamepads(&gamepadOperator, &gamepadDriver);
-    // drivetrain.resetState();
+    drivetrain.setGamepads(&gamepadOperator, &gamepadDriver);
+    drivetrain.resetState();
 
     frc::LiveWindow::EnableAllTelemetry();
     frc::DataLogManager::Start();
@@ -69,11 +69,8 @@ void Robot::DisabledPeriodic() {
  */
 void Robot::AutonomousInit() {
     drivetrain.resetState();
-    /* drivetrain.resetState(); */
-    // drivetrain.state.matchStart = frc::Timer::GetFPGATimestamp().to<double>();
-    // drivetrain.setDriveMotorNeutralMode(valor::NeutralMode::Brake);
-    // drivetrain.doubtX = AUTO_DOUBTX;
-    // drivetrain.doubtY = AUTO_DOUBTY;
+    drivetrain.doubtX = AUTO_DOUBTX;
+    drivetrain.doubtY = AUTO_DOUBTY;
 
     // autoCommands.clear();
     // autoCommands.push_back(valorAuto.getSelectedAuto());
@@ -81,7 +78,6 @@ void Robot::AutonomousInit() {
 }
 
 void Robot::AutonomousExit() {
-    // drivetrain.state.xPose = true;
 }
 
 void Robot::AutonomousPeriodic() {
