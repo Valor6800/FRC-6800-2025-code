@@ -20,6 +20,7 @@
 #include <pathplanner/lib/auto/NamedCommands.h>
 #include <utility>
 #include "frc/geometry/Pose3d.h"
+#include <pathplanner/lib/controllers/PPHolonomicDriveController.h>
 #include "frc/geometry/Rotation3d.h"
 #include "units/angle.h"
 #include <ctre/phoenix6/TalonFX.hpp>
@@ -98,48 +99,34 @@ Drivetrain::Drivetrain(frc::TimedRobot *_robot) :
     /*
      * 3.8m/s, 5m/s^2, ~125lbs Apr. 2
      */
-    /*AutoBuilder::configureHolonomic(
-        [this]() { 
-            if (state.useCalculatedEstimator)
-                return getCalculatedPose();
-            else
-                return getRawPose();
-        }, // Robot pose supplier
-        [this](frc::Pose2d pose){ resetOdometry(pose); }, // Method to reset odometry (will be called if your auto has a starting pose)
-        [this](){ return getRobotRelativeSpeeds(); table->PutNumber("timestamp of retrieving speeds", frc::Timer::GetFPGATimestamp().to<double>()); }, // ChassisSpeeds supplier. MUST BE ROBOT RELATIVE
-        [this](frc::ChassisSpeeds speeds){ driveRobotRelative(speeds); }, // Method that will drive the robot given ROBOT RELATIVE ChassisSpeeds
-        HolonomicPathFollowerConfig( // HolonomicPathFollowerConfig, this should likely live in your Constants class
-            PIDConstants(xPIDF.P, xPIDF.I, xPIDF.D), // Translation PID constants
-            PIDConstants(thetaPIDF.P, thetaPIDF.I, thetaPIDF.D), // Rotation PID constants
-            units::meters_per_second_t{maxDriveSpeed}, // Max module speed, in m/s
-            Constants::driveBaseRadius(), // Drive base radius in meters. Distance from robot center to furthest module.
-            ReplanningConfig(true, false, .1_m, .25_m) // Default path replanning config. See the API for the options here
-        ),
-        []() {
-            // Boolean supplier that controls when the path will be mirrored for the red alliance
-            // This will flip the path being followed to the red side of the field.
-            // THE ORIGIN WILL REMAIN ON THE BLUE SIDE
-            auto alliance = frc::DriverStation::GetAlliance();
-            if (alliance) {
-                return alliance.value() == frc::DriverStation::Alliance::kRed;
-            }
-            return false;
-        },
-        this // Reference to this subsystem to set requirements
-    );
-
-    pathplanner::NamedCommands::registerCommand("Set Camera Estimator", std::move(
-        frc2::InstantCommand([this]() { state.useCalculatedEstimator = true; })
-    ).ToPtr());
-
-    pathplanner::NamedCommands::registerCommand("Set Estimator", std::move(
-        frc2::InstantCommand([this]() { state.useCalculatedEstimator = false; })
-    ).ToPtr());
-
-    pathplanner::NamedCommands::registerCommand("Reset gyro", std::move(
-        frc2::InstantCommand([this]() { resetGyro(); })
-    ).ToPtr());
-*/
+    // AutoBuilder::configure(
+    //     [this](){ 
+    //         if (state.useCalculatedEstimator) {
+    //             return getCalculatedPose();
+    //         }
+    //         return getRawPose();
+    //     }, // Robot pose supplier
+    //     [this](frc::Pose2d pose){ resetOdometry(pose); }, // Method to reset odometry (will be called if your auto has a starting pose)
+    //     [this](){ return getRobotRelativeSpeeds(); }, // ChassisSpeeds supplier. MUST BE ROBOT RELATIVE
+    //     [this](frc::ChassisSpeeds speeds, auto _){ driveRobotRelative(speeds); }, // Method that will drive the robot given ROBOT RELATIVE ChassisSpeeds
+    //     std::shared_ptr<PPHolonomicDriveController>(new PPHolonomicDriveController(
+    //         PIDConstants(xPIDF.P, xPIDF.I, xPIDF.D), // Translation PID constants
+    //         PIDConstants(thetaPIDF.P, thetaPIDF.I, thetaPIDF.D) // Rotation PID constants
+    //     )),
+    //     RobotConfig::fromGUISettings(),
+    //     []() {
+    //         // Boolean supplier that controls when the path will be mirrored for the red alliance
+    //         // This will flip the path being followed to the red side of the field.
+    //         // THE ORIGIN WILL REMAIN ON THE BLUE SIDE
+    //
+    //         auto alliance = frc::DriverStation::GetAlliance();
+    //         if (alliance) {
+    //             return alliance.value() == frc::DriverStation::Alliance::kRed;
+    //         }
+    //         return false;
+    //     },
+    //     this // Reference to this subsystem to set requirements
+    // );
     resetState();
 }
 
