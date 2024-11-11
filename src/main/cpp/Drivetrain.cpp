@@ -237,6 +237,7 @@ Drivetrain::Drivetrain(frc::TimedRobot *_robot, valor::CANdleSensor* _leds) :
             }
             return getCalculatedPose();
             //return getRawPose();
+
         }, // Robot pose supplier
         [this](frc::Pose2d pose){ resetOdometry(pose); }, // Method to reset odometry (will be called if your auto has a starting pose)
         [this](){ return getRobotRelativeSpeeds(); }, // ChassisSpeeds supplier. MUST BE ROBOT RELATIVE
@@ -267,6 +268,7 @@ Drivetrain::Drivetrain(frc::TimedRobot *_robot, valor::CANdleSensor* _leds) :
     doubtRot = 1;
     robotPublisher = nt::NetworkTableInstance::GetDefault().GetStructTopic<frc::Pose2d>("Robot Pose").Publish();
     robotInTagSpacePublisher = nt::NetworkTableInstance::GetDefault().GetStructTopic<frc::Transform2d>("Robot In Tag Space Transform").Publish();
+
 
     resetState();
     init();
