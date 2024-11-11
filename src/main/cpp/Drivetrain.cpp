@@ -339,6 +339,11 @@ void Drivetrain::init()
     state.reefTag = {-1, frc::Pose2d()};
     currentPosePathPlanner = nt::NetworkTableInstance::GetDefault().GetStructTopic<frc::Pose2d>("/PathPlanner/currentPose").Subscribe(frc::Pose2d{});
     targetPosePathPlanner = nt::NetworkTableInstance::GetDefault().GetStructTopic<frc::Pose2d>("/PathPlanner/targetPose").Subscribe(frc::Pose2d{});
+
+    gamePieceCamera = new valor::GamePieceSensor(robot, Constants::gamePieceCam.first, Constants::gamePieceCam.second, calcEstimator.get());
+
+    gamePieceCamera->setPipe(valor::VisionSensor::PIPELINE_0);
+
 }
 
 void Drivetrain::assessInputs()

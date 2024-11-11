@@ -891,5 +891,10 @@ namespace Constants {
                 default: return 0.5_tr;
             }}
         }
+        static std::pair<const char*, frc::Pose3d> gamePieceCam{
+
+            "limelight-minty", mintCameraPosition()
+        };
+
 }
 #pragma GCC diagnostic pop
