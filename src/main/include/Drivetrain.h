@@ -15,6 +15,7 @@
 #include "valkyrie/controllers/PhoenixController.h"
 #include "valkyrie/controllers/PIDF.h"
 #include "valkyrie/drivetrain/Swerve.h"
+#include "valkyrie/sensors/GamePieceSensor.h"
 
 #include <frc/kinematics/SwerveDriveKinematics.h>
 #include <frc/estimator/SwerveDrivePoseEstimator.h>
@@ -142,4 +143,7 @@ private:
      std::vector<valor::AprilTagsSensor*> aprilTagSensors;
 
      units::meter_t visionAcceptanceRadius;
+
+      valor::GamePieceSensor* gamePieceCamera;
+
 };
