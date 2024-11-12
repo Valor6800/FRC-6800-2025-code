@@ -99,6 +99,8 @@ private:
     void setDriveOpenLoop(units::meters_per_second_t mps);
     void setDriveClosedLoop(units::meters_per_second_t mps);
 
+    frc::SwerveModuleState desiredState;
+
     AzimuthMotor* azimuthMotor;
     DriveMotor* driveMotor;
 

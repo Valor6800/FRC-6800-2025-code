@@ -82,6 +82,15 @@ void PhoenixController::setupCANCoder(int deviceId, units::turn_t offset, bool c
     }
 }
 
+void PhoenixController::setContinuousWrap(bool continuousWrap, bool saveImmediately)
+{
+    config.ClosedLoopGeneral.ContinuousWrap = continuousWrap;
+
+    if (saveImmediately) {
+        getMotor()->GetConfigurator().Apply(config.ClosedLoopGeneral);
+    }
+}
+
 void PhoenixController::applyConfig()
 {
     getMotor()->GetConfigurator().Apply(config, units::second_t{5});

@@ -67,6 +67,7 @@ public:
     void setSpeedUpdateFrequency(units::hertz_t);
 
     void setEncoderPosition(units::turn_t position) override;
+    void setContinuousWrap(bool, bool saveImmediately = false);
     
     void setPosition(units::turn_t) override;
     void setSpeed(units::turns_per_second_t) override;

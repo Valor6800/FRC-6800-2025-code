@@ -171,6 +171,7 @@ std::vector<std::pair<SwerveAzimuthMotor*, SwerveDriveMotor*>> Drivetrain::gener
         azimuthMotor->setPIDF(azimuthPID, 0);
         azimuthMotor->enableFOC(true);
         azimuthMotor->setupCANCoder(CANIDs::CANCODER_CANS[i], Constants::swerveZeros()[i], false, PIGEON_CAN_BUS);
+        azimuthMotor->setContinuousWrap(true);
         azimuthMotor->applyConfig();
 
         SwerveAzimuthMotor* driveMotor = new SwerveDriveMotor(
