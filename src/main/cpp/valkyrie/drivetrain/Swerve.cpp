@@ -10,8 +10,6 @@
 #define MODULE_DIFF_XS {1, 1, -1, -1}
 #define MODULE_DIFF_YS {1, -1, -1, 1}
 
-#define MAX_DRIVE_SPEED 5.0_mps
-
 const units::hertz_t KP_ROTATE(-90);
 const units::hertz_t KD_ROTATE(-30);
 
@@ -117,7 +115,7 @@ void Swerve<AzimuthMotor, DriveMotor>::analyzeDashboard()
 
     // Prioritize rotation if we try to move and rotate at the same time
     //
-    // An individual module is capped at MAX_DRIVE_SPEED
+    // An individual module is capped at maxDriveSpeed
     // The diagram below represents when the robot tries to translate forward and rotate clockwise,
     //      ^->
     // ^    |O   
@@ -133,8 +131,8 @@ void Swerve<AzimuthMotor, DriveMotor>::analyzeDashboard()
     units::meters_per_second_t moduleSpeedsRotation = units::meters_per_second_t{rotSpeedRPS.to<double>() * Constants::driveBaseRadius().to<double>()};
     units::meters_per_second_t moduleSpeedsTranslation = units::meters_per_second_t{sqrtf(powf(xSpeedMPS.to<double>(), 2) + powf(ySpeedMPS.to<double>(), 2))};
 
-    if (moduleSpeedsTranslation + moduleSpeedsRotation > MAX_DRIVE_SPEED) {
-        units::meters_per_second_t adjustedModuleSpeedsTranslation = std::max(MAX_DRIVE_SPEED - moduleSpeedsRotation, 0_mps);
+    if (moduleSpeedsTranslation + moduleSpeedsRotation > maxDriveSpeed) {
+        units::meters_per_second_t adjustedModuleSpeedsTranslation = std::max(maxDriveSpeed - moduleSpeedsRotation, 0_mps);
         xSpeedMPS *= adjustedModuleSpeedsTranslation / moduleSpeedsTranslation;
         ySpeedMPS *= adjustedModuleSpeedsTranslation / moduleSpeedsTranslation;
     }
