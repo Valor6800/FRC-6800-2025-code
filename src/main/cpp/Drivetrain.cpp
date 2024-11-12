@@ -198,6 +198,7 @@ void Drivetrain::resetState()
 
     resetEncoders();
     resetOdometry(frc::Pose2d{0_m, 0_m, 0_rad});
+    state.autoError = 0;
 }
 
 void Drivetrain::init()
@@ -220,6 +221,13 @@ void Drivetrain::analyzeDashboard()
     table->PutBoolean("Calculated estimator?", state.useCalculatedEstimator);
 
     frc::Pose2d botpose;
+
+    auto ppTable = nt::NetworkTableInstance::GetDefault().GetTable("PathPlanner");
+    
+    std::vector<double> currentPose = ppTable->GetNumberArray("currentPose", std::array<double, 3>{0, 0, 0});
+    std::vector<double> targetPose = ppTable->GetNumberArray("targetPose", std::array<double, 3>{0, 0, 0});
+
+    state.autoError += pathDiff(currentPose, targetPose);
     
     visionAcceptanceRadius = (units::meter_t) table->GetNumber("Vision Acceptance", VISION_ACCEPTANCE.to<double>());
 
@@ -292,6 +300,14 @@ frc2::FunctionalCommand* Drivetrain::getResetOdom() {
 //     }
 // }
 
+double Drivetrain::pathDiff(std::vector<double> currPose, std::vector<double> tarPose){
+    double xError = fabs(currPose[0] - tarPose[0]);
+    double yError = fabs(currPose[1] - tarPose[1]);
+    double rotError = fabs(currPose[2] - tarPose[2]);
+
+    return sqrtf(powf(xError, 2) + powf(yError, 2));
+}
+
 void Drivetrain::InitSendable(wpi::SendableBuilder& builder)
     {
         Swerve::InitSendable(builder);
@@ -317,6 +333,11 @@ void Drivetrain::InitSendable(wpi::SendableBuilder& builder)
             } > 20.0_mps_sq; // ~60 kg bot -> 600 N, 5 measurements * 20ms = .1s, 
                                                                                      // impulse = .1 * 600 = 60 Joules
             },
+            nullptr
+        );
+        builder.AddDoubleProperty(
+            "Auto Error",
+            [this] {return state.autoError / 75;},
             nullptr
         );
     }

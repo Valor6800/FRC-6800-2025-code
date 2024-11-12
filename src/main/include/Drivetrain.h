@@ -112,6 +112,8 @@ public:
           units::second_t startTimestamp; // generic
           
           struct { units::acceleration::meters_per_second_squared_t x,y,z; } accel;
+
+          double autoError;
      } state;
 
      frc2::FunctionalCommand* getResetOdom();
@@ -122,6 +124,7 @@ public:
      double teleopStart;
 
      double doubtX, doubtY;
+     double pathDiff(std::vector<double> currPose, std::vector<double> tarPose);
 
 private:
 
