@@ -74,25 +74,25 @@ frc::SwerveModuleState SwerveModule<AzimuthMotor, DriveMotor>::getState()
 }
 
 template<class AzimuthMotor, class DriveMotor>
-void SwerveModule<AzimuthMotor, DriveMotor>::setDesiredState(frc::SwerveModuleState desiredState, bool isDriveOpenLoop)
+void SwerveModule<AzimuthMotor, DriveMotor>::setDesiredState(frc::SwerveModuleState _desiredState, bool isDriveOpenLoop)
 {
-
     // Deadband
-    if (desiredState.speed < DRIVE_DEADBAND) {
+    if (_desiredState.speed < DRIVE_DEADBAND) {
         setDriveOpenLoop(0_mps);
         return;
     }
 
     // Get current angle, optimize drive state
     frc::Rotation2d currentAngle = getAzimuthPosition();
-    desiredState.Optimize(currentAngle);
+    _desiredState.Optimize(currentAngle);
 
     // Output optimized rotation and speed
-    setAzimuthPosition(desiredState.angle);
+    setAzimuthPosition(_desiredState.angle);
     if (isDriveOpenLoop)
-        setDriveOpenLoop(desiredState.speed);
+        setDriveOpenLoop(_desiredState.speed);
     else
-        setDriveClosedLoop(desiredState.speed);
+        setDriveClosedLoop(_desiredState.speed);
+    desiredState = _desiredState;
 }
 
 template<class AzimuthMotor, class DriveMotor>
@@ -139,11 +139,7 @@ units::turn_t SwerveModule<AzimuthMotor, DriveMotor>::getMagEncoderCount()
 template<class AzimuthMotor, class DriveMotor>
 void SwerveModule<AzimuthMotor, DriveMotor>::setAzimuthPosition(frc::Rotation2d desiredAngle)
 {
-    frc::Rotation2d currentAngle = getAzimuthPosition();
-    frc::Rotation2d deltaAngle = desiredAngle - currentAngle;
-    units::turn_t deltaRotations = deltaAngle.Radians() / (2.0 * M_PI);
-    units::turn_t desiredRotations = currentAngle.Radians() / (2.0 * M_PI) + deltaRotations;
-    azimuthMotor->setPosition(desiredRotations);
+    azimuthMotor->setPosition(units::turn_t{desiredAngle.Radians().value() / (2.0 * M_PI)});
 }
 
 template<class AzimuthMotor, class DriveMotor>
@@ -182,13 +178,19 @@ void SwerveModule<AzimuthMotor, DriveMotor>::InitSendable(wpi::SendableBuilder& 
     );
     builder.AddDoubleProperty
     (
-        "position: angle",
-        [this] { return getModulePosition().angle.Degrees().template to<double>(); },
+        "desired state: angle",
+        [this] { return desiredState.angle.Degrees().template to<double>(); },
         nullptr
     );
     builder.AddDoubleProperty
     (
-        "position: distance",
+        "desired state: speed",
+        [this] { return desiredState.speed.value(); },
+        nullptr
+    );
+    builder.AddDoubleProperty
+    (
+        "state: distance",
         [this] { return getModulePosition().distance.template to<double>(); },
         nullptr
     );

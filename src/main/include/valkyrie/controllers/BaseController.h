@@ -207,7 +207,7 @@ public:
      * @param pidf The new PIDF values to use for the system
      * @param slot Set which slot of the motor to apply the PIDF. 0 if slots aren't compatible
      */
-    virtual void setPIDF(valor::PIDF pidf, int slot = 0) = 0;
+    virtual void setPIDF(valor::PIDF pidf, int slot = 0, bool saveImmediately = false) = 0;
 
     /**
      * @brief Set both soft limits for the motor
@@ -233,7 +233,7 @@ public:
      * 
      * @param forward The forward soft limit
      */
-    virtual void setForwardLimit(units::turn_t forward) = 0;
+    virtual void setForwardLimit(units::turn_t forward, bool saveImmediately = false) = 0;
 
     /**
      * @brief Set the reverse soft limit for the motor
@@ -242,7 +242,7 @@ public:
      * 
      * @param reverse The reverse soft limit
      */
-    virtual void setReverseLimit(units::turn_t reverse) = 0;
+    virtual void setReverseLimit(units::turn_t reverse, bool saveImmediately = false) = 0;
 
     /**
      * @brief Set the gear ratios for the motor
@@ -253,8 +253,21 @@ public:
      * 
      * @param rotorToSensor The gear ratio from rotor to where the sensor is. Should be 1 if no external sensor
      * @param sensorToMech The gear ratio from the sensor to the mechanism's output shaft. Should be the gear ratio if no external sensor
+     * @param saveImmediately Tell the underlying controller to apply the changes immediately, or to wait until a manual apply has been called
      */
-    virtual void setGearRatios(double rotorToSensor, double sensorToMech) = 0;
+    virtual void setGearRatios(double rotorToSensor, double sensorToMech, bool saveImmediately = false) = 0;
+
+    /**
+     * @brief Set the current limits for the motor
+     * 
+     * To be defined by the implemented BaseController class
+     * 
+     * @param statorCurrentLimit The stator's current limit in amps
+     * @param supplyCurrentLimit The supply current limit in amps
+     * @param supplyCurrentThreshold The supply current threshold in amps
+     * @param supplyTimeThreshold The amount of time before re-allowing current to pass through
+     */
+    virtual void setCurrentLimits(units::ampere_t statorCurrentLimit, units::ampere_t supplyCurrentLimit, units::ampere_t supplyCurrentThreshold, units::second_t supplyTimeThreshold, bool saveImmediately = false) = 0;
 
     /**
      * @brief Set which profile to use
@@ -267,9 +280,9 @@ public:
      */
     virtual void setProfile(int slot) = 0;
 
-    virtual void setNeutralMode(valor::NeutralMode mode) = 0;
+    virtual void setNeutralMode(valor::NeutralMode mode, bool saveImmediately = false) = 0;
 
-    virtual void setOpenLoopRamp(units::second_t time) = 0;
+    virtual void setOpenLoopRamp(units::second_t time, bool saveImmediately = false) = 0;
 
     valor::NeutralMode getNeutralMode(){
         return neutralMode;
@@ -279,7 +292,7 @@ public:
 
     virtual units::turn_t getAbsEncoderPosition() = 0;
 
-    virtual void setupCANCoder(int deviceId, units::turn_t offset, bool clockwise = false, std::string canbus = "", ctre::phoenix6::signals::AbsoluteSensorRangeValue absoluteRange=ctre::phoenix6::signals::AbsoluteSensorRangeValue::Unsigned_0To1) = 0;
+    virtual void setupCANCoder(int deviceId, units::turn_t offset, bool clockwise = false, std::string canbus = "", ctre::phoenix6::signals::AbsoluteSensorRangeValue absoluteRange=ctre::phoenix6::signals::AbsoluteSensorRangeValue::Unsigned_0To1, bool saveImmediately = false) = 0;
     virtual units::turn_t getCANCoder() = 0;
 
 protected:

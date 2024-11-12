@@ -28,7 +28,6 @@ class PhoenixController : public BaseController<ctre::phoenix6::hardware::TalonF
 {
 public:
     PhoenixController(valor::PhoenixControllerType, int _canID, valor::NeutralMode _mode, bool _inverted, std::string _canbus = "");
-    PhoenixController(valor::PhoenixControllerType, int _canID, valor::NeutralMode _mode, bool _inverted, double rotorToSensor, double sensorToMech, valor::PIDF pidf, std::string _canbus = "");
 
     static units::revolutions_per_minute_t getPhoenixControllerMotorSpeed(PhoenixControllerType controllerType)
     {
@@ -50,15 +49,15 @@ public:
         }
     }
 
-    void init(double rotorToSensor, double sensorToMech, valor::PIDF pidf);
     void init() override;
 
     void enableFOC(bool enableFOC);
     void applyConfig() override;
 
     void reset() override;
-    void setNeutralMode(ctre::phoenix6::configs::MotorOutputConfigs& config, valor::NeutralMode mode);
-    void setNeutralMode(valor::NeutralMode mode) override;
+    void setNeutralMode(valor::NeutralMode mode, bool saveImmediately = false) override;
+    
+    void setCurrentLimits(units::ampere_t statorCurrentLimit, units::ampere_t supplyCurrentLimit, units::ampere_t supplyCurrentThreshold, units::second_t supplyTimeThreshold, bool saveImmediately = false) override;
 
     units::turn_t getPosition() override;
     units::turns_per_second_t getSpeed() override;
@@ -68,6 +67,7 @@ public:
     void setSpeedUpdateFrequency(units::hertz_t);
 
     void setEncoderPosition(units::turn_t position) override;
+    void setContinuousWrap(bool, bool saveImmediately = false);
     
     void setPosition(units::turn_t) override;
     void setSpeed(units::turns_per_second_t) override;
@@ -75,26 +75,24 @@ public:
 
     void setupFollower(int, bool = false) override;
     
-    void setPIDF(valor::PIDF pidf, int slot) override;
-    void setPIDF(ctre::phoenix6::configs::Slot0Configs&, ctre::phoenix6::configs::MotionMagicConfigs&, valor::PIDF pidf);
+    void setPIDF(valor::PIDF pidf, int slot, bool saveImmediately = false) override;
 
-    void setForwardLimit(units::turn_t forward) override;
-    void setReverseLimit(units::turn_t reverse) override;
+    void setForwardLimit(units::turn_t forward, bool saveImmediately = false) override;
+    void setReverseLimit(units::turn_t reverse, bool saveImmediately = false) override;
     
-    void setGearRatios(double, double) override;
-    void setGearRatios(ctre::phoenix6::configs::FeedbackConfigs&, double, double);
+    void setGearRatios(double, double, bool saveImmediately = false) override;
 
     void setProfile(int slot) override;
 
     units::turn_t getAbsEncoderPosition();
 
-    void setupCANCoder(int deviceId, units::turn_t offset, bool clockwise, std::string canbus = "", ctre::phoenix6::signals::AbsoluteSensorRangeValue absoluteRange=ctre::phoenix6::signals::AbsoluteSensorRangeValue::Unsigned_0To1) override;
+    void setupCANCoder(int deviceId, units::turn_t offset, bool clockwise, std::string canbus = "", ctre::phoenix6::signals::AbsoluteSensorRangeValue absoluteRange=ctre::phoenix6::signals::AbsoluteSensorRangeValue::Unsigned_0To1, bool saveImmediately = false) override;
     units::turn_t getCANCoder() override;
 
     float getBusUtil(const char* canBusName);
     ctre::phoenix6::signals::MagnetHealthValue getMagnetHealth();
     
-    void setOpenLoopRamp(units::second_t time) override;
+    void setOpenLoopRamp(units::second_t time, bool saveImmediately = false) override;
 
     void InitSendable(wpi::SendableBuilder& builder) override;
 
@@ -110,5 +108,7 @@ private:
 
     ctre::phoenix6::StatusSignal<units::turn_t>& res_position;
     ctre::phoenix6::StatusSignal<units::turns_per_second_t>& res_velocity;
+
+    ctre::phoenix6::configs::TalonFXConfiguration config;
 };
 }
