@@ -5,8 +5,12 @@
 #include <frc/geometry/Translation2d.h>
 #include <frc/DriverStation.h>
 
+#include "Constants.h"
+
 #define MODULE_DIFF_XS {1, 1, -1, -1}
 #define MODULE_DIFF_YS {1, -1, -1, 1}
+
+#define MAX_DRIVE_SPEED 5.0_mps
 
 const units::hertz_t KP_ROTATE(-90);
 const units::hertz_t KD_ROTATE(-30);
@@ -109,6 +113,30 @@ void Swerve<AzimuthMotor, DriveMotor>::analyzeDashboard()
     if (frc::DriverStation::GetAlliance() == frc::DriverStation::kRed) {
         xSpeedMPS *= -1.0;
         ySpeedMPS *= -1.0;
+    }
+
+    // Prioritize rotation if we try to move and rotate at the same time
+    //
+    // An individual module is capped at MAX_DRIVE_SPEED
+    // The diagram below represents when the robot tries to translate forward and rotate clockwise,
+    //      ^->
+    // ^    |O   
+    // |        ^
+    // |O       ||O
+    //    <-^    V 
+    //      |O   
+    // where each O is a module and each arrow represents the translational and rotational movements.
+    // Note how for the left-most module, the two movements are additive, so this module will be the fastest. 
+    // We assume there is always a module at this fastest position and decrease the translational speed to allow
+    // the desired rotation speed to be achieved by the module.
+
+    units::meters_per_second_t moduleSpeedsRotation = units::meters_per_second_t{rotSpeedRPS.to<double>() * Constants::driveBaseRadius().to<double>()};
+    units::meters_per_second_t moduleSpeedsTranslation = units::meters_per_second_t{sqrtf(powf(xSpeedMPS.to<double>(), 2) + powf(ySpeedMPS.to<double>(), 2))};
+
+    if (moduleSpeedsTranslation + moduleSpeedsRotation > MAX_DRIVE_SPEED) {
+        units::meters_per_second_t adjustedModuleSpeedsTranslation = std::max(MAX_DRIVE_SPEED - moduleSpeedsRotation, 0_mps);
+        xSpeedMPS *= adjustedModuleSpeedsTranslation / moduleSpeedsTranslation;
+        ySpeedMPS *= adjustedModuleSpeedsTranslation / moduleSpeedsTranslation;
     }
 }
 
