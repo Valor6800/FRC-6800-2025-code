@@ -1,15 +1,24 @@
 #include "Drivetrain.h"
 #include <cmath>
 #include <cstddef>
+#include <cstdlib>
 #include <frc/DriverStation.h>
 #include <iostream>
 #include <math.h>
+#include <memory>
+#include <optional>
 #include <pathplanner/lib/auto/AutoBuilder.h>
 #include <string>
 #include "Constants.h"
+#include "frc/geometry/Translation2d.h"
+#include "frc2/command/Command.h"
+#include "frc2/command/CommandPtr.h"
 #include "frc2/command/Commands.h"
 #include "frc2/command/FunctionalCommand.h"
 #include "frc2/command/SequentialCommandGroup.h"
+#include "pathplanner/lib/config/RobotConfig.h"
+#include "pathplanner/lib/path/PathPlannerPath.h"
+#include "pathplanner/lib/path/Waypoint.h"
 #include "units/acceleration.h"
 #include "units/length.h"
 #include "units/velocity.h"
@@ -18,9 +27,11 @@
 #include "valkyrie/sensors/VisionSensor.h"
 #include <frc2/command/InstantCommand.h>
 #include <pathplanner/lib/auto/NamedCommands.h>
+#include <sys/types.h>
 #include <utility>
 #include "frc/geometry/Pose3d.h"
 #include <pathplanner/lib/controllers/PPHolonomicDriveController.h>
+#include <pathplanner/lib/commands/PathfindThenFollowPath.h>
 #include "frc/geometry/Rotation3d.h"
 #include "units/angle.h"
 #include <ctre/phoenix6/TalonFX.hpp>
@@ -55,6 +66,12 @@ const units::meter_t WHEEL_DIAMETER(0.0973_m);
 #define TIME_TELEOP_VERT 105.0f
 
 #define MT2_POSE true
+
+#define MAX_VEL 3.0_mps
+#define MAX_ACC 3.0_mps_sq
+#define MAX_ANGULAR_VEL 540.0_deg_per_s
+#define MAX_ANGULAR_ACC 720.0_deg_per_s_sq
+
 
 Drivetrain::Drivetrain(frc::TimedRobot *_robot) : 
     valor::Swerve<SwerveAzimuthMotor, SwerveDriveMotor>(
@@ -129,8 +146,66 @@ Drivetrain::Drivetrain(frc::TimedRobot *_robot) :
         },
         this // Reference to this subsystem to set requirements
     );
+
+    pathplanner::NamedCommands::registerCommand(
+        "Drive To Point",
+        driveTo()
+    );
+
     resetState();
     init();
+}
+
+frc2::CommandPtr Drivetrain::driveTo() {
+    frc::Translation2d startPose = getCalculatedPose().Translation();
+    frc::Translation2d endPose = frc::Translation2d(4_m, 5.75_m);
+    units::radian_t theta{
+        tan((endPose.Y() - startPose.Y()).to<double>() / (endPose.X() - startPose.X()).to<double>())
+    };
+    frc::Translation2d startPoseControlPoint{
+        startPose.X() + .25_m * cos(theta.to<double>()),
+        startPose.Y() + .25_m * sin(theta.to<double>()),
+    };
+
+    frc::Translation2d endPoseControlPoint{
+        endPose.X() - .25_m * cos(theta.to<double>()),
+        endPose.Y() - .25_m * sin(theta.to<double>()),
+    };
+
+    std::vector<Waypoint> points = std::vector<Waypoint>{
+        Waypoint(
+            std::nullopt,
+            startPose,
+            startPoseControlPoint
+        ),
+        Waypoint(
+            endPoseControlPoint,
+            endPose,
+            std::nullopt
+        )
+    };
+
+    std::shared_ptr<PathPlannerPath> path = std::make_shared<PathPlannerPath>(
+            new PathPlannerPath(
+            points,
+            PathConstraints(
+                MAX_VEL, MAX_ACC, MAX_ANGULAR_VEL, MAX_ANGULAR_ACC
+            ),
+            std::nullopt,
+            GoalEndState(0.0_mps, frc::Rotation2d(0_deg))
+        )
+    );
+
+    frc2::CommandPtr pathAndFollow = AutoBuilder::pathfindThenFollowPath(
+        path,
+        PathConstraints(
+            MAX_VEL, MAX_ACC, MAX_ANGULAR_VEL, MAX_ANGULAR_ACC
+        )
+    );
+
+    pathAndFollow.Schedule();
+
+    return pathAndFollow;
 }
 
 Drivetrain::~Drivetrain(){}

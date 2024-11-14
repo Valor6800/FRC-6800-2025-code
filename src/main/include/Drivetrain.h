@@ -1,6 +1,8 @@
 #pragma once
 
 #include "frc/geometry/Pose3d.h"
+#include "frc2/command/CommandPtr.h"
+#include "frc2/command/Commands.h"
 #include "units/acceleration.h"
 #include "units/length.h"
 #include "valkyrie/sensors/AprilTagsSensor.h"
@@ -115,6 +117,10 @@ public:
           
           struct { units::acceleration::meters_per_second_squared_t x,y,z; } accel;
      } state;
+
+    frc2::CommandPtr cmd = frc2::cmd::Sequence();
+    
+     frc2::CommandPtr driveTo();
 
      frc2::FunctionalCommand* getResetOdom();
 
