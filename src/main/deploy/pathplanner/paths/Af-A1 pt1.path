@@ -1,0 +1,52 @@
+{
+  "version": 1.0,
+  "waypoints": [
+    {
+      "anchor": {
+        "x": 3.108658262527752,
+        "y": 7.080577081473897
+      },
+      "prevControl": null,
+      "nextControl": {
+        "x": 4.108658262527753,
+        "y": 7.080577081473897
+      },
+      "isLocked": false,
+      "linkedName": "Acrid"
+    },
+    {
+      "anchor": {
+        "x": 8.280114347265732,
+        "y": 7.446088392176785
+      },
+      "prevControl": {
+        "x": 7.280114347265732,
+        "y": 7.446088392176785
+      },
+      "nextControl": null,
+      "isLocked": false,
+      "linkedName": "A1"
+    }
+  ],
+  "rotationTargets": [],
+  "constraintZones": [],
+  "pointTowardsZones": [],
+  "eventMarkers": [],
+  "globalConstraints": {
+    "maxVelocity": 3.0,
+    "maxAcceleration": 3.0,
+    "maxAngularVelocity": 540.0,
+    "maxAngularAcceleration": 720.0
+  },
+  "goalEndState": {
+    "velocity": 0,
+    "rotation": 0.0
+  },
+  "reversed": false,
+  "folder": "Stas' tests",
+  "idealStartingState": {
+    "velocity": 0,
+    "rotation": 0.0
+  },
+  "useDefaultConstraints": true
+}

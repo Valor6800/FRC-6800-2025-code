@@ -1,5 +1,9 @@
 #include "Robot.h"
 #include "frc/AnalogTriggerType.h"
+#include "frc2/command/CommandPtr.h"
+#include "pathplanner/lib/auto/AutoBuilder.h"
+#include "pathplanner/lib/path/PathPlannerPath.h"
+#include "valkyrie/Auto.h"
 
 #include <frc/smartdashboard/SmartDashboard.h>
 #include <frc2/command/CommandScheduler.h>
@@ -71,9 +75,27 @@ void Robot::AutonomousInit() {
     // drivetrain.setDriveMotorNeutralMode(valor::NeutralMode::Brake);
     // drivetrain.doubtX = AUTO_DOUBTX;
     // drivetrain.doubtY = AUTO_DOUBTY;
+    
+    frc2::CommandPtr alt = valor::Auto::buildDynamicStep(
+        [this](){return true;},
+        valor::Auto::makePathCommand("a2-shoot"),
+        valor::Auto::makePathCommand("a2-a3-shoot")
+    );
+    
+    frc2::CommandPtr a = valor::Auto::composePaths({"Af BLUE", "Af-A1 pt1"}).AndThen(
+        valor::Auto::buildDynamicStep(
+            [this](){return true;},
+            valor::Auto::composePaths({"a1-shoot", "shoot-a2"}).AndThen(
+                std::move(alt)
+            ),
+            valor::Auto::makePathCommand("a1-a2").AndThen(
+                std::move(alt)
+            )
+        )
+    );
 
     autoCommands.clear();
-    autoCommands.push_back(valorAuto.getSelectedAuto());
+    autoCommands.push_back(std::move(a));
     autoCommands.back().Schedule();
 }
 

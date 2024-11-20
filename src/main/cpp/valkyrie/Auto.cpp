@@ -1,5 +1,8 @@
 #include "valkyrie/Auto.h"
+#include "frc2/command/CommandPtr.h"
+#include "frc2/command/Commands.h"
 #include "pathplanner/lib/auto/AutoBuilder.h"
+#include "pathplanner/lib/path/PathPlannerPath.h"
 // #include <frc/Filesystem.h>
 #include <networktables/NetworkTableInstance.h>
 #include <networktables/NetworkTable.h>
@@ -29,6 +32,32 @@ frc2::CommandPtr Auto::makeAuto(std::string autoName){
 frc2::CommandPtr Auto::getSelectedAuto(){
     std::string selection = m_chooser.GetSelected(); 
     return getAuto(selection);
+}
+
+frc2::CommandPtr Auto::buildDynamicStep(std::function<bool ()> condition, frc2::CommandPtr _commandIfTrue, frc2::CommandPtr _commandIfFalse) {
+    frc2::CommandPtr *commandIfTrue = &_commandIfTrue;
+    frc2::CommandPtr *commandIfFalse = &_commandIfFalse;
+    return frc2::InstantCommand([condition, commandIfTrue, commandIfFalse](){
+        if (condition()){
+            if (commandIfTrue != nullptr)
+                commandIfTrue->Schedule();
+        } else {
+            if (commandIfFalse != nullptr)
+                commandIfFalse->Schedule();
+        }
+    }).ToPtr();
+}
+
+frc2::CommandPtr Auto::makePathCommand(std::string pathName){
+    return pathplanner::AutoBuilder::followPath(pathplanner::PathPlannerPath::fromPathFile(pathName));
+}
+
+frc2::CommandPtr Auto::composePaths(std::vector<std::string> pathNames) {
+    std::vector<frc2::CommandPtr> commands;
+    for (std::string pathName : pathNames){
+        commands.push_back(makePathCommand(pathName));
+    }
+    return frc2::cmd::Sequence(std::move(commands));
 }
 
 frc2::CommandPtr Auto::getAuto(std::string selection) {

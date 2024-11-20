@@ -1,0 +1,52 @@
+{
+  "version": 1.0,
+  "waypoints": [
+    {
+      "anchor": {
+        "x": 5.013154236884284,
+        "y": 6.297874277208335
+      },
+      "prevControl": null,
+      "nextControl": {
+        "x": 6.06121706224894,
+        "y": 6.749093947261969
+      },
+      "isLocked": false,
+      "linkedName": "Score amp"
+    },
+    {
+      "anchor": {
+        "x": 8.280114347265732,
+        "y": 5.789145476439101
+      },
+      "prevControl": {
+        "x": 7.280114347265732,
+        "y": 5.789145476439101
+      },
+      "nextControl": null,
+      "isLocked": false,
+      "linkedName": "a2"
+    }
+  ],
+  "rotationTargets": [],
+  "constraintZones": [],
+  "pointTowardsZones": [],
+  "eventMarkers": [],
+  "globalConstraints": {
+    "maxVelocity": 3.0,
+    "maxAcceleration": 3.0,
+    "maxAngularVelocity": 540.0,
+    "maxAngularAcceleration": 720.0
+  },
+  "goalEndState": {
+    "velocity": 0,
+    "rotation": 0.0
+  },
+  "reversed": false,
+  "folder": "Stas' tests",
+  "idealStartingState": {
+    "velocity": 0,
+    "rotation": 10.421430161231989
+  },
+  "useDefaultConstraints": true
+}
