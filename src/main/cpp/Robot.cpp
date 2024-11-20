@@ -18,8 +18,8 @@
 #define SEGMENTS 2
 
 Robot::Robot() :
-    drivetrain(this)
-    /* valorAuto(), */
+    drivetrain(this),
+    valorAuto()
 {
     printf("\033[2J");
     frc::TimedRobot();
@@ -32,13 +32,13 @@ Robot::Robot() :
 }
 
 void Robot::RobotInit() {
-    // drivetrain.setGamepads(&gamepadOperator, &gamepadDriver);
-    // drivetrain.resetState();
+    drivetrain.setGamepads(&gamepadOperator, &gamepadDriver);
+    drivetrain.resetState();
 
     frc::LiveWindow::EnableAllTelemetry();
     frc::DataLogManager::Start();
 
-    // valorAuto.fillAutoList();
+    valorAuto.fillAutoList();
     // valorAuto.preloadAuto("A1-");
     // valorAuto.preloadAuto("A1-2");
 }
@@ -60,7 +60,7 @@ void Robot::RobotPeriodic() { frc2::CommandScheduler::GetInstance().Run(); }
 void Robot::DisabledInit() { }
 
 void Robot::DisabledPeriodic() { 
-    // valorAuto.preloadSelectedAuto();
+    valorAuto.preloadSelectedAuto();
 }
 
 /**
@@ -72,9 +72,9 @@ void Robot::AutonomousInit() {
     drivetrain.doubtX = AUTO_DOUBTX;
     drivetrain.doubtY = AUTO_DOUBTY;
 
-    // autoCommands.clear();
-    // autoCommands.push_back(valorAuto.getSelectedAuto());
-    // autoCommands.back().Schedule();
+    autoCommands.clear();
+    autoCommands.push_back(valorAuto.getSelectedAuto());
+    autoCommands.back().Schedule();
 }
 
 void Robot::AutonomousExit() {
