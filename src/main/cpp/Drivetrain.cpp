@@ -3,7 +3,6 @@
 #include <cstddef>
 #include <cstdlib>
 #include <frc/DriverStation.h>
-#include <iostream>
 #include <math.h>
 #include <memory>
 #include <optional>
@@ -11,11 +10,8 @@
 #include <string>
 #include "Constants.h"
 #include "frc/geometry/Translation2d.h"
-#include "frc2/command/Command.h"
 #include "frc2/command/CommandPtr.h"
-#include "frc2/command/Commands.h"
 #include "frc2/command/FunctionalCommand.h"
-#include "frc2/command/SequentialCommandGroup.h"
 #include "pathplanner/lib/config/RobotConfig.h"
 #include "pathplanner/lib/path/PathPlannerPath.h"
 #include "pathplanner/lib/path/Waypoint.h"
@@ -31,8 +27,8 @@
 #include <utility>
 #include "frc/geometry/Pose3d.h"
 #include <pathplanner/lib/controllers/PPHolonomicDriveController.h>
+#include <frc2/command/ScheduleCommand.h>
 #include <pathplanner/lib/commands/PathfindThenFollowPath.h>
-#include "frc/geometry/Rotation3d.h"
 #include "units/angle.h"
 #include <ctre/phoenix6/TalonFX.hpp>
 
@@ -149,7 +145,7 @@ Drivetrain::Drivetrain(frc::TimedRobot *_robot) :
 
     pathplanner::NamedCommands::registerCommand(
         "Drive To Point",
-        driveTo()
+        std::move(driveTo())
     );
 
     resetState();
@@ -158,7 +154,7 @@ Drivetrain::Drivetrain(frc::TimedRobot *_robot) :
 
 frc2::CommandPtr Drivetrain::driveTo() {
     frc::Translation2d startPose = getCalculatedPose().Translation();
-    frc::Translation2d endPose = frc::Translation2d(4_m, 5.75_m);
+    frc::Translation2d endPose = frc::Translation2d(14.634_m, 2.769_m);
     units::radian_t theta{
         tan((endPose.Y() - startPose.Y()).to<double>() / (endPose.X() - startPose.X()).to<double>())
     };
@@ -176,35 +172,45 @@ frc2::CommandPtr Drivetrain::driveTo() {
         Waypoint(
             std::nullopt,
             startPose,
-            startPoseControlPoint
+            std::make_optional(frc::Translation2d(
+                .25_m,
+                frc::Rotation2d(180_deg)
+            ))
         ),
         Waypoint(
-            endPoseControlPoint,
+            std::make_optional(frc::Translation2d(
+                .25_m,
+                frc::Rotation2d(180_deg)
+            )),
             endPose,
             std::nullopt
         )
     };
 
     std::shared_ptr<PathPlannerPath> path = std::make_shared<PathPlannerPath>(
-            new PathPlannerPath(
+            PathPlannerPath(
             points,
             PathConstraints(
-                MAX_VEL, MAX_ACC, MAX_ANGULAR_VEL, MAX_ANGULAR_ACC
+                MAX_VEL / 2.0,
+                MAX_ACC / 2.0,
+                MAX_ANGULAR_VEL / 2.0,
+                MAX_ANGULAR_ACC / 2.0
             ),
             std::nullopt,
-            GoalEndState(0.0_mps, frc::Rotation2d(0_deg))
+            GoalEndState(0.0_mps, frc::Rotation2d(180_deg))
         )
     );
 
     frc2::CommandPtr pathAndFollow = AutoBuilder::pathfindThenFollowPath(
         path,
         PathConstraints(
-            MAX_VEL, MAX_ACC, MAX_ANGULAR_VEL, MAX_ANGULAR_ACC
+            MAX_VEL / 2.0,
+            MAX_ACC / 2.0,
+            MAX_ANGULAR_VEL / 2.0,
+            MAX_ANGULAR_ACC / 2.0
         )
     );
-
-    pathAndFollow.Schedule();
-
+    
     return pathAndFollow;
 }
 
