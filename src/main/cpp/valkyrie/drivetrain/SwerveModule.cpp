@@ -58,7 +58,7 @@ units::meters_per_second_t SwerveModule<AzimuthMotor, DriveMotor>::getDriveSpeed
 template<class AzimuthMotor, class DriveMotor>
 units::meters_per_second_t SwerveModule<AzimuthMotor, DriveMotor>::getMaxDriveSpeed()
 {
-    return driveMotor->getMaxMotorSpeed() * wheelConversion;
+    return driveMotor->getMaxMechSpeed() * wheelConversion;
 }
 
 template<class AzimuthMotor, class DriveMotor>

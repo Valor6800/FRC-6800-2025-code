@@ -443,4 +443,9 @@ void Swerve<AzimuthMotor, DriveMotor>::InitSendable(wpi::SendableBuilder& builde
         },
         nullptr
     );
+    builder.AddDoubleProperty(
+        "Max Drive Speed MPS",
+        [this] {return maxDriveSpeed.value();},
+        nullptr
+    );
 }
