@@ -41,8 +41,8 @@ class Robot : public frc::TimedRobot {
         valor::Gamepad gamepadOperator{OIConstants::GAMEPAD_OPERATOR_LOCATION};
         valor::Gamepad gamepadDriver{OIConstants::GAMEPAD_BASE_LOCATION};
 
-        // std::vector<frc2::CommandPtr> autoCommands;
+        std::vector<frc2::CommandPtr> autoCommands;
 
         Drivetrain drivetrain;
-        // valor::Auto valorAuto;
+        valor::Auto valorAuto;
 };

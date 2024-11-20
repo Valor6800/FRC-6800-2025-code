@@ -42,6 +42,7 @@
 #include <frc2/command/WaitCommand.h>
 #include <frc/TimedRobot.h>
 #include <frc2/command/FunctionalCommand.h>
+#include <frc2/command/ScheduleCommand.h>
 
 #include <ctre/phoenix6/Pigeon2.hpp>
 
@@ -117,7 +118,7 @@ public:
           struct { units::acceleration::meters_per_second_squared_t x,y,z; } accel;
      } state;
 
-    frc2::CommandPtr cmd = frc2::cmd::Sequence();
+    /* frc2::Command* cmd; */
     
      frc2::CommandPtr driveTo();
 
