@@ -153,20 +153,8 @@ Drivetrain::Drivetrain(frc::TimedRobot *_robot) :
 }
 
 frc2::CommandPtr Drivetrain::driveTo() {
-    frc::Translation2d startPose = getCalculatedPose().Translation();
+    frc::Translation2d startPose = AutoBuilder::getCurrentPose().Translation();
     frc::Translation2d endPose = frc::Translation2d(14.634_m, 2.769_m);
-    units::radian_t theta{
-        tan((endPose.Y() - startPose.Y()).to<double>() / (endPose.X() - startPose.X()).to<double>())
-    };
-    frc::Translation2d startPoseControlPoint{
-        startPose.X() + .25_m * cos(theta.to<double>()),
-        startPose.Y() + .25_m * sin(theta.to<double>()),
-    };
-
-    frc::Translation2d endPoseControlPoint{
-        endPose.X() - .25_m * cos(theta.to<double>()),
-        endPose.Y() - .25_m * sin(theta.to<double>()),
-    };
 
     std::vector<Waypoint> points = std::vector<Waypoint>{
         Waypoint(
@@ -201,15 +189,7 @@ frc2::CommandPtr Drivetrain::driveTo() {
         )
     );
 
-    frc2::CommandPtr pathAndFollow = AutoBuilder::pathfindThenFollowPath(
-        path,
-        PathConstraints(
-            MAX_VEL / 2.0,
-            MAX_ACC / 2.0,
-            MAX_ANGULAR_VEL / 2.0,
-            MAX_ANGULAR_ACC / 2.0
-        )
-    );
+    frc2::CommandPtr pathAndFollow = AutoBuilder::followPath(path);
     
     return pathAndFollow;
 }
