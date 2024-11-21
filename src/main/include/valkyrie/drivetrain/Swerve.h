@@ -112,7 +112,10 @@ private:
     bool useCarpetGrain;
     double carpetGrainMultiplier;
     bool roughTowardsRed;
+    double fullStick;
     void calculateCarpetPose();
+
+    frc::Timer *timer;
 };
 
 }

@@ -4,6 +4,7 @@
 #include <frc/estimator/SwerveDrivePoseEstimator.h>
 #include <frc/geometry/Translation2d.h>
 #include <frc/DriverStation.h>
+#include <frc/Timer.h>
 
 #define MODULE_DIFF_XS {1, 1, -1, -1}
 #define MODULE_DIFF_YS {1, -1, -1, 1}
@@ -110,6 +111,13 @@ void Swerve<AzimuthMotor, DriveMotor>::analyzeDashboard()
         xSpeedMPS *= -1.0;
         ySpeedMPS *= -1.0;
     }
+
+    if(fabs(driverGamepad->leftStickY()) > 0.95) {
+        timer->Start();
+    } else {
+        timer->Stop();
+        fullStick += timer->Get().to<double>();
+    }
 }
 
 template<class AzimuthMotor, class DriveMotor>
@@ -156,12 +164,6 @@ void Swerve<AzimuthMotor, DriveMotor>::setSwerveDesiredState(wpi::array<frc::Swe
     for (size_t i = 0; i < MODULE_COUNT; i++) {
         swerveModules[i]->setDesiredState(desiredStates[i], isDriveOpenLoop);
     }
-}
-
-template<class AzimuthMotor, class DriveMotor>
-void Swerve<AzimuthMotor, DriveMotor>::resetState()
-{
-    resetOdometry(frc::Pose2d{0_m, 0_m, 0_rad});
 }
 
 template<class AzimuthMotor, class DriveMotor>
@@ -291,6 +293,13 @@ wpi::array<frc::SwerveModuleState, MODULE_COUNT> Swerve<AzimuthMotor, DriveMotor
     auto states = kinematics->ToSwerveModuleStates(chassisSpeeds);
     kinematics->DesaturateWheelSpeeds(&states, maxDriveSpeed);
     return states;
+}
+
+template<class AzimuthMotor, class DriveMotor>
+void Swerve<AzimuthMotor, DriveMotor>::resetState()
+{
+    resetOdometry(frc::Pose2d{0_m, 0_m, 0_rad});
+    fullStick = 0.0;
 }
 
 template<class AzimuthMotor, class DriveMotor>
@@ -446,6 +455,11 @@ void Swerve<AzimuthMotor, DriveMotor>::InitSendable(wpi::SendableBuilder& builde
     builder.AddDoubleProperty(
         "Max Drive Speed MPS",
         [this] {return maxDriveSpeed.value();},
+        nullptr
+    );
+    builder.AddDoubleProperty(
+        "Full Stick",
+        [this] {return fullStick / 135;},
         nullptr
     );
 }
