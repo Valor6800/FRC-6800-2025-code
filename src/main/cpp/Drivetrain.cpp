@@ -1,4 +1,5 @@
 #include "Drivetrain.h"
+#include <charconv>
 #include <cmath>
 #include <cstddef>
 #include <cstdlib>
@@ -11,6 +12,7 @@
 #include "Constants.h"
 #include "frc/geometry/Translation2d.h"
 #include "frc2/command/CommandPtr.h"
+#include "frc2/command/Commands.h"
 #include "frc2/command/FunctionalCommand.h"
 #include "pathplanner/lib/config/RobotConfig.h"
 #include "pathplanner/lib/path/PathPlannerPath.h"
@@ -143,33 +145,51 @@ Drivetrain::Drivetrain(frc::TimedRobot *_robot) :
         this // Reference to this subsystem to set requirements
     );
 
+    table->PutNumber("End X", 13.634);
+    table->PutNumber("End Y", 3.769);
+
     pathplanner::NamedCommands::registerCommand(
         "Drive To Point",
-        std::move(driveTo())
+        std::move(
+            frc2::InstantCommand(
+                [this] () {
+
+                    frc::Translation2d endPose {
+                        units::meter_t{table->GetNumber("End X", 13.634)},
+                        units::meter_t{table->GetNumber("End Y", 3.769)}
+                    };
+                    driveCMD = driveTo(endPose);
+                    driveCMD.Schedule();
+                }
+            ).ToPtr()
+        )
     );
 
     resetState();
     init();
 }
 
-frc2::CommandPtr Drivetrain::driveTo() {
-    frc::Translation2d startPose = AutoBuilder::getCurrentPose().Translation();
-    frc::Translation2d endPose = frc::Translation2d(14.634_m, 2.769_m);
+frc2::CommandPtr Drivetrain::driveTo(frc::Translation2d endPose) {
+    frc::Translation2d startPose = this->getCalculatedPose().Translation();
+    double theta = std::atan2(endPose.Y().value() - startPose.Y().value(), endPose.X().value() - startPose.X().value());
+    frc::Translation2d endPoseControlPoint {
+        -.25_m  * cos(theta) + endPose.X(),
+        -.25_m  * sin(theta) + endPose.Y(),
 
+    };
+    frc::Translation2d startPoseControlPoint {
+        .25_m  * cos(theta) + startPose.X(),
+        .25_m  * sin(theta) + startPose.Y(),
+
+    };
     std::vector<Waypoint> points = std::vector<Waypoint>{
         Waypoint(
             std::nullopt,
             startPose,
-            std::make_optional(frc::Translation2d(
-                .25_m,
-                frc::Rotation2d(180_deg)
-            ))
+            std::make_optional(startPoseControlPoint)
         ),
         Waypoint(
-            std::make_optional(frc::Translation2d(
-                .25_m,
-                frc::Rotation2d(180_deg)
-            )),
+            std::make_optional(endPoseControlPoint),
             endPose,
             std::nullopt
         )
@@ -179,18 +199,21 @@ frc2::CommandPtr Drivetrain::driveTo() {
             PathPlannerPath(
             points,
             PathConstraints(
-                MAX_VEL / 2.0,
-                MAX_ACC / 2.0,
-                MAX_ANGULAR_VEL / 2.0,
-                MAX_ANGULAR_ACC / 2.0
+                MAX_VEL,
+                MAX_ACC,
+                MAX_ANGULAR_VEL,
+                MAX_ANGULAR_ACC
             ),
             std::nullopt,
-            GoalEndState(0.0_mps, frc::Rotation2d(180_deg))
+            GoalEndState(0.0_mps, frc::Rotation2d(90_deg))
         )
     );
 
+
     frc2::CommandPtr pathAndFollow = AutoBuilder::followPath(path);
     
+    std::cout << "-------------------------------------\n\n" << startPose.X().value() << "\n\n";
+
     return pathAndFollow;
 }
 
@@ -198,6 +221,7 @@ Drivetrain::~Drivetrain(){}
 
 std::vector<std::pair<SwerveAzimuthMotor*, SwerveDriveMotor*>> Drivetrain::generateModules()
 {
+
     std::vector<std::pair<SwerveAzimuthMotor*, SwerveDriveMotor*>> modules;
 
     valor::PIDF azimuthPID;
@@ -369,6 +393,19 @@ void Drivetrain::InitSendable(wpi::SendableBuilder& builder)
                 sqrtf(powf(state.accel.x.to<double>(), 2) + powf(state.accel.y.to<double>(), 2))
             } > 20.0_mps_sq; // ~60 kg bot -> 600 N, 5 measurements * 20ms = .1s, 
                                                                                      // impulse = .1 * 600 = 60 Joules
+            },
+            nullptr
+        );
+
+        builder.AddDoubleArrayProperty(
+            "Auto Pos",
+            [this] {
+                std::vector<double> pose{
+                    AutoBuilder::getCurrentPose().X().value(),
+                    AutoBuilder::getCurrentPose().Y().value(),
+                    AutoBuilder::getCurrentPose().Rotation().Degrees().value()
+                };
+                return pose;
             },
             nullptr
         );

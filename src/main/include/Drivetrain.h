@@ -121,7 +121,9 @@ public:
 
     /* frc2::Command* cmd; */
     
-     frc2::CommandPtr driveTo();
+    frc::Translation2d tempEndPose = frc::Translation2d(13.634_m, 3.769_m);
+     frc2::CommandPtr driveCMD = frc2::cmd::None();
+     frc2::CommandPtr driveTo(frc::Translation2d endPose);
 
      frc2::FunctionalCommand* getResetOdom();
 
