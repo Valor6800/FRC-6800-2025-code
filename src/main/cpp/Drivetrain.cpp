@@ -139,6 +139,8 @@ Drivetrain::Drivetrain(frc::TimedRobot *_robot, valor::CANdleSensor *_leds) :
         aprilTagSensors.push_back(new valor::AprilTagsSensor(robot, aprilCam.first, aprilCam.second));  
         aprilTagSensors.back()->setPipe(valor::VisionSensor::PIPELINE_0);
     }
+    gamePieceCamera = new valor::GamePieceSensor(robot, Constants::gamePieceCam.first, Constants::gamePieceCam.second, calcEstimator.get());
+    gamePieceCamera->setPipe(valor::VisionSensor::PIPELINE_0);
 
 
     aprilTagSensors[4]->setPipe(valor::VisionSensor::PIPELINE_1);
@@ -263,7 +265,6 @@ void Drivetrain::init()
     gamePieceCamera = new valor::GamePieceSensor(robot, Constants::gamePieceCam.first, Constants::gamePieceCam.second, calcEstimator.get());
 
     gamePieceCamera->setPipe(valor::VisionSensor::PIPELINE_0);
-
 }
 
 void Drivetrain::assessInputs()
@@ -379,6 +380,10 @@ void Drivetrain::analyzeDashboard()
     }
 
     Swerve::analyzeDashboard();
+
+    table->PutBoolean("Calculated estimator?", state.useCalculatedEstimator);
+
+    gamePieceCamera->getSensor();
 
     visionAcceptanceRadius = (units::meter_t) table->GetNumber("Vision Acceptance", VISION_ACCEPTANCE.to<double>());
 

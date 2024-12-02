@@ -351,7 +351,6 @@ namespace Constants {
             case Robot::Gold: return frc::Pose3d();
             default: return frc::Pose3d();
         }};
-
         static std::vector<std::pair<const char*, frc::Pose3d>> aprilCameras{
                     std::pair("limelight-mint", mintCameraPosition()),
                     std::pair("limelight-choco", chocolateCameraPosition()),
@@ -661,8 +660,7 @@ namespace Constants {
             }}
         }
         static std::pair<const char*, frc::Pose3d> gamePieceCam{
-
-            "limelight-minty", mintCameraPosition()
+            "limelight-berry", mintCameraPosition()
         };
 
 }
