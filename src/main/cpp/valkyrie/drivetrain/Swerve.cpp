@@ -113,10 +113,11 @@ void Swerve<AzimuthMotor, DriveMotor>::analyzeDashboard()
     }
 
     if(fabs(driverGamepad->leftStickY()) > 0.95) {
-        timer->Start();
+        start = frc::Timer::GetFPGATimestamp().to<double>();
     } else {
-        timer->Stop();
-        fullStick += timer->Get().to<double>();
+        double time = frc::Timer::GetFPGATimestamp().to<double>() - start;
+
+        fullStick += time;
     }
 }
 
