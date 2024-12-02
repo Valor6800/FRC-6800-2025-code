@@ -22,8 +22,7 @@ frc::Pose3d GamePieceSensor::getGlobalPose() {
 
     updateRelative();
 
-    if (estimator->GetEstimatedPosition().X() == 0.0_m || estimator->GetEstimatedPosition().Y() == 0.0_m) return frc::Pose3d();
-    
+    if (estimator == nullptr) return frc::Pose3d();
 
     units::radian_t robotTheta = estimator->GetEstimatedPosition().Rotation().Radians(); //Get robot theta from pigeon
 
