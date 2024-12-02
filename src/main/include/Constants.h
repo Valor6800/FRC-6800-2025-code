@@ -319,7 +319,6 @@ namespace Constants {
                 }
             };
         }};
-
         static frc::Pose3d berryCameraPosition(){ switch (teamNumber){
             case ALPHA_TEAM_NUMBER: return frc::Pose3d{}; // Temp value; TODO: Change it
             case SIDE_SWIPE_TEAM_NUMBER: return frc::Pose3d{}; // Temp value; TODO: Change it
@@ -334,7 +333,6 @@ namespace Constants {
                 }
             };
         }};
-
         static std::vector<std::pair<const char*, frc::Pose3d>> aprilCameras{
                     std::pair("limelight-mint", mintCameraPosition()),
                     std::pair("limelight-choco", chocolateCameraPosition()),
@@ -343,8 +341,7 @@ namespace Constants {
                     std::pair("limelight-berry", berryCameraPosition())
         };
         static std::pair<const char*, frc::Pose3d> gamePieceCam{
-
-            "limelight-minty", mintCameraPosition()
+            "limelight-berry", mintCameraPosition()
         };
 
 }
