@@ -114,6 +114,9 @@ public:
           struct { units::acceleration::meters_per_second_squared_t x,y,z; } accel;
      } state;
 
+     frc::Translation2d convertToGlobalSpace(frc::Translation2d robotSpace);
+     frc::Translation2d convertToRobotSpace(frc::Translation2d globalSpace);
+
      frc2::FunctionalCommand* getResetOdom();
 
      units::meters_per_second_t getRobotSpeeds();

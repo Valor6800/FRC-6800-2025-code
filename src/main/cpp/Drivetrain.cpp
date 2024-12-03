@@ -285,6 +285,17 @@ frc2::FunctionalCommand* Drivetrain::getResetOdom() {
     );
 }
 
+frc::Translation2d Drivetrain::convertToRobotSpace(frc::Translation2d globalSpace){
+
+}
+
+frc::Translation2d Drivetrain::convertToGlobalSpace(frc::Translation2d robotSpace){
+    units::meter_t globalX = -sin(getCalculatedPose().Rotation().Radians().to<double>()) * robotSpace.Y() + cos(getCalculatedPose().Rotation().Radians().to<double>()) * robotSpace.X() + getCalculatedPose().X();
+    units::meter_t globalY = cos(getCalculatedPose().Rotation().Radians().to<double>()) * robotSpace.Y() + sin(getCalculatedPose().Rotation().Radians().to<double>()) * robotSpace.X() + getCalculatedPose().Y();
+
+    return frc::Translation2d(globalX, globalY);
+}
+
 // void Drivetrain::setDriveMotorNeutralMode(valor::NeutralMode mode) {
 //     for (int i = 0; i < SWERVE_COUNT; i++)
 //     {
