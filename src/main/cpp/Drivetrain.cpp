@@ -149,18 +149,30 @@ Drivetrain::Drivetrain(frc::TimedRobot *_robot) :
     table->PutNumber("End Y", 3.769);
 
     pathplanner::NamedCommands::registerCommand(
-        "Drive To Point",
+        "Drive To Note",
         std::move(
-            frc2::InstantCommand(
+            frc2::FunctionalCommand(
+                [] () {},
                 [this] () {
-
-                    frc::Translation2d endPose {
-                        units::meter_t{table->GetNumber("End X", 13.634)},
-                        units::meter_t{table->GetNumber("End Y", 3.769)}
-                    };
-                    driveCMD = driveTo(endPose);
+                    if (!gamePieceCamera->hasTarget()) return;
+                    driveCMD = driveTo(gamePieceCamera->getSensor().Translation().ToTranslation2d());
                     driveCMD.Schedule();
-                }
+                },
+                [] (bool) {},
+                [this] () {
+                    return sqrtf(
+                        powf(
+                            gamePieceCamera->relativePoseFromCenter.x.value(),
+                            2
+                        ) + 
+                        powf(
+                            gamePieceCamera->relativePoseFromCenter.y.value(),
+                            2
+                        )
+                    ) < .2  // meters
+                    || !gamePieceCamera->hasTarget();
+                },
+                {this}
             ).ToPtr()
         )
     );
@@ -198,20 +210,21 @@ frc2::CommandPtr Drivetrain::driveTo(frc::Translation2d endPose) {
             PathPlannerPath(
             points,
             PathConstraints(
-                MAX_VEL,
-                MAX_ACC,
-                MAX_ANGULAR_VEL,
-                MAX_ANGULAR_ACC
+                MAX_VEL / 10.0,
+                MAX_ACC / 10.0,
+                MAX_ANGULAR_VEL / 10.0,
+                MAX_ANGULAR_ACC / 10.0
             ),
             std::nullopt,
-            GoalEndState(0.0_mps, frc::Rotation2d(90_deg))
+            GoalEndState(0.0_mps, frc::Rotation2d(180_deg))
         )
     );
 
 
     frc2::CommandPtr pathAndFollow = AutoBuilder::followPath(path);
     
-    std::cout << "-------------------------------------\n\n" << startPose.X().value() << "\n\n";
+    std::cout << "\n\nStarting at: (" << std::to_string(startPose.X().value()) << ", " << std::to_string(startPose.Y().value()) << ")\n";
+    std::cout << "\n\nGoing to: (" << std::to_string(endPose.X().value()) << ", " << std::to_string(endPose.Y().value()) << ")\n";
 
     return pathAndFollow;
 }

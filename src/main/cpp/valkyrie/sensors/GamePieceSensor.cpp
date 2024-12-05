@@ -29,8 +29,8 @@ frc::Pose3d GamePieceSensor::getGlobalPose() {
     units::meter_t robotX = estimator->GetEstimatedPosition().X(); //Get robot X from odom
     units::meter_t robotY = estimator->GetEstimatedPosition().Y(); //Get robot Y from odom
 
-    units::meter_t globalX = -sin(robotTheta.to<double>()) * relativePoseFromCenter.y + cos(robotTheta.to<double>()) * relativePoseFromCenter.x + robotX;
-    units::meter_t globalY = cos(robotTheta.to<double>()) * relativePoseFromCenter.y + sin(robotTheta.to<double>()) * relativePoseFromCenter.x + robotY;
+    units::meter_t globalX = -sin(robotTheta.value()) * relativePoseFromCenter.y + cos(robotTheta.value()) * relativePoseFromCenter.x + robotX;
+    units::meter_t globalY = cos(robotTheta.value()) * relativePoseFromCenter.y + sin(robotTheta.value()) * relativePoseFromCenter.x + robotY;
 
     return frc::Pose3d(
        globalY,
@@ -42,16 +42,16 @@ frc::Pose3d GamePieceSensor::getGlobalPose() {
 // clang-format on
 void GamePieceSensor::updateRelative() {
     if (!hasTarget()) return;
-
-    relativePoseFromCamera.x = cameraPose.Z() * tanf((M_PI/2.0) + cameraPose.Rotation().Y().to<double>() + units::angle::degree_t(tx).convert<units::angle::radian>().to<double>());
-    relativePoseFromCamera.y = relativePoseFromCamera.x / (tanf((M_PI/2.0) - cameraPose.Rotation().Z().to<double>() + units::angle::degree_t(ty).convert<units::angle::radian>().to<double>()));
+    
+    relativePoseFromCamera.x = (cameraPose.Z() - 2.0_in) * tan((M_PI/2.0) + cameraPose.Rotation().Y().value() + units::angle::degree_t(ty).convert<units::angle::radian>().value());
+    relativePoseFromCamera.y = -relativePoseFromCamera.x / tan((M_PI/2.0) - cameraPose.Rotation().Z().value() + units::angle::degree_t(tx).convert<units::angle::radian>().value());
 
     updateRelativeToCenter();
 }
 
 void GamePieceSensor::updateRelativeToCenter() {
-    relativePoseFromCenter.x = relativePoseFromCamera.x * cos(cameraPose.Rotation().Z().to<double>()) - relativePoseFromCamera.y * sin(cameraPose.Rotation().Z().to<double>()) + cameraPose.X();
-    relativePoseFromCenter.y = relativePoseFromCamera.x * sin(cameraPose.Rotation().Z().to<double>()) + relativePoseFromCamera.y * cos(cameraPose.Rotation().Z().to<double>()) + cameraPose.Y();
+    relativePoseFromCenter.x = relativePoseFromCamera.x * cos(cameraPose.Rotation().Z().value()) - relativePoseFromCamera.y * sin(cameraPose.Rotation().Z().value()) + cameraPose.X();
+    relativePoseFromCenter.y = relativePoseFromCamera.x * sin(cameraPose.Rotation().Z().value()) + relativePoseFromCamera.y * cos(cameraPose.Rotation().Z().value()) + cameraPose.Y();
 
 }
 
@@ -63,8 +63,8 @@ void GamePieceSensor::InitSendable(wpi::SendableBuilder& builder) {
         [this] {
             frc::Pose2d gamePos = getSensor().ToPose2d();
             std::vector<double> gamePosVector{
-                gamePos.Y().to<double>(),
-                gamePos.X().to<double>(),
+                gamePos.X().value(),
+                gamePos.Y().value(),
             };
             return gamePosVector;
         },
@@ -75,8 +75,8 @@ void GamePieceSensor::InitSendable(wpi::SendableBuilder& builder) {
         [this]
         {
             return std::vector<double>{
-                relativePoseFromCamera.x.to<double>(), // Fd
-                relativePoseFromCamera.y.to<double>() // lt and rt
+                relativePoseFromCamera.x.value(), // Fd
+                relativePoseFromCamera.y.value() // lt and rt
             };
         },
         nullptr
@@ -86,8 +86,8 @@ void GamePieceSensor::InitSendable(wpi::SendableBuilder& builder) {
         [this]
         {
             return std::vector<double>{
-                relativePoseFromCenter.x.to<double>(), // Fd
-                relativePoseFromCenter.y.to<double>() // lt and rt
+                relativePoseFromCenter.x.value(), // Fd
+                relativePoseFromCenter.y.value() // lt and rt
             };
         },
         nullptr
