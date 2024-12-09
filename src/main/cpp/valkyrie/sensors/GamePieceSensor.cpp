@@ -5,6 +5,7 @@
 #include "units/length.h"
 #include "wpi/detail/value_t.h"
 #include <cmath>
+#include <iostream>
 #include <vector>
 // clang-format off
 using namespace valor;
@@ -29,30 +30,31 @@ frc::Pose3d GamePieceSensor::getGlobalPose() {
     units::meter_t robotX = estimator->GetEstimatedPosition().X(); //Get robot X from odom
     units::meter_t robotY = estimator->GetEstimatedPosition().Y(); //Get robot Y from odom
 
-    units::meter_t globalX = -sin(robotTheta.to<double>()) * relativePoseFromCenter.y + cos(robotTheta.to<double>()) * relativePoseFromCenter.x + robotX;
-    units::meter_t globalY = cos(robotTheta.to<double>()) * relativePoseFromCenter.y + sin(robotTheta.to<double>()) * relativePoseFromCenter.x + robotY;
+    units::meter_t globalX = robotX + relativePoseFromCenter.x * cos(robotTheta.value()) + relativePoseFromCenter.y * sin(robotTheta.value());
+    units::meter_t globalY = robotY - relativePoseFromCenter.x * sin(robotTheta.value()) + relativePoseFromCenter.y * cos(robotTheta.value());
 
     return frc::Pose3d(
-       globalY,
        globalX,
+       globalY,
        0_m,
        frc::Rotation3d()
     );
 }
 // clang-format on
+#define ANGLE_ERR 0.0
 void GamePieceSensor::updateRelative() {
     if (!hasTarget()) return;
-
-    relativePoseFromCamera.x = cameraPose.Z() * tanf((M_PI/2.0) + cameraPose.Rotation().Y().to<double>() + units::angle::degree_t(tx).convert<units::angle::radian>().to<double>());
-    relativePoseFromCamera.y = relativePoseFromCamera.x / (tanf((M_PI/2.0) - cameraPose.Rotation().Z().to<double>() + units::angle::degree_t(ty).convert<units::angle::radian>().to<double>()));
+    double angle = cameraPose.Rotation().Y().value() + (units::angle::degree_t(ty).convert<units::angle::radian>().value() + ANGLE_ERR /* * 1.36586656 */) /* + (((ty * M_PI) / 180.0) / 3.0) */; 
+    std::cout << "\n\n\t\t" << angle << "\n\n";
+    relativePoseFromCamera.x = (cameraPose.Z() - 2.0_in) * tan((M_PI / 2.0) + angle);
+    relativePoseFromCamera.y = relativePoseFromCamera.x / tan((M_PI/2.0) - cameraPose.Rotation().Z().value() + units::angle::degree_t(tx).convert<units::angle::radian>().value());
 
     updateRelativeToCenter();
 }
 
 void GamePieceSensor::updateRelativeToCenter() {
-    relativePoseFromCenter.x = relativePoseFromCamera.x * cos(cameraPose.Rotation().Z().to<double>()) - relativePoseFromCamera.y * sin(cameraPose.Rotation().Z().to<double>()) + cameraPose.X();
-    relativePoseFromCenter.y = relativePoseFromCamera.x * sin(cameraPose.Rotation().Z().to<double>()) + relativePoseFromCamera.y * cos(cameraPose.Rotation().Z().to<double>()) + cameraPose.Y();
-
+    relativePoseFromCenter.x = relativePoseFromCamera.x * cos(cameraPose.Rotation().Z().value()) - relativePoseFromCamera.y * sin(cameraPose.Rotation().Z().value()) + cameraPose.X();
+    relativePoseFromCenter.y = relativePoseFromCamera.x * sin(cameraPose.Rotation().Z().value()) - relativePoseFromCamera.y * cos(cameraPose.Rotation().Z().value()) + cameraPose.Y();
 }
 
 void GamePieceSensor::InitSendable(wpi::SendableBuilder& builder) {
@@ -92,4 +94,6 @@ void GamePieceSensor::InitSendable(wpi::SendableBuilder& builder) {
         },
         nullptr
     );
+
+    VisionSensor::InitSendable(builder);
 }

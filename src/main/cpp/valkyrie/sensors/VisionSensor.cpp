@@ -100,4 +100,19 @@ void VisionSensor::calculate(){
 void VisionSensor::InitSendable(wpi::SendableBuilder& builder) {
     builder.AddDoubleProperty("totalLatency", [this] {return getTotalLatency().to<double>();}, nullptr);
     builder.AddBooleanProperty("hasTarget", [this]{ return hasTarget();}, nullptr);
+    builder.AddDoubleProperty(
+        "ty (deg)",
+        [this] {return ty;},
+        nullptr
+    );
+    builder.AddDoubleProperty(
+        "tx (deg)",
+        [this] {return tx;},
+        nullptr
+    );
+    builder.AddDoubleProperty(
+        "tv",
+        [this] {return tv;},
+        nullptr
+    );
 }
