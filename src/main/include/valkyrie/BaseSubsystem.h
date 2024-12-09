@@ -64,7 +64,6 @@ class BaseSubsystem : public frc2::Subsystem, public wpi::Sendable, public wpi::
         {
             table = nt::NetworkTableInstance::GetDefault().GetTable(name);
             wpi::SendableRegistry::AddLW(this, "BaseSubsystem", subsystemName);
-            init();
         }
         
         /**

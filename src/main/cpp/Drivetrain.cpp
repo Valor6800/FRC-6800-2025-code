@@ -139,6 +139,7 @@ Drivetrain::Drivetrain(frc::TimedRobot *_robot) :
     ).ToPtr());
 */
     resetState();
+    init();
 }
 
 Drivetrain::~Drivetrain(){}
