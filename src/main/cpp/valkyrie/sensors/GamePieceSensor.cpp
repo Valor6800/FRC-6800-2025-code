@@ -44,9 +44,9 @@ frc::Pose3d GamePieceSensor::getGlobalPose() {
 #define ANGLE_ERR 1.972405059
 void GamePieceSensor::updateRelative() {
     if (!hasTarget()) return;
-    double angle = cameraPose.Rotation().Y().value() + (units::angle::degree_t(ty).convert<units::angle::radian>().value() + ANGLE_ERR /* * 1.36586656 */) /* + (((ty * M_PI) / 180.0) / 3.0) */; 
+    double angle = cameraPose.Rotation().Y().value() + (units::angle::degree_t(ty).convert<units::angle::radian>().value() + (ANGLE_ERR * (M_PI/180.0)) /* * 1.36586656 */) /* + (((ty * M_PI) / 180.0) / 3.0) */; 
     std::cout << "\n\n\t\t" << angle << "\n\n";
-    relativePoseFromCamera.x = (cameraPose.Z() - 2.0_in) * tan((M_PI / 2.0) + angle);
+    relativePoseFromCamera.x = cameraPose.Z() * tan((M_PI / 2.0) + angle);
     relativePoseFromCamera.y = relativePoseFromCamera.x / tan((M_PI/2.0) - cameraPose.Rotation().Z().value() + units::angle::degree_t(tx).convert<units::angle::radian>().value());
 
     updateRelativeToCenter();
