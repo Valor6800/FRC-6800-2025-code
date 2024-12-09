@@ -4,6 +4,7 @@
 #include "units/time.h"
 #include "valkyrie/sensors/BaseSensor.h"
 #include "wpi/array.h"
+#include "wpi/sendable/SendableBuilder.h"
 #include <array>
 #include <span>
 #include <vector>
@@ -79,4 +80,22 @@ void VisionSensor::calculate(){
     
     currState = getSensor();
     
+}
+
+void VisionSensor::InitSendable(wpi::SendableBuilder& builder) {
+    builder.AddDoubleProperty(
+        "ty (deg)",
+        [this] {return ty;},
+        nullptr
+    );
+    builder.AddDoubleProperty(
+        "tx (deg)",
+        [this] {return tx;},
+        nullptr
+    );
+    builder.AddDoubleProperty(
+        "tv",
+        [this] {return tv;},
+        nullptr
+    );
 }

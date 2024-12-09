@@ -322,12 +322,12 @@ namespace Constants {
             case ALPHA_TEAM_NUMBER: return frc::Pose3d{}; // Temp value; TODO: Change it
             case SIDE_SWIPE_TEAM_NUMBER: return frc::Pose3d{}; // Temp value; TODO: Change it
             default: return frc::Pose3d{
-                14.0_in - (1.0_in + 15.0_in/16.0), // 4
-                0.0_in, // -3.5
-                16.5_in, // 21.75 
+                14.0_in - 1.875_in, // 4
+                -.25_in, // -3.5
+                42.2275_cm, // 21.75 
                 frc::Rotation3d{
                     0_deg,
-                    -14.6_deg, //32.7
+                    -15.0_deg, //32.7
                     0_deg
                 }
             };
@@ -338,7 +338,7 @@ namespace Constants {
                     std::pair("limelight-mango", mangoCameraPosition())
         };
         static std::pair<const char*, frc::Pose3d> gamePieceCam{
-            "limelight-berry", mintCameraPosition()
+            "limelight-berry", berryCameraPosition()
         };
 
 }
