@@ -41,7 +41,7 @@ frc::Pose3d GamePieceSensor::getGlobalPose() {
     );
 }
 // clang-format on
-#define ANGLE_ERR 0.0
+#define ANGLE_ERR 1.972405059
 void GamePieceSensor::updateRelative() {
     if (!hasTarget()) return;
     double angle = cameraPose.Rotation().Y().value() + (units::angle::degree_t(ty).convert<units::angle::radian>().value() + ANGLE_ERR /* * 1.36586656 */) /* + (((ty * M_PI) / 180.0) / 3.0) */; 
