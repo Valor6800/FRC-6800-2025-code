@@ -117,12 +117,14 @@ public:
           units::second_t startTimestamp; // generic
           
           struct { units::acceleration::meters_per_second_squared_t x,y,z; } accel;
+          frc::Translation2d lastPathEndPose;
      } state;
 
     /* frc2::Command* cmd; */
     
     frc::Translation2d tempEndPose = frc::Translation2d(13.634_m, 3.769_m);
      frc2::CommandPtr driveCMD = frc2::cmd::None();
+     bool stillGenerating;
      frc2::CommandPtr driveTo(frc::Translation2d endPose);
 
      frc2::FunctionalCommand* getResetOdom();

@@ -10,11 +10,13 @@
 #include <pathplanner/lib/auto/AutoBuilder.h>
 #include <string>
 #include "Constants.h"
+#include "frc/Timer.h"
 #include "frc/geometry/Translation2d.h"
 #include "frc2/command/CommandPtr.h"
 #include "frc2/command/Commands.h"
 #include "frc2/command/FunctionalCommand.h"
 #include "pathplanner/lib/config/RobotConfig.h"
+#include "pathplanner/lib/path/IdealStartingState.h"
 #include "pathplanner/lib/path/PathPlannerPath.h"
 #include "pathplanner/lib/path/Waypoint.h"
 #include "units/acceleration.h"
@@ -149,16 +151,30 @@ Drivetrain::Drivetrain(frc::TimedRobot *_robot) :
     table->PutNumber("End Y", 3.769);
 
     pathplanner::NamedCommands::registerCommand(
-        "Drive To Point",
+        "Gen Path",
         std::move(
             frc2::InstantCommand(
                 [this] () {
 
                     frc::Translation2d endPose {
-                        units::meter_t{table->GetNumber("End X", 13.634)},
-                        units::meter_t{table->GetNumber("End Y", 3.769)}
+                        3.367_m,
+                        4.596_m
                     };
+                    state.lastPathEndPose = frc::Translation2d(1.568_m, 4.960_m);
+                    units::second_t startTime = frc::GetTime();
+                    printf("\n\n\t\t%.5f\n\n", startTime.value());
                     driveCMD = driveTo(endPose);
+                    printf("\n\n\t\t%.5f\n\n", frc::GetTime().value() - startTime.value());
+                }
+            ).ToPtr()
+        )
+    );
+
+    pathplanner::NamedCommands::registerCommand(
+        "Drive Path",
+        std::move(
+            frc2::InstantCommand(
+                [this] () {
                     driveCMD.Schedule();
                 }
             ).ToPtr()
@@ -170,7 +186,8 @@ Drivetrain::Drivetrain(frc::TimedRobot *_robot) :
 }
 
 frc2::CommandPtr Drivetrain::driveTo(frc::Translation2d endPose) {
-    frc::Translation2d startPose = this->getCalculatedPose().Translation();
+    frc::Translation2d startPose = state.lastPathEndPose;
+    /* frc::Translation2d startPose = this->getCalculatedPose().Translation(); */
     double theta = std::atan2(endPose.Y().value() - startPose.Y().value(), endPose.X().value() - startPose.X().value());
     frc::Translation2d endPoseControlPoint {
         -.25_m  * cos(theta) + endPose.X(),
@@ -204,8 +221,11 @@ frc2::CommandPtr Drivetrain::driveTo(frc::Translation2d endPose) {
                 MAX_ANGULAR_VEL,
                 MAX_ANGULAR_ACC
             ),
-            std::nullopt,
-            GoalEndState(0.0_mps, frc::Rotation2d(90_deg))
+            std::make_optional(IdealStartingState(
+                2_mps,
+                frc::Rotation2d(0.0_deg)
+            )),
+            GoalEndState(0.0_mps, frc::Rotation2d(0_deg))
         )
     );
 
