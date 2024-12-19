@@ -125,6 +125,7 @@ Drivetrain::Drivetrain(frc::TimedRobot *_robot) :
         },
         this // Reference to this subsystem to set requirements
     );
+
     resetState();
 }
 

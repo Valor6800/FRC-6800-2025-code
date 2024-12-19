@@ -1,0 +1,81 @@
+{
+  "version": "2025.0",
+  "waypoints": [
+    {
+      "anchor": {
+        "x": 1.35,
+        "y": 6.467440337441439
+      },
+      "prevControl": null,
+      "nextControl": {
+        "x": 1.7644603900318914,
+        "y": 6.4897623684136265
+      },
+      "isLocked": false,
+      "linkedName": "Start amp"
+    },
+    {
+      "anchor": {
+        "x": 2.3887683562404165,
+        "y": 6.467440337441439
+      },
+      "prevControl": {
+        "x": 2.139037316991043,
+        "y": 6.479033785393957
+      },
+      "nextControl": null,
+      "isLocked": false,
+      "linkedName": "Acrid"
+    }
+  ],
+  "rotationTargets": [],
+  "constraintZones": [
+    {
+      "name": "Let it rotate",
+      "minWaypointRelativePos": 0,
+      "maxWaypointRelativePos": 0.5,
+      "constraints": {
+        "maxVelocity": 0.8,
+        "maxAcceleration": 5.0,
+        "maxAngularVelocity": 720.0,
+        "maxAngularAcceleration": 1600.0,
+        "nominalVoltage": 12.0,
+        "unlimited": false
+      }
+    },
+    {
+      "name": "Slow",
+      "minWaypointRelativePos": 0.8,
+      "maxWaypointRelativePos": 1.0,
+      "constraints": {
+        "maxVelocity": 1.2,
+        "maxAcceleration": 5.0,
+        "maxAngularVelocity": 720.0,
+        "maxAngularAcceleration": 1600.0,
+        "nominalVoltage": 12.0,
+        "unlimited": false
+      }
+    }
+  ],
+  "pointTowardsZones": [],
+  "eventMarkers": [],
+  "globalConstraints": {
+    "maxVelocity": 0.5,
+    "maxAcceleration": 3.0,
+    "maxAngularVelocity": 540.0,
+    "maxAngularAcceleration": 720.0,
+    "nominalVoltage": 12.0,
+    "unlimited": false
+  },
+  "goalEndState": {
+    "velocity": 0.0,
+    "rotation": -1.2081809297013715
+  },
+  "reversed": false,
+  "folder": null,
+  "idealStartingState": {
+    "velocity": 0,
+    "rotation": 0.0
+  },
+  "useDefaultConstraints": true
+}

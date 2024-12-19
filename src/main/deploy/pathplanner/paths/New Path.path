@@ -3,29 +3,29 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 3.456737010696244,
-        "y": 6.467440337441439
+        "x": 2.0,
+        "y": 7.0
       },
       "prevControl": null,
       "nextControl": {
-        "x": 3.5913613956857544,
-        "y": 6.160297839114197
+        "x": 3.0,
+        "y": 7.0
       },
       "isLocked": false,
-      "linkedName": "A1 test"
+      "linkedName": null
     },
     {
       "anchor": {
-        "x": 3.7742058956340134,
-        "y": 5.83914712273869
+        "x": 4.104561190603863,
+        "y": 6.710612870299815
       },
       "prevControl": {
-        "x": 3.6815068815322816,
-        "y": 6.143195138242128
+        "x": 3.104561190603863,
+        "y": 6.710612870299815
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "score amp test"
+      "linkedName": null
     }
   ],
   "rotationTargets": [],
@@ -42,7 +42,7 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 6.193869574093802
+    "rotation": 0.0
   },
   "reversed": false,
   "folder": "Stas' tests",

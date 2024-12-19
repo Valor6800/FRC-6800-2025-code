@@ -3,16 +3,16 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 2.3887683562404165,
+        "x": 2.321426471556647,
         "y": 6.467440337441439
       },
       "prevControl": null,
       "nextControl": {
-        "x": 3.388768356240417,
-        "y": 6.467440337441439
+        "x": 2.650513527878908,
+        "y": 6.483407679561309
       },
       "isLocked": false,
-      "linkedName": "Acrid"
+      "linkedName": null
     },
     {
       "anchor": {
@@ -20,8 +20,8 @@
         "y": 6.467440337441439
       },
       "prevControl": {
-        "x": 2.905828135730346,
-        "y": 6.453485008604855
+        "x": 3.099064901833508,
+        "y": 6.484951673390037
       },
       "nextControl": null,
       "isLocked": false,
@@ -31,7 +31,30 @@
   "rotationTargets": [],
   "constraintZones": [],
   "pointTowardsZones": [],
-  "eventMarkers": [],
+  "eventMarkers": [
+    {
+      "name": "Check condition",
+      "waypointRelativePos": 0,
+      "endWaypointRelativePos": null,
+      "command": {
+        "type": "named",
+        "data": {
+          "name": "Check condition"
+        }
+      }
+    },
+    {
+      "name": "Schedule next",
+      "waypointRelativePos": 0.9528265157807314,
+      "endWaypointRelativePos": null,
+      "command": {
+        "type": "named",
+        "data": {
+          "name": "Schedule next"
+        }
+      }
+    }
+  ],
   "globalConstraints": {
     "maxVelocity": 0.5,
     "maxAcceleration": 3.0,
@@ -45,7 +68,7 @@
     "rotation": 0.0
   },
   "reversed": false,
-  "folder": "Stas' tests",
+  "folder": "More tests",
   "idealStartingState": {
     "velocity": 0,
     "rotation": 0.0

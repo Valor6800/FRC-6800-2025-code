@@ -35,15 +35,11 @@ frc2::CommandPtr Auto::getSelectedAuto(){
 }
 
 frc2::CommandPtr Auto::buildDynamicStep(std::function<bool ()> condition, frc2::CommandPtr _commandIfTrue, frc2::CommandPtr _commandIfFalse) {
-    frc2::CommandPtr *commandIfTrue = &_commandIfTrue;
-    frc2::CommandPtr *commandIfFalse = &_commandIfFalse;
-    return frc2::InstantCommand([condition, commandIfTrue, commandIfFalse](){
+    return frc2::InstantCommand([condition, &_commandIfTrue, &_commandIfFalse](){
         if (condition()){
-            if (commandIfTrue != nullptr)
-                commandIfTrue->Schedule();
+            _commandIfTrue.Schedule();
         } else {
-            if (commandIfFalse != nullptr)
-                commandIfFalse->Schedule();
+            _commandIfFalse.Schedule();
         }
     }).ToPtr();
 }

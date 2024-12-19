@@ -1,8 +1,11 @@
 #include "Robot.h"
 #include "frc/AnalogTriggerType.h"
+#include "frc/geometry/Pose2d.h"
 #include "frc2/command/CommandPtr.h"
+#include "frc2/command/InstantCommand.h"
 #include "pathplanner/lib/auto/AutoBuilder.h"
 #include "pathplanner/lib/path/PathPlannerPath.h"
+#include "units/length.h"
 #include "valkyrie/Auto.h"
 
 #include <frc/smartdashboard/SmartDashboard.h>
@@ -32,6 +35,24 @@ Robot::Robot() :
     //         autoCommands.back().Schedule();
     //     })
     // ).ToPtr());
+    //
+    pathplanner::NamedCommands::registerCommand(
+            "Schedule next", 
+            frc2::InstantCommand(
+                [this](){
+                    autoCommands.back().Schedule();
+                }
+        ).ToPtr()
+    );
+
+    pathplanner::NamedCommands::registerCommand(
+            "Check condition", 
+            frc2::InstantCommand(
+                [this](){
+                    autoCommands.back().Schedule();
+                }
+        ).ToPtr()
+    );
 }
 
 void Robot::RobotInit() {
@@ -72,31 +93,46 @@ void Robot::DisabledPeriodic() {
  */
 void Robot::AutonomousInit() {
     drivetrain.resetState();
+    printf("starting auto init");
     // drivetrain.setDriveMotorNeutralMode(valor::NeutralMode::Brake);
     // drivetrain.doubtX = AUTO_DOUBTX;
     // drivetrain.doubtY = AUTO_DOUBTY;
     
-    frc2::CommandPtr alt = valor::Auto::buildDynamicStep(
-        [this](){return true;},
-        valor::Auto::makePathCommand("a2-shoot"),
-        valor::Auto::makePathCommand("a2-a3-shoot")
-    );
-    
-    frc2::CommandPtr a = valor::Auto::composePaths({"Af BLUE", "Af-A1 pt1"}).AndThen(
+
+    std::string initPathName = "Copy of Af BLUE";
+    auto path = pathplanner::PathPlannerPath::fromPathFile(initPathName);
+    auto initpos = path->getWaypoints().front().anchor;
+    drivetrain.resetOdometry(frc::Pose2d(initpos.X(), initpos.Y(), path->getInitialHeading()));
+    // creating a commandptr and using std::move on it twice doesn't work
+    auto opt1 = valor::Auto::makePathCommand("a1-a2");
+    auto opt2 = valor::Auto::composePaths({"a1-shoot", "shoot-a2"});
+    frc2::CommandPtr a = valor::Auto::composePaths({initPathName, "Af-A1 pt1"}).AndThen(
         valor::Auto::buildDynamicStep(
-            [this](){return true;},
-            valor::Auto::composePaths({"a1-shoot", "shoot-a2"}).AndThen(
-                std::move(alt)
-            ),
-            valor::Auto::makePathCommand("a1-a2").AndThen(
-                std::move(alt)
-            )
+            [](){return true;},
+            std::move(opt1),
+            // valor::Auto::composePaths({"a1-shoot", "shoot-a2"}).AndThen(
+            //     valor::Auto::buildDynamicStep(
+            //         [this](){return true;},
+            //         valor::Auto::makePathCommand("a2-shoot"),
+            //         valor::Auto::makePathCommand("a2-a3-shoot")
+            //     )
+            // ),
+            std::move(opt2)
+            // valor::Auto::makePathCommand("a1-a2").AndThen(
+            //     valor::Auto::buildDynamicStep(
+            //         [this](){return true;},
+            //         valor::Auto::makePathCommand("a2-shoot"),
+            //         valor::Auto::makePathCommand("a2-a3-shoot")
+            //     )
+            // )
         )
     );
 
     autoCommands.clear();
     autoCommands.push_back(std::move(a));
+    printf("Added auto command");
     autoCommands.back().Schedule();
+    printf("Scheduled auto");
 }
 
 void Robot::AutonomousExit() {

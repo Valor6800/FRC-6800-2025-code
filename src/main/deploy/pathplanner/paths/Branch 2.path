@@ -3,25 +3,25 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 1.3843291650283531,
-        "y": 5.578179066194199
+        "x": 3.456737010696244,
+        "y": 6.467440337441439
       },
       "prevControl": null,
       "nextControl": {
-        "x": 2.3843291650283525,
-        "y": 5.578179066194199
+        "x": 4.456737010696244,
+        "y": 6.467440337441439
       },
       "isLocked": false,
-      "linkedName": null
+      "linkedName": "A1 test"
     },
     {
       "anchor": {
-        "x": 4.0,
-        "y": 6.0
+        "x": 5.053820473381688,
+        "y": 5.83255545677758
       },
       "prevControl": {
-        "x": 3.0,
-        "y": 6.0
+        "x": 4.053820473381688,
+        "y": 5.83255545677758
       },
       "nextControl": null,
       "isLocked": false,
@@ -33,7 +33,7 @@
   "pointTowardsZones": [],
   "eventMarkers": [],
   "globalConstraints": {
-    "maxVelocity": 3.0,
+    "maxVelocity": 0.5,
     "maxAcceleration": 3.0,
     "maxAngularVelocity": 540.0,
     "maxAngularAcceleration": 720.0,
@@ -45,7 +45,7 @@
     "rotation": 0.0
   },
   "reversed": false,
-  "folder": null,
+  "folder": "More tests",
   "idealStartingState": {
     "velocity": 0,
     "rotation": 0.0

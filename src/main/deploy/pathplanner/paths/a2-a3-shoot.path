@@ -1,52 +1,36 @@
 {
-  "version": 1.0,
+  "version": "2025.0",
   "waypoints": [
     {
       "anchor": {
-        "x": 8.280114347265732,
-        "y": 5.789145476439101
+        "x": 4.86135570419289,
+        "y": 5.973118279569893
       },
       "prevControl": null,
       "nextControl": {
-        "x": 8.29335706356598,
-        "y": 4.93882056745595
+        "x": 4.48165199108176,
+        "y": 5.993427736855474
       },
       "isLocked": false,
-      "linkedName": "a2"
+      "linkedName": "a2 test"
     },
     {
       "anchor": {
-        "x": 8.280114347265732,
-        "y": 4.089089502253079
+        "x": 3.7742058956340134,
+        "y": 5.83914712273869
       },
       "prevControl": {
-        "x": 8.291484437624222,
-        "y": 4.687628221124452
-      },
-      "nextControl": {
-        "x": 8.27536609998111,
-        "y": 3.839134598024888
-      },
-      "isLocked": false,
-      "linkedName": "a3"
-    },
-    {
-      "anchor": {
-        "x": 5.013154236884284,
-        "y": 6.297874277208335
-      },
-      "prevControl": {
-        "x": 7.960329471584869,
-        "y": 7.158786771277247
+        "x": 4.07653176417464,
+        "y": 5.963082319683157
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "Score amp"
+      "linkedName": "score amp test"
     }
   ],
   "rotationTargets": [
     {
-      "waypointRelativePos": 1,
+      "waypointRelativePos": 0.5,
       "rotationDegrees": -91.918029348025
     }
   ],
@@ -54,10 +38,12 @@
   "pointTowardsZones": [],
   "eventMarkers": [],
   "globalConstraints": {
-    "maxVelocity": 3.0,
+    "maxVelocity": 0.5,
     "maxAcceleration": 3.0,
     "maxAngularVelocity": 540.0,
-    "maxAngularAcceleration": 720.0
+    "maxAngularAcceleration": 720.0,
+    "nominalVoltage": 12.0,
+    "unlimited": false
   },
   "goalEndState": {
     "velocity": 0,
