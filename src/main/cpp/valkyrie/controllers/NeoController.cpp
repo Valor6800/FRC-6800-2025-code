@@ -48,7 +48,7 @@ void NeoController::init()
     wpi::SendableRegistry::AddLW(this, "NeoController", "ID " + std::to_string(0));
 }
 
-void NeoController::setupCANCoder(int deviceId, units::turn_t offset, bool clockwise, std::string canbus, ctre::phoenix6::signals::AbsoluteSensorRangeValue absoluteRange, bool saveImmediately)
+void NeoController::setupCANCoder(int deviceId, units::turn_t offset, bool clockwise, std::string canbus, units::turn_t absoluteRange, bool saveImmediately)
 {
     cancoder = new ctre::phoenix6::hardware::CANcoder(deviceId, canbus);
 }

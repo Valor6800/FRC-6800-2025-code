@@ -86,7 +86,7 @@ public:
 
     units::turn_t getAbsEncoderPosition();
 
-    void setupCANCoder(int deviceId, units::turn_t offset, bool clockwise, std::string canbus = "", ctre::phoenix6::signals::AbsoluteSensorRangeValue absoluteRange=ctre::phoenix6::signals::AbsoluteSensorRangeValue::Unsigned_0To1, bool saveImmediately = false) override;
+    void setupCANCoder(int deviceId, units::turn_t offset, bool clockwise, std::string canbus = "", units::turn_t absoluteRange=1_tr, bool saveImmediately = false) override;
     units::turn_t getCANCoder() override;
 
     float getBusUtil(const char* canBusName);

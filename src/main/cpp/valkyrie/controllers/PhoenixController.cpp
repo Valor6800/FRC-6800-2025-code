@@ -61,12 +61,12 @@ void PhoenixController::init()
     wpi::SendableRegistry::AddLW(this, "PhoenixController", "ID " + std::to_string(getMotor()->GetDeviceID()));
 }
 
-void PhoenixController::setupCANCoder(int deviceId, units::turn_t offset, bool clockwise, std::string canbus, ctre::phoenix6::signals::AbsoluteSensorRangeValue absoluteRange, bool saveImmediately)
+void PhoenixController::setupCANCoder(int deviceId, units::turn_t offset, bool clockwise, std::string canbus, units::turn_t absoluteRange, bool saveImmediately)
 {
     cancoder = new ctre::phoenix6::hardware::CANcoder(deviceId, canbus);
     
     ctre::phoenix6::configs::MagnetSensorConfigs cancoderConfig;
-    cancoderConfig.AbsoluteSensorRange = absoluteRange;
+    cancoderConfig.AbsoluteSensorDiscontinuityPoint = absoluteRange;
     cancoderConfig.SensorDirection = clockwise ? signals::SensorDirectionValue::Clockwise_Positive :
                                          signals::SensorDirectionValue::CounterClockwise_Positive;
     cancoderConfig.MagnetOffset = -offset;
