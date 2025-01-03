@@ -72,11 +72,7 @@ public:
 private:
     valor::PIDF pidf;
     int currentProfile;
-
-    rev::spark::SparkClosedLoopController pidController;
-    // rev::spark::SparkRelativeEncoder encoder;
-    // rev::spark::SparkAbsoluteEncoder extEncoder;
-
     ctre::phoenix6::hardware::CANcoder *cancoder;
+    rev::spark::SparkClosedLoopController pidController;
 };
 }
