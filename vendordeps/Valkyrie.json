@@ -1,20 +1,20 @@
 {
     "fileName": "ValkyrieVendor.json",
     "name": "Valkyrie",
-    "version": "0.0.1",
+    "version": "1.0.0",
     "frcYear": "2025",
     "uuid": "d2481362-631b-482b-8ca0-180a0b744ff9",
     "mavenUrls": [
-        "https://git.valor6800.com/valor6800/valkyrie/-/raw/vendordep/releases"
+        "https://git.valor6800.com/valor6800/valkyrie/-/raw/main/releases"
     ],
-    "jsonUrl": "https://git.valor6800.com/valor6800/valkyrie/-/raw/vendordep/Valkyrie.json",
+    "jsonUrl": "https://git.valor6800.com/valor6800/valkyrie/-/raw/main/Valkyrie.json",
     "javaDependencies": [],
     "jniDependencies": [],
     "cppDependencies": [
         {
             "groupId": "org.valor.valkyrie",
             "artifactId": "Valkyrie-cpp",
-            "version": "0.0.1",
+            "version": "1.0.0",
             "libName": "Valkyrie",
             "headerClassifier": "headers",
             "sharedLibrary": false,
