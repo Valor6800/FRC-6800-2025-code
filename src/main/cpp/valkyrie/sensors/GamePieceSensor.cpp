@@ -45,6 +45,21 @@ GamePieceSensor::GamePieceSensor(frc::TimedRobot* robot, const char *name, frc::
         {cameraPose.Y().value()},
         {cameraPose.Z().value()}
     };
+
+    Eigen::Matrix<double, 3, 3> intrinsicMatrix{
+        {1038.543, 0, 609.345},
+        {0, 1037.537, 469.070},
+        {0, 0, 1}
+    };
+
+    //TODO: Do this on init
+    Eigen::Matrix<double, 3, 3> CameraPoseMatrix{
+        {fullRotationMatrix.row(0)[0], fullRotationMatrix.row(0)[1], cameraTranslation[0]},
+        {fullRotationMatrix.row(1)[0], fullRotationMatrix.row(1)[1], cameraTranslation[1]},
+        {fullRotationMatrix.row(2)[0], fullRotationMatrix.row(2)[1], cameraTranslation[2]},
+    };
+
+    homographyMatrix = intrinsicMatrix * CameraPoseMatrix;
 }
 
 frc::Pose3d GamePieceSensor::getGlobalPose() {
@@ -74,34 +89,28 @@ frc::Pose3d GamePieceSensor::getGlobalPose() {
 void GamePieceSensor::updateRelative() {
 
     //TODO: Make this an input and class memmber constant
-    Eigen::Matrix<double, 3, 3> intrinsicMatrix{
-        {1038.543, 0, 609.345},
-        {0, 1037.537, 469.070},
-        {0, 0, 1}
-    };
-
-    //TODO: Do this on init
-    Eigen::Matrix<double, 3, 4> CameraPoseMatrix{
-        {fullRotationMatrix.row(0)[0], fullRotationMatrix.row(0)[1], fullRotationMatrix.row(0)[2], cameraTranslation[0]},
-        {fullRotationMatrix.row(1)[0], fullRotationMatrix.row(1)[1], fullRotationMatrix.row(1)[2], cameraTranslation[1]},
-        {fullRotationMatrix.row(2)[0], fullRotationMatrix.row(2)[1], fullRotationMatrix.row(2)[2], cameraTranslation[2]},
-    };
-
-    auto inverseHomography = Eigen::Inverse(intrinsicMatrix * CameraPoseMatrix);
     
     if (!hasTarget()) return;
     
-    //TODO: make this suitable with enums for different types of limelights
-    Eigen::Matrix<double, 4, 1> pixelCoord {
-        {(62.5 - (2 * tx)) / (2 * 62.5)},
-        {(48.9 - (2 * ty)) / (2 * 48.9)},
-        {1}
-    };
+    //TODO: make this suitable with enums for different types of limelights and resolutions
+    Eigen::Vector3d pixelCoord (
+        2592 * ((62.5 - (2 * tx)) / (2 * 62.5)),
+        1944 * (48.9 - (2 * ty)) / (2 * 48.9),
+        1
+    );
 
-    Eigen::Matrix<double, 3, 1> gamePieceMatrix = inverseHomography * pixelCoord;
+    // auto temp_HomographyMatrix = Eigen::Map<Eigen::Matrix<double, 3, 3, Eigen::RowMajor>>{homographyMatrix.data()};
 
-    relativePoseFromCamera.x = units::meter_t{gamePieceMatrix.col(0)[0]};
-    relativePoseFromCamera.y = units::meter_t{gamePieceMatrix.col(0)[1]};
+    auto inv_HomographyMatrix = Eigen::Inverse<Eigen::Matrix<double, 3, 3>>(homographyMatrix);
+    auto gamePieceMatrix = inv_HomographyMatrix * pixelCoord;
+    // auto gamePieceMatrix = Eigen::Matrix<double, 3, 1>{
+    //     {1},
+    //     {2},
+    //     {3}
+    // };
+    std::cout << "\n\n\t\t" << inv_HomographyMatrix(0,0) << "x" << inv_HomographyMatrix(1,0) << "\n\n" << std::endl;
+    relativePoseFromCamera.x = units::meter_t{gamePieceMatrix(0,0)};
+    relativePoseFromCamera.y = units::meter_t{gamePieceMatrix(1,0)};
 
     updateRelativeToCenter();
 }
