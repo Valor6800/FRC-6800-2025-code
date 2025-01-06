@@ -25,6 +25,7 @@ class GamePieceSensor : public valor::VisionSensor {
 
         RotationMatrix rollMatrix, yawMatrix, pitchMatrix, fullRotationMatrix;
         Eigen::Matrix<double, 3, 1> cameraTranslation;
+        Eigen::Matrix3d homographyMatrix;
         frc::SwerveDrivePoseEstimator<4>* estimator;
 };
 }
