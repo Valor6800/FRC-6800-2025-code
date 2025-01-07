@@ -280,6 +280,49 @@ frc2::FunctionalCommand* Drivetrain::getResetOdom() {
     );
 }
 
+void Drivetrain::alignAngle()
+{
+    // get tags that are on the specfic reef
+    bool isRed = frc::DriverStation::GetAlliance() == frc::DriverStation::Alliance::kRed ? true : false;
+    int tagID;
+    for(valor::AprilTagsSensor* aprilLime : aprilTagSensors) {
+        if (aprilLime->hasTarget()) {
+            if (isRed) {
+                if(aprilLime->getTagID() >= 6 && aprilLime->getTagID() <= 11){
+                    tagID = aprilLime->getTagID();
+                }
+            }
+            if (!isRed) {
+                if(aprilLime->getTagID()>=17 && aprilLime->getTagID() <= 22){
+                    tagID = aprilLime->getTagID();
+                }
+            }
+        }
+    }
+
+    // set each id angle to the correct angle
+    switch(tagID){
+        case 6:
+            Swerve::targetAngle = -30_deg; // 6
+            break;
+        case 7:
+            Swerve::targetAngle = 0_deg;
+            break;
+        case 8:
+            Swerve::targetAngle = 30_deg; // 8
+            break;
+        case 9:
+            Swerve::targetAngle = 120_deg;
+            break;
+        case 10:
+            Swerve::targetAngle = 180_deg; // 10
+            break;
+        case 11:
+            Swerve::targetAngle = -120_deg; // 11
+            break;
+    }
+}
+
 // void Drivetrain::setDriveMotorNeutralMode(valor::NeutralMode mode) {
 //     for (int i = 0; i < SWERVE_COUNT; i++)
 //     {
