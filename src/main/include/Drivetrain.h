@@ -120,6 +120,13 @@ public:
      units::meters_per_second_t getRobotSpeeds();
 
      // void setDriveMotorNeutralMode(valor::NeutralMode mode);
+
+     // alings the robot using tags
+     void alignAngleTags();
+
+     // align the robot using the position on the field
+     void alignAngleZoning();
+
      double teleopStart;
 
      double doubtX, doubtY;

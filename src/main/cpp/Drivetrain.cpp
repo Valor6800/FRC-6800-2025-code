@@ -56,6 +56,20 @@ const units::meter_t WHEEL_DIAMETER(0.0973_m);
 
 #define MT2_POSE true
 
+#define BLUE_REEF_17_ANGLE 120_deg
+#define BLUE_REEF_18_ANGLE 180_deg
+#define BLUE_REEF_19_ANGLE -120_deg
+#define BLUE_REEF_20_ANGLE -30_deg
+#define BLUE_REEF_21_ANGLE 0_deg
+#define BLUE_REEF_22_ANGLE  30_deg
+
+#define RED_REEF_6_ANGLE 30_deg
+#define RED_REEF_7_ANGLE 0_deg
+#define RED_REEF_8_ANGLE -30_deg
+#define RED_REEF_9_ANGLE -120_deg
+#define RED_REEF_10_ANGLE 180_deg
+#define RED_REEF_11_ANGLE 120_deg
+
 Drivetrain::Drivetrain(frc::TimedRobot *_robot) : 
     valor::Swerve<SwerveAzimuthMotor, SwerveDriveMotor>(
         _robot,
@@ -269,6 +283,74 @@ frc2::FunctionalCommand* Drivetrain::getResetOdom() {
         },
         {}
     );
+}
+
+void Drivetrain::alignAngleTags()
+{
+    // get tags that are on the specfic reef
+    bool isRed = frc::DriverStation::GetAlliance() == frc::DriverStation::Alliance::kRed ? true : false;
+    int tagID;
+    for(valor::AprilTagsSensor* aprilLime : aprilTagSensors) {
+        if (aprilLime->hasTarget()) {
+            if (isRed) {
+                if(aprilLime->getTagID() >= 6 && aprilLime->getTagID() <= 11){
+                    tagID = aprilLime->getTagID();
+                }
+            }
+            if (!isRed) {
+                if(aprilLime->getTagID()>=17 && aprilLime->getTagID() <= 22){
+                    tagID = aprilLime->getTagID();
+                }
+            }
+        }
+    }
+
+    // set each id angle to the correct angle
+    switch(tagID){
+        //red tags
+        case 6:
+            Swerve::targetAngle = RED_REEF_6_ANGLE; // 6
+            break;
+        case 7:
+            Swerve::targetAngle = RED_REEF_7_ANGLE;
+            break;
+        case 8:
+            Swerve::targetAngle = RED_REEF_8_ANGLE; // 8
+            break;
+        case 9:
+            Swerve::targetAngle = RED_REEF_9_ANGLE;
+            break;
+        case 10:
+            Swerve::targetAngle = RED_REEF_10_ANGLE; // 10
+            break;
+        case 11:
+            Swerve::targetAngle = RED_REEF_11_ANGLE; // 11
+            break;
+        //blue tags
+        case 17:
+            Swerve::targetAngle = BLUE_REEF_17_ANGLE; // 17
+            break;
+        case 18:
+            Swerve::targetAngle = BLUE_REEF_18_ANGLE; // 18
+            break;
+        case 19:
+            Swerve::targetAngle = BLUE_REEF_19_ANGLE; // 19
+            break;
+        case 20:
+            Swerve::targetAngle = BLUE_REEF_20_ANGLE; // 20
+            break;
+        case 21:
+            Swerve::targetAngle = BLUE_REEF_21_ANGLE; // 21
+            break;
+        case 22:
+            Swerve::targetAngle = BLUE_REEF_22_ANGLE; // 22
+            break;
+    }
+}
+
+void Drivetrain::alignAngleZoning()
+{
+
 }
 
 // void Drivetrain::setDriveMotorNeutralMode(valor::NeutralMode mode) {
