@@ -1,0 +1,31 @@
+{
+  "version": "2025.0",
+  "command": {
+    "type": "sequential",
+    "data": {
+      "commands": [
+        {
+          "type": "path",
+          "data": {
+            "pathName": "C4-R2L4R"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "R2L4R-H2"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "H2-R3L4R"
+          }
+        }
+      ]
+    }
+  },
+  "resetOdom": true,
+  "folder": null,
+  "choreoAuto": false
+}
