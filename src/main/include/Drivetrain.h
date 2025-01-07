@@ -119,6 +119,8 @@ public:
      units::meters_per_second_t getRobotSpeeds();
 
      // void setDriveMotorNeutralMode(valor::NeutralMode mode);
+     void alignAngle();
+
      double teleopStart;
 
      double doubtX, doubtY;
