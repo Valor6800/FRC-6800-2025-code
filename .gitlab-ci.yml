@@ -1,0 +1,36 @@
+image: wpilib/roborio-cross-ubuntu:2025-22.04
+
+stages:
+  - build
+  - deploy
+
+build:
+  stage: build
+  script:
+    - apt-get update -y && apt-get install -y openjdk-11-jdk  # Install JDK or adjust as needed
+    - ./gradlew build
+  artifacts:
+    paths:
+      - build/
+    reports:
+      junit: '**/TEST-*.xml'
+
+doxygen:
+  stage: build
+  script:
+    - apt-get update -y && apt-get install -y libtinfo5  # Install required dependencies
+    - ./gradlew doxygen
+    - mv docs/html public
+  artifacts:
+    paths:
+      - public
+
+pages:
+  stage: deploy
+  script:
+    - ls -l public
+  artifacts:
+    paths:
+      - public
+  only:
+    - main
