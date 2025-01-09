@@ -1,8 +1,9 @@
 #pragma once
 
-#include <Drivetrain.h>
 #include <frc/smartdashboard/SendableChooser.h>
 #include <frc/smartdashboard/SmartDashboard.h>
+#include <networktables/NetworkTable.h>
+#include <networktables/NetworkTableInstance.h>
 
 
 namespace valor {

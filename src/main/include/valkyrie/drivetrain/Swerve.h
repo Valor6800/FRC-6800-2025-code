@@ -9,6 +9,7 @@
 
 #include "valkyrie/BaseSubsystem.h"
 #include "valkyrie/drivetrain/SwerveModule.h"
+#include "valkyrie/CharMode.h"
 
 #define MODULE_COUNT 4
 
