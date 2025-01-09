@@ -7,9 +7,9 @@
 
 #pragma once
 
+#include "frc/RobotController.h"
 #include <cmath>
-#include <iostream>
-#include <frc/RobotController.h>
+#include <iostream> #include <frc/RobotController.h>
 #include <frc/geometry/Rotation3d.h>
 #include <units/angle.h>
 #include <units/length.h>
@@ -320,10 +320,27 @@ namespace Constants {
             };
         }};
 
+        static frc::Pose3d berryCameraPosition(){ switch (teamNumber){
+            case ALPHA_TEAM_NUMBER: return frc::Pose3d{}; // Temp value; TODO: Change it
+            case SIDE_SWIPE_TEAM_NUMBER: return frc::Pose3d{}; // Temp value; TODO: Change it
+            default: return frc::Pose3d{
+                14.0_in - 1.875_in, // 4
+                -.25_in, // -3.5
+                42.2275_cm, // 21.75 
+                frc::Rotation3d{
+                    0_deg,
+                    -15.0_deg, //32.7
+                    0_deg
+                }
+            };
+        }};
+
         static std::vector<std::pair<const char*, frc::Pose3d>> aprilCameras{
                     std::pair("limelight-mint", mintCameraPosition()),
                     std::pair("limelight-choco", chocolateCameraPosition()),
-                    std::pair("limelight-mango", mangoCameraPosition())
+                    std::pair("limelight-mango", mangoCameraPosition()),
+                    std::pair("limelight-vanilla", vanillaCameraPosition()),
+                    std::pair("limelight-berry", berryCameraPosition())
         };
 }
 #pragma GCC diagnostic pop
