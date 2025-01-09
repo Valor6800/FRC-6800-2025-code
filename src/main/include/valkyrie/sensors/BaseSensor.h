@@ -116,6 +116,16 @@ public:
      */
     T getSensor() { return sensorLambda ? sensorLambda() : T(); }
 
+    /**
+     * @brief Get the latest sensor data without polling the data
+     * 
+     * The lambda is updating the current state in the background, therefore this function
+     * will return the latest current state without re-calling the lambda
+     * 
+     * @return T Returns the latest sensor data updated by @link getSensor @endlink
+     */
+    T getLatestSensorData() { return currState; }
+
     virtual void InitSendable(wpi::SendableBuilder& builder) = 0;
 
 protected:
