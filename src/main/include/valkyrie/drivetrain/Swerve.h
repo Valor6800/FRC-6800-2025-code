@@ -6,6 +6,8 @@
 #include <frc/kinematics/ChassisSpeeds.h>
 #include <frc/kinematics/SwerveDriveKinematics.h>
 #include <frc/estimator/SwerveDrivePoseEstimator.h>
+#include <frc/controller/ProfiledPIDController.h>
+#include <frc/trajectory/TrapezoidProfile.h>
 
 #include "valkyrie/BaseSubsystem.h"
 #include "valkyrie/drivetrain/SwerveModule.h"
@@ -98,6 +100,10 @@ protected:
     void setSwerveDesiredState(wpi::array<frc::SwerveModuleState, MODULE_COUNT> desiredStates, bool isDriveOpenLoop);
 
 private:
+    const units::radians_per_second_t MAX_ROTATION_VEL = 6_rad_per_s;
+    const units::radians_per_second_squared_t MAX_ROTATION_ACCEL = 3_rad_per_s_sq;
+    const double KP = 1;
+    const double KD = 0.0;
 
     std::vector<valor::SwerveModule<AzimuthMotor, DriveMotor> *> swerveModules;
 
@@ -113,6 +119,9 @@ private:
     double carpetGrainMultiplier;
     bool roughTowardsRed;
     void calculateCarpetPose();
+
+    frc::TrapezoidProfile<units::radian>::Constraints rot_constraints{MAX_ROTATION_VEL, MAX_ROTATION_ACCEL};
+    frc::ProfiledPIDController<units::radian> rot_controller{KP, 0.0, KD, rot_constraints};
 };
 
 }

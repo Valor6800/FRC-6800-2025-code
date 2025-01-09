@@ -65,6 +65,7 @@ Swerve<AzimuthMotor, DriveMotor>::~Swerve()
 template<class AzimuthMotor, class DriveMotor>
 void Swerve<AzimuthMotor, DriveMotor>::init()
 {
+    rot_controller.EnableContinuousInput(units::radian_t{-M_PI}, units::radian_t{M_PI});
 }
 
 template<class AzimuthMotor, class DriveMotor>
@@ -80,6 +81,14 @@ void Swerve<AzimuthMotor, DriveMotor>::assessInputs()
     xSpeed = driverGamepad->leftStickY(2);
     ySpeed = driverGamepad->leftStickX(2);
     rotSpeed = driverGamepad->rightStickX(3);
+
+    if (driverGamepad->GetAButtonPressed()) {
+        lockingToTarget = true;
+        if (lockingToTarget) {
+            targetAngle = 0_deg;
+            rot_controller.SetGoal(units::radian_t{targetAngle});
+        }
+    }
 }
 
 template<class AzimuthMotor, class DriveMotor>
@@ -94,11 +103,12 @@ void Swerve<AzimuthMotor, DriveMotor>::analyzeDashboard()
     // Rotational Speed calculations
     if (lockingToTarget) {
         units::radian_t robotRotation = getCalculatedPose().Rotation().Radians();
-        units::radian_t errorAngle = robotRotation - targetAngle;
-        units::radian_t error = units::math::fmod(errorAngle + units::radian_t(M_PI), 2 * units::radian_t(M_PI)) - units::radian_t(M_PI);
-        static units::radian_t prevError = error;
-        rotSpeedRPS = error * KP_ROTATE + (error - prevError) * KD_ROTATE;
-        prevError = error;
+        rotSpeedRPS = units::radians_per_second_t{rot_controller.Calculate(robotRotation)};
+        // units::radian_t errorAngle = robotRotation - targetAngle;
+        // units::radian_t error = units::math::fmod(errorAngle + units::radian_t(M_PI), 2 * units::radian_t(M_PI)) - units::radian_t(M_PI);
+        // static units::radian_t prevError = error;
+        // rotSpeedRPS = error * KP_ROTATE + (error - prevError) * KD_ROTATE;
+        // prevError = error;
     } else {
         rotSpeedRPS = rotSpeed * maxRotationSpeed;
     }
@@ -446,6 +456,11 @@ void Swerve<AzimuthMotor, DriveMotor>::InitSendable(wpi::SendableBuilder& builde
     builder.AddDoubleProperty(
         "Max Drive Speed MPS",
         [this] {return maxDriveSpeed.value();},
+        nullptr
+    );
+    builder.AddDoubleProperty(
+        "Target Angle",
+        [this] {return units::radian_t{targetAngle}.to<double>();},
         nullptr
     );
 }
