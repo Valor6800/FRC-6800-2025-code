@@ -22,7 +22,6 @@ Robot::Robot() :
     drivetrain(this),
     valorAuto()
 {
-    printf("\033[2J");
     frc::TimedRobot();
 
     // pathplanner::NamedCommands::registerCommand("Reschedule", std::move(

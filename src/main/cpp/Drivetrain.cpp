@@ -1,6 +1,5 @@
 #include "Drivetrain.h"
-#include <cmath>
-#include <cstddef>
+#include <cmath> #include <cstddef>
 #include <frc/DriverStation.h>
 #include <iostream>
 #include <math.h>
@@ -327,7 +326,7 @@ void Drivetrain::alignAngleTags()
 
 void Drivetrain::setAngleBasedOnTag(int tagID)
 {
-        switch(tagID){
+    switch(tagID){
         //red tags
         case 6:
             Swerve::targetAngle = RED_REEF_6_ANGLE; // 6
@@ -375,7 +374,6 @@ void Drivetrain::alignAngleZoning()
 {
 
 }
-
 // void Drivetrain::setDriveMotorNeutralMode(valor::NeutralMode mode) {
 //     for (int i = 0; i < SWERVE_COUNT; i++)
 //     {

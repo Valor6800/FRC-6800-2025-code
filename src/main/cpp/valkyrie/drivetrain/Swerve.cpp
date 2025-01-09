@@ -104,6 +104,7 @@ void Swerve<AzimuthMotor, DriveMotor>::analyzeDashboard()
     if (useCarpetGrain)
         calculateCarpetPose();
 
+    // Linear Speed calculations
     xSpeedMPS = units::meters_per_second_t{xSpeed * maxDriveSpeed};
     ySpeedMPS = units::meters_per_second_t{ySpeed * maxDriveSpeed};
     if (frc::DriverStation::GetAlliance() == frc::DriverStation::kBlue) {
