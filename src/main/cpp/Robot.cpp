@@ -40,6 +40,8 @@ void Robot::RobotInit() {
     // valorAuto.fillAutoList();
     // valorAuto.preloadAuto("A1-");
     // valorAuto.preloadAuto("A1-2");
+
+    charMode.fillSelecList();
 }
 /**
  * This function is called every robot packet, no matter the mode. Use

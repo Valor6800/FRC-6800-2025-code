@@ -13,6 +13,7 @@
 #include "valkyrie/controllers/PhoenixController.h"
 #include "valkyrie/controllers/PIDF.h"
 #include "valkyrie/drivetrain/Swerve.h"
+#include "valkyrie/CharMode.h"
 
 #include <frc/kinematics/SwerveDriveKinematics.h>
 #include <frc/estimator/SwerveDrivePoseEstimator.h>
@@ -108,6 +109,7 @@ public:
      {
           // Use in auto to toggle between vision pose and normal pose
           bool useCalculatedEstimator;
+          bool characterization;
 
           units::second_t startTimestamp; // generic
           

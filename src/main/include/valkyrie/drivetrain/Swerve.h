@@ -97,6 +97,8 @@ protected:
     frc::ChassisSpeeds getRobotRelativeSpeeds();
     void setSwerveDesiredState(wpi::array<frc::SwerveModuleState, MODULE_COUNT> desiredStates, bool isDriveOpenLoop);
 
+    bool rotTest;
+
 private:
 
     std::vector<valor::SwerveModule<AzimuthMotor, DriveMotor> *> swerveModules;
@@ -113,6 +115,8 @@ private:
     double carpetGrainMultiplier;
     bool roughTowardsRed;
     void calculateCarpetPose();
+
+    //CharMode charMode;
 };
 
 }

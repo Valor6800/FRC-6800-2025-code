@@ -5,6 +5,7 @@
 #include <frc/geometry/Translation2d.h>
 #include <frc/DriverStation.h>
 
+
 #define MODULE_DIFF_XS {1, 1, -1, -1}
 #define MODULE_DIFF_YS {1, -1, -1, 1}
 
@@ -88,8 +89,12 @@ void Swerve<AzimuthMotor, DriveMotor>::analyzeDashboard()
     rawEstimator->UpdateWithTime(frc::Timer::GetFPGATimestamp(), getGyro(), getModuleStates());
     calcEstimator->UpdateWithTime(frc::Timer::GetFPGATimestamp(), getGyro(), getModuleStates());
 
-    if (useCarpetGrain)
+    if (useCarpetGrain){
         calculateCarpetPose();
+    }
+    /*if (charMode.GetSelected() = "Rot Test") {
+        rotTest = true;
+    }*/
 
     // Rotational Speed calculations
     if (lockingToTarget) {
@@ -448,4 +453,9 @@ void Swerve<AzimuthMotor, DriveMotor>::InitSendable(wpi::SendableBuilder& builde
         [this] {return maxDriveSpeed.value();},
         nullptr
     );
+    /*builder.AddBooleanProperty(
+        "Rot Test",
+        [this] {return rotTest;},
+        nullptr
+    );*/
 }

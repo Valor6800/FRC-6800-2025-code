@@ -21,6 +21,7 @@
 #include "frc/geometry/Rotation3d.h"
 #include "units/angle.h"
 #include <ctre/phoenix6/TalonFX.hpp>
+#include <valkyrie/CharMode.h>
 
 using namespace pathplanner;
 
