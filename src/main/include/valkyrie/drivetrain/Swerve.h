@@ -104,8 +104,12 @@ protected:
 private:
     const units::radians_per_second_t MAX_ROTATION_VEL = 6_rad_per_s;
     const units::radians_per_second_squared_t MAX_ROTATION_ACCEL = 3_rad_per_s_sq;
-    const double KP = 1;
-    const double KD = 0.0;
+    const units::meters_per_second_t MAX_Y_VEL = 0.5_mps;
+    const units::meters_per_second_squared_t MAX_Y_ACCEL = 1_mps_sq;
+    const double ROT_KP = 1;
+    const double ROT_KD = 0.0;
+    const double Y_KP = 1;
+    const double Y_KD = 0;
 
     std::vector<valor::SwerveModule<AzimuthMotor, DriveMotor> *> swerveModules;
 
@@ -128,7 +132,10 @@ private:
     CharMode charac;
 
     frc::TrapezoidProfile<units::radian>::Constraints rot_constraints{MAX_ROTATION_VEL, MAX_ROTATION_ACCEL};
-    frc::ProfiledPIDController<units::radian> rot_controller{KP, 0.0, KD, rot_constraints};
+    frc::ProfiledPIDController<units::radian> rot_controller{ROT_KP, 0.0, ROT_KD, rot_constraints};
+
+    frc::TrapezoidProfile<units::meter>::Constraints y_constraints{MAX_Y_VEL, MAX_Y_ACCEL};
+    frc::ProfiledPIDController<units::meter> y_controller{Y_KP, 0.0, Y_KD, y_constraints};
 };
 
 }

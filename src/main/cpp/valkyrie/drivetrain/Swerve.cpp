@@ -85,8 +85,9 @@ void Swerve<AzimuthMotor, DriveMotor>::assessInputs()
     if (driverGamepad->GetAButtonPressed()) {
         lockingToTarget = true;
         if (lockingToTarget) {
-            targetAngle = 0_deg;
-            rot_controller.SetGoal(units::radian_t{targetAngle});
+            y_controller.SetGoal(1_m);
+            // targetAngle = 0_deg;
+            // rot_controller.SetGoal(units::radian_t{targetAngle});
         }
     }
 }
@@ -100,35 +101,27 @@ void Swerve<AzimuthMotor, DriveMotor>::analyzeDashboard()
     if (useCarpetGrain)
         calculateCarpetPose();
 
-    // Rotational Speed calculations
-    if (lockingToTarget) {
-        units::radian_t robotRotation = getCalculatedPose().Rotation().Radians();
-        rotSpeedRPS = units::radians_per_second_t{rot_controller.Calculate(robotRotation)};
-        // units::radian_t errorAngle = robotRotation - targetAngle;
-        // units::radian_t error = units::math::fmod(errorAngle + units::radian_t(M_PI), 2 * units::radian_t(M_PI)) - units::radian_t(M_PI);
-        // static units::radian_t prevError = error;
-        // rotSpeedRPS = error * KP_ROTATE + (error - prevError) * KD_ROTATE;
-        // prevError = error;
-    } else {
-        rotSpeedRPS = rotSpeed * maxRotationSpeed;
-    }
-
-    // Linear Speed calculations
     xSpeedMPS = units::meters_per_second_t{xSpeed * maxDriveSpeed};
     ySpeedMPS = units::meters_per_second_t{ySpeed * maxDriveSpeed};
     if (frc::DriverStation::GetAlliance() == frc::DriverStation::kRed) {
         xSpeedMPS *= -1.0;
         ySpeedMPS *= -1.0;
     }
+    // Rotational Speed calculations
+    if (lockingToTarget) {
+        // units::radian_t robotRotation = getCalculatedPose().Rotation().Radians();
+        // rotSpeedRPS = units::radians_per_second_t{rot_controller.Calculate(robotRotation)};
+        // units::radian_t errorAngle = robotRotation - targetAngle;
+        // units::radian_t error = units::math::fmod(errorAngle + units::radian_t(M_PI), 2 * units::radian_t(M_PI)) - units::radian_t(M_PI);
+        // static units::radian_t prevError = error;
+        // rotSpeedRPS = error * KP_ROTATE + (error - prevError) * KD_ROTATE;
+        // prevError = error;
+        ySpeedMPS = units::meters_per_second_t{y_controller.Calculate(getCalculatedPose().Y())};
+    } else {
+        rotSpeedRPS = rotSpeed * maxRotationSpeed;
+    }
 
-   if (selectedTest == CharMode::ROT && driverGamepad->GetAButton()) {
-        rotTest = true;
-   } else if (selectedTest == CharMode::STR_LINE && driverGamepad->GetAButton()) {
-        strLineTest = true;
-   } else {
-        rotTest = false;
-        strLineTest = false;
-   }
+    // Linear Speed calculations
 }
 
 template<class AzimuthMotor, class DriveMotor>
