@@ -117,8 +117,6 @@ private:
     bool charMode;
     bool rotTest;
     bool strLineTest;
-    AzimuthMotor* azimuthMotor;
-    DriveMotor* driveMotor;
 };
 
 }

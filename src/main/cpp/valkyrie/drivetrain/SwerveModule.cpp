@@ -143,6 +143,18 @@ void SwerveModule<AzimuthMotor, DriveMotor>::setAzimuthPosition(frc::Rotation2d 
 }
 
 template<class AzimuthMotor, class DriveMotor>
+void SwerveModule<AzimuthMotor, DriveMotor>::setAzimuthPower(int voltage)
+{
+    azimuthMotor->setPower(units::volt_t{voltage});
+}
+
+template<class AzimuthMotor, class DriveMotor>
+void SwerveModule<AzimuthMotor, DriveMotor>::setDrivePower(int voltage)
+{
+    driveMotor->setPower(units::volt_t{voltage});
+}
+
+template<class AzimuthMotor, class DriveMotor>
 void SwerveModule<AzimuthMotor, DriveMotor>::setDriveOpenLoop(units::meters_per_second_t mps)
 {
     driveMotor->setPower(mps / getMaxDriveSpeed() * units::volt_t{12});
