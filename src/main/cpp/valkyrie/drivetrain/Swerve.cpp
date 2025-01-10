@@ -118,7 +118,13 @@ void Swerve<AzimuthMotor, DriveMotor>::analyzeDashboard()
             rotTest = true;
         } else if (driverGamepad->GetBButton()) {
             strLineTest = true;
+        } else{
+            rotTest = false;
+            strLineTest = false;
         }
+    } else {
+        rotTest = false;
+        strLineTest = false;
     }
 }
 
@@ -126,11 +132,22 @@ template<class AzimuthMotor, class DriveMotor>
 void Swerve<AzimuthMotor, DriveMotor>::assignOutputs()
 {
     if (rotTest) {
-        azimuthMotor->setPower((units::volt_t) 12);
+        swerveModules[0]->setAzimuthPosition(frc::Rotation2d(-45_deg));
+        swerveModules[1]->setAzimuthPosition(frc::Rotation2d(-135_deg));
+        swerveModules[2]->setAzimuthPosition(frc::Rotation2d(-225_deg));
+        swerveModules[3]->setAzimuthPosition(frc::Rotation2d(45_deg));
+        for (size_t i = 0; i < MODULE_COUNT; i++) {
+            swerveModules[i]->setDrivePower(12);
+        }
     } else if (strLineTest){
-        azimuthMotor->setPosition((units::angle::turn_t) 0);
-        driveMotor->setPower((units::volt_t) 12);
+        for (size_t i = 0; i < MODULE_COUNT; i++) {
+            swerveModules[i]->setAzimuthPosition(frc::Rotation2d());
+            swerveModules[i]->setDrivePower(2);
+        }
     } else{
+        for (size_t i = 0; i < MODULE_COUNT; i++) {
+            swerveModules[i]->setDrivePower(0);
+        }
         drive(xSpeedMPS, ySpeedMPS, rotSpeedRPS, true);
     }
 }

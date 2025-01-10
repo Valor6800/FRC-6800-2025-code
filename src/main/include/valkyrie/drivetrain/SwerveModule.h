@@ -86,6 +86,9 @@ public:
 
     void setAzimuthPosition(frc::Rotation2d angle);
 
+    void setAzimuthPower(int voltage);
+    void setDrivePower(int voltage);
+
     void InitSendable(wpi::SendableBuilder& builder) override;
 
 private:
