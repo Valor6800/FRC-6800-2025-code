@@ -47,6 +47,7 @@ Swerve<AzimuthMotor, DriveMotor>::Swerve(frc::TimedRobot *_robot,
     rawEstimator = std::make_unique<frc::SwerveDrivePoseEstimator<MODULE_COUNT>>(*kinematics, getGyro(), getModuleStates(), frc::Pose2d{0_m, 0_m, 0_rad});
     calcEstimator = std::make_unique<frc::SwerveDrivePoseEstimator<MODULE_COUNT>>(*kinematics, getGyro(), getModuleStates(), frc::Pose2d{0_m, 0_m, 0_rad});
 
+    table->PutBoolean("Char Mode", false);
     resetState();
 }
 
@@ -88,6 +89,7 @@ void Swerve<AzimuthMotor, DriveMotor>::analyzeDashboard()
     rawEstimator->UpdateWithTime(frc::Timer::GetFPGATimestamp(), getGyro(), getModuleStates());
     calcEstimator->UpdateWithTime(frc::Timer::GetFPGATimestamp(), getGyro(), getModuleStates());
 
+    charMode = table->GetBoolean("Char Mode", false);
     if (useCarpetGrain)
         calculateCarpetPose();
 
@@ -110,12 +112,27 @@ void Swerve<AzimuthMotor, DriveMotor>::analyzeDashboard()
         xSpeedMPS *= -1.0;
         ySpeedMPS *= -1.0;
     }
+
+    if (charMode) {
+        if (driverGamepad->GetAButton()) {
+            rotTest = true;
+        } else if (driverGamepad->GetBButton()) {
+            strLineTest = true;
+        }
+    }
 }
 
 template<class AzimuthMotor, class DriveMotor>
 void Swerve<AzimuthMotor, DriveMotor>::assignOutputs()
 {
-    drive(xSpeedMPS, ySpeedMPS, rotSpeedRPS, true);
+    if (rotTest) {
+        azimuthMotor->setPower((units::volt_t) 12);
+    } else if (strLineTest){
+        azimuthMotor->setPosition((units::angle::turn_t) 0);
+        driveMotor->setPower((units::volt_t) 12);
+    } else{
+        drive(xSpeedMPS, ySpeedMPS, rotSpeedRPS, true);
+    }
 }
 
 template<class AzimuthMotor, class DriveMotor>
@@ -162,6 +179,8 @@ template<class AzimuthMotor, class DriveMotor>
 void Swerve<AzimuthMotor, DriveMotor>::resetState()
 {
     resetOdometry(frc::Pose2d{0_m, 0_m, 0_rad});
+    rotTest = false;
+    strLineTest = false;
 }
 
 template<class AzimuthMotor, class DriveMotor>
@@ -446,6 +465,11 @@ void Swerve<AzimuthMotor, DriveMotor>::InitSendable(wpi::SendableBuilder& builde
     builder.AddDoubleProperty(
         "Max Drive Speed MPS",
         [this] {return maxDriveSpeed.value();},
+        nullptr
+    );
+    builder.AddBooleanProperty(
+        "Char Mode",
+        [this] {return charMode;},
         nullptr
     );
 }

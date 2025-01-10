@@ -113,6 +113,12 @@ private:
     double carpetGrainMultiplier;
     bool roughTowardsRed;
     void calculateCarpetPose();
+
+    bool charMode;
+    bool rotTest;
+    bool strLineTest;
+    AzimuthMotor* azimuthMotor;
+    DriveMotor* driveMotor;
 };
 
 }
