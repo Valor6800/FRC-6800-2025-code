@@ -215,6 +215,10 @@ void Drivetrain::assessInputs()
 
     if (!driverGamepad || !driverGamepad->IsConnected() || !operatorGamepad || !operatorGamepad->IsConnected())
         return;
+
+    for (valor::AprilTagsSensor *aprilCam : aprilTagSensors) {
+        if (aprilCam->hasTarget() && aprilCam->hasTarget())
+    }
 }
 
 void Drivetrain::analyzeDashboard()

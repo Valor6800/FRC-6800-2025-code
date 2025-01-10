@@ -82,14 +82,11 @@ void Swerve<AzimuthMotor, DriveMotor>::assessInputs()
     ySpeed = driverGamepad->leftStickX(2);
     rotSpeed = driverGamepad->rightStickX(3);
 
-    if (driverGamepad->GetAButtonPressed()) {
-        lockingToTarget = true;
-        if (lockingToTarget) {
-            y_controller.SetGoal(1_m);
-            // targetAngle = 0_deg;
-            // rot_controller.SetGoal(units::radian_t{targetAngle});
-        }
-    }
+    lockingToTarget = driverGamepad->GetAButtonPressed();
+    // if (driverGamepad->GetAButtonPressed()) {
+    //     lockingToTarget = true;
+    //     y_controller.SetGoal(1_m);
+    // }
 }
 
 template<class AzimuthMotor, class DriveMotor>
