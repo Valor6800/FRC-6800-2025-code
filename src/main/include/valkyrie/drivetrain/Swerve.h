@@ -99,6 +99,8 @@ protected:
     void setSwerveDesiredState(wpi::array<frc::SwerveModuleState, MODULE_COUNT> desiredStates, bool isDriveOpenLoop);
 
     bool rotTest;
+    bool stateRotTest;
+    units::radians_per_second_t rotTestSpeed;
 
 private:
 
@@ -117,7 +119,8 @@ private:
     bool roughTowardsRed;
     void calculateCarpetPose();
 
-    //CharMode charMode;
+    CharMode charMode;
+    AzimuthMotor* azimuthMotor;
 };
 
 }

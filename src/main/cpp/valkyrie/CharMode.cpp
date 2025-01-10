@@ -8,7 +8,7 @@ using namespace valor;
 const std::string list[2] = {"Straight line test", "Rot test"};
 
 CharMode::CharMode(){
-    table = nt::NetworkTableInstance::GetDefault().GetTable("auto");
+    table = nt::NetworkTableInstance::GetDefault().GetTable("list");
 }
 
 void CharMode::fillSelecList(){
@@ -18,7 +18,7 @@ void CharMode::fillSelecList(){
     frc::SmartDashboard::PutData(&chooser);
 }
 
-void CharMode::GetSelected(){
-
+std::string CharMode::getSelected(){
+    return chooser.GetSelected();
 }
 

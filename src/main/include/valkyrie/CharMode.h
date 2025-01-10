@@ -18,7 +18,7 @@ class CharMode
          */
         void fillSelecList();
 
-        void GetSelected();
+        std::string getSelected();
        
 
     private:

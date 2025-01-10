@@ -76,6 +76,8 @@ void Swerve<AzimuthMotor, DriveMotor>::assessInputs()
 
     if (driverGamepad->GetBackButtonPressed()) {
         resetGyro();
+    } if (driverGamepad->GetAButton()) {
+        stateRotTest = true;
     }
 
     xSpeed = driverGamepad->leftStickY(2);
@@ -92,9 +94,9 @@ void Swerve<AzimuthMotor, DriveMotor>::analyzeDashboard()
     if (useCarpetGrain){
         calculateCarpetPose();
     }
-    /*if (charMode.GetSelected() = "Rot Test") {
+    if (charMode.getSelected() == "Rot test") {
         rotTest = true;
-    }*/
+    }
 
     // Rotational Speed calculations
     if (lockingToTarget) {
@@ -120,7 +122,11 @@ void Swerve<AzimuthMotor, DriveMotor>::analyzeDashboard()
 template<class AzimuthMotor, class DriveMotor>
 void Swerve<AzimuthMotor, DriveMotor>::assignOutputs()
 {
-    drive(xSpeedMPS, ySpeedMPS, rotSpeedRPS, true);
+    if (rotTest && stateRotTest) {
+        azimuthMotor->setPower((units::volt_t) 12);
+    } else{
+        drive(xSpeedMPS, ySpeedMPS, rotSpeedRPS, true);
+    }
 }
 
 template<class AzimuthMotor, class DriveMotor>
@@ -453,9 +459,9 @@ void Swerve<AzimuthMotor, DriveMotor>::InitSendable(wpi::SendableBuilder& builde
         [this] {return maxDriveSpeed.value();},
         nullptr
     );
-    /*builder.AddBooleanProperty(
+    builder.AddBooleanProperty(
         "Rot Test",
         [this] {return rotTest;},
         nullptr
-    );*/
+    );
 }
