@@ -66,6 +66,7 @@ void Robot::DisabledPeriodic() {
  * This autonomous runs the autonomous command selected by your {@link
  * RobotContainer} class.
  */
+// TODO: re-add the neutral mode back in
 void Robot::AutonomousInit() {
     drivetrain.resetState();
     drivetrain.doubtX = AUTO_DOUBTX;
