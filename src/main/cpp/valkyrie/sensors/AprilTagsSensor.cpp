@@ -31,10 +31,9 @@ frc::Pose3d AprilTagsSensor::getGlobalPose() {
     
     std::vector<double> botToTargetPose = limeTable->GetNumberArray("botpose_targetspace", std::span<const double>());
 
-    if (botPose.size() == 0 || botToTargetPose.size() == 0) return frc::Pose3d();
+    if (botPose.size() == 0 || botToTargetPose.size() == 0) {distance = 0_m;return frc::Pose3d();}
 
     if (botToTargetPose.size() == 6) distance = units::meter_t(sqrtf(powf(botToTargetPose[0], 2) + powf(botToTargetPose[1], 2) + powf(botToTargetPose[2], 2)));
-    else distance = 0_m;
 
     return frc::Pose3d(
         (units::meter_t) botPose[0],
