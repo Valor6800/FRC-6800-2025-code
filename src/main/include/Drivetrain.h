@@ -131,6 +131,7 @@ public:
      double doubtX, doubtY;
 
 private:
+     bool aprilTagOnReef(int id);
 
      std::vector<std::pair<SwerveAzimuthMotor*, SwerveDriveMotor*>> generateModules();
 
