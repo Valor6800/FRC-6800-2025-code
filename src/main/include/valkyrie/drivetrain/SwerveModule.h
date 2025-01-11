@@ -6,6 +6,7 @@
 #include <frc/kinematics/SwerveModuleState.h>
 #include <frc/kinematics/SwerveModulePosition.h>
 #include <frc/DutyCycleEncoder.h>
+#include <units/voltage.h>
 
 #include <wpi/sendable/Sendable.h>
 #include <wpi/sendable/SendableBuilder.h>
@@ -86,8 +87,8 @@ public:
 
     void setAzimuthPosition(frc::Rotation2d angle);
 
-    void setAzimuthPower(int voltage);
-    void setDrivePower(int voltage);
+    void setAzimuthPower(units::volt_t voltage);
+    void setDrivePower(units::volt_t voltage);
 
     void InitSendable(wpi::SendableBuilder& builder) override;
 
