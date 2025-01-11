@@ -16,8 +16,7 @@
 #include "valkyrie/sensors/AprilTagsSensor.h"
 #include "units/length.h"
 #include "valkyrie/sensors/VisionSensor.h"
-#include <frc2/command/InstantCommand.h>
-#include <pathplanner/lib/auto/NamedCommands.h>
+#include <frc2/command/InstantCommand.h> #include <pathplanner/lib/auto/NamedCommands.h>
 #include <utility>
 #include "frc/geometry/Pose3d.h"
 #include "frc/geometry/Rotation3d.h"
@@ -99,6 +98,9 @@ Drivetrain::Drivetrain(frc::TimedRobot *_robot) :
         aprilTagSensors.push_back(new valor::AprilTagsSensor(robot, aprilCam.first, aprilCam.second));  
         aprilTagSensors.back()->setPipe(valor::VisionSensor::PIPELINE_0);
     }
+
+    aprilTagSensors[4]->setPipe(valor::VisionSensor::PIPELINE_1);
+    aprilTagSensors[4]->setCameraPose(Constants::aprilCameras[4].second);
 
     setupGyro(
         CANIDs::PIGEON_CAN,

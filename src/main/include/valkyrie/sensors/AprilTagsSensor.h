@@ -44,6 +44,7 @@ namespace valor
             };
 
             frc::Pose3d getMegaTagPose2(Orientation orient);
+            frc::Pose3d getTargetToBotPose();
 
         private:
             frc::Pose3d getGlobalPose() override;
