@@ -82,11 +82,11 @@ void Swerve<AzimuthMotor, DriveMotor>::assessInputs()
     ySpeed = driverGamepad->leftStickX(2);
     rotSpeed = driverGamepad->rightStickX(3);
 
-    lockingToTarget = driverGamepad->GetAButtonPressed();
-    // if (driverGamepad->GetAButtonPressed()) {
-    //     lockingToTarget = true;
-    //     y_controller.SetGoal(1_m);
-    // }
+    lockingToTarget = false;
+
+    if(driverGamepad->GetAButton()){
+        lockingToTarget = true;
+    }
 }
 
 template<class AzimuthMotor, class DriveMotor>
@@ -106,8 +106,10 @@ void Swerve<AzimuthMotor, DriveMotor>::analyzeDashboard()
     }
     // Rotational Speed calculations
     if (lockingToTarget) {
-        // units::radian_t robotRotation = getCalculatedPose().Rotation().Radians();
-        // rotSpeedRPS = units::radians_per_second_t{rot_controller.Calculate(robotRotation)};
+        rot_controller.SetGoal(units::radian_t{targetAngle});
+        units::radian_t robotRotation = getCalculatedPose().Rotation().Radians();
+        rotSpeedRPS = units::radians_per_second_t{rot_controller.Calculate(robotRotation)} + rot_controller.GetSetpoint().velocity;
+        // units::radians_per_second_t{rot_controller.Calculate(robotRotation)};
         // units::radian_t errorAngle = robotRotation - targetAngle;
         // units::radian_t error = units::math::fmod(errorAngle + units::radian_t(M_PI), 2 * units::radian_t(M_PI)) - units::radian_t(M_PI);
         // static units::radian_t prevError = error;

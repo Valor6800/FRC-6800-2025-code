@@ -122,7 +122,7 @@ public:
      // void setDriveMotorNeutralMode(valor::NeutralMode mode);
 
      // alings the robot using tags
-     void alignAngleTags();
+     int alignAngleTags();
 
      // align the robot using the position on the field
      void alignAngleZoning();

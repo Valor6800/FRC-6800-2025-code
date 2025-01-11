@@ -102,14 +102,14 @@ protected:
     void setSwerveDesiredState(wpi::array<frc::SwerveModuleState, MODULE_COUNT> desiredStates, bool isDriveOpenLoop);
 
 private:
-    const units::radians_per_second_t MAX_ROTATION_VEL = 6_rad_per_s;
-    const units::radians_per_second_squared_t MAX_ROTATION_ACCEL = 3_rad_per_s_sq;
-    const units::meters_per_second_t MAX_Y_VEL = 0.5_mps;
-    const units::meters_per_second_squared_t MAX_Y_ACCEL = 1_mps_sq;
-    const double ROT_KP = 1;
-    const double ROT_KD = 0.0;
-    const double Y_KP = 1;
-    const double Y_KD = 0;
+    const units::radians_per_second_t MAX_ROTATION_VEL = 16_rad_per_s;
+    const units::radians_per_second_squared_t MAX_ROTATION_ACCEL = 12_rad_per_s_sq;
+    const units::meters_per_second_t MAX_Y_VEL = 5.5_mps;
+    const units::meters_per_second_squared_t MAX_Y_ACCEL = 3_mps_sq;
+    double ROT_KP = 9;
+    double ROT_KD = 0.25;
+    double Y_KP = 1;
+    double Y_KD = 0;
 
     std::vector<valor::SwerveModule<AzimuthMotor, DriveMotor> *> swerveModules;
 
