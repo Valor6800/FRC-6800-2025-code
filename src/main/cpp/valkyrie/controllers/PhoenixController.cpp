@@ -10,10 +10,11 @@ const units::turns_per_second_t FALCON_PIDF_KV(6); // RPS cruise velocity
 const units::turns_per_second_squared_t FALCON_PIDF_KA(130.0); // RPS/S acceleration (6.5/130 = 0.05 seconds to max speed)
 const units::turns_per_second_cubed_t FALCON_PIDF_KJ(650.0); // RPS/S^2 jerk (4000/40000 = 0.1 seconds to max acceleration)
 
-const units::ampere_t SUPPLY_CURRENT_THRESHOLD(60);
+const units::ampere_t SUPPLY_CURRENT_THRESHOLD(45);
 const units::ampere_t STATOR_CURRENT_LIMIT(80);
-const units::ampere_t SUPPLY_CURRENT_LIMIT(45);
+const units::ampere_t SUPPLY_CURRENT_LIMIT(60);
 const units::millisecond_t SUPPLY_TIME_THRESHOLD(500);
+const units::ampere_t PEAK_TORQUE_CURRENT(100);
 
 const units::turn_t DEADBAND(0.01);
 
@@ -150,9 +151,12 @@ void PhoenixController::setCurrentLimits(units::ampere_t statorCurrentLimit, uni
     config.CurrentLimits.SupplyCurrentLimitEnable = true;
     config.CurrentLimits.SupplyCurrentLowerTime = supplyTimeThreshold;
     config.CurrentLimits.SupplyCurrentLowerLimit = supplyCurrentThreshold;
+    config.TorqueCurrent.PeakForwardTorqueCurrent = PEAK_TORQUE_CURRENT;
+    config.TorqueCurrent.PeakReverseTorqueCurrent = -PEAK_TORQUE_CURRENT;
 
     if (saveImmediately) {
         getMotor()->GetConfigurator().Apply(config.CurrentLimits);
+        getMotor()->GetConfigurator().Apply(config.TorqueCurrent);
     }
 }
 
