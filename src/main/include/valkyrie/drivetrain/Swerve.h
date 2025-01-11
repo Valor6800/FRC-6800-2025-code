@@ -120,8 +120,6 @@ private:
     bool rotTest;
     bool strLineTest;
     
-    CharMode charac;
-    
 };
 
 }
