@@ -55,6 +55,7 @@ const units::meter_t WHEEL_DIAMETER(0.0973_m);
 
 #define MT2_POSE true
 
+// fix these
 #define BLUE_REEF_17_ANGLE 120_deg
 #define BLUE_REEF_18_ANGLE 180_deg
 #define BLUE_REEF_19_ANGLE -120_deg
@@ -62,12 +63,14 @@ const units::meter_t WHEEL_DIAMETER(0.0973_m);
 #define BLUE_REEF_21_ANGLE 0_deg
 #define BLUE_REEF_22_ANGLE  30_deg
 
-#define RED_REEF_6_ANGLE 30_deg
+#define RED_REEF_6_ANGLE 60_deg
 #define RED_REEF_7_ANGLE 0_deg
-#define RED_REEF_8_ANGLE -30_deg
-#define RED_REEF_9_ANGLE -120_deg
-#define RED_REEF_10_ANGLE 180_deg
-#define RED_REEF_11_ANGLE 120_deg
+#define RED_REEF_8_ANGLE -60_deg
+
+// fix these
+#define RED_REEF_9_ANGLE -30_deg
+#define RED_REEF_10_ANGLE 0_deg
+#define RED_REEF_11_ANGLE 30_deg
 
 Drivetrain::Drivetrain(frc::TimedRobot *_robot) : 
     valor::Swerve<SwerveAzimuthMotor, SwerveDriveMotor>(
@@ -225,6 +228,9 @@ void Drivetrain::assessInputs()
     if (!driverGamepad || !driverGamepad->IsConnected() || !operatorGamepad || !operatorGamepad->IsConnected())
         return;
 
+    if (driverGamepad->GetAButtonPressed()){
+        // alignAngleTags();
+    }
     /*for (valor::AprilTagsSensor *aprilCam : aprilTagSensors) {
         if (aprilCam->hasTarget() && aprilCam->hasTarget());
     }*/
@@ -298,11 +304,11 @@ frc2::FunctionalCommand* Drivetrain::getResetOdom() {
     );
 }
 
-void Drivetrain::alignAngleTags()
+int Drivetrain::alignAngleTags()
 {
     // get tags that are on the specfic reef
     bool isRed = frc::DriverStation::GetAlliance() == frc::DriverStation::Alliance::kRed ? true : false;
-    int tagID;
+    int tagID = -1;
     for(valor::AprilTagsSensor* aprilLime : aprilTagSensors) {
         if (aprilLime->hasTarget()) {
             if (isRed) {
@@ -359,6 +365,8 @@ void Drivetrain::alignAngleTags()
             Swerve::targetAngle = BLUE_REEF_22_ANGLE; // 22
             break;
     }
+    
+    return tagID;
 }
 
 void Drivetrain::alignAngleZoning()
@@ -398,6 +406,11 @@ void Drivetrain::InitSendable(wpi::SendableBuilder& builder)
             } > 20.0_mps_sq; // ~60 kg bot -> 600 N, 5 measurements * 20ms = .1s, 
                                                                                      // impulse = .1 * 600 = 60 Joules
             },
+            nullptr
+        );
+        builder.AddDoubleProperty(
+            "Locking Tag ID",
+            [this] {return alignAngleTags();},
             nullptr
         );
     }
