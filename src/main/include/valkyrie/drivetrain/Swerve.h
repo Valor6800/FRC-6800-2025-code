@@ -88,6 +88,9 @@ protected:
     units::meters_per_second_t maxDriveSpeed;
     units::radians_per_second_t maxRotationSpeed;
 
+    units::meters_per_second velocity;
+    units::meters_per_second_t feedForward = 0_mps;
+
     std::unique_ptr<ctre::phoenix6::hardware::Pigeon2> pigeon;
     std::unique_ptr<frc::SwerveDriveKinematics<MODULE_COUNT>> kinematics;
     std::unique_ptr<frc::SwerveDrivePoseEstimator<MODULE_COUNT>> rawEstimator;
@@ -95,6 +98,9 @@ protected:
 
     bool lockingToTarget;
     units::degree_t targetAngle;
+
+    bool alignToTarget;
+    units::meter_t yDistance = 0.0_m;
 
     void enableCarpetGrain(double grainMultiplier, bool roughTowardsRed);
     
@@ -108,7 +114,7 @@ private:
     const units::meters_per_second_squared_t MAX_Y_ACCEL = 3_mps_sq;
     double ROT_KP = 9;
     double ROT_KD = 0.25;
-    double Y_KP = 1;
+    double Y_KP = 0.0;
     double Y_KD = 0;
 
     std::vector<valor::SwerveModule<AzimuthMotor, DriveMotor> *> swerveModules;

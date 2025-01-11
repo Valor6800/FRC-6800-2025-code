@@ -5,6 +5,7 @@
 #include "units/length.h"
 #include "units/time.h"
 #include "units/velocity.h"
+#include <chrono>
 #include <frc/Timer.h>
 #include <cmath>
 #include <limits>
@@ -136,6 +137,46 @@ frc::Pose3d AprilTagsSensor::getMegaTagPose2(AprilTagsSensor::Orientation orient
 
 }
 
+frc::Pose3d AprilTagsSensor::getTargetToBotPose() {
+    if (!hasTarget()) return frc::Pose3d();
+
+    std::vector<double> targetToBot = limeTable->GetNumberArray("targetpose_robotspace", std::span<double>());
+
+    if (targetToBot.size() == 0) return frc::Pose3d();
+
+    return frc::Pose3d(
+        units::meter_t{targetToBot[0]},
+        units::meter_t{targetToBot[1]},
+        units::meter_t{targetToBot[2]},
+        frc::Rotation3d(
+            units::degree_t{targetToBot[3]},
+            units::degree_t{targetToBot[4]},
+            units::degree_t{targetToBot[5]}
+        )
+    );
+
+}
+
+frc::Pose3d AprilTagsSensor::get_botpose_targetspace() {
+    if (!hasTarget()) return frc::Pose3d();
+
+    std::vector<double> targetToBot = limeTable->GetNumberArray("botpose_targetspace", std::span<double>());
+
+    if (targetToBot.size() == 0) return frc::Pose3d();
+
+    return frc::Pose3d(
+        units::meter_t{targetToBot[0]},
+        units::meter_t{targetToBot[1]},
+        units::meter_t{targetToBot[2]},
+        frc::Rotation3d(
+            units::degree_t{targetToBot[3]},
+            units::degree_t{targetToBot[4]},
+            units::degree_t{targetToBot[5]}
+        )
+    );
+
+}
+
 void AprilTagsSensor::InitSendable(wpi::SendableBuilder& builder) {
     builder.SetSmartDashboardType("Subsystem");
 
@@ -188,4 +229,5 @@ void AprilTagsSensor::InitSendable(wpi::SendableBuilder& builder) {
     builder.AddDoubleProperty("totalLatency", [this] {return getTotalLatency().to<double>();}, nullptr);
     builder.AddDoubleProperty("distanceFromTarget", [this] {return distance.to<double>();}, nullptr);
     builder.AddDoubleProperty("Vision acceptance outlier", [this] {return normalVisionOutlier.to<double>();}, nullptr);
+    builder.AddDoubleProperty("tid", [this] {return getTagID();}, nullptr);
 }

@@ -87,6 +87,12 @@ void Swerve<AzimuthMotor, DriveMotor>::assessInputs()
     if(driverGamepad->GetAButton()){
         lockingToTarget = true;
     }
+
+    alignToTarget = false;
+
+    if(driverGamepad->GetBButton()){
+        alignToTarget = true;
+    }
 }
 
 template<class AzimuthMotor, class DriveMotor>
@@ -100,7 +106,7 @@ void Swerve<AzimuthMotor, DriveMotor>::analyzeDashboard()
 
     xSpeedMPS = units::meters_per_second_t{xSpeed * maxDriveSpeed};
     ySpeedMPS = units::meters_per_second_t{ySpeed * maxDriveSpeed};
-    if (frc::DriverStation::GetAlliance() == frc::DriverStation::kRed) {
+    if (frc::DriverStation::GetAlliance() == frc::DriverStation::kBlue) {
         xSpeedMPS *= -1.0;
         ySpeedMPS *= -1.0;
     }
@@ -109,13 +115,10 @@ void Swerve<AzimuthMotor, DriveMotor>::analyzeDashboard()
         rot_controller.SetGoal(units::radian_t{targetAngle});
         units::radian_t robotRotation = getCalculatedPose().Rotation().Radians();
         rotSpeedRPS = units::radians_per_second_t{rot_controller.Calculate(robotRotation)} + rot_controller.GetSetpoint().velocity;
-        // units::radians_per_second_t{rot_controller.Calculate(robotRotation)};
-        // units::radian_t errorAngle = robotRotation - targetAngle;
-        // units::radian_t error = units::math::fmod(errorAngle + units::radian_t(M_PI), 2 * units::radian_t(M_PI)) - units::radian_t(M_PI);
-        // static units::radian_t prevError = error;
-        // rotSpeedRPS = error * KP_ROTATE + (error - prevError) * KD_ROTATE;
-        // prevError = error;
-        ySpeedMPS = units::meters_per_second_t{y_controller.Calculate(getCalculatedPose().Y())};
+    } 
+    if (alignToTarget){
+        y_controller.SetGoal(0.01_m);
+        ySpeedMPS = units::meters_per_second_t{y_controller.Calculate(yDistance)} + y_controller.GetSetpoint().velocity;
     } else {
         rotSpeedRPS = rotSpeed * maxRotationSpeed;
     }
@@ -479,6 +482,36 @@ void Swerve<AzimuthMotor, DriveMotor>::InitSendable(wpi::SendableBuilder& builde
     builder.AddDoubleProperty(
         "Target Angle",
         [this] {return units::radian_t{targetAngle}.to<double>();},
+        nullptr
+    );
+    builder.AddDoubleProperty(
+        "Setpoint Velocity",
+        [this] {return rot_controller.GetSetpoint().velocity.to<double>();},
+        nullptr
+    );
+    builder.AddDoubleProperty(
+        "Position Tolerance",
+        [this] {return rot_controller.GetPositionTolerance();},
+        nullptr
+    );
+    builder.AddBooleanProperty(
+        "At Goal",
+        [this] {return rot_controller.AtGoal();},
+        nullptr
+    );
+    builder.AddDoubleProperty(
+        "Y Distance",
+        [this] {return yDistance.to<double>();},
+        nullptr
+    );
+    builder.AddDoubleProperty(
+        "Feedforward",
+        [this] {return feedForward.to<double>();},
+        nullptr
+    );
+    builder.AddBooleanProperty(
+        "Locking to Target",
+        [this] {return lockingToTarget;},
         nullptr
     );
 }

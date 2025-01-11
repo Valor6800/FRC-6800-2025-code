@@ -113,6 +113,10 @@ public:
           units::second_t startTimestamp; // generic
           
           struct { units::acceleration::meters_per_second_squared_t x,y,z; } accel;
+
+          bool lockingToReef;
+
+          int reefTag;
      } state;
 
      frc2::FunctionalCommand* getResetOdom();
@@ -122,7 +126,10 @@ public:
      // void setDriveMotorNeutralMode(valor::NeutralMode mode);
 
      // alings the robot using tags
-     int alignAngleTags();
+     void alignAngleTags();
+
+     // set angle based on tag
+     void setAngleBasedOnTag(int tagID);
 
      // align the robot using the position on the field
      void alignAngleZoning();

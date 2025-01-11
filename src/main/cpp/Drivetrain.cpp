@@ -16,7 +16,7 @@
 #include "valkyrie/sensors/AprilTagsSensor.h"
 #include "units/length.h"
 #include "valkyrie/sensors/VisionSensor.h"
-#include <frc2/command/InstantCommand.h>
+#include <frc2/command/InstantCommand.h> 
 #include <pathplanner/lib/auto/NamedCommands.h>
 #include <utility>
 #include "frc/geometry/Pose3d.h"
@@ -64,9 +64,10 @@ const units::meter_t WHEEL_DIAMETER(0.0973_m);
 #define BLUE_REEF_21_ANGLE 0_deg
 #define BLUE_REEF_22_ANGLE  30_deg
 
-#define RED_REEF_6_ANGLE 60_deg
+// these are correct
+#define RED_REEF_6_ANGLE -60_deg
 #define RED_REEF_7_ANGLE 0_deg
-#define RED_REEF_8_ANGLE -60_deg
+#define RED_REEF_8_ANGLE 60_deg
 
 // fix these
 #define RED_REEF_9_ANGLE -30_deg
@@ -219,9 +220,8 @@ void Drivetrain::assessInputs()
     if (!driverGamepad || !driverGamepad->IsConnected() || !operatorGamepad || !operatorGamepad->IsConnected())
         return;
 
-    if (driverGamepad->GetAButtonPressed()){
-        // alignAngleTags();
-    }
+    // state.lockingToReef = driverGamepad->GetAButtonPressed();
+
     /*for (valor::AprilTagsSensor *aprilCam : aprilTagSensors) {
         if (aprilCam->hasTarget() && aprilCam->hasTarget());
     }*/
@@ -229,6 +229,29 @@ void Drivetrain::assessInputs()
 
 void Drivetrain::analyzeDashboard()
 {
+    bool isRed = frc::DriverStation::GetAlliance() == frc::DriverStation::Alliance::kRed ? true : false;
+    state.reefTag = -1;
+    for(valor::AprilTagsSensor* aprilLime : aprilTagSensors) {
+        if (aprilLime->hasTarget()) {
+            if (isRed) {
+                if(aprilLime->getTagID() >= 6 && aprilLime->getTagID() <= 11){
+                    state.reefTag = aprilLime->getTagID();
+                }
+            }
+            if (!isRed) {
+                if(aprilLime->getTagID()>=17 && aprilLime->getTagID() <= 22){
+                    state.reefTag = aprilLime->getTagID();
+                }
+            }
+        }
+    }
+
+    alignAngleTags();
+
+    if(aprilTagSensors[4]->hasTarget()) {
+        Swerve::yDistance = aprilTagSensors[4]->get_botpose_targetspace().X();
+    } 
+
     Swerve::analyzeDashboard();
 
     visionAcceptanceRadius = (units::meter_t) table->GetNumber("Vision Acceptance", VISION_ACCEPTANCE.to<double>());
@@ -295,28 +318,16 @@ frc2::FunctionalCommand* Drivetrain::getResetOdom() {
     );
 }
 
-int Drivetrain::alignAngleTags()
+void Drivetrain::alignAngleTags()
 {
-    // get tags that are on the specfic reef
-    bool isRed = frc::DriverStation::GetAlliance() == frc::DriverStation::Alliance::kRed ? true : false;
-    int tagID = -1;
-    for(valor::AprilTagsSensor* aprilLime : aprilTagSensors) {
-        if (aprilLime->hasTarget()) {
-            if (isRed) {
-                if(aprilLime->getTagID() >= 6 && aprilLime->getTagID() <= 11){
-                    tagID = aprilLime->getTagID();
-                }
-            }
-            if (!isRed) {
-                if(aprilLime->getTagID()>=17 && aprilLime->getTagID() <= 22){
-                    tagID = aprilLime->getTagID();
-                }
-            }
-        }
-    }
-
     // set each id angle to the correct angle
-    switch(tagID){
+    // aprilTagSensors[4]->get_botpose_targetspace();
+    setAngleBasedOnTag(state.reefTag);
+}
+
+void Drivetrain::setAngleBasedOnTag(int tagID)
+{
+        switch(tagID){
         //red tags
         case 6:
             Swerve::targetAngle = RED_REEF_6_ANGLE; // 6
@@ -355,9 +366,9 @@ int Drivetrain::alignAngleTags()
         case 22:
             Swerve::targetAngle = BLUE_REEF_22_ANGLE; // 22
             break;
+        default:
+            Swerve::targetAngle = 90_deg;
     }
-    
-    return tagID;
 }
 
 void Drivetrain::alignAngleZoning()
@@ -401,7 +412,7 @@ void Drivetrain::InitSendable(wpi::SendableBuilder& builder)
         );
         builder.AddDoubleProperty(
             "Locking Tag ID",
-            [this] {return alignAngleTags();},
+            [this] {return state.reefTag;},
             nullptr
         );
     }
