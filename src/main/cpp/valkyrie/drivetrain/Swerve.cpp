@@ -13,6 +13,9 @@ const units::hertz_t KD_ROTATE(-30);
 
 using namespace valor;
 
+#define KP_ROTATE 0.5
+#define KD_ROTATE 0.0
+
 // Explicit template instantiation
 // This is needed for linking
 template class valor::Swerve<valor::PhoenixController, valor::PhoenixController>;
@@ -82,13 +85,12 @@ void Swerve<AzimuthMotor, DriveMotor>::assessInputs()
     ySpeed = driverGamepad->leftStickX(2);
     rotSpeed = driverGamepad->rightStickX(3);
 
-    if (driverGamepad->GetAButtonPressed()) {
+    if(driverGamepad->GetAButton()){
         lockingToTarget = true;
-        if (lockingToTarget) {
-            y_controller.SetGoal(1_m);
-            // targetAngle = 0_deg;
-            // rot_controller.SetGoal(units::radian_t{targetAngle});
-        }
+        rot_controller.SetGoal(units::radian_t{targetAngle});
+    }
+    if(driverGamepad->GetBButtonPressed()){
+        lockingToTarget = false;
     }
 }
 
@@ -109,14 +111,15 @@ void Swerve<AzimuthMotor, DriveMotor>::analyzeDashboard()
     }
     // Rotational Speed calculations
     if (lockingToTarget) {
-        // units::radian_t robotRotation = getCalculatedPose().Rotation().Radians();
-        // rotSpeedRPS = units::radians_per_second_t{rot_controller.Calculate(robotRotation)};
+        units::radian_t robotRotation = getCalculatedPose().Rotation().Radians();
+        rotSpeedRPS = units::radians_per_second_t{rot_controller.Calculate(robotRotation)} + rot_controller.GetSetpoint().velocity;
+        // units::radians_per_second_t{rot_controller.Calculate(robotRotation)};
         // units::radian_t errorAngle = robotRotation - targetAngle;
         // units::radian_t error = units::math::fmod(errorAngle + units::radian_t(M_PI), 2 * units::radian_t(M_PI)) - units::radian_t(M_PI);
         // static units::radian_t prevError = error;
         // rotSpeedRPS = error * KP_ROTATE + (error - prevError) * KD_ROTATE;
         // prevError = error;
-        ySpeedMPS = units::meters_per_second_t{y_controller.Calculate(getCalculatedPose().Y())};
+        // ySpeedMPS = units::meters_per_second_t{y_controller.Calculate(getCalculatedPose().Y())};
     } else {
         rotSpeedRPS = rotSpeed * maxRotationSpeed;
     }
@@ -463,6 +466,11 @@ void Swerve<AzimuthMotor, DriveMotor>::InitSendable(wpi::SendableBuilder& builde
     builder.AddDoubleProperty(
         "Target Angle",
         [this] {return units::radian_t{targetAngle}.to<double>();},
+        nullptr
+    );
+    builder.AddDoubleProperty(
+        "Setpoint Velocity",
+        [this] {return rot_controller.GetSetpoint().velocity.to<double>();},
         nullptr
     );
 }

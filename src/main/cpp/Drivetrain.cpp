@@ -95,10 +95,6 @@ Drivetrain::Drivetrain(frc::TimedRobot *_robot) :
     for (std::pair<const char*, frc::Pose3d> aprilCam : Constants::aprilCameras) {
         aprilTagSensors.push_back(new valor::AprilTagsSensor(robot, aprilCam.first, aprilCam.second));  
         aprilTagSensors.back()->setPipe(valor::VisionSensor::PIPELINE_0);
-
-        if (aprilTagSensors.size() == 1) {
-            aprilTagSensors.back()->normalVisionOutlier = 6.0_m;
-        }
     }
 
     setupGyro(
@@ -228,6 +224,10 @@ void Drivetrain::assessInputs()
 
     if (!driverGamepad || !driverGamepad->IsConnected() || !operatorGamepad || !operatorGamepad->IsConnected())
         return;
+
+    /*for (valor::AprilTagsSensor *aprilCam : aprilTagSensors) {
+        if (aprilCam->hasTarget() && aprilCam->hasTarget());
+    }*/
 }
 
 void Drivetrain::analyzeDashboard()
