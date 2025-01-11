@@ -16,8 +16,7 @@
 #include "valkyrie/sensors/AprilTagsSensor.h"
 #include "units/length.h"
 #include "valkyrie/sensors/VisionSensor.h"
-#include <frc2/command/InstantCommand.h>
-#include <pathplanner/lib/auto/NamedCommands.h>
+#include <frc2/command/InstantCommand.h> #include <pathplanner/lib/auto/NamedCommands.h>
 #include <utility>
 #include "frc/geometry/Pose3d.h"
 #include "frc/geometry/Rotation3d.h"
