@@ -137,16 +137,16 @@ void Swerve<AzimuthMotor, DriveMotor>::assignOutputs()
         swerveModules[2]->setAzimuthPosition(frc::Rotation2d(-225_deg));
         swerveModules[3]->setAzimuthPosition(frc::Rotation2d(45_deg));
         for (size_t i = 0; i < MODULE_COUNT; i++) {
-            swerveModules[i]->setDrivePower(12);
+            swerveModules[i]->setDrivePower(units::volt_t (12));
         }
     } else if (strLineTest){
         for (size_t i = 0; i < MODULE_COUNT; i++) {
             swerveModules[i]->setAzimuthPosition(frc::Rotation2d());
-            swerveModules[i]->setDrivePower(12);
+            swerveModules[i]->setDrivePower(units::volt_t (12));
         }
     } else{
         for (size_t i = 0; i < MODULE_COUNT; i++) {
-            swerveModules[i]->setDrivePower(0);
+            swerveModules[i]->setDrivePower(units::volt_t (0));
         }
         drive(xSpeedMPS, ySpeedMPS, rotSpeedRPS, true);
     }
