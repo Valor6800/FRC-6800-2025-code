@@ -8,8 +8,8 @@ GrappleLidarSensor::GrappleLidarSensor(frc::TimedRobot *_robot, const char *_nam
 {
     wpi::SendableRegistry::AddLW(this, "GrappleLidarSensor", sensorName);
 
-    device->set_ranging_mode(grpl::LaserCanRangingMode::Long);
-    device->set_timing_budget(grpl::LaserCanTimingBudget::TB20ms);
+    device->set_ranging_mode(grpl::LaserCanRangingMode::Short);
+    device->set_timing_budget(grpl::LaserCanTimingBudget::TB50ms);
     device->set_roi(grpl::LaserCanROI{ 8, 8, 16, 16 });
 
     setGetter([this](){
