@@ -95,6 +95,8 @@ Drivetrain::Drivetrain(frc::TimedRobot *_robot) :
     /*
      * 3.8m/s, 5m/s^2, ~125lbs Apr. 2
      */
+
+    
     AutoBuilder::configure(
         [this](){ 
             if (state.useCalculatedEstimator) {
@@ -125,6 +127,7 @@ Drivetrain::Drivetrain(frc::TimedRobot *_robot) :
     );
     resetState();
     init();
+    printf("\n\nHello World2\n\n");
 }
 
 Drivetrain::~Drivetrain(){}
@@ -206,6 +209,7 @@ void Drivetrain::analyzeDashboard()
     visionAcceptanceRadius = (units::meter_t) table->GetNumber("Vision Acceptance", VISION_ACCEPTANCE.to<double>());
 
     for (valor::AprilTagsSensor* aprilLime : aprilTagSensors) {
+        if (!aprilLime->hasTarget()) continue;
         aprilLime->applyVisionMeasurement(
             calcEstimator.get(),
             getRobotSpeeds(),
