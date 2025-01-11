@@ -18,13 +18,8 @@
 #define SEGMENTS 2
 
 Robot::Robot() :
-<<<<<<< HEAD
-    drivetrain(this)
-    /* valorAuto(), */
-=======
     drivetrain(this),
     valorAuto()
->>>>>>> f02180f (Working auto running)
 {
     frc::TimedRobot();
 
