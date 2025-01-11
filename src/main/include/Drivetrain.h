@@ -4,6 +4,7 @@
 #include "units/acceleration.h"
 #include "units/length.h"
 #include "valkyrie/sensors/AprilTagsSensor.h"
+#include "valkyrie/sensors/GrappleLidarSensor.h"
 #include "valkyrie/BaseSubsystem.h"
 #include "Constants.h"
 #include <map>
@@ -131,6 +132,7 @@ private:
      valor::PIDF thetaPIDF;
      
      std::vector<valor::AprilTagsSensor*> aprilTagSensors;
+     valor::GrappleLidarSensor lidarSensor;
 
      units::meter_t visionAcceptanceRadius;
 };

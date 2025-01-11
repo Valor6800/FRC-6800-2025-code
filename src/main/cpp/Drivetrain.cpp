@@ -63,7 +63,8 @@ Drivetrain::Drivetrain(frc::TimedRobot *_robot) :
         Constants::moduleDiff(),
         WHEEL_DIAMETER
     ),
-    teleopStart(999999999999)
+    teleopStart(999999999999),
+    lidarSensor(_robot, "Front Lidar Sensor", CANIDs::FRONT_LIDAR_SENSOR)
 {
     xPIDF.P = KPX;
     xPIDF.I = KIX;

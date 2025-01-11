@@ -87,6 +87,7 @@ namespace CANIDs {
     constexpr static int CLIMBER_FOLLOW = 33;
     constexpr static int AMP = 10;
     constexpr static int CANDLE = 60;
+    constexpr static int FRONT_LIDAR_SENSOR = 49;
 }
 
 #pragma GCC diagnostic push

@@ -40,12 +40,12 @@ void GrappleLidarSensor::calculate()
 void GrappleLidarSensor::InitSendable(wpi::SendableBuilder& builder)
 {
     builder.SetSmartDashboardType("Subsystem");
-    builder.AddBooleanProperty(
-        "Previous State", 
+    builder.AddDoubleProperty(
+        "Previous State (mm)", 
         [this] { return prevState.to<double>(); },
         nullptr);
-    builder.AddBooleanProperty(
-        "Current State", 
+    builder.AddDoubleProperty(
+        "Current State (mm)", 
         [this] { return currState.to<double>(); },
         nullptr);
 }
