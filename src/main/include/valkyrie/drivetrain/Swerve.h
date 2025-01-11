@@ -9,6 +9,7 @@
 
 #include "valkyrie/BaseSubsystem.h"
 #include "valkyrie/drivetrain/SwerveModule.h"
+#include "valkyrie/CharMode.h"
 
 #define MODULE_COUNT 4
 
@@ -18,6 +19,7 @@ template<class AzimuthMotor, class DriveMotor>
 class Swerve : public valor::BaseSubsystem
 {
 public:
+    std::string selectedTest;
 
     Swerve(frc::TimedRobot *_robot,
                 const char* _name,
@@ -117,6 +119,9 @@ private:
     bool charMode;
     bool rotTest;
     bool strLineTest;
+    
+    CharMode charac;
+    
 };
 
 }
