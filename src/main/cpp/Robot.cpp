@@ -1,5 +1,6 @@
 #include "Robot.h"
 #include "frc/AnalogTriggerType.h"
+#include "frc2/command/Commands.h"
 
 #include <frc/smartdashboard/SmartDashboard.h>
 #include <frc2/command/CommandScheduler.h>
@@ -49,7 +50,9 @@ void Robot::RobotInit() {
  * <p> This runs after the mode specific periodic functions, but before
  * LiveWindow and SmartDashboard integrated updating.
  */
-void Robot::RobotPeriodic() { frc2::CommandScheduler::GetInstance().Run(); }
+void Robot::RobotPeriodic() {
+    frc2::CommandScheduler::GetInstance().Run(); 
+}
 
 /**
  * This function is called once each time the robot enters Disabled mode. You
@@ -72,9 +75,11 @@ void Robot::AutonomousInit() {
     drivetrain.doubtX = AUTO_DOUBTX;
     drivetrain.doubtY = AUTO_DOUBTY;
 
-    autoCommands.clear();
-    autoCommands.push_back(valorAuto.getSelectedAuto());
-    autoCommands.back().Schedule();
+    autoCommands = valorAuto.getSelectedAuto();
+    autoCommands.Schedule();
+    // autoCommands.clear();
+    // autoCommands.push_back(valorAuto.getSelectedAuto());
+    // autoCommands.back().Schedule();
 }
 
 void Robot::AutonomousExit() {

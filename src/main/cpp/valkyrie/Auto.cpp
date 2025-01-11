@@ -1,4 +1,6 @@
 #include "valkyrie/Auto.h"
+#include <iostream>
+#include "frc2/command/Commands.h"
 #include "pathplanner/lib/auto/AutoBuilder.h"
 // #include <frc/Filesystem.h>
 #include <networktables/NetworkTableInstance.h>
@@ -11,15 +13,15 @@
 #include <frc2/command/WaitCommand.h>
 // 
 #include <filesystem>
-
-using namespace valor;
-using namespace pathplanner;
+#include <string>
+using namespace valor; using namespace pathplanner;
 
 #define AUTOS_PATH (std::string)"/home/lvuser/deploy/pathplanner/autos/"
 #define PATHS_PATH (std::string)"/home/lvuser/deploy/pathplanner/paths/"
 
 Auto::Auto(){
     table = nt::NetworkTableInstance::GetDefault().GetTable("auto");
+    m_chooser.SetDefaultOption("NONE", "NONE");
 }
 
 frc2::CommandPtr Auto::makeAuto(std::string autoName){
@@ -32,6 +34,7 @@ frc2::CommandPtr Auto::getSelectedAuto(){
 }
 
 frc2::CommandPtr Auto::getAuto(std::string selection) {
+    if (selection == "NONE") return frc2::cmd::None();
     for (uint i = 0; i < loadedAutos.size(); i++) {
         if (loadedAutos[i].first == selection)
             return std::move(loadedAutos[i].second);
@@ -52,8 +55,9 @@ void Auto::preloadAuto(std::string autoName){
 }
 
 void Auto::preloadSelectedAuto(){
-    if (m_chooser.GetSelected() != "")
+    if (m_chooser.GetSelected() != "" && m_chooser.GetSelected().find("NONE") == std::string::npos) {
         preloadAuto(m_chooser.GetSelected());
+    }
 }
 
 void Auto::clearAutos(){
@@ -99,6 +103,7 @@ std::vector<std::string> listDirectory(std::string path_name){
     std::vector<std::string> files;
 
     for (const auto & entry : std::filesystem::directory_iterator(path_name)){
+        if (entry.path().string().find("NONE") != std::string::npos) continue;
         std::string path = entry.path();
         if (path.find(".path") != std::string::npos || path.find(".auto") != std::string::npos) {
             files.push_back(entry.path());
@@ -109,6 +114,7 @@ std::vector<std::string> listDirectory(std::string path_name){
 
 void Auto::fillAutoList(){
     for (std::string path : listDirectory(AUTOS_PATH)){
+        // if (path.find("NONE") != std::string::npos) {continue;}
         m_chooser.AddOption(makeFriendlyName(removeFileType(path)), removeFileType(path));
     }
     frc::SmartDashboard::PutData(&m_chooser);
