@@ -142,7 +142,7 @@ void Swerve<AzimuthMotor, DriveMotor>::assignOutputs()
     } else if (strLineTest){
         for (size_t i = 0; i < MODULE_COUNT; i++) {
             swerveModules[i]->setAzimuthPosition(frc::Rotation2d());
-            swerveModules[i]->setDrivePower(2);
+            swerveModules[i]->setDrivePower(12);
         }
     } else{
         for (size_t i = 0; i < MODULE_COUNT; i++) {
