@@ -13,6 +13,7 @@
 
 #include "valkyrie/Auto.h"
 #include "Drivetrain.h"
+#include "valkyrie/CharMode.h"
 
 #include <frc/DriverStation.h>
 #include <frc/DataLogManager.h>
@@ -45,4 +46,5 @@ class Robot : public frc::TimedRobot {
 
         Drivetrain drivetrain;
         valor::Auto valorAuto;
+        valor::CharMode charMode;
 };

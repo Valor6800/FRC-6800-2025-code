@@ -41,6 +41,7 @@ void Robot::RobotInit() {
     valorAuto.fillAutoList();
     // valorAuto.preloadAuto("A1-");
     // valorAuto.preloadAuto("A1-2");
+    charMode.fillSelectList();
 }
 /**
  * This function is called every robot packet, no matter the mode. Use
@@ -91,7 +92,9 @@ void Robot::AutonomousPeriodic() {
 /**
  * This function is called periodically during operator control.
  */
-void Robot::TeleopPeriodic() {}
+void Robot::TeleopPeriodic() {
+    drivetrain.selectedTest = charMode.getSelected();
+}
 
 /**
  * This function is called periodically during test mode.

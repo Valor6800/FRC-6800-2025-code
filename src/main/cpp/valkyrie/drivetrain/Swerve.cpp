@@ -47,7 +47,6 @@ Swerve<AzimuthMotor, DriveMotor>::Swerve(frc::TimedRobot *_robot,
     rawEstimator = std::make_unique<frc::SwerveDrivePoseEstimator<MODULE_COUNT>>(*kinematics, getGyro(), getModuleStates(), frc::Pose2d{0_m, 0_m, 0_rad});
     calcEstimator = std::make_unique<frc::SwerveDrivePoseEstimator<MODULE_COUNT>>(*kinematics, getGyro(), getModuleStates(), frc::Pose2d{0_m, 0_m, 0_rad});
 
-    table->PutBoolean("Char Mode", false);
     resetState();
 }
 
@@ -89,7 +88,6 @@ void Swerve<AzimuthMotor, DriveMotor>::analyzeDashboard()
     rawEstimator->UpdateWithTime(frc::Timer::GetFPGATimestamp(), getGyro(), getModuleStates());
     calcEstimator->UpdateWithTime(frc::Timer::GetFPGATimestamp(), getGyro(), getModuleStates());
 
-    charMode = table->GetBoolean("Char Mode", false);
     if (useCarpetGrain)
         calculateCarpetPose();
 
@@ -113,19 +111,14 @@ void Swerve<AzimuthMotor, DriveMotor>::analyzeDashboard()
         ySpeedMPS *= -1.0;
     }
 
-    if (charMode) {
-        if (driverGamepad->GetAButton()) {
-            rotTest = true;
-        } else if (driverGamepad->GetBButton()) {
-            strLineTest = true;
-        } else{
-            rotTest = false;
-            strLineTest = false;
-        }
-    } else {
+   if (selectedTest == "Rot test" && driverGamepad->GetAButton()) {
+        rotTest = true;
+   } else if (selectedTest == "Straight line test" && driverGamepad->GetAButton()) {
+        strLineTest = true;
+   } else {
         rotTest = false;
         strLineTest = false;
-    }
+   }
 }
 
 template<class AzimuthMotor, class DriveMotor>
@@ -137,17 +130,14 @@ void Swerve<AzimuthMotor, DriveMotor>::assignOutputs()
         swerveModules[2]->setAzimuthPosition(frc::Rotation2d(-225_deg));
         swerveModules[3]->setAzimuthPosition(frc::Rotation2d(45_deg));
         for (size_t i = 0; i < MODULE_COUNT; i++) {
-            swerveModules[i]->setDrivePower(units::volt_t (12));
+            swerveModules[i]->setDrivePower(units::volt_t (5));
         }
     } else if (strLineTest){
         for (size_t i = 0; i < MODULE_COUNT; i++) {
             swerveModules[i]->setAzimuthPosition(frc::Rotation2d());
-            swerveModules[i]->setDrivePower(units::volt_t (12));
+            swerveModules[i]->setDrivePower(units::volt_t (5));
         }
     } else{
-        for (size_t i = 0; i < MODULE_COUNT; i++) {
-            swerveModules[i]->setDrivePower(units::volt_t (0));
-        }
         drive(xSpeedMPS, ySpeedMPS, rotSpeedRPS, true);
     }
 }
@@ -484,9 +474,9 @@ void Swerve<AzimuthMotor, DriveMotor>::InitSendable(wpi::SendableBuilder& builde
         [this] {return maxDriveSpeed.value();},
         nullptr
     );
-    builder.AddBooleanProperty(
-        "Char Mode",
-        [this] {return charMode;},
+    builder.AddStringProperty(
+        "Selected Test",
+        [this] {return selectedTest;},
         nullptr
     );
 }
