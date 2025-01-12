@@ -255,7 +255,7 @@ void PhoenixController::setPosition(units::turn_t position)
 void PhoenixController::enableFOC(bool enableFOC)
 {
     req_position.EnableFOC = enableFOC;
-    req_velocity.EnableFOC = enableFOC;
+    // VelocityTorqueCurrentFOC requires FOC
     req_voltage.EnableFOC = enableFOC;
 }
 

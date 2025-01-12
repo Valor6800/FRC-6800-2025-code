@@ -101,7 +101,7 @@ private:
     int currentProfile;
 
     ctre::phoenix6::controls::MotionMagicVoltage req_position;
-    ctre::phoenix6::controls::VelocityVoltage req_velocity;
+    ctre::phoenix6::controls::VelocityTorqueCurrentFOC req_velocity;
     ctre::phoenix6::controls::VoltageOut req_voltage;
 
     ctre::phoenix6::hardware::CANcoder *cancoder;
