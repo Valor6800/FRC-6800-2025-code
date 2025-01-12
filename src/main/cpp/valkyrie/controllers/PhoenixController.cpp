@@ -31,6 +31,7 @@ PhoenixController::PhoenixController(valor::PhoenixControllerType controllerType
     req_position(units::turn_t{0}),
     req_velocity(units::turns_per_second_t{0}),
     req_voltage(units::volt_t{0}),
+    req_current(0_A),
     cancoder(nullptr),
     res_position(getMotor()->GetPosition()),
     res_velocity(getMotor()->GetVelocity())
@@ -154,6 +155,11 @@ void PhoenixController::setCurrentLimits(units::ampere_t statorCurrentLimit, uni
     if (saveImmediately) {
         getMotor()->GetConfigurator().Apply(config.CurrentLimits);
     }
+}
+
+void PhoenixController::setCurrent(units::ampere_t current) {
+    req_current.Output = current;
+    getMotor()->SetControl(req_current);
 }
 
 void PhoenixController::setPIDF(valor::PIDF _pidf, int slot, bool saveImmediately)

@@ -68,6 +68,12 @@ public:
         bool isFOC
     );
 
+    void drive(
+        units::ampere_t xCurrent,
+        units::ampere_t yCurrent,
+        units::ampere_t rotCurrent
+    );
+
     void driveRobotRelative(frc::ChassisSpeeds speeds);
 
     void InitSendable(wpi::SendableBuilder& builder) override;
@@ -77,9 +83,14 @@ protected:
     double ySpeed;
     double rotSpeed;
 
+    // units::radians_per_second_t rotSpeedRPS;
     units::meters_per_second_t xSpeedMPS;
     units::meters_per_second_t ySpeedMPS;
     units::radians_per_second_t rotSpeedRPS;
+
+    units::ampere_t xCurrent;
+    units::ampere_t yCurrent;
+    units::ampere_t rotCurrent;
 
     units::meters_per_second_t maxDriveSpeed;
     units::radians_per_second_t maxRotationSpeed;

@@ -6,6 +6,7 @@
 #include <frc/kinematics/SwerveModuleState.h>
 #include <frc/kinematics/SwerveModulePosition.h>
 #include <frc/DutyCycleEncoder.h>
+#include <units/current.h>
 
 #include <wpi/sendable/Sendable.h>
 #include <wpi/sendable/SendableBuilder.h>
@@ -57,6 +58,8 @@ public:
      * @param isDriveOpen true if drive should set speed using closed-loop velocity control
      */
     void setDesiredState(frc::SwerveModuleState desiredState, bool isDriveOpenLoop);
+
+    void setDesiredStateAmps(frc::SwerveModuleState desiredState);
 
     /**
      * Command the swerve module motors to the desired state using closed-loop drive speed control

@@ -96,6 +96,23 @@ void SwerveModule<AzimuthMotor, DriveMotor>::setDesiredState(frc::SwerveModuleSt
 }
 
 template<class AzimuthMotor, class DriveMotor>
+void SwerveModule<AzimuthMotor, DriveMotor>::setDesiredStateAmps(frc::SwerveModuleState _desiredState)
+{
+    if (_desiredState.speed < DRIVE_DEADBAND) {
+        setDriveOpenLoop(0_mps);
+        return;
+    }
+
+    frc::Rotation2d currentAngle = getAzimuthPosition();
+    _desiredState.Optimize(currentAngle);
+
+    setAzimuthPosition(_desiredState.angle);
+
+    driveMotor->setCurrent(units::ampere_t{_desiredState.speed.to<double>()});
+    desiredState = _desiredState;
+}
+
+template<class AzimuthMotor, class DriveMotor>
 void SwerveModule<AzimuthMotor, DriveMotor>::resetDriveEncoder()
 {
     driveMotor->reset();

@@ -92,30 +92,35 @@ void Swerve<AzimuthMotor, DriveMotor>::analyzeDashboard()
         calculateCarpetPose();
 
     // Rotational Speed calculations
-    if (lockingToTarget) {
-        units::radian_t robotRotation = getCalculatedPose().Rotation().Radians();
-        units::radian_t errorAngle = robotRotation - targetAngle;
-        units::radian_t error = units::math::fmod(errorAngle + units::radian_t(M_PI), 2 * units::radian_t(M_PI)) - units::radian_t(M_PI);
-        static units::radian_t prevError = error;
-        rotSpeedRPS = error * KP_ROTATE + (error - prevError) * KD_ROTATE;
-        prevError = error;
-    } else {
-        rotSpeedRPS = rotSpeed * maxRotationSpeed;
-    }
+    // if (lockingToTarget) {
+    //     units::radian_t robotRotation = getCalculatedPose().Rotation().Radians();
+    //     units::radian_t errorAngle = robotRotation - targetAngle;
+    //     units::radian_t error = units::math::fmod(errorAngle + units::radian_t(M_PI), 2 * units::radian_t(M_PI)) - units::radian_t(M_PI);
+    //     static units::radian_t prevError = error;
+    //     rotSpeedRPS = error * KP_ROTATE + (error - prevError) * KD_ROTATE;
+    //     prevError = error;
+    // } else {
+    //     rotSpeedRPS = rotSpeed * maxRotationSpeed;
+    // }
 
     // Linear Speed calculations
-    xSpeedMPS = units::meters_per_second_t{xSpeed * maxDriveSpeed};
-    ySpeedMPS = units::meters_per_second_t{ySpeed * maxDriveSpeed};
+    // current = units::ampere_t{sqrt(pow(xSpeed, 2) + powf(ySpeed, 2)) * 30};
+
+    xCurrent = units::ampere_t{xSpeed * 60};
+    yCurrent = units::ampere_t{ySpeed * 60};
+    rotCurrent = units::ampere_t{rotSpeed * 60};
+    // xSpeedMPS = units::meters_per_second_t{xSpeed * maxDriveSpeed};
+    // ySpeedMPS = units::meters_per_second_t{ySpeed * maxDriveSpeed};
     if (frc::DriverStation::GetAlliance() == frc::DriverStation::kRed) {
-        xSpeedMPS *= -1.0;
-        ySpeedMPS *= -1.0;
+        xSpeed *= -1.0;
+        ySpeed *= -1.0;
     }
 }
 
 template<class AzimuthMotor, class DriveMotor>
 void Swerve<AzimuthMotor, DriveMotor>::assignOutputs()
 {
-    drive(xSpeedMPS, ySpeedMPS, rotSpeedRPS, true);
+    drive(xCurrent, yCurrent, rotCurrent);
 }
 
 template<class AzimuthMotor, class DriveMotor>
@@ -131,6 +136,14 @@ void Swerve<AzimuthMotor, DriveMotor>::drive(
                                   omega_radps,
                                   isFOC);
     setSwerveDesiredState(desiredStates, true);
+}
+
+template<class AzimuthMotor, class DriveMotor>
+void Swerve<AzimuthMotor, DriveMotor>::drive(units::ampere_t xCurrent, units::ampere_t yCurrent, units::ampere_t rotCurrent) {
+    auto desiredStates = getModuleStates(units::meters_per_second_t{xCurrent.to<double>()}, units::meters_per_second_t{yCurrent.to<double>()}, units::radians_per_second_t{rotCurrent.to<double>()}, true);
+    for (size_t i = 0; i < MODULE_COUNT; i++) {
+        swerveModules[i]->setDesiredStateAmps(desiredStates[i]);
+    }
 }
 
 template<class AzimuthMotor, class DriveMotor>
@@ -314,17 +327,17 @@ void Swerve<AzimuthMotor, DriveMotor>::InitSendable(wpi::SendableBuilder& builde
     );
     builder.AddDoubleProperty(
         "Commanded X Speed MPS",
-        [this] { return xSpeedMPS.value(); },
+        [this] { return xCurrent.value(); },
         nullptr
     );
     builder.AddDoubleProperty(
         "Commanded Y Speed MPS",
-        [this] { return ySpeedMPS.value(); },
+        [this] { return yCurrent.value(); },
         nullptr
     );
     builder.AddDoubleProperty(
         "Commanded Rot Speed MPS",
-        [this] { return rotSpeedRPS.value(); },
+        [this] { return rotCurrent.value(); },
         nullptr
     );
     builder.AddDoubleProperty(

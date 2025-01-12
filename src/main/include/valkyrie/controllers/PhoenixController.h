@@ -62,6 +62,7 @@ public:
     units::turn_t getPosition() override;
     units::turns_per_second_t getSpeed() override;
     units::ampere_t getCurrent() override;
+    void setCurrent(units::ampere_t);
 
     void setPositionUpdateFrequency(units::hertz_t);
     void setSpeedUpdateFrequency(units::hertz_t);
@@ -103,6 +104,7 @@ private:
     ctre::phoenix6::controls::MotionMagicVoltage req_position;
     ctre::phoenix6::controls::VelocityVoltage req_velocity;
     ctre::phoenix6::controls::VoltageOut req_voltage;
+    ctre::phoenix6::controls::TorqueCurrentFOC req_current;
 
     ctre::phoenix6::hardware::CANcoder *cancoder;
 
