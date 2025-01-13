@@ -19,10 +19,14 @@
 
 
 Robot::Robot() :
-    drivetrain(this),
+    drivetrain(this, &leds),
     scorer(this),
     climber(this),
-    valorAuto()
+    valorAuto(),
+    leds(this, LED_COUNT, SEGMENTS, CANIDs::CANDLE, "")
+
+
+    /* valorAuto(), */
 {
     frc::TimedRobot();
 

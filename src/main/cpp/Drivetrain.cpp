@@ -87,7 +87,23 @@ const units::meter_t WHEEL_DIAMETER(0.0973_m);
 #define POLE_OFFSET 6.758_in
 #define SCORER_TO_ROBOT 0.5_in
 
-Drivetrain::Drivetrain(frc::TimedRobot *_robot) : 
+// fix these
+#define BLUE_REEF_17_ANGLE 120_deg
+#define BLUE_REEF_18_ANGLE 180_deg
+#define BLUE_REEF_19_ANGLE -120_deg
+#define BLUE_REEF_20_ANGLE -30_deg
+#define BLUE_REEF_21_ANGLE 0_deg
+#define BLUE_REEF_22_ANGLE  30_deg
+
+// these are correct
+#define RED_REEF_6_ANGLE -60_deg
+#define RED_REEF_7_ANGLE 0_deg
+#define RED_REEF_8_ANGLE 60_deg
+#define RED_REEF_9_ANGLE 120_deg
+#define RED_REEF_10_ANGLE 180_deg
+#define RED_REEF_11_ANGLE -120_deg
+
+Drivetrain::Drivetrain(frc::TimedRobot *_robot, valor::CANdleSensor *_leds) : 
     valor::Swerve<SwerveAzimuthMotor, SwerveDriveMotor>(
         _robot,
         "SwerveDrive",
@@ -95,7 +111,8 @@ Drivetrain::Drivetrain(frc::TimedRobot *_robot) :
         Constants::moduleDiff(),
         WHEEL_DIAMETER
     ),
-    teleopStart(999999999999)
+    teleopStart(999999999999),
+    leds(_leds)
 {
     xPIDF.P = KPX;
     xPIDF.I = KIX;
@@ -349,6 +366,25 @@ void Drivetrain::analyzeDashboard()
             doubtX,
             doubtY
         );
+
+        for (int i = 0; i < 4; i++) {
+        int color = 0xAC41FF;
+        switch (azimuthControllers[i]->getMagnetHealth().value) {
+            case 1: 
+                color = 0xFF0000;
+                break;
+            case 2:
+                color = 0xFF8C00;
+                break;
+            case 3:
+                color = 0x00FF00;
+                break;
+        }
+        leds->setLED(i, color);
+        }
+        for (int i = 5; i < 8; i++)
+            leds->setLED(i, 0x000000);
+
     }
 
     if (!driverGamepad || !driverGamepad->IsConnected() || !operatorGamepad || !operatorGamepad->IsConnected())

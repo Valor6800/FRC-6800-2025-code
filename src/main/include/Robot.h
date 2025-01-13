@@ -16,6 +16,7 @@
 #include "Drivetrain.h"
 #include "subsystems/Scorer.h"
 #include "valkyrie/CharMode.h"
+#include "valkyrie/sensors/CANdleSensor.h"
 
 #include <frc/DriverStation.h>
 #include <frc/DataLogManager.h>
@@ -47,6 +48,10 @@ class Robot : public frc::TimedRobot {
         valor::Gamepad gamepadDriver{OIConstants::GAMEPAD_BASE_LOCATION};
 
         frc2::CommandPtr autoCommands = frc2::cmd::None();
+
+        // std::vector<frc2::CommandPtr> autoCommands;
+        
+        valor::CANdleSensor leds;
         Drivetrain drivetrain;
         Scorer scorer;
         Climber climber;
