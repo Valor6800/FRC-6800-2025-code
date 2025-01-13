@@ -32,6 +32,7 @@
 #include <frc/trajectory/TrajectoryGenerator.h>
 #include <frc/smartdashboard/SendableChooser.h>
 #include <frc/smartdashboard/SmartDashboard.h>
+#include "valkyrie/sensors/CANdleSensor.h"
 
 #include <frc2/command/SwerveControllerCommand.h>
 #include <frc2/command/Command.h>
@@ -143,6 +144,7 @@ private:
      bool aprilTagOnReef(int id);
 
      std::vector<std::pair<SwerveAzimuthMotor*, SwerveDriveMotor*>> generateModules();
+     std::vector<SwerveAzimuthMotor *> azimuthControllers;
 
      valor::PIDF xPIDF;
      valor::PIDF thetaPIDF;
@@ -151,4 +153,7 @@ private:
      valor::GrappleLidarSensor lidarSensor;
 
      units::meter_t visionAcceptanceRadius;
+
+
+     valor::CANdleSensor *leds;
 };

@@ -298,6 +298,25 @@ void Drivetrain::analyzeDashboard()
             doubtX,
             doubtY
         );
+
+        for (int i = 0; i < 4; i++) {
+        int color = 0xAC41FF;
+        switch (azimuthControllers[i]->getMagnetHealth().value) {
+            case 1: 
+                color = 0xFF0000;
+                break;
+            case 2:
+                color = 0xFF8C00;
+                break;
+            case 3:
+                color = 0x00FF00;
+                break;
+        }
+        leds->setLED(i, color);
+        }
+        for (int i = 5; i < 8; i++)
+            leds->setLED(i, 0x000000);
+
     }
 
     if (!driverGamepad || !driverGamepad->IsConnected() || !operatorGamepad || !operatorGamepad->IsConnected())

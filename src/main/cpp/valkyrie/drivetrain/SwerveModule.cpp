@@ -82,6 +82,11 @@ void SwerveModule<AzimuthMotor, DriveMotor>::setDesiredState(frc::SwerveModuleSt
         return;
     }
 
+
+    // if (_desiredState.speed > driveMotor->getMaxMechSpeed()) {
+    //     _desiredState.speed = driveMotor->getMaxMechSpeed();
+    // }
+
     // Get current angle, optimize drive state
     frc::Rotation2d currentAngle = getAzimuthPosition();
     _desiredState.Optimize(currentAngle);
