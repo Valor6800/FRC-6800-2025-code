@@ -34,6 +34,7 @@
 #include <frc/trajectory/TrajectoryGenerator.h>
 #include <frc/smartdashboard/SendableChooser.h>
 #include <frc/smartdashboard/SmartDashboard.h>
+#include "valkyrie/sensors/CANdleSensor.h"
 
 #include <frc2/command/SwerveControllerCommand.h>
 #include <frc2/command/Command.h>
@@ -89,7 +90,7 @@ public:
       * 
       * @param robot Top level robot object to parse out smart dashboard and table information
       */
-     Drivetrain(frc::TimedRobot *robot);
+     Drivetrain(frc::TimedRobot *robot, valor::CANdleSensor *_leds);
 
      /**
       * @brief Destroy the Drivetrain object
@@ -174,4 +175,9 @@ private:
      frc::Transform2d poseErrorPP;
      frc::LinearFilter<double> filter = frc::LinearFilter<double>::MovingAverage(10);
      double unfilteredYDistance;
+
+
+     valor::CANdleSensor *leds;
+
+     
 };
