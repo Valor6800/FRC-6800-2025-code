@@ -163,6 +163,7 @@ private:
       bool hasReset;
 
      std::vector<std::pair<SwerveAzimuthMotor*, SwerveDriveMotor*>> generateModules();
+     std::vector<SwerveAzimuthMotor *> azimuthControllers;
 
      valor::PIDF xPIDF;
      valor::PIDF thetaPIDF;
@@ -175,7 +176,6 @@ private:
      frc::Transform2d poseErrorPP;
      frc::LinearFilter<double> filter = frc::LinearFilter<double>::MovingAverage(10);
      double unfilteredYDistance;
-
 
      valor::CANdleSensor *leds;
 
