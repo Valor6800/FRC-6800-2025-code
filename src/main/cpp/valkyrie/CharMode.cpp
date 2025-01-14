@@ -6,8 +6,6 @@
 
 using namespace valor;
 
-const std::string list[2] = {"Straight line test", "Rot test"};
-
 void CharMode::init() {
     table = nt::NetworkTableInstance::GetDefault().GetTable("list");
     chooser.SetDefaultOption("None", MODE_OPTIONS::NONE);

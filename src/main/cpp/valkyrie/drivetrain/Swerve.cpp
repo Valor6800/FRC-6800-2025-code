@@ -130,12 +130,12 @@ void Swerve<AzimuthMotor, DriveMotor>::assignOutputs()
         swerveModules[2]->setAzimuthPosition(frc::Rotation2d(-225_deg));
         swerveModules[3]->setAzimuthPosition(frc::Rotation2d(45_deg));
         for (size_t i = 0; i < MODULE_COUNT; i++) {
-            swerveModules[i]->setDrivePower(units::volt_t (5));
+            swerveModules[i]->setDrivePower(units::volt_t (12));
         }
     } else if (strLineTest){
         for (size_t i = 0; i < MODULE_COUNT; i++) {
             swerveModules[i]->setAzimuthPosition(frc::Rotation2d());
-            swerveModules[i]->setDrivePower(units::volt_t (5));
+            swerveModules[i]->setDrivePower(units::volt_t (12));
         }
     } else{
         drive(xSpeedMPS, ySpeedMPS, rotSpeedRPS, true);
@@ -186,7 +186,6 @@ template<class AzimuthMotor, class DriveMotor>
 void Swerve<AzimuthMotor, DriveMotor>::resetState()
 {
     resetOdometry(frc::Pose2d{0_m, 0_m, 0_rad});
-    //selectedTest = CharMode::NONE;
     rotTest = false;
     strLineTest = false;
 }
