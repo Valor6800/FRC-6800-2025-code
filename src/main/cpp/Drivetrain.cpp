@@ -74,7 +74,23 @@ const units::meter_t WHEEL_DIAMETER(0.0973_m);
 #define RED_REEF_10_ANGLE 180_deg
 #define RED_REEF_11_ANGLE -120_deg
 
-Drivetrain::Drivetrain(frc::TimedRobot *_robot) : 
+// fix these
+#define BLUE_REEF_17_ANGLE 120_deg
+#define BLUE_REEF_18_ANGLE 180_deg
+#define BLUE_REEF_19_ANGLE -120_deg
+#define BLUE_REEF_20_ANGLE -30_deg
+#define BLUE_REEF_21_ANGLE 0_deg
+#define BLUE_REEF_22_ANGLE  30_deg
+
+// these are correct
+#define RED_REEF_6_ANGLE -60_deg
+#define RED_REEF_7_ANGLE 0_deg
+#define RED_REEF_8_ANGLE 60_deg
+#define RED_REEF_9_ANGLE 120_deg
+#define RED_REEF_10_ANGLE 180_deg
+#define RED_REEF_11_ANGLE -120_deg
+
+Drivetrain::Drivetrain(frc::TimedRobot *_robot, valor::CANdleSensor *_leds) : 
     valor::Swerve<SwerveAzimuthMotor, SwerveDriveMotor>(
         _robot,
         "SwerveDrive",
@@ -83,7 +99,8 @@ Drivetrain::Drivetrain(frc::TimedRobot *_robot) :
         WHEEL_DIAMETER
     ),
     teleopStart(999999999999),
-    lidarSensor(_robot, "Front Lidar Sensor", CANIDs::FRONT_LIDAR_SENSOR)
+    lidarSensor(_robot, "Front Lidar Sensor", CANIDs::FRONT_LIDAR_SENSOR),
+    leds(_leds)
 {
     xPIDF.P = KPX;
     xPIDF.I = KIX;
