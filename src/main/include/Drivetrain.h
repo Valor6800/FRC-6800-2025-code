@@ -145,7 +145,6 @@ private:
 
      std::vector<std::pair<SwerveAzimuthMotor*, SwerveDriveMotor*>> generateModules();
      std::vector<SwerveAzimuthMotor *> azimuthControllers;
-     std::vector<SwerveAzimuthMotor *> azimuthControllers;
 
      valor::PIDF xPIDF;
      valor::PIDF thetaPIDF;
@@ -162,4 +161,6 @@ private:
 
 
      valor::CANdleSensor *leds;
+
+     
 };
