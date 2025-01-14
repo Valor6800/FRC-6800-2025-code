@@ -33,6 +33,10 @@ void VisionSensor::setCameraPose(frc::Pose3d camPose){
     limeTable->PutNumberArray("camerapose_robotspace_set", camPosition); 
 }
 
+const char* VisionSensor::getName() {
+    return BaseSensor::sensorName;
+}
+
 void VisionSensor::reset() {
     currState = frc::Pose3d();
     tx = 0;
@@ -43,7 +47,7 @@ void VisionSensor::reset() {
 
 void VisionSensor::setPipe(PipeLines _pipe) {
     if (limeTable == nullptr) return;
-    limeTable->PutNumber("pipeline", _pipe);
+    limeTable->PutNumber("pipeline", static_cast<int>(_pipe));
 }
 
 bool VisionSensor::hasTarget() {

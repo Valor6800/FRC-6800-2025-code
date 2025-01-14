@@ -46,6 +46,8 @@ class VisionSensor : public valor::BaseSensor<frc::Pose3d> {
 
         virtual void InitSendable(wpi::SendableBuilder& builder) override = 0;
 
+        const char* getName();
+
         
 
     protected:
