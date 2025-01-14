@@ -74,6 +74,12 @@ frc::SwerveModuleState SwerveModule<AzimuthMotor, DriveMotor>::getState()
 }
 
 template<class AzimuthMotor, class DriveMotor>
+ctre::phoenix6::signals::MagnetHealthValue SwerveModule<AzimuthMotor, DriveMotor>::getAzimuthMagnetHealth() 
+{
+    return azimuthMotor->getMagnetHealth();
+}
+
+template<class AzimuthMotor, class DriveMotor>
 void SwerveModule<AzimuthMotor, DriveMotor>::setDesiredState(frc::SwerveModuleState _desiredState, bool isDriveOpenLoop)
 {
     // Deadband
@@ -81,11 +87,6 @@ void SwerveModule<AzimuthMotor, DriveMotor>::setDesiredState(frc::SwerveModuleSt
         setDriveOpenLoop(0_mps);
         return;
     }
-
-
-    // if (_desiredState.speed > driveMotor->getMaxMechSpeed()) {
-    //     _desiredState.speed = driveMotor->getMaxMechSpeed();
-    // }
 
     // Get current angle, optimize drive state
     frc::Rotation2d currentAngle = getAzimuthPosition();

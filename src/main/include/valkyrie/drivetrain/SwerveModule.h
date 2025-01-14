@@ -7,6 +7,7 @@
 #include <frc/kinematics/SwerveModulePosition.h>
 #include <frc/DutyCycleEncoder.h>
 #include <units/voltage.h>
+#include <ctre/phoenix6/CANcoder.hpp>
 
 #include <wpi/sendable/Sendable.h>
 #include <wpi/sendable/SendableBuilder.h>
@@ -38,6 +39,8 @@ public:
     );
 
     frc::Rotation2d getAzimuthPosition();
+
+    ctre::phoenix6::signals::MagnetHealthValue getAzimuthMagnetHealth();
 
     units::meter_t getDrivePosition();
 

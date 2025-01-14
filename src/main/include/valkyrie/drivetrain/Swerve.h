@@ -6,6 +6,7 @@
 #include <frc/kinematics/ChassisSpeeds.h>
 #include <frc/kinematics/SwerveDriveKinematics.h>
 #include <frc/estimator/SwerveDrivePoseEstimator.h>
+
 #include <frc/controller/ProfiledPIDController.h>
 #include <frc/trajectory/TrapezoidProfile.h>
 
@@ -52,6 +53,8 @@ public:
       */
     frc::Pose2d getRawPose();
     frc::Pose2d getCalculatedPose();
+
+    ctre::phoenix6::signals::MagnetHealthValue getAzimuthMagnetHealth(int index);
 
     void setupGyro(int, const char*, units::degree_t, units::degree_t, units::degree_t);
     void resetGyro();

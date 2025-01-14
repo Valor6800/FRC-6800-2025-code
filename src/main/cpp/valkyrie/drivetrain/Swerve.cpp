@@ -450,6 +450,11 @@ frc::Pose2d Swerve<AzimuthMotor, DriveMotor>::getCalculatedPose()
 }
 
 template<class AzimuthMotor, class DriveMotor>
+ctre::phoenix6::signals::MagnetHealthValue Swerve<AzimuthMotor, DriveMotor>::getAzimuthMagnetHealth(int index) {
+    return swerveModules[index]->getAzimuthMagnetHealth().value;
+}
+
+template<class AzimuthMotor, class DriveMotor>
 wpi::array<frc::SwerveModulePosition, MODULE_COUNT> Swerve<AzimuthMotor, DriveMotor>::getModuleStates()
 {
     wpi::array<frc::SwerveModulePosition, MODULE_COUNT> modulePositions = wpi::array<frc::SwerveModulePosition, MODULE_COUNT>(wpi::empty_array);
