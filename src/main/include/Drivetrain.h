@@ -78,7 +78,7 @@ public:
       * 
       * @param robot Top level robot object to parse out smart dashboard and table information
       */
-     Drivetrain(frc::TimedRobot *robot);
+     Drivetrain(frc::TimedRobot *robot, valor::CANdleSensor *_leds);
 
      /**
       * @brief Destroy the Drivetrain object
@@ -127,7 +127,6 @@ public:
 private:
 
      std::vector<std::pair<SwerveAzimuthMotor*, SwerveDriveMotor*>> generateModules();
-     std::vector<SwerveAzimuthMotor *> azimuthControllers;
 
      valor::PIDF xPIDF;
      valor::PIDF thetaPIDF;
@@ -138,4 +137,6 @@ private:
 
 
      valor::CANdleSensor *leds;
+
+     
 };

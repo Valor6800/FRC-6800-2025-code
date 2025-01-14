@@ -13,6 +13,7 @@
 
 #include "valkyrie/Auto.h"
 #include "Drivetrain.h"
+#include "valkyrie/sensors/CANdleSensor.h"
 
 #include <frc/DriverStation.h>
 #include <frc/DataLogManager.h>
@@ -42,7 +43,8 @@ class Robot : public frc::TimedRobot {
         valor::Gamepad gamepadDriver{OIConstants::GAMEPAD_BASE_LOCATION};
 
         // std::vector<frc2::CommandPtr> autoCommands;
-
+        
+        valor::CANdleSensor leds;
         Drivetrain drivetrain;
         // valor::Auto valorAuto;
 };

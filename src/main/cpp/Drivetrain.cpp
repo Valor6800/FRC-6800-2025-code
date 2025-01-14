@@ -55,7 +55,7 @@ const units::meter_t WHEEL_DIAMETER(0.0973_m);
 
 #define MT2_POSE true
 
-Drivetrain::Drivetrain(frc::TimedRobot *_robot) : 
+Drivetrain::Drivetrain(frc::TimedRobot *_robot, valor::CANdleSensor *_leds) : 
     valor::Swerve<SwerveAzimuthMotor, SwerveDriveMotor>(
         _robot,
         "SwerveDrive",
@@ -63,7 +63,8 @@ Drivetrain::Drivetrain(frc::TimedRobot *_robot) :
         Constants::moduleDiff(),
         WHEEL_DIAMETER
     ),
-    teleopStart(999999999999)
+    teleopStart(999999999999),
+    leds(_leds)
 {
     xPIDF.P = KPX;
     xPIDF.I = KIX;

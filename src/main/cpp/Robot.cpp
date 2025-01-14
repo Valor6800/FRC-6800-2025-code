@@ -18,7 +18,9 @@
 #define SEGMENTS 2
 
 Robot::Robot() :
-    drivetrain(this)
+    leds(this, LED_COUNT, SEGMENTS, CANIDs::CANDLE, ""),
+    drivetrain(this, &leds)
+
     /* valorAuto(), */
 {
     frc::TimedRobot();
