@@ -38,6 +38,7 @@ void Robot::RobotInit() {
     frc::LiveWindow::EnableAllTelemetry();
     frc::DataLogManager::Start();
 
+    charMode.init();
     valorAuto.fillAutoList();
     // valorAuto.preloadAuto("A1-");
     // valorAuto.preloadAuto("A1-2");

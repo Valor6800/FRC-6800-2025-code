@@ -19,7 +19,7 @@ template<class AzimuthMotor, class DriveMotor>
 class Swerve : public valor::BaseSubsystem
 {
 public:
-    std::string selectedTest;
+    CharMode::MODE_OPTIONS selectedTest;
 
     Swerve(frc::TimedRobot *_robot,
                 const char* _name,
@@ -116,10 +116,10 @@ private:
     bool roughTowardsRed;
     void calculateCarpetPose();
 
-    bool charMode;
     bool rotTest;
     bool strLineTest;
     
+    CharMode charac;
 };
 
 }

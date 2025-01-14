@@ -8,20 +8,19 @@ using namespace valor;
 
 const std::string list[2] = {"Straight line test", "Rot test"};
 
-CharMode::CharMode(){
+void CharMode::init() {
     table = nt::NetworkTableInstance::GetDefault().GetTable("list");
-    chooser.SetDefaultOption("None", "None");
+    chooser.SetDefaultOption("None", MODE_OPTIONS::NONE);
 }
 
 void CharMode::fillSelectList(){
-    for (std::string option : list){
-        chooser.AddOption(static_cast<std::string_view> (option), option);//static_cast<std::string_view>(
+    for (std::pair<MODE_OPTIONS, std::string> i : modeMap){
+        chooser.AddOption(static_cast<std::string_view>(i.second), static_cast<int>(i.first)); //static_cast<std::string_view>(
     }
     frc::SmartDashboard::PutData("CharMode", &chooser);
 }
 
-
-std::string CharMode::getSelected(){
-    std::string selected = chooser.GetSelected();
+CharMode::MODE_OPTIONS CharMode::getSelected(){
+    MODE_OPTIONS selected = static_cast<MODE_OPTIONS> (chooser.GetSelected());
     return selected;
 }

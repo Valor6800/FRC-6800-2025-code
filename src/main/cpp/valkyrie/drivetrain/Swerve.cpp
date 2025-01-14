@@ -111,9 +111,9 @@ void Swerve<AzimuthMotor, DriveMotor>::analyzeDashboard()
         ySpeedMPS *= -1.0;
     }
 
-   if (selectedTest == "Rot test" && driverGamepad->GetAButton()) {
+   if (selectedTest == CharMode::ROT && driverGamepad->GetAButton()) {
         rotTest = true;
-   } else if (selectedTest == "Straight line test" && driverGamepad->GetAButton()) {
+   } else if (selectedTest == CharMode::STR_LINE && driverGamepad->GetAButton()) {
         strLineTest = true;
    } else {
         rotTest = false;
@@ -186,6 +186,7 @@ template<class AzimuthMotor, class DriveMotor>
 void Swerve<AzimuthMotor, DriveMotor>::resetState()
 {
     resetOdometry(frc::Pose2d{0_m, 0_m, 0_rad});
+    //selectedTest = CharMode::NONE;
     rotTest = false;
     strLineTest = false;
 }
@@ -472,11 +473,6 @@ void Swerve<AzimuthMotor, DriveMotor>::InitSendable(wpi::SendableBuilder& builde
     builder.AddDoubleProperty(
         "Max Drive Speed MPS",
         [this] {return maxDriveSpeed.value();},
-        nullptr
-    );
-    builder.AddStringProperty(
-        "Selected Test",
-        [this] {return selectedTest;},
         nullptr
     );
 }

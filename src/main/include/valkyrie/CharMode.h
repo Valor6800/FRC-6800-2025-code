@@ -5,28 +5,39 @@
 #include <networktables/NetworkTable.h>
 #include <networktables/NetworkTableInstance.h>
 
+#include <map>
+
 
 namespace valor {
 
 class CharMode
 {
     public:
-        CharMode();
+        void init();
 
         /**
          * Fills the SendableChooser with a list of characterization modes
          */
         void fillSelectList();
 
-        std::string getSelected();
+        enum MODE_OPTIONS{
+            NONE,
+            ROT,
+            STR_LINE
+        };
 
-        void InitSendable(wpi::SendableBuilder& builder);
-       
+        std::unordered_map<MODE_OPTIONS, std::string> modeMap {
+            {NONE, "None"},
+            {ROT, "Rot"},
+            {STR_LINE, "Straight line test"}
+        };
+
+        MODE_OPTIONS getSelected();
 
     private:
         
         std::shared_ptr<nt::NetworkTable> table;
-        frc::SendableChooser<std::string> chooser;
+        frc::SendableChooser<int> chooser;
 
 };
 
