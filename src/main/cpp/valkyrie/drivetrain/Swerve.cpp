@@ -117,13 +117,13 @@ void Swerve<AzimuthMotor, DriveMotor>::analyzeDashboard()
         units::radian_t robotRotation = getCalculatedPose().Rotation().Radians();
         rotSpeedRPS = units::radians_per_second_t{rot_controller.Calculate(robotRotation)} + rot_controller.GetSetpoint().velocity;
     } 
+    else {
+        rotSpeedRPS = rotSpeed * maxRotationSpeed;
+    }
     if (alignToTarget){
         y_controller.SetGoal(0.01_m);
         ySpeedMPS = units::meters_per_second_t{y_controller.Calculate(yDistance)} + y_controller.GetSetpoint().velocity;
-    } else {
-        rotSpeedRPS = rotSpeed * maxRotationSpeed;
     }
-
     // Linear Speed calculations
 }
 
