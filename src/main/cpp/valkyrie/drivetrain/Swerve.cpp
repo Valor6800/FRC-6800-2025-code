@@ -1,4 +1,6 @@
 #include "valkyrie/drivetrain/Swerve.h"
+#include "units/length.h"
+#include "units/math.h"
 #include "valkyrie/controllers/PhoenixController.h"
 
 #include <frc/estimator/SwerveDrivePoseEstimator.h>
@@ -39,6 +41,12 @@ Swerve<AzimuthMotor, DriveMotor>::Swerve(frc::TimedRobot *_robot,
             _wheelDiameter
         ));
     }
+
+    table->PutNumber("Y_KP", 0.0);
+    table->PutNumber("Y_KD", 0.0);
+    table->PutNumber("Y_KI", 0.0);
+
+    y_controller.SetTolerance(units::millimeter_t{40});
 
     maxDriveSpeed = swerveModules[0]->getMaxDriveSpeed();
     maxRotationSpeed = units::radian_t{2.0 * M_PI} * swerveModules[0]->getMaxDriveSpeed() / _module_radius;
@@ -98,6 +106,10 @@ void Swerve<AzimuthMotor, DriveMotor>::assessInputs()
 template<class AzimuthMotor, class DriveMotor>
 void Swerve<AzimuthMotor, DriveMotor>::analyzeDashboard()
 {
+    y_controller.SetP(table->GetNumber("Y_KP", 0.0));
+    y_controller.SetD(table->GetNumber("Y_KD", 0.0));
+    y_controller.SetI(table->GetNumber("Y_KI", 0.0));
+
     rawEstimator->UpdateWithTime(frc::Timer::GetFPGATimestamp(), getGyro(), getModuleStates());
     calcEstimator->UpdateWithTime(frc::Timer::GetFPGATimestamp(), getGyro(), getModuleStates());
 
@@ -120,10 +132,16 @@ void Swerve<AzimuthMotor, DriveMotor>::analyzeDashboard()
     else {
         rotSpeedRPS = rotSpeed * maxRotationSpeed;
     }
+
     if (alignToTarget){
-        y_controller.SetGoal(0.01_m);
-        ySpeedMPS = units::meters_per_second_t{y_controller.Calculate(yDistance)} + y_controller.GetSetpoint().velocity;
+        y_controller.SetGoal(0.0_m);
+        calculated_y_controller_val = y_controller.Calculate(yDistance, 0.0_m);
+        relativeToTagSpeed = units::meters_per_second_t{calculated_y_controller_val};
+        xSpeedMPS = relativeToTagSpeed * units::math::sin(-targetAngle);
+        ySpeedMPS = relativeToTagSpeed * units::math::cos(-targetAngle);
     }
+
+    
     // Linear Speed calculations
 }
 
@@ -513,6 +531,11 @@ void Swerve<AzimuthMotor, DriveMotor>::InitSendable(wpi::SendableBuilder& builde
     builder.AddBooleanProperty(
         "Locking to Target",
         [this] {return lockingToTarget;},
+        nullptr
+    );
+    builder.AddDoubleProperty(
+        "Calculated y_controller value",
+        [this] {return calculated_y_controller_val;},
         nullptr
     );
 }
