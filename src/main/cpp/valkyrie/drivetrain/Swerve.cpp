@@ -1,13 +1,16 @@
 #include "valkyrie/drivetrain/Swerve.h"
 #include "valkyrie/controllers/PhoenixController.h"
 
+#include <ctre/phoenix6/swerve/SwerveDrivetrainConstants.hpp>
+#include <ctre/phoenix6/swerve/SwerveModuleConstants.hpp>
 #include <frc/estimator/SwerveDrivePoseEstimator.h>
 #include <frc/geometry/Translation2d.h>
 #include <frc/DriverStation.h>
+#include "Constants.h"
 
 #define MODULE_DIFF_XS {1, 1, -1, -1}
 #define MODULE_DIFF_YS {1, -1, -1, 1}
-
+ 
 const units::hertz_t KP_ROTATE(-90);
 const units::hertz_t KD_ROTATE(-30);
 
@@ -26,6 +29,37 @@ Swerve<AzimuthMotor, DriveMotor>::Swerve(frc::TimedRobot *_robot,
 ) : valor::BaseSubsystem(_robot, _name), lockingToTarget(false), useCarpetGrain(false)
 {
     frc2::CommandScheduler::GetInstance().RegisterSubsystem(this);
+
+    auto steerGains = ctre::phoenix6::configs::Slot0Configs{}
+        .WithKP(Constants::azimuthKP());
+    auto driveGains = ctre::phoenix6::configs::Slot0Configs{}
+        .WithKP(Constants::driveKP());
+    auto motorTorqueCurrentConfig = ctre::phoenix6::configs::TorqueCurrentConfigs
+    auto motorConfig = ctre::phoenix6::configs::TalonFXConfiguration{}
+        .WithTorqueCurrent(motorTorqueCurrentConfig);
+    auto pigeonMountConfig = ctre::phoenix6::configs::MountPoseConfigs{}
+        .WithMountPoseRoll(Constants::pigeonMountRoll())
+        .WithMountPosePitch(Constants::pigeonMountPitch())
+        .WithMountPoseYaw(Constants::pigeonMountYaw());
+    auto pigeon2Config = ctre::phoenix6::configs::Pigeon2Configuration{}
+        .WithMountPose(pigeonMountConfig);
+    auto drivetrainConstants = ctre::phoenix6::swerve::SwerveDrivetrainConstants{}
+        .WithCANBusName("baseCAN")
+        .WithPigeon2Id(CANIDs::PIGEON_CAN)
+        .WithPigeon2Configs(pigeon2Config);
+    auto moduleConstantsFactory = ctre::phoenix6::swerve::SwerveModuleConstantsFactory<ctre::phoenix6::configs::TalonFXConfiguration, ctre::phoenix6::configs::TalonFXConfiguration, ctre::phoenix6::configs::CANcoderConfiguration>{}
+        .WithDriveMotorGearRatio(Constants::driveGearRatio())
+        .WithSteerMotorGearRatio(Constants::azimuthGearRatio())
+        .WithWheelRadius(0.0973_m / 2)
+        .WithSteerMotorGains(steerGains)
+        .WithDriveMotorGains(driveGains)
+        .WithSteerMotorClosedLoopOutput(ctre::phoenix6::swerve::ClosedLoopOutputType::TorqueCurrentFOC)
+        .WithDriveMotorClosedLoopOutput(ctre::phoenix6::swerve::ClosedLoopOutputType::TorqueCurrentFOC)
+        .WithDriveMotorType(ctre::phoenix6::swerve::DriveMotorArrangement::TalonFX_Integrated)
+        .WithSteerMotorType(ctre::phoenix6::swerve::SteerMotorArrangement::TalonFX_Integrated)
+        .WithDriveMotorInitialConfigs(motorConfig)
+        .WithSteerMotorInitialConfigs(motorConfig)
+        .WithFeedbackSource(ctre::phoenix6::swerve::SteerFeedbackType::FusedCANcoder);
 
     int MDX[] = MODULE_DIFF_XS;
     int MDY[] = MODULE_DIFF_YS;
