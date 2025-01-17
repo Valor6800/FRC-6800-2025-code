@@ -1,8 +1,13 @@
 #include "valkyrie/drivetrain/Swerve.h"
+#include "Eigen/Core"
 #include "units/length.h"
 #include "units/math.h"
+#include "units/velocity.h"
 #include "valkyrie/controllers/PhoenixController.h"
+#include <iostream>
 
+#include <cstdio>
+#include <filesystem>
 #include <frc/estimator/SwerveDrivePoseEstimator.h>
 #include <frc/geometry/Translation2d.h>
 #include <frc/DriverStation.h>
@@ -12,6 +17,33 @@
 
 const units::hertz_t KP_ROTATE(-90);
 const units::hertz_t KD_ROTATE(-30);
+
+// fix these
+#define BLUE_REEF_17_ANGLE 120_deg
+#define BLUE_REEF_18_ANGLE 180_deg
+#define BLUE_REEF_19_ANGLE -120_deg
+#define BLUE_REEF_20_ANGLE -30_deg
+#define BLUE_REEF_21_ANGLE 0_deg
+#define BLUE_REEF_22_ANGLE  30_deg
+
+// these are correct
+#define RED_REEF_6_ANGLE -60_deg
+#define RED_REEF_7_ANGLE 0_deg
+#define RED_REEF_8_ANGLE 60_deg
+#define RED_REEF_9_ANGLE 120_deg
+#define RED_REEF_10_ANGLE 180_deg
+#define RED_REEF_11_ANGLE -120_deg
+
+
+#define MAKE_VECTOR(angle) Eigen::Vector2d{units::math::sin(angle).value(), units::math::cos(angle).value()}
+const Eigen::Vector2d reefUnitVectors[6]{
+    MAKE_VECTOR(RED_REEF_6_ANGLE),
+    MAKE_VECTOR(RED_REEF_7_ANGLE),
+    MAKE_VECTOR(RED_REEF_8_ANGLE),
+    MAKE_VECTOR(RED_REEF_9_ANGLE),
+    MAKE_VECTOR(RED_REEF_10_ANGLE),
+    MAKE_VECTOR(RED_REEF_11_ANGLE)
+};
 
 using namespace valor;
 
@@ -132,13 +164,22 @@ void Swerve<AzimuthMotor, DriveMotor>::analyzeDashboard()
     else {
         rotSpeedRPS = rotSpeed * maxRotationSpeed;
     }
+    joystickVector = Eigen::Vector2d{xSpeed, ySpeed};
+    double dotProduct = joystickVector.dot(MAKE_VECTOR(90_deg - targetAngle));
+    joystickVector *= fabs(dotProduct);
+    joystickVector *= maxDriveSpeed.value();
 
     if (alignToTarget){
         y_controller.SetGoal(0.0_m);
         calculated_y_controller_val = y_controller.Calculate(yDistance, 0.0_m);
         relativeToTagSpeed = units::meters_per_second_t{calculated_y_controller_val};
-        xSpeedMPS = relativeToTagSpeed * units::math::sin(-targetAngle);
-        ySpeedMPS = relativeToTagSpeed * units::math::cos(-targetAngle);
+
+        
+        pidVector = MAKE_VECTOR(-targetAngle) * relativeToTagSpeed.value();
+        powerVector = joystickVector + pidVector;
+        // powerVector *= dotProduct / fabs(dotProduct);
+        xSpeedMPS = units::meters_per_second_t{powerVector[0]};
+        ySpeedMPS = units::meters_per_second_t{powerVector[1]};
     }
 
     
@@ -536,6 +577,22 @@ void Swerve<AzimuthMotor, DriveMotor>::InitSendable(wpi::SendableBuilder& builde
     builder.AddDoubleProperty(
         "Calculated y_controller value",
         [this] {return calculated_y_controller_val;},
+        nullptr
+    );
+
+    builder.AddDoubleArrayProperty(
+        "Joystick Vector",
+        [this] {return std::vector<double>{joystickVector[0], joystickVector[1]};},
+        nullptr
+    );
+    builder.AddDoubleArrayProperty(
+        "Y_Controller PID Vector",
+        [this] {return std::vector<double>{pidVector[0], pidVector[1]};},
+        nullptr
+    );
+    builder.AddDoubleArrayProperty(
+        "Power Vector",
+        [this] {return std::vector<double>{powerVector[0], powerVector[1]};},
         nullptr
     );
 }

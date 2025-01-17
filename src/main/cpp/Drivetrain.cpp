@@ -7,6 +7,7 @@
 #include <pathplanner/lib/auto/AutoBuilder.h>
 #include <string>
 #include "Constants.h"
+#include "Eigen/Core"
 #include "frc2/command/Commands.h"
 #include "frc2/command/FunctionalCommand.h"
 #include "frc2/command/SequentialCommandGroup.h"
@@ -18,6 +19,7 @@
 #include "valkyrie/sensors/VisionSensor.h"
 #include <frc2/command/InstantCommand.h> 
 #include <pathplanner/lib/auto/NamedCommands.h>
+#include <unordered_map>
 #include <utility>
 #include "frc/geometry/Pose3d.h"
 #include <pathplanner/lib/controllers/PPHolonomicDriveController.h>
@@ -68,11 +70,9 @@ const units::meter_t WHEEL_DIAMETER(0.0973_m);
 #define RED_REEF_6_ANGLE -60_deg
 #define RED_REEF_7_ANGLE 0_deg
 #define RED_REEF_8_ANGLE 60_deg
-
-// fix these
-#define RED_REEF_9_ANGLE -30_deg
-#define RED_REEF_10_ANGLE 0_deg
-#define RED_REEF_11_ANGLE 30_deg
+#define RED_REEF_9_ANGLE 120_deg
+#define RED_REEF_10_ANGLE 180_deg
+#define RED_REEF_11_ANGLE -120_deg
 
 Drivetrain::Drivetrain(frc::TimedRobot *_robot) : 
     valor::Swerve<SwerveAzimuthMotor, SwerveDriveMotor>(
