@@ -225,7 +225,6 @@ void Drivetrain::assessInputs()
     state.getTag = false;
     if ((driverGamepad->GetBButton() || driverGamepad->GetAButton()) && state.reefTag == -1) {
         state.getTag = true;
-        printf("\n\nPressed\n\n");
     } else if (!driverGamepad->GetBButton() && !driverGamepad->GetAButton()) {
         state.reefTag = -1;
     }
@@ -257,7 +256,7 @@ void Drivetrain::analyzeDashboard()
 
     alignAngleTags();
 
-    if(aprilTagSensors[4]->hasTarget()) {
+    if(aprilTagSensors[4]->hasTarget() && aprilTagSensors[4]->getTagID() == state.reefTag) {
         Swerve::yDistance = aprilTagSensors[4]->get_botpose_targetspace().X();
     } 
 

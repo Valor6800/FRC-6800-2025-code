@@ -101,7 +101,7 @@ protected:
     bool lockingToTarget;
     units::degree_t targetAngle;
 
-    bool alignToTarget;
+    bool alignToTarget = false;
     units::meter_t yDistance = 0.0_m;
 
     void enableCarpetGrain(double grainMultiplier, bool roughTowardsRed);

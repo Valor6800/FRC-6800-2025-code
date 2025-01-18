@@ -11,6 +11,7 @@
 #include <frc/estimator/SwerveDrivePoseEstimator.h>
 #include <frc/geometry/Translation2d.h>
 #include <frc/DriverStation.h>
+#include <memory>
 
 #define MODULE_DIFF_XS {1, 1, -1, -1}
 #define MODULE_DIFF_YS {1, -1, -1, 1}
@@ -35,15 +36,7 @@ const units::hertz_t KD_ROTATE(-30);
 #define RED_REEF_11_ANGLE -120_deg
 
 
-#define MAKE_VECTOR(angle) Eigen::Vector2d{units::math::sin(angle).value(), units::math::cos(angle).value()}
-const Eigen::Vector2d reefUnitVectors[6]{
-    MAKE_VECTOR(RED_REEF_6_ANGLE),
-    MAKE_VECTOR(RED_REEF_7_ANGLE),
-    MAKE_VECTOR(RED_REEF_8_ANGLE),
-    MAKE_VECTOR(RED_REEF_9_ANGLE),
-    MAKE_VECTOR(RED_REEF_10_ANGLE),
-    MAKE_VECTOR(RED_REEF_11_ANGLE)
-};
+#define MAKE_VECTOR(angle) Eigen::Vector2d{units::math::cos(angle).value(), units::math::sin(angle).value()}
 
 using namespace valor;
 
@@ -122,17 +115,7 @@ void Swerve<AzimuthMotor, DriveMotor>::assessInputs()
     ySpeed = driverGamepad->leftStickX(2);
     rotSpeed = driverGamepad->rightStickX(3);
 
-    lockingToTarget = false;
-
-    if(driverGamepad->GetAButton()){
-        lockingToTarget = true;
-    }
-
-    alignToTarget = false;
-
-    if(driverGamepad->GetBButton()){
-        alignToTarget = true;
-    }
+    alignToTarget = driverGamepad->GetAButton();
 }
 
 template<class AzimuthMotor, class DriveMotor>
@@ -156,7 +139,7 @@ void Swerve<AzimuthMotor, DriveMotor>::analyzeDashboard()
         ySpeedMPS *= -1.0;
     }
     // Rotational Speed calculations
-    if (lockingToTarget) {
+    if (alignToTarget) {
         rot_controller.SetGoal(units::radian_t{targetAngle});
         units::radian_t robotRotation = getCalculatedPose().Rotation().Radians();
         rotSpeedRPS = units::radians_per_second_t{rot_controller.Calculate(robotRotation)} + rot_controller.GetSetpoint().velocity;
@@ -164,19 +147,19 @@ void Swerve<AzimuthMotor, DriveMotor>::analyzeDashboard()
     else {
         rotSpeedRPS = rotSpeed * maxRotationSpeed;
     }
-    joystickVector = Eigen::Vector2d{ySpeed, xSpeed};
+
+    joystickVector = Eigen::Vector2d{xSpeed, ySpeed};
     double dotProduct = joystickVector.dot(MAKE_VECTOR(targetAngle));
     joystickVector = dotProduct * MAKE_VECTOR(targetAngle);
     joystickVector *= maxDriveSpeed.value();
-    joystickVector = Eigen::Vector2d{joystickVector[1], joystickVector[0]};
+    // joystickVector = Eigen::Vector2d{joystickVector[0], joystickVector[1]};
 
     if (alignToTarget){
         y_controller.SetGoal(0.0_m);
         calculated_y_controller_val = y_controller.Calculate(yDistance, 0.0_m);
         relativeToTagSpeed = units::meters_per_second_t{calculated_y_controller_val};
 
-        
-        pidVector = MAKE_VECTOR(-targetAngle) * relativeToTagSpeed.value();
+        pidVector = MAKE_VECTOR(targetAngle - 90_deg) * relativeToTagSpeed.value();
         powerVector = joystickVector + pidVector;
         // powerVector *= dotProduct / fabs(dotProduct);
         xSpeedMPS = units::meters_per_second_t{powerVector[0]};
