@@ -76,8 +76,10 @@ public:
     };
 
 private:
-    double wheelDiameter = 0.1;
     Drivetrain *drivetrain;
-    valor::PhoenixController* scorerMotor;
+    valor::DebounceSensor scorerDebounceSensor;
+    valor::PhoenixController *elevatorMotor;
+    valor::PhoenixController *scorerMotor;
     valor::GrappleLidarSensor lidarSensor;
+    double wheelDiameter = 0.1;
 };
