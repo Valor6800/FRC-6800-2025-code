@@ -25,23 +25,31 @@ public:
     void analyzeDashboard();
     void assignOutputs();
 
-    void setClimbPID();
-
     void InitSendable(wpi::SendableBuilder& builder);
 
     enum CLIMB_STATE
     {
-        
+        STOW,
+        DEPLOY,
+        CLIMB
+    };
+
+    enum CRAB_STATE
+    {
+        NO_CRAB,
+        CRABBING
     };
 
     struct x
     {
         CLIMB_STATE climbState;
+        CRAB_STATE crabState;
+        bool climbed;
 
     }state;
 
-
 private:
     valor::PhoenixController *climbMotor;
+    valor::PhoenixController *crabMotor;
 };
 
