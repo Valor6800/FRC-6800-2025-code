@@ -211,6 +211,7 @@ void Drivetrain::resetState()
 void Drivetrain::init()
 {
     Swerve::init();
+    state.reefTag = -1;
 }
 
 void Drivetrain::assessInputs()
@@ -221,7 +222,13 @@ void Drivetrain::assessInputs()
         return;
 
     // state.lockingToReef = driverGamepad->GetAButtonPressed();
-
+    state.getTag = false;
+    if ((driverGamepad->GetBButton() || driverGamepad->GetAButton()) && state.reefTag == -1) {
+        state.getTag = true;
+        printf("\n\nPressed\n\n");
+    } else if (!driverGamepad->GetBButton() && !driverGamepad->GetAButton()) {
+        state.reefTag = -1;
+    }
     /*for (valor::AprilTagsSensor *aprilCam : aprilTagSensors) {
         if (aprilCam->hasTarget() && aprilCam->hasTarget());
     }*/
@@ -230,17 +237,19 @@ void Drivetrain::assessInputs()
 void Drivetrain::analyzeDashboard()
 {
     bool isRed = frc::DriverStation::GetAlliance() == frc::DriverStation::Alliance::kRed ? true : false;
-    state.reefTag = -1;
-    for(valor::AprilTagsSensor* aprilLime : aprilTagSensors) {
-        if (aprilLime->hasTarget()) {
-            if (isRed) {
-                if(aprilLime->getTagID() >= 6 && aprilLime->getTagID() <= 11){
-                    state.reefTag = aprilLime->getTagID();
+
+    if (state.getTag){
+        for(valor::AprilTagsSensor* aprilLime : aprilTagSensors) {
+            if (aprilLime->hasTarget()) {
+                if (isRed) {
+                    if(aprilLime->getTagID() >= 6 && aprilLime->getTagID() <= 11){
+                        state.reefTag = aprilLime->getTagID();
+                    }
                 }
-            }
-            if (!isRed) {
-                if(aprilLime->getTagID()>=17 && aprilLime->getTagID() <= 22){
-                    state.reefTag = aprilLime->getTagID();
+                if (!isRed) {
+                    if(aprilLime->getTagID()>=17 && aprilLime->getTagID() <= 22){
+                        state.reefTag = aprilLime->getTagID();
+                    }
                 }
             }
         }
@@ -367,7 +376,7 @@ void Drivetrain::setAngleBasedOnTag(int tagID)
             Swerve::targetAngle = BLUE_REEF_22_ANGLE; // 22
             break;
         default:
-            alignAngleZoning();
+            ;
     }
 }
 

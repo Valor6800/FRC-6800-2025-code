@@ -165,7 +165,6 @@ void Swerve<AzimuthMotor, DriveMotor>::analyzeDashboard()
         rotSpeedRPS = rotSpeed * maxRotationSpeed;
     }
     joystickVector = Eigen::Vector2d{ySpeed, xSpeed};
-    std::cout << "\n\n" << "x: " << joystickVector[0] << "\ty:" << joystickVector[1] << "\n\n";
     double dotProduct = joystickVector.dot(MAKE_VECTOR(targetAngle));
     joystickVector = dotProduct * MAKE_VECTOR(targetAngle);
     joystickVector *= maxDriveSpeed.value();

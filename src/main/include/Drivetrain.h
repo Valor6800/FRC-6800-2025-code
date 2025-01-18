@@ -117,6 +117,7 @@ public:
           bool lockingToReef;
 
           int reefTag;
+          bool getTag;
      } state;
 
      frc2::FunctionalCommand* getResetOdom();
