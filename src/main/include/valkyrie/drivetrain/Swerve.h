@@ -1,5 +1,6 @@
 #pragma once
 
+#include "TunerConstants.h"
 #include <frc2/command/InstantCommand.h>
 #include <ctre/phoenix6/Pigeon2.hpp>
 #include <frc/geometry/Pose2d.h>
@@ -118,6 +119,17 @@ private:
 
     bool rotTest;
     bool strLineTest;
+
+    TunerSwerveDrivetrain drivetrain{
+        TunerConstants::DrivetrainConstants,
+        TunerConstants::FrontLeft,
+        TunerConstants::FrontRight,
+        TunerConstants::BackLeft,
+        TunerConstants::BackRight,
+    };
+
+    // Default uses open loop voltage for drive, position for azimuth
+    ctre::phoenix6::swerve::requests::FieldCentric fieldCentricRequest;
     
     CharMode charac;
 };

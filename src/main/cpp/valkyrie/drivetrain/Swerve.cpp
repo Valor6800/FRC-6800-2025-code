@@ -30,70 +30,39 @@ Swerve<AzimuthMotor, DriveMotor>::Swerve(frc::TimedRobot *_robot,
 {
     frc2::CommandScheduler::GetInstance().RegisterSubsystem(this);
 
-    auto steerGains = ctre::phoenix6::configs::Slot0Configs{}
-        .WithKP(Constants::azimuthKP());
-    auto driveGains = ctre::phoenix6::configs::Slot0Configs{}
-        .WithKP(Constants::driveKP());
-    auto motorTorqueCurrentConfig = ctre::phoenix6::configs::TorqueCurrentConfigs
-    auto motorConfig = ctre::phoenix6::configs::TalonFXConfiguration{}
-        .WithTorqueCurrent(motorTorqueCurrentConfig);
-    auto pigeonMountConfig = ctre::phoenix6::configs::MountPoseConfigs{}
-        .WithMountPoseRoll(Constants::pigeonMountRoll())
-        .WithMountPosePitch(Constants::pigeonMountPitch())
-        .WithMountPoseYaw(Constants::pigeonMountYaw());
-    auto pigeon2Config = ctre::phoenix6::configs::Pigeon2Configuration{}
-        .WithMountPose(pigeonMountConfig);
-    auto drivetrainConstants = ctre::phoenix6::swerve::SwerveDrivetrainConstants{}
-        .WithCANBusName("baseCAN")
-        .WithPigeon2Id(CANIDs::PIGEON_CAN)
-        .WithPigeon2Configs(pigeon2Config);
-    auto moduleConstantsFactory = ctre::phoenix6::swerve::SwerveModuleConstantsFactory<ctre::phoenix6::configs::TalonFXConfiguration, ctre::phoenix6::configs::TalonFXConfiguration, ctre::phoenix6::configs::CANcoderConfiguration>{}
-        .WithDriveMotorGearRatio(Constants::driveGearRatio())
-        .WithSteerMotorGearRatio(Constants::azimuthGearRatio())
-        .WithWheelRadius(0.0973_m / 2)
-        .WithSteerMotorGains(steerGains)
-        .WithDriveMotorGains(driveGains)
-        .WithSteerMotorClosedLoopOutput(ctre::phoenix6::swerve::ClosedLoopOutputType::TorqueCurrentFOC)
-        .WithDriveMotorClosedLoopOutput(ctre::phoenix6::swerve::ClosedLoopOutputType::TorqueCurrentFOC)
-        .WithDriveMotorType(ctre::phoenix6::swerve::DriveMotorArrangement::TalonFX_Integrated)
-        .WithSteerMotorType(ctre::phoenix6::swerve::SteerMotorArrangement::TalonFX_Integrated)
-        .WithDriveMotorInitialConfigs(motorConfig)
-        .WithSteerMotorInitialConfigs(motorConfig)
-        .WithFeedbackSource(ctre::phoenix6::swerve::SteerFeedbackType::FusedCANcoder);
+    // int MDX[] = MODULE_DIFF_XS;
+    // int MDY[] = MODULE_DIFF_YS;
+    // wpi::array<frc::Translation2d, MODULE_COUNT> motorLocations = wpi::array<frc::Translation2d, MODULE_COUNT>(wpi::empty_array);
+    // for (size_t i = 0; i < MODULE_COUNT; i++) {
+    //     motorLocations[i] = frc::Translation2d{_module_radius * MDX[i], _module_radius * MDY[i]};
+    //     swerveModules.push_back(new valor::SwerveModule<AzimuthMotor, DriveMotor>(
+    //         modules[i].first,
+    //         modules[i].second,
+    //         motorLocations[i],
+    //         _wheelDiameter
+    //     ));
+    // }
 
-    int MDX[] = MODULE_DIFF_XS;
-    int MDY[] = MODULE_DIFF_YS;
-    wpi::array<frc::Translation2d, MODULE_COUNT> motorLocations = wpi::array<frc::Translation2d, MODULE_COUNT>(wpi::empty_array);
-    for (size_t i = 0; i < MODULE_COUNT; i++) {
-        motorLocations[i] = frc::Translation2d{_module_radius * MDX[i], _module_radius * MDY[i]};
-        swerveModules.push_back(new valor::SwerveModule<AzimuthMotor, DriveMotor>(
-            modules[i].first,
-            modules[i].second,
-            motorLocations[i],
-            _wheelDiameter
-        ));
-    }
+    // maxDriveSpeed = swerveModules[0]->getMaxDriveSpeed();
+    // maxRotationSpeed = units::radian_t{2.0 * M_PI} * swerveModules[0]->getMaxDriveSpeed() / _module_radius;
 
-    maxDriveSpeed = swerveModules[0]->getMaxDriveSpeed();
-    maxRotationSpeed = units::radian_t{2.0 * M_PI} * swerveModules[0]->getMaxDriveSpeed() / _module_radius;
+    // kinematics = std::make_unique<frc::SwerveDriveKinematics<MODULE_COUNT>>(motorLocations);
+    // rawEstimator = std::make_unique<frc::SwerveDrivePoseEstimator<MODULE_COUNT>>(*kinematics, getGyro(), getModuleStates(), frc::Pose2d{0_m, 0_m, 0_rad});
+    // calcEstimator = std::make_unique<frc::SwerveDrivePoseEstimator<MODULE_COUNT>>(*kinematics, getGyro(), getModuleStates(), frc::Pose2d{0_m, 0_m, 0_rad});
 
-    kinematics = std::make_unique<frc::SwerveDriveKinematics<MODULE_COUNT>>(motorLocations);
-    rawEstimator = std::make_unique<frc::SwerveDrivePoseEstimator<MODULE_COUNT>>(*kinematics, getGyro(), getModuleStates(), frc::Pose2d{0_m, 0_m, 0_rad});
-    calcEstimator = std::make_unique<frc::SwerveDrivePoseEstimator<MODULE_COUNT>>(*kinematics, getGyro(), getModuleStates(), frc::Pose2d{0_m, 0_m, 0_rad});
-
-    resetState();
+    // resetState();
 }
 
 template<class AzimuthMotor, class DriveMotor>
 Swerve<AzimuthMotor, DriveMotor>::~Swerve()
 {
-    for (int i = 0; i < MODULE_COUNT; i++)
-    {
-        delete swerveModules[i];
-    }
+    // for (int i = 0; i < MODULE_COUNT; i++)
+    // {
+    //     delete swerveModules[i];
+    // }
 
-    rawEstimator.release();
-    calcEstimator.release();
+    // rawEstimator.release();
+    // calcEstimator.release();
 }
 
 template<class AzimuthMotor, class DriveMotor>
@@ -107,9 +76,9 @@ void Swerve<AzimuthMotor, DriveMotor>::assessInputs()
     if (!driverGamepad || !driverGamepad->IsConnected())
         return;
 
-    if (driverGamepad->GetBackButtonPressed()) {
-        resetGyro();
-    }
+    // if (driverGamepad->GetBackButtonPressed()) {
+    //     resetGyro();
+    // }
 
     xSpeed = driverGamepad->leftStickY(2);
     ySpeed = driverGamepad->leftStickX(2);
@@ -119,61 +88,67 @@ void Swerve<AzimuthMotor, DriveMotor>::assessInputs()
 template<class AzimuthMotor, class DriveMotor>
 void Swerve<AzimuthMotor, DriveMotor>::analyzeDashboard()
 {
-    rawEstimator->UpdateWithTime(frc::Timer::GetFPGATimestamp(), getGyro(), getModuleStates());
-    calcEstimator->UpdateWithTime(frc::Timer::GetFPGATimestamp(), getGyro(), getModuleStates());
+//     rawEstimator->UpdateWithTime(frc::Timer::GetFPGATimestamp(), getGyro(), getModuleStates());
+//     calcEstimator->UpdateWithTime(frc::Timer::GetFPGATimestamp(), getGyro(), getModuleStates());
 
-    if (useCarpetGrain)
-        calculateCarpetPose();
+//     if (useCarpetGrain)
+//         calculateCarpetPose();
 
-    // Rotational Speed calculations
-    if (lockingToTarget) {
-        units::radian_t robotRotation = getCalculatedPose().Rotation().Radians();
-        units::radian_t errorAngle = robotRotation - targetAngle;
-        units::radian_t error = units::math::fmod(errorAngle + units::radian_t(M_PI), 2 * units::radian_t(M_PI)) - units::radian_t(M_PI);
-        static units::radian_t prevError = error;
-        rotSpeedRPS = error * KP_ROTATE + (error - prevError) * KD_ROTATE;
-        prevError = error;
-    } else {
-        rotSpeedRPS = rotSpeed * maxRotationSpeed;
-    }
+//     // Rotational Speed calculations
+//     if (lockingToTarget) {
+//         units::radian_t robotRotation = getCalculatedPose().Rotation().Radians();
+//         units::radian_t errorAngle = robotRotation - targetAngle;
+//         units::radian_t error = units::math::fmod(errorAngle + units::radian_t(M_PI), 2 * units::radian_t(M_PI)) - units::radian_t(M_PI);
+//         static units::radian_t prevError = error;
+//         rotSpeedRPS = error * KP_ROTATE + (error - prevError) * KD_ROTATE;
+//         prevError = error;
+//     } else {
+//         rotSpeedRPS = rotSpeed * maxRotationSpeed;
+//     }
 
-    // Linear Speed calculations
-    xSpeedMPS = units::meters_per_second_t{xSpeed * maxDriveSpeed};
-    ySpeedMPS = units::meters_per_second_t{ySpeed * maxDriveSpeed};
-    if (frc::DriverStation::GetAlliance() == frc::DriverStation::kRed) {
-        xSpeedMPS *= -1.0;
-        ySpeedMPS *= -1.0;
-    }
+//     // Linear Speed calculations
+//     xSpeedMPS = units::meters_per_second_t{xSpeed * maxDriveSpeed};
+//     ySpeedMPS = units::meters_per_second_t{ySpeed * maxDriveSpeed};
+//     if (frc::DriverStation::GetAlliance() == frc::DriverStation::kRed) {
+//         xSpeedMPS *= -1.0;
+//         ySpeedMPS *= -1.0;
+//     }
 
-   if (selectedTest == CharMode::ROT && driverGamepad->GetAButton()) {
-        rotTest = true;
-   } else if (selectedTest == CharMode::STR_LINE && driverGamepad->GetAButton()) {
-        strLineTest = true;
-   } else {
-        rotTest = false;
-        strLineTest = false;
-   }
+//    if (selectedTest == CharMode::ROT && driverGamepad->GetAButton()) {
+//         rotTest = true;
+//    } else if (selectedTest == CharMode::STR_LINE && driverGamepad->GetAButton()) {
+//         strLineTest = true;
+//    } else {
+//         rotTest = false;
+//         strLineTest = false;
+//    }
 }
 
 template<class AzimuthMotor, class DriveMotor>
 void Swerve<AzimuthMotor, DriveMotor>::assignOutputs()
 {
-    if (rotTest) {
-        swerveModules[0]->setAzimuthPosition(frc::Rotation2d(-45_deg));
-        swerveModules[1]->setAzimuthPosition(frc::Rotation2d(-135_deg));
-        swerveModules[2]->setAzimuthPosition(frc::Rotation2d(-225_deg));
-        swerveModules[3]->setAzimuthPosition(frc::Rotation2d(45_deg));
-        for (size_t i = 0; i < MODULE_COUNT; i++) {
-            swerveModules[i]->setDrivePower(units::volt_t (12));
-        }
-    } else if (strLineTest){
-        for (size_t i = 0; i < MODULE_COUNT; i++) {
-            swerveModules[i]->setAzimuthPosition(frc::Rotation2d());
-            swerveModules[i]->setDrivePower(units::volt_t (12));
-        }
-    } else{
-        drive(xSpeedMPS, ySpeedMPS, rotSpeedRPS, true);
-    }
+    drivetrain.SetControl(
+        fieldCentricRequest
+            .WithVelocityX(units::meters_per_second_t{xSpeed})
+            .WithVelocityY(units::meters_per_second_t{ySpeed})
+            .WithRotationalRate(units::radians_per_second_t{rotSpeed * 2 * M_PI})
+    );
+    // if (rotTest) {
+    //     swerveModules[0]->setAzimuthPosition(frc::Rotation2d(-45_deg));
+    //     swerveModules[1]->setAzimuthPosition(frc::Rotation2d(-135_deg));
+    //     swerveModules[2]->setAzimuthPosition(frc::Rotation2d(-225_deg));
+    //     swerveModules[3]->setAzimuthPosition(frc::Rotation2d(45_deg));
+    //     for (size_t i = 0; i < MODULE_COUNT; i++) {
+    //         swerveModules[i]->setDrivePower(units::volt_t (12));
+    //     }
+    // } else if (strLineTest){
+    //     for (size_t i = 0; i < MODULE_COUNT; i++) {
+    //         swerveModules[i]->setAzimuthPosition(frc::Rotation2d());
+    //         swerveModules[i]->setDrivePower(units::volt_t (12));
+    //     }
+    // } else{
+    //     drive(xSpeedMPS, ySpeedMPS, rotSpeedRPS, true);
+    // }
 }
 
 template<class AzimuthMotor, class DriveMotor>
@@ -357,155 +332,155 @@ template<class AzimuthMotor, class DriveMotor>
 void Swerve<AzimuthMotor, DriveMotor>::InitSendable(wpi::SendableBuilder& builder)
 {
     builder.SetSmartDashboardType("Subsystem");
-    builder.AddDoubleProperty(
-        "Commanded X Speed",
-        [this] { return xSpeed; },
-        nullptr
-    );
-    builder.AddDoubleProperty(
-        "Commanded Y Speed",
-        [this] { return ySpeed; },
-        nullptr
-    );
-    builder.AddDoubleProperty(
-        "Commanded Rot Speed",
-        [this] { return rotSpeed; },
-        nullptr
-    );
-    builder.AddDoubleProperty(
-        "Commanded X Speed MPS",
-        [this] { return xSpeedMPS.value(); },
-        nullptr
-    );
-    builder.AddDoubleProperty(
-        "Commanded Y Speed MPS",
-        [this] { return ySpeedMPS.value(); },
-        nullptr
-    );
-    builder.AddDoubleProperty(
-        "Commanded Rot Speed MPS",
-        [this] { return rotSpeedRPS.value(); },
-        nullptr
-    );
-    builder.AddDoubleProperty(
-        "Actual Raw Pose X",
-        [this] { return getRawPose().X().template to<double>(); },
-        nullptr
-    );
-    builder.AddDoubleProperty(
-        "Actual Raw Pose Y",
-        [this] { return getRawPose().Y().template to<double>(); },
-        nullptr
-    );
-    builder.AddDoubleProperty(
-        "Actual Raw Pose Theta",
-        [this] { return getRawPose().Rotation().Degrees().template to<double>(); },
-        nullptr
-    );
-    builder.AddDoubleArrayProperty(
-        "Actual Raw Pose",
-        [this] 
-        { 
-            std::vector<double> pose;
-            pose.push_back(getRawPose().X().template to<double>());
-            pose.push_back(getRawPose().Y().template to<double>());
-            pose.push_back(getRawPose().Rotation().Radians().template to<double>());
-            return pose;
-        },
-        nullptr
-    );
-    builder.AddDoubleProperty(
-        "Actual Calculated Pose X",
-        [this] { return getCalculatedPose().X().template to<double>(); },
-        nullptr
-    );
-    builder.AddDoubleProperty(
-        "Actual Calculated Pose Y",
-        [this] { return getCalculatedPose().Y().template to<double>(); },
-        nullptr
-    );
-    builder.AddDoubleProperty(
-        "Actual Calculated Pose Theta",
-        [this] { return getCalculatedPose().Rotation().Degrees().template to<double>(); },
-        nullptr
-    );
-    builder.AddDoubleArrayProperty(
-        "Actual Calculated Pose",
-        [this] 
-        { 
-            std::vector<double> pose;
-            pose.push_back(getCalculatedPose().X().template to<double>());
-            pose.push_back(getCalculatedPose().Y().template to<double>());
-            pose.push_back(getCalculatedPose().Rotation().Radians().template to<double>());
-            return pose;
-        },
-        nullptr
-    );
-    builder.AddDoubleProperty(
-        "Gyro Pitch",
-        [this]
-        {
-            return pigeon->GetPitch().GetValueAsDouble();
-        },
-        nullptr
-    );
-    builder.AddDoubleProperty(
-        "Gyro Yaw",
-        [this]
-        {
-            return pigeon->GetYaw().GetValueAsDouble();
-        },
-        nullptr
-    );
-    builder.AddDoubleProperty(
-        "Gyro Roll",
-        [this]
-        {
-            return pigeon->GetRoll().GetValueAsDouble();
-        },
-        nullptr
-    );
-    builder.AddBooleanProperty(
-        "Tilted",
-        [this]
-        {
-            double yaw = pigeon->GetYaw().GetValueAsDouble(), roll = pigeon->GetRoll().GetValueAsDouble(); // in degrees
-            double elevation = std::fabs(yaw) + std::fabs(roll); // not at all but close enough
-            return elevation > 5.0;
-        },
-        nullptr
-    );
-    builder.AddDoubleArrayProperty(
-        "swerve states",
-        [this] 
-        { 
-            std::vector<double> states;
-            states.push_back(swerveModules[0]->getState().angle.Degrees().template to<double>());
-            states.push_back(swerveModules[0]->getState().speed.template to<double>());
-            states.push_back(swerveModules[1]->getState().angle.Degrees().template to<double>());
-            states.push_back(swerveModules[1]->getState().speed.template to<double>());
-            states.push_back(swerveModules[2]->getState().angle.Degrees().template to<double>());
-            states.push_back(swerveModules[2]->getState().speed.template to<double>());
-            states.push_back(swerveModules[3]->getState().angle.Degrees().template to<double>());
-            states.push_back(swerveModules[3]->getState().speed.template to<double>());
-            return states;
-        },
-        nullptr
-    );
-    builder.AddDoubleArrayProperty(
-        "Robot Velocities",
-        [this]
-        {
-            std::vector<double> states;
-            states.push_back(getRobotRelativeSpeeds().vx.template to<double>());
-            states.push_back(getRobotRelativeSpeeds().vy.template to<double>());
-            return states;
-        },
-        nullptr
-    );
-    builder.AddDoubleProperty(
-        "Max Drive Speed MPS",
-        [this] {return maxDriveSpeed.value();},
-        nullptr
-    );
+    // builder.AddDoubleProperty(
+    //     "Commanded X Speed",
+    //     [this] { return xSpeed; },
+    //     nullptr
+    // );
+    // builder.AddDoubleProperty(
+    //     "Commanded Y Speed",
+    //     [this] { return ySpeed; },
+    //     nullptr
+    // );
+    // builder.AddDoubleProperty(
+    //     "Commanded Rot Speed",
+    //     [this] { return rotSpeed; },
+    //     nullptr
+    // );
+    // builder.AddDoubleProperty(
+    //     "Commanded X Speed MPS",
+    //     [this] { return xSpeedMPS.value(); },
+    //     nullptr
+    // );
+    // builder.AddDoubleProperty(
+    //     "Commanded Y Speed MPS",
+    //     [this] { return ySpeedMPS.value(); },
+    //     nullptr
+    // );
+    // builder.AddDoubleProperty(
+    //     "Commanded Rot Speed MPS",
+    //     [this] { return rotSpeedRPS.value(); },
+    //     nullptr
+    // );
+    // builder.AddDoubleProperty(
+    //     "Actual Raw Pose X",
+    //     [this] { return getRawPose().X().template to<double>(); },
+    //     nullptr
+    // );
+    // builder.AddDoubleProperty(
+    //     "Actual Raw Pose Y",
+    //     [this] { return getRawPose().Y().template to<double>(); },
+    //     nullptr
+    // );
+    // builder.AddDoubleProperty(
+    //     "Actual Raw Pose Theta",
+    //     [this] { return getRawPose().Rotation().Degrees().template to<double>(); },
+    //     nullptr
+    // );
+    // builder.AddDoubleArrayProperty(
+    //     "Actual Raw Pose",
+    //     [this] 
+    //     { 
+    //         std::vector<double> pose;
+    //         pose.push_back(getRawPose().X().template to<double>());
+    //         pose.push_back(getRawPose().Y().template to<double>());
+    //         pose.push_back(getRawPose().Rotation().Radians().template to<double>());
+    //         return pose;
+    //     },
+    //     nullptr
+    // );
+    // builder.AddDoubleProperty(
+    //     "Actual Calculated Pose X",
+    //     [this] { return getCalculatedPose().X().template to<double>(); },
+    //     nullptr
+    // );
+    // builder.AddDoubleProperty(
+    //     "Actual Calculated Pose Y",
+    //     [this] { return getCalculatedPose().Y().template to<double>(); },
+    //     nullptr
+    // );
+    // builder.AddDoubleProperty(
+    //     "Actual Calculated Pose Theta",
+    //     [this] { return getCalculatedPose().Rotation().Degrees().template to<double>(); },
+    //     nullptr
+    // );
+    // builder.AddDoubleArrayProperty(
+    //     "Actual Calculated Pose",
+    //     [this] 
+    //     { 
+    //         std::vector<double> pose;
+    //         pose.push_back(getCalculatedPose().X().template to<double>());
+    //         pose.push_back(getCalculatedPose().Y().template to<double>());
+    //         pose.push_back(getCalculatedPose().Rotation().Radians().template to<double>());
+    //         return pose;
+    //     },
+    //     nullptr
+    // );
+    // builder.AddDoubleProperty(
+    //     "Gyro Pitch",
+    //     [this]
+    //     {
+    //         return pigeon->GetPitch().GetValueAsDouble();
+    //     },
+    //     nullptr
+    // );
+    // builder.AddDoubleProperty(
+    //     "Gyro Yaw",
+    //     [this]
+    //     {
+    //         return pigeon->GetYaw().GetValueAsDouble();
+    //     },
+    //     nullptr
+    // );
+    // builder.AddDoubleProperty(
+    //     "Gyro Roll",
+    //     [this]
+    //     {
+    //         return pigeon->GetRoll().GetValueAsDouble();
+    //     },
+    //     nullptr
+    // );
+    // builder.AddBooleanProperty(
+    //     "Tilted",
+    //     [this]
+    //     {
+    //         double yaw = pigeon->GetYaw().GetValueAsDouble(), roll = pigeon->GetRoll().GetValueAsDouble(); // in degrees
+    //         double elevation = std::fabs(yaw) + std::fabs(roll); // not at all but close enough
+    //         return elevation > 5.0;
+    //     },
+    //     nullptr
+    // );
+    // builder.AddDoubleArrayProperty(
+    //     "swerve states",
+    //     [this] 
+    //     { 
+    //         std::vector<double> states;
+    //         states.push_back(swerveModules[0]->getState().angle.Degrees().template to<double>());
+    //         states.push_back(swerveModules[0]->getState().speed.template to<double>());
+    //         states.push_back(swerveModules[1]->getState().angle.Degrees().template to<double>());
+    //         states.push_back(swerveModules[1]->getState().speed.template to<double>());
+    //         states.push_back(swerveModules[2]->getState().angle.Degrees().template to<double>());
+    //         states.push_back(swerveModules[2]->getState().speed.template to<double>());
+    //         states.push_back(swerveModules[3]->getState().angle.Degrees().template to<double>());
+    //         states.push_back(swerveModules[3]->getState().speed.template to<double>());
+    //         return states;
+    //     },
+    //     nullptr
+    // );
+    // builder.AddDoubleArrayProperty(
+    //     "Robot Velocities",
+    //     [this]
+    //     {
+    //         std::vector<double> states;
+    //         states.push_back(getRobotRelativeSpeeds().vx.template to<double>());
+    //         states.push_back(getRobotRelativeSpeeds().vy.template to<double>());
+    //         return states;
+    //     },
+    //     nullptr
+    // );
+    // builder.AddDoubleProperty(
+    //     "Max Drive Speed MPS",
+    //     [this] {return maxDriveSpeed.value();},
+    //     nullptr
+    // );
 }

@@ -67,68 +67,68 @@ Drivetrain::Drivetrain(frc::TimedRobot *_robot) :
     teleopStart(999999999999),
     lidarSensor(_robot, "Front Lidar Sensor", CANIDs::FRONT_LIDAR_SENSOR)
 {
-    xPIDF.P = KPX;
-    xPIDF.I = KIX;
-    xPIDF.D = KDX;
+    // xPIDF.P = KPX;
+    // xPIDF.I = KIX;
+    // xPIDF.D = KDX;
 
-    thetaPIDF.P = KPT;
-    thetaPIDF.I = KIT;
-    thetaPIDF.D = KDT;
+    // thetaPIDF.P = KPT;
+    // thetaPIDF.I = KIT;
+    // thetaPIDF.D = KDT;
 
-    table->PutNumber("Vision Std", 3.0);
-    table->PutNumber("Vision Acceptance", VISION_ACCEPTANCE.to<double>() );
-    table->PutNumber("KPLIMELIGHT", KP_LIMELIGHT);
-    table->PutBoolean("Accepting Vision Measurements", true);
+    // table->PutNumber("Vision Std", 3.0);
+    // table->PutNumber("Vision Acceptance", VISION_ACCEPTANCE.to<double>() );
+    // table->PutNumber("KPLIMELIGHT", KP_LIMELIGHT);
+    // table->PutBoolean("Accepting Vision Measurements", true);
 
-    for (std::pair<const char*, frc::Pose3d> aprilCam : Constants::aprilCameras) {
-        aprilTagSensors.push_back(new valor::AprilTagsSensor(robot, aprilCam.first, aprilCam.second));  
-        aprilTagSensors.back()->setPipe(valor::VisionSensor::PIPELINE_0);
-    }
+    // for (std::pair<const char*, frc::Pose3d> aprilCam : Constants::aprilCameras) {
+    //     aprilTagSensors.push_back(new valor::AprilTagsSensor(robot, aprilCam.first, aprilCam.second));  
+    //     aprilTagSensors.back()->setPipe(valor::VisionSensor::PIPELINE_0);
+    // }
 
-    aprilTagSensors[4]->setPipe(valor::VisionSensor::PIPELINE_1);
-    aprilTagSensors[4]->setCameraPose(Constants::aprilCameras[4].second);
+    // aprilTagSensors[4]->setPipe(valor::VisionSensor::PIPELINE_1);
+    // aprilTagSensors[4]->setCameraPose(Constants::aprilCameras[4].second);
 
-    setupGyro(
-        CANIDs::PIGEON_CAN,
-        PIGEON_CAN_BUS,
-        Constants::pigeonMountRoll(),
-        Constants::pigeonMountPitch(),
-        Constants::pigeonMountYaw()
-    );
+    // setupGyro(
+    //     CANIDs::PIGEON_CAN,
+    //     PIGEON_CAN_BUS,
+    //     Constants::pigeonMountRoll(),
+    //     Constants::pigeonMountPitch(),
+    //     Constants::pigeonMountYaw()
+    // );
     
-    /*
-     * 3.8m/s, 5m/s^2, ~125lbs Apr. 2
-     */
-    AutoBuilder::configure(
-        [this](){ 
-            if (state.useCalculatedEstimator) {
-                return getCalculatedPose();
-            }
-            return getRawPose();
-        }, // Robot pose supplier
-        [this](frc::Pose2d pose){ resetOdometry(pose); }, // Method to reset odometry (will be called if your auto has a starting pose)
-        [this](){ return getRobotRelativeSpeeds(); }, // ChassisSpeeds supplier. MUST BE ROBOT RELATIVE
-        [this](frc::ChassisSpeeds speeds, auto _){ driveRobotRelative(speeds); }, // Method that will drive the robot given ROBOT RELATIVE ChassisSpeeds
-        std::shared_ptr<PPHolonomicDriveController>(new PPHolonomicDriveController(
-            PIDConstants(xPIDF.P, xPIDF.I, xPIDF.D), // Translation PID constants
-            PIDConstants(thetaPIDF.P, thetaPIDF.I, thetaPIDF.D) // Rotation PID constants
-        )),
-        RobotConfig::fromGUISettings(),
-        []() {
-            // Boolean supplier that controls when the path will be mirrored for the red alliance
-            // This will flip the path being followed to the red side of the field.
-            // THE ORIGIN WILL REMAIN ON THE BLUE SIDE
+    // /*
+    //  * 3.8m/s, 5m/s^2, ~125lbs Apr. 2
+    //  */
+    // AutoBuilder::configure(
+    //     [this](){ 
+    //         if (state.useCalculatedEstimator) {
+    //             return getCalculatedPose();
+    //         }
+    //         return getRawPose();
+    //     }, // Robot pose supplier
+    //     [this](frc::Pose2d pose){ resetOdometry(pose); }, // Method to reset odometry (will be called if your auto has a starting pose)
+    //     [this](){ return getRobotRelativeSpeeds(); }, // ChassisSpeeds supplier. MUST BE ROBOT RELATIVE
+    //     [this](frc::ChassisSpeeds speeds, auto _){ driveRobotRelative(speeds); }, // Method that will drive the robot given ROBOT RELATIVE ChassisSpeeds
+    //     std::shared_ptr<PPHolonomicDriveController>(new PPHolonomicDriveController(
+    //         PIDConstants(xPIDF.P, xPIDF.I, xPIDF.D), // Translation PID constants
+    //         PIDConstants(thetaPIDF.P, thetaPIDF.I, thetaPIDF.D) // Rotation PID constants
+    //     )),
+    //     RobotConfig::fromGUISettings(),
+    //     []() {
+    //         // Boolean supplier that controls when the path will be mirrored for the red alliance
+    //         // This will flip the path being followed to the red side of the field.
+    //         // THE ORIGIN WILL REMAIN ON THE BLUE SIDE
 
-            auto alliance = frc::DriverStation::GetAlliance();
-            if (alliance) {
-                return alliance.value() == frc::DriverStation::Alliance::kRed;
-            }
-            return false;
-        },
-        this // Reference to this subsystem to set requirements
-    );
-    resetState();
-    init();
+    //         auto alliance = frc::DriverStation::GetAlliance();
+    //         if (alliance) {
+    //             return alliance.value() == frc::DriverStation::Alliance::kRed;
+    //         }
+    //         return false;
+    //     },
+    //     this // Reference to this subsystem to set requirements
+    // );
+    // resetState();
+    // init();
 }
 
 Drivetrain::~Drivetrain(){}
@@ -184,49 +184,49 @@ std::vector<std::pair<SwerveAzimuthMotor*, SwerveDriveMotor*>> Drivetrain::gener
 
 void Drivetrain::resetState()
 {
-    Swerve::resetState();
+    // Swerve::resetState();
 
-    resetEncoders();
-    resetOdometry(frc::Pose2d{0_m, 0_m, 0_rad});
+    // resetEncoders();
+    // resetOdometry(frc::Pose2d{0_m, 0_m, 0_rad});
 }
 
 void Drivetrain::init()
 {
-    Swerve::init();
+    // Swerve::init();
 }
 
 void Drivetrain::assessInputs()
 {
     Swerve::assessInputs();
 
-    if (!driverGamepad || !driverGamepad->IsConnected() || !operatorGamepad || !operatorGamepad->IsConnected())
-        return;
+    // if (!driverGamepad || !driverGamepad->IsConnected() || !operatorGamepad || !operatorGamepad->IsConnected())
+    //     return;
 }
 
 void Drivetrain::analyzeDashboard()
 {
-    Swerve::analyzeDashboard();
+    // Swerve::analyzeDashboard();
 
-    visionAcceptanceRadius = (units::meter_t) table->GetNumber("Vision Acceptance", VISION_ACCEPTANCE.to<double>());
+    // visionAcceptanceRadius = (units::meter_t) table->GetNumber("Vision Acceptance", VISION_ACCEPTANCE.to<double>());
 
-    for (valor::AprilTagsSensor* aprilLime : aprilTagSensors) {
-        aprilLime->applyVisionMeasurement(
-            calcEstimator.get(),
-            getRobotSpeeds(),
-            table->GetBoolean("Accepting Vision Measurements", true),
-            doubtX,
-            doubtY
-        );
-    }
+    // for (valor::AprilTagsSensor* aprilLime : aprilTagSensors) {
+    //     aprilLime->applyVisionMeasurement(
+    //         calcEstimator.get(),
+    //         getRobotSpeeds(),
+    //         table->GetBoolean("Accepting Vision Measurements", true),
+    //         doubtX,
+    //         doubtY
+    //     );
+    // }
 
-    if (!driverGamepad || !driverGamepad->IsConnected() || !operatorGamepad || !operatorGamepad->IsConnected())
-        return;
+    // if (!driverGamepad || !driverGamepad->IsConnected() || !operatorGamepad || !operatorGamepad->IsConnected())
+    //     return;
 
-    if (frc::Timer::GetFPGATimestamp().to<double>() - teleopStart > TIME_TELEOP_VERT && frc::Timer::GetFPGATimestamp().to<double>() - teleopStart < TIME_TELEOP_VERT + 3) {
-        operatorGamepad->setRumble(true);
-    } else {
-        operatorGamepad->setRumble(false);
-    }
+    // if (frc::Timer::GetFPGATimestamp().to<double>() - teleopStart > TIME_TELEOP_VERT && frc::Timer::GetFPGATimestamp().to<double>() - teleopStart < TIME_TELEOP_VERT + 3) {
+    //     operatorGamepad->setRumble(true);
+    // } else {
+    //     operatorGamepad->setRumble(false);
+    // }
 }
 
 void Drivetrain::assignOutputs()
