@@ -12,7 +12,13 @@
 #include <frc2/command/FunctionalCommand.h>
 #include <frc2/command/InstantCommand.h>
 #include <frc2/command/WaitCommand.h>
-#include <frc/PWM.h>
+
+#define STOW_POS 1.0f
+#define DEPLOYED_POS 65.0f
+
+#define INTAKE_POWER 2.0f
+#define OUTTAKE_POWER -2.0f
+
 
 
 Intake::Intake(frc::TimedRobot *_robot, valor::CANdleSensor *_leds) : valor::BaseSubsystem(_robot, "Intake"),
@@ -43,25 +49,23 @@ void Intake::init()
     bool wheelI = false;
 
     pivotMotor = new valor::PhoenixController(
-    valor::PhoenixControllerType::FALCON,
-    CANIDs::INTAKE_PIVOT,
-    valor::NeutralMode::Brake,
-    true,
-    "baseCAN"
+        valor::PhoenixControllerType::FALCON,
+        CANIDs::INTAKE_PIVOT,
+        valor::NeutralMode::Brake,
+        true,
+        "baseCAN"
     );
 
-    pivotMotor->setupFollower(CANIDs::INTAKE_PIVOT_FOLLOW, wheelI);
     pivotMotor->enableFOC(true);
 
     wheelMotor = new valor::PhoenixController(
-    valor::PhoenixControllerType::FALCON,
-    CANIDs::INTAKE_WHEEL,
-    valor::NeutralMode::Brake,
-    true,
-    "baseCAN"
+        valor::PhoenixControllerType::FALCON,
+        CANIDs::INTAKE_WHEEL,
+        valor::NeutralMode::Brake,
+        true,
+        "baseCAN"
     );
 
-    wheelMotor->setupFollower(CANIDs::INTAKE_WHEEL_FOLLOW, wheelI);
     wheelMotor->enableFOC(true);
 
     resetState();
@@ -75,17 +79,19 @@ void Intake::assessInputs()
     if (driverGamepad->DPadUp()){
         state.pivotState = DEPLOYED;
         state.wheelState = INTAKE;
+
     } else if (driverGamepad->DPadDown()){
         state.pivotState = DEPLOYED;
         state.wheelState = OUTTAKE;
+
     } else {
         state.pivotState = STOW;
         state.wheelState = NONE;
-    }
 
+    }
 }
 
-// void Climber::analyzeDashboard()
+// void Intake::analyzeDashboard()
 // {
 //     return;
 // }
@@ -93,17 +99,23 @@ void Intake::assessInputs()
 void Intake::assignOutputs()
 {
     if (state.pivotState == PIVOT_STATE::DEPLOYED){
-        pivotMotor->setPosition(units::turn_t{.75});
-    } else if(state.pivotState == PIVOT_STATE::STOW){
-        pivotMotor->setPosition(units::turn_t{0});
+        pivotMotor->setPosition(units::turn_t{DEPLOYED_POS});
+
+    } else {
+        pivotMotor->setPosition(units::turn_t{STOW_POS});
+
     }
 
+
     if (state.wheelState == WHEEL_STATE::INTAKE){
-        wheelMotor->setPower(units::volt_t{3});
+        wheelMotor->setPower(units::volt_t{INTAKE_POWER});
+
     } else if (state.wheelState == WHEEL_STATE::OUTTAKE){
-        wheelMotor->setPower(units::volt_t{2});
+        wheelMotor->setPower(units::volt_t{OUTTAKE_POWER});
+
     } else {
-        wheelMotor->setPower(units::volt_t{1});
+        wheelMotor->setPower(units::volt_t{0});
+
     }
 }
 
