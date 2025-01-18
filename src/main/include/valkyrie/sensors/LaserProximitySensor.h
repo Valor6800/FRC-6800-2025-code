@@ -44,7 +44,7 @@ public:
      * 
      * @return Latest distance in millimeters.
      */
-    T getLidarData() const;
+    T getLidarData();
 
 private:
     T thresholdDistance;
