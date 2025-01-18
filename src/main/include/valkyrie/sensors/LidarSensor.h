@@ -3,14 +3,14 @@
 #include "valkyrie/sensors/BaseSensor.h"
 #include <frc/TimedRobot.h>
 #include <units/length.h>
-#include <grpl/LaserCan.h>
 
 namespace valor {
 
 /**
  * @brief Specific implementation of the Lidar Sensor for Grapple Robotics LidarCAN device
  */
-class GrappleLidarSensor : public BaseSensor<units::length::millimeter_t>
+template <class T>
+class LidarSensor : public BaseSensor<T>
 {
 public:
 
@@ -19,25 +19,26 @@ public:
      * 
     * Usage:
     * \code {.cpp}
-     * valor::GrappleLidarSensor lidarDevice = valor::GrappleLidarSensor(robot, "GrappleLidarDevice", 23);
-     * units::millimeter_t distance = lidarDevice.getLatestSensorData();
+     * valor::LidarSensor lidarDevice = valor::LidarSensor(robot, "LidarDevice", 23);
+     * T distance = lidarDevice.getLatestSensorData();
     * \endcode
      * 
      * @param _robot Pass in the Robot reference so the calculate method can be auto-scheduled
      */
-    GrappleLidarSensor(frc::TimedRobot *_robot, const char* name, int canId);
+    LidarSensor(frc::TimedRobot *_robot, const char* name);
     
-    void reset();
+    virtual void reset();
+
+    virtual void setGetter(std::function<T()> _lambda);
 
     void InitSendable(wpi::SendableBuilder& builder) override;
 
-    units::length::millimeter_t getLidarDistance();
+    T getMaxDistance();
+    void setMaxDistance(T);
 
 private:
-
     void calculate();
-
-    grpl::LaserCan *device;
+    T maxDistance;
 
 };
 }

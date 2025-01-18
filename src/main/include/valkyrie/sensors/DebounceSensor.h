@@ -30,7 +30,7 @@ public:
      */
     DebounceSensor(frc::TimedRobot *_robot, const char* name);
     
-    void reset();
+    virtual void reset();
 
     /**
      * @brief Setup a lambda function to detect a rising or falling edge of the sensor
