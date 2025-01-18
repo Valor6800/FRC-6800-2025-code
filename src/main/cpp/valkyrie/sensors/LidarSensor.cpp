@@ -2,6 +2,8 @@
 
 using namespace valor;
 
+template class valor::LidarSensor<units::millimeter_t>;
+
 #define MAX_RANGE 1.2f
 
 template <class T>

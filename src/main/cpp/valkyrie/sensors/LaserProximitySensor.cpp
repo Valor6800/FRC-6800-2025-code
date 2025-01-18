@@ -1,6 +1,8 @@
 #include "valkyrie/sensors/LaserProximitySensor.h"
 
-namespace valor {
+using namespace valor;
+
+template class valor::LaserProximitySensor<units::millimeter_t>;
 
 template <class T>
 LaserProximitySensor<T>::LaserProximitySensor(frc::TimedRobot* _robot, const char* name)
@@ -38,8 +40,6 @@ void LaserProximitySensor<T>::setGetter(std::function<T()> getter)
 }
 
 template <class T>
-T LaserProximitySensor<T>::getLidarData() const {
+T LaserProximitySensor<T>::getLidarData() {
     return LidarSensor<T>::getLatestSensorData();
-}
-
 }
