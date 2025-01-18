@@ -251,7 +251,7 @@ void PhoenixController::setPosition(units::turn_t position)
 {
     req_position.Position = position; // Mechanism rotations
     getMotor()->SetControl(req_position);
-}
+}                    
 
 void PhoenixController::enableFOC(bool enableFOC)
 {

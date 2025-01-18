@@ -83,6 +83,7 @@ namespace CANIDs {
     constexpr static int RIGHT_SHOOTER_WHEEL2 = 18;
     constexpr static int LEFT_SHOOTER_WHEEL = 15; // Relative to shooter being forward
     constexpr static int LEFT_SHOOTER_WHEEL2 = 17;
+    constexpr static int SCORER_WHEEL = 39;
     constexpr static int FEEDER = 14;
     constexpr static int CLIMBER_LEAD = 53;
     constexpr static int CLIMBER_FOLLOW = 54;
