@@ -4,6 +4,7 @@
 #include "valkyrie/BaseSubsystem.h"
 #include "valkyrie/controllers/PhoenixController.h"
 #include "Constants.h"
+#include "valkyrie/BaseSubsystem.h"
 #include "valkyrie/controllers/PIDF.h"
 #include <frc/smartdashboard/SendableChooser.h>
 #include <frc/smartdashboard/SmartDashboard.h>
@@ -12,7 +13,6 @@
 #include <frc2/command/Command.h>
 #include <frc2/command/Commands.h>
 
-#include <frc/PWM.h>
 #include <unordered_map>
 #include "valkyrie/Gamepad.h"
 
@@ -30,22 +30,22 @@ public:
     void init();
     void resetState();
     void assessInputs();
-    void analyzeDashboard();
+    // void analyzeDashboard();
     void assignOutputs();
 
     void InitSendable(wpi::SendableBuilder& builder);
 
     enum PIVOT_STATE
     {
-        STOW,
-        DEPLOYED
+        DEPLOYED,
+        STOW
     };
 
     enum WHEEL_STATE
     {
-        NONE,
         INTAKE,
-        OUTTAKE
+        OUTTAKE,
+        NONE
     };
 
     struct x
@@ -57,9 +57,8 @@ public:
 
 
 private:
-    valor::PhoenixController *pivotMotors;
-    valor::PhoenixController *intakeMotors;
-    frc::PWM *servo;
+    valor::PhoenixController *pivotMotor;
+    valor::PhoenixController *wheelMotor;
 
     Drivetrain *drive;
     valor::CANdleSensor *leds;

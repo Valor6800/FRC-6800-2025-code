@@ -87,9 +87,10 @@ namespace CANIDs {
     constexpr static int CLIMBER_FOLLOW = 33;
     constexpr static int AMP = 10;
     constexpr static int CANDLE = 60;
-    constexpr static int INTAKE = 100;
-    constexpr static int INTAKE_FOLLOW = 101;
-    constexpr static int INTAKE_PIVOT = 102;
+    constexpr static int INTAKE_PIVOT = 100;
+    constexpr static int INTAKE_PIVOT_FOLLOW = 101;
+    constexpr static int INTAKE_WHEEL = 102;
+    constexpr static int INTAKE_WHEEL_FOLLOW = 102;
 }
 
 #pragma GCC diagnostic push
