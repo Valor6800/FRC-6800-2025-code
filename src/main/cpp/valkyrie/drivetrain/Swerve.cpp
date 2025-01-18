@@ -1,9 +1,12 @@
 #include "valkyrie/drivetrain/Swerve.h"
 #include "Eigen/Core"
+#include "units/angle.h"
+#include "units/angular_velocity.h"
 #include "units/length.h"
 #include "units/math.h"
 #include "units/velocity.h"
 #include "valkyrie/controllers/PhoenixController.h"
+#include "wpi/sendable/SendableRegistry.h"
 #include <iostream>
 
 #include <cstdio>
@@ -54,6 +57,10 @@ Swerve<AzimuthMotor, DriveMotor>::Swerve(frc::TimedRobot *_robot,
 {
     frc2::CommandScheduler::GetInstance().RegisterSubsystem(this);
 
+    wpi::SendableRegistry::Add(
+        &rot_controller, "rot_controller"
+    );
+
     int MDX[] = MODULE_DIFF_XS;
     int MDY[] = MODULE_DIFF_YS;
     wpi::array<frc::Translation2d, MODULE_COUNT> motorLocations = wpi::array<frc::Translation2d, MODULE_COUNT>(wpi::empty_array);
@@ -71,8 +78,13 @@ Swerve<AzimuthMotor, DriveMotor>::Swerve(frc::TimedRobot *_robot,
     table->PutNumber("Y_KD", 0.0);
     table->PutNumber("Y_KI", 0.0);
 
-    y_controller.SetTolerance(units::millimeter_t{40});
+    table->PutNumber("Rot_KP", ROT_KP);
+    table->PutNumber("Rot_KD", ROT_KD);
+    table->PutNumber("Rot_KI", 0.0);
 
+
+    rot_controller.SetTolerance(2_deg, units::degrees_per_second_t{1});
+    y_controller.SetTolerance(units::millimeter_t{40}, .01_mps);
     maxDriveSpeed = swerveModules[0]->getMaxDriveSpeed();
     maxRotationSpeed = units::radian_t{2.0 * M_PI} * swerveModules[0]->getMaxDriveSpeed() / _module_radius;
 
@@ -116,6 +128,10 @@ void Swerve<AzimuthMotor, DriveMotor>::assessInputs()
     rotSpeed = driverGamepad->rightStickX(3);
 
     alignToTarget = driverGamepad->GetAButton();
+    if (driverGamepad->GetAButtonPressed()) {
+        rot_controller.Reset(getCalculatedPose().Rotation().Radians());
+        y_controller.Reset(yDistance);
+    }
 }
 
 template<class AzimuthMotor, class DriveMotor>
@@ -124,6 +140,10 @@ void Swerve<AzimuthMotor, DriveMotor>::analyzeDashboard()
     y_controller.SetP(table->GetNumber("Y_KP", 0.0));
     y_controller.SetD(table->GetNumber("Y_KD", 0.0));
     y_controller.SetI(table->GetNumber("Y_KI", 0.0));
+
+    rot_controller.SetP(table->GetNumber("Rot_KP", 0.0));
+    rot_controller.SetD(table->GetNumber("Rot_KD", 0.0));
+    rot_controller.SetI(table->GetNumber("Rot_KI", 0.0));
 
     rawEstimator->UpdateWithTime(frc::Timer::GetFPGATimestamp(), getGyro(), getModuleStates());
     calcEstimator->UpdateWithTime(frc::Timer::GetFPGATimestamp(), getGyro(), getModuleStates());
@@ -142,6 +162,7 @@ void Swerve<AzimuthMotor, DriveMotor>::analyzeDashboard()
     if (alignToTarget) {
         rot_controller.SetGoal(units::radian_t{targetAngle});
         units::radian_t robotRotation = getCalculatedPose().Rotation().Radians();
+        rot_controller.Calculate(robotRotation);
         rotSpeedRPS = units::radians_per_second_t{rot_controller.Calculate(robotRotation)} + rot_controller.GetSetpoint().velocity;
     } 
     else {
@@ -157,7 +178,7 @@ void Swerve<AzimuthMotor, DriveMotor>::analyzeDashboard()
     if (alignToTarget){
         y_controller.SetGoal(0.0_m);
         calculated_y_controller_val = y_controller.Calculate(yDistance, 0.0_m);
-        relativeToTagSpeed = units::meters_per_second_t{calculated_y_controller_val};
+        relativeToTagSpeed = units::meters_per_second_t{calculated_y_controller_val} + y_controller.GetSetpoint().velocity;
 
         pidVector = MAKE_VECTOR(targetAngle - 90_deg) * relativeToTagSpeed.value();
         powerVector = joystickVector + pidVector;
@@ -553,11 +574,6 @@ void Swerve<AzimuthMotor, DriveMotor>::InitSendable(wpi::SendableBuilder& builde
         [this] {return feedForward.to<double>();},
         nullptr
     );
-    builder.AddBooleanProperty(
-        "Locking to Target",
-        [this] {return lockingToTarget;},
-        nullptr
-    );
     builder.AddDoubleProperty(
         "Calculated y_controller value",
         [this] {return calculated_y_controller_val;},
@@ -577,6 +593,27 @@ void Swerve<AzimuthMotor, DriveMotor>::InitSendable(wpi::SendableBuilder& builde
     builder.AddDoubleArrayProperty(
         "Power Vector",
         [this] {return std::vector<double>{powerVector[0], powerVector[1]};},
+        nullptr
+    );
+    builder.AddDoubleProperty(
+        "Rotation Controller Setpoint",
+        [this] {return static_cast<double>(rot_controller.GetSetpoint().position());},
+        nullptr
+    );
+    builder.AddDoubleProperty(
+        "Y Controller Setpoint",
+        [this] {return static_cast<double>(y_controller.GetSetpoint().position());},
+        nullptr
+    );
+    builder.AddDoubleProperty(
+        "Y Controller Setpoint Velocity",
+        [this] {return static_cast<double>(y_controller.GetSetpoint().velocity());},
+        nullptr
+    );
+    
+    builder.AddBooleanProperty(
+        "Locking on Target",
+        [this] {return alignToTarget;},
         nullptr
     );
 }

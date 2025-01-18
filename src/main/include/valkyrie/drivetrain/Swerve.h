@@ -114,8 +114,8 @@ private:
     const units::radians_per_second_squared_t MAX_ROTATION_ACCEL = 12_rad_per_s_sq;
     const units::meters_per_second_t MAX_Y_VEL = 5.5_mps;
     const units::meters_per_second_squared_t MAX_Y_ACCEL = 3_mps_sq;
-    double ROT_KP = 9;
-    double ROT_KD = 0.25;
+    double ROT_KP = 3;
+    double ROT_KD = 0.5;
     double Y_KP = 0.0;
     double Y_KD = 0;
 

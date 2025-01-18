@@ -216,7 +216,7 @@ void Drivetrain::init()
 
 void Drivetrain::assessInputs()
 {
-    Swerve::assessInputs();
+
 
     if (!driverGamepad || !driverGamepad->IsConnected() || !operatorGamepad || !operatorGamepad->IsConnected())
         return;
@@ -228,13 +228,7 @@ void Drivetrain::assessInputs()
     } else if (!driverGamepad->GetBButton() && !driverGamepad->GetAButton()) {
         state.reefTag = -1;
     }
-    /*for (valor::AprilTagsSensor *aprilCam : aprilTagSensors) {
-        if (aprilCam->hasTarget() && aprilCam->hasTarget());
-    }*/
-}
 
-void Drivetrain::analyzeDashboard()
-{
     bool isRed = frc::DriverStation::GetAlliance() == frc::DriverStation::Alliance::kRed ? true : false;
 
     if (state.getTag){
@@ -254,11 +248,23 @@ void Drivetrain::analyzeDashboard()
         }
     }
 
-    alignAngleTags();
-
     if(aprilTagSensors[4]->hasTarget() && aprilTagSensors[4]->getTagID() == state.reefTag) {
         Swerve::yDistance = aprilTagSensors[4]->get_botpose_targetspace().X();
-    } 
+    }
+
+    Swerve::assessInputs();
+    /*for (valor::AprilTagsSensor *aprilCam : aprilTagSensors) {
+        if (aprilCam->hasTarget() && aprilCam->hasTarget());
+    }*/
+}
+
+void Drivetrain::analyzeDashboard()
+{
+
+
+    alignAngleTags();
+
+     
 
     Swerve::analyzeDashboard();
 
