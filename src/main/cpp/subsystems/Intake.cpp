@@ -46,7 +46,6 @@ void Intake::init()
     valor::PIDF wheelPID;
 
     wheelPID.aFFType = valor::FeedForwardType::LINEAR;
-    bool wheelI = false;
 
     pivotMotor = new valor::PhoenixController(
         valor::PhoenixControllerType::FALCON,
@@ -96,6 +95,7 @@ void Intake::assessInputs()
 //     return;
 // }
 
+
 void Intake::assignOutputs()
 {
     if (state.pivotState == PIVOT_STATE::DEPLOYED){
@@ -117,6 +117,36 @@ void Intake::assignOutputs()
         wheelMotor->setPower(units::volt_t{0});
 
     }
+
+
+    int color = 0xAC41FF;
+    switch (pivotMotor->getMagnetHealth().value) {
+        case 1: 
+            color = 0xFF0000;
+            break;
+        case 2:
+            color = 0xFF8C00;
+            break;
+        case 3:
+            color = 0x00FF00;
+            break;
+    }
+    leds->setLED(7, color);
+
+    color = 0xAC41FF;
+    switch (wheelMotor->getMagnetHealth().value) {
+        case 1: 
+            color = 0xFF0000;
+            break;
+        case 2:
+            color = 0xFF8C00;
+            break;
+        case 3:
+            color = 0x00FF00;
+            break;
+    }
+    leds->setLED(8, color);
+
 }
 
 void Intake::InitSendable(wpi::SendableBuilder& builder)
