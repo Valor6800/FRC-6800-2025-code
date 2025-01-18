@@ -5,6 +5,8 @@
 #include "valkyrie/controllers/PhoenixController.h"
 #include "Constants.h"
 #include "valkyrie/controllers/PIDF.h"
+#include "valkyrie/sensors/CurrentSensor.h"
+
 #include <frc/smartdashboard/SendableChooser.h>
 #include <frc/smartdashboard/SmartDashboard.h>
 
@@ -25,6 +27,9 @@ public:
     void analyzeDashboard();
     void assignOutputs();
 
+    void setClimberPID();
+    void setCrabPID();
+
     void InitSendable(wpi::SendableBuilder& builder);
 
     enum CLIMB_STATE
@@ -37,19 +42,25 @@ public:
     enum CRAB_STATE
     {
         NO_CRAB,
-        CRABBING
+        CRABBING,
+        CRABBED
     };
 
     struct x
     {
         CLIMB_STATE climbState;
         CRAB_STATE crabState;
+
         bool climbed;
+        double spikeCurrent;
+        double cacheSize;
 
     }state;
 
 private:
     valor::PhoenixController *climbMotor;
     valor::PhoenixController *crabMotor;
+
+    valor::CurrentSensor currentSensor;
 };
 
