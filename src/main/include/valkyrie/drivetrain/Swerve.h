@@ -93,6 +93,16 @@ protected:
     frc::ChassisSpeeds getRobotRelativeSpeeds();
     void setSwerveDesiredState(wpi::array<frc::SwerveModuleState, MODULE_COUNT> desiredStates, bool isDriveOpenLoop);
 
+protected:
+    TunerSwerveDrivetrain drivetrain{
+        TunerConstants::DrivetrainConstants,
+        TunerConstants::FrontLeft,
+        TunerConstants::FrontRight,
+        TunerConstants::BackLeft,
+        TunerConstants::BackRight,
+    };
+
+
 private:
 
     std::vector<valor::SwerveModule<AzimuthMotor, DriveMotor> *> swerveModules;
@@ -112,14 +122,6 @@ private:
 
     bool rotTest;
     bool strLineTest;
-
-    TunerSwerveDrivetrain drivetrain{
-        TunerConstants::DrivetrainConstants,
-        TunerConstants::FrontLeft,
-        TunerConstants::FrontRight,
-        TunerConstants::BackLeft,
-        TunerConstants::BackRight,
-    };
 
     // Default uses open loop voltage for drive, position for azimuth
     ctre::phoenix6::swerve::requests::FieldCentric fieldCentricRequest;

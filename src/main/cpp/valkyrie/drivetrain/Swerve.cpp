@@ -29,7 +29,7 @@ Swerve<AzimuthMotor, DriveMotor>::Swerve(frc::TimedRobot *_robot, const char* _n
     posePublisher{table->GetStructTopic<frc::Pose2d>("Drivetrain Pose").Publish()}
 {
     frc2::CommandScheduler::GetInstance().RegisterSubsystem(this);
-    drivetrain.SetControl(fieldCentricRequest);
+    // drivetrain.SetControl(fieldCentricRequest);
     // int MDX[] = MODULE_DIFF_XS;
     // int MDY[] = MODULE_DIFF_YS;
     // wpi::array<frc::Translation2d, MODULE_COUNT> motorLocations = wpi::array<frc::Translation2d, MODULE_COUNT>(wpi::empty_array);
@@ -49,8 +49,6 @@ Swerve<AzimuthMotor, DriveMotor>::Swerve(frc::TimedRobot *_robot, const char* _n
     // kinematics = std::make_unique<frc::SwerveDriveKinematics<MODULE_COUNT>>(motorLocations);
     // rawEstimator = std::make_unique<frc::SwerveDrivePoseEstimator<MODULE_COUNT>>(*kinematics, getGyro(), getModuleStates(), frc::Pose2d{0_m, 0_m, 0_rad});
     // calcEstimator = std::make_unique<frc::SwerveDrivePoseEstimator<MODULE_COUNT>>(*kinematics, getGyro(), getModuleStates(), frc::Pose2d{0_m, 0_m, 0_rad});
-
-    resetState();
 }
 
 template<class AzimuthMotor, class DriveMotor>

@@ -39,7 +39,7 @@ void Robot::RobotInit() {
     frc::DataLogManager::Start();
 
     // charMode.init();
-    // valorAuto.fillAutoList();
+    valorAuto.fillAutoList();
     // valorAuto.preloadAuto("A1-");
     // valorAuto.preloadAuto("A1-2");
     // charMode.fillSelectList();
@@ -64,7 +64,7 @@ void Robot::RobotPeriodic() {
 void Robot::DisabledInit() { }
 
 void Robot::DisabledPeriodic() { 
-    // valorAuto.preloadSelectedAuto();
+    valorAuto.preloadSelectedAuto();
 }
 
 /**
@@ -77,8 +77,8 @@ void Robot::AutonomousInit() {
     drivetrain.doubtX = AUTO_DOUBTX;
     drivetrain.doubtY = AUTO_DOUBTY;
 
-    // autoCommands = valorAuto.getSelectedAuto();
-    // autoCommands.Schedule();
+    autoCommands = valorAuto.getSelectedAuto();
+    autoCommands.Schedule();
     // autoCommands.clear();
     // autoCommands.push_back(valorAuto.getSelectedAuto());
     // autoCommands.back().Schedule();

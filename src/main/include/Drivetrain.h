@@ -1,47 +1,8 @@
 #pragma once
-
-#include "frc/geometry/Pose3d.h"
-#include "units/acceleration.h"
-#include "units/length.h"
-#include "valkyrie/sensors/AprilTagsSensor.h"
-#include "valkyrie/sensors/GrappleLidarSensor.h"
-#include "valkyrie/BaseSubsystem.h"
-#include "Constants.h"
-#include <map>
-#include <string>
-#include <vector>
-
-#include "valkyrie/controllers/PhoenixController.h"
-#include "valkyrie/controllers/PIDF.h"
 #include "valkyrie/drivetrain/Swerve.h"
-
-#include <frc/kinematics/SwerveDriveKinematics.h>
-#include <frc/estimator/SwerveDrivePoseEstimator.h>
-#include <frc/kinematics/ChassisSpeeds.h>
-#include <frc/DutyCycleEncoder.h>
-#include <frc/Timer.h>
-
-#include <frc/geometry/Translation2d.h>
-#include <frc/geometry/Pose2d.h>
-#include <frc/geometry/Rotation2d.h>
-#include <frc/kinematics/DifferentialDriveWheelSpeeds.h>
-#include <frc/controller/SimpleMotorFeedforward.h>
-#include <frc/kinematics/DifferentialDriveKinematics.h>
-#include <frc/trajectory/constraint/DifferentialDriveVoltageConstraint.h>
-#include <frc/trajectory/Trajectory.h>
-#include <frc/trajectory/TrajectoryGenerator.h>
-#include <frc/smartdashboard/SendableChooser.h>
-#include <frc/smartdashboard/SmartDashboard.h>
-
-#include <frc2/command/SwerveControllerCommand.h>
-#include <frc2/command/Command.h>
-#include <frc2/command/InstantCommand.h>
-#include <frc2/command/SequentialCommandGroup.h>
-#include <frc2/command/WaitCommand.h>
-#include <frc/TimedRobot.h>
+#include "valkyrie/controllers/PhoenixController.h"
+#include "valkyrie/sensors/AprilTagsSensor.h"
 #include <frc2/command/FunctionalCommand.h>
-
-#include <ctre/phoenix6/Pigeon2.hpp>
 
 #define SWERVE_COUNT 4
 
@@ -135,4 +96,6 @@ private:
      // valor::GrappleLidarSensor lidarSensor;
 
      units::meter_t visionAcceptanceRadius;
+
+    ctre::phoenix6::swerve::requests::ApplyRobotSpeeds autoRobotSpeedsRequest;
 };

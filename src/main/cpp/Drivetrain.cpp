@@ -1,29 +1,10 @@
+#define _USE_MATH_DEFINES
 #include "Drivetrain.h"
-#include <cmath>
-#include <cstddef>
-#include <frc/DriverStation.h>
-#include <iostream>
-#include <math.h>
-#include <pathplanner/lib/auto/AutoBuilder.h>
-#include <string>
 #include "Constants.h"
-#include "frc2/command/Commands.h"
-#include "frc2/command/FunctionalCommand.h"
-#include "frc2/command/SequentialCommandGroup.h"
-#include "units/acceleration.h"
-#include "units/length.h"
-#include "units/velocity.h"
-#include "valkyrie/sensors/AprilTagsSensor.h"
-#include "units/length.h"
-#include "valkyrie/sensors/VisionSensor.h"
-#include <frc2/command/InstantCommand.h>
-#include <pathplanner/lib/auto/NamedCommands.h>
-#include <utility>
-#include "frc/geometry/Pose3d.h"
+#include <pathplanner/lib/auto/AutoBuilder.h>
 #include <pathplanner/lib/controllers/PPHolonomicDriveController.h>
-#include "frc/geometry/Rotation3d.h"
-#include "units/angle.h"
-#include <ctre/phoenix6/TalonFX.hpp>
+#include <frc/DriverStation.h>
+#include <wpi/print.h>
 
 using namespace pathplanner;
 
@@ -64,13 +45,13 @@ Drivetrain::Drivetrain(frc::TimedRobot *_robot) :
     teleopStart(999999999999)
     // lidarSensor(_robot, "Front Lidar Sensor", CANIDs::FRONT_LIDAR_SENSOR)
 {
-    // xPIDF.P = KPX;
-    // xPIDF.I = KIX;
-    // xPIDF.D = KDX;
+    xPIDF.P = KPX;
+    xPIDF.I = KIX;
+    xPIDF.D = KDX;
 
-    // thetaPIDF.P = KPT;
-    // thetaPIDF.I = KIT;
-    // thetaPIDF.D = KDT;
+    thetaPIDF.P = KPT;
+    thetaPIDF.I = KIT;
+    thetaPIDF.D = KDT;
 
     // table->PutNumber("Vision Std", 3.0);
     // table->PutNumber("Vision Acceptance", VISION_ACCEPTANCE.to<double>() );
@@ -96,35 +77,42 @@ Drivetrain::Drivetrain(frc::TimedRobot *_robot) :
     // /*
     //  * 3.8m/s, 5m/s^2, ~125lbs Apr. 2
     //  */
-    // AutoBuilder::configure(
-    //     [this](){ 
-    //         if (state.useCalculatedEstimator) {
-    //             return getCalculatedPose();
-    //         }
-    //         return getRawPose();
-    //     }, // Robot pose supplier
-    //     [this](frc::Pose2d pose){ resetOdometry(pose); }, // Method to reset odometry (will be called if your auto has a starting pose)
-    //     [this](){ return getRobotRelativeSpeeds(); }, // ChassisSpeeds supplier. MUST BE ROBOT RELATIVE
-    //     [this](frc::ChassisSpeeds speeds, auto _){ driveRobotRelative(speeds); }, // Method that will drive the robot given ROBOT RELATIVE ChassisSpeeds
-    //     std::shared_ptr<PPHolonomicDriveController>(new PPHolonomicDriveController(
-    //         PIDConstants(xPIDF.P, xPIDF.I, xPIDF.D), // Translation PID constants
-    //         PIDConstants(thetaPIDF.P, thetaPIDF.I, thetaPIDF.D) // Rotation PID constants
-    //     )),
-    //     RobotConfig::fromGUISettings(),
-    //     []() {
-    //         // Boolean supplier that controls when the path will be mirrored for the red alliance
-    //         // This will flip the path being followed to the red side of the field.
-    //         // THE ORIGIN WILL REMAIN ON THE BLUE SIDE
+    AutoBuilder::configure(
+        [this](){ 
+            wpi::println("Returning current pose...");
+            return drivetrain.GetState().Pose;
+        },
+        [this](frc::Pose2d pose){
+            wpi::println("Resetting current pose...");
+            drivetrain.ResetPose(pose);
+        }, // Method to reset odometry (will be called if your auto has a starting pose)
+        [this](){
+            wpi::println("Getting current ChassisSpeeds");
+            return drivetrain.GetState().Speeds;
+        }, // ChassisSpeeds supplier. MUST BE ROBOT RELATIVE
+        [this](frc::ChassisSpeeds speeds) {
+            wpi::println("Setting ChassisSpeeds");
+            drivetrain.SetControl(autoRobotSpeedsRequest.WithSpeeds(speeds));
+        }, // Method that will drive the robot given ROBOT RELATIVE ChassisSpeeds
+        std::make_shared<PPHolonomicDriveController>(
+            PIDConstants(xPIDF.P, xPIDF.I, xPIDF.D), // Translation PID constants
+            PIDConstants(thetaPIDF.P, thetaPIDF.I, thetaPIDF.D) // Rotation PID constants
+        ),
+        RobotConfig::fromGUISettings(),
+        []() {
+            // Boolean supplier that controls when the path will be mirrored for the red alliance
+            // This will flip the path being followed to the red side of the field.
+            // THE ORIGIN WILL REMAIN ON THE BLUE SIDE
 
-    //         auto alliance = frc::DriverStation::GetAlliance();
-    //         if (alliance) {
-    //             return alliance.value() == frc::DriverStation::Alliance::kRed;
-    //         }
-    //         return false;
-    //     },
-    //     this // Reference to this subsystem to set requirements
-    // );
-    // resetState();
+            auto alliance = frc::DriverStation::GetAlliance();
+            if (alliance) {
+                return alliance.value() == frc::DriverStation::Alliance::kRed;
+            }
+            return false;
+        },
+        this // Reference to this subsystem to set requirements
+    );
+    resetState();
     // init();
 }
 
@@ -181,7 +169,7 @@ std::vector<std::pair<SwerveAzimuthMotor*, SwerveDriveMotor*>> Drivetrain::gener
 
 void Drivetrain::resetState()
 {
-    // Swerve::resetState();
+    Swerve::resetState();
 
     // resetEncoders();
     // resetOdometry(frc::Pose2d{0_m, 0_m, 0_rad});
