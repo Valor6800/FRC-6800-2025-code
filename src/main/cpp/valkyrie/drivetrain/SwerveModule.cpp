@@ -1,3 +1,4 @@
+#define _USE_MATH_DEFINES
 #include "valkyrie/drivetrain/SwerveModule.h"
 #include "valkyrie/controllers/PhoenixController.h"
 #include "Constants.h"

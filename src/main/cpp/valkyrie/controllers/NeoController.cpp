@@ -1,3 +1,4 @@
+#define _USE_MATH_DEFINES
 #include "valkyrie/controllers/NeoController.h"
 
 #define NEO_PIDF_KP 10.0f

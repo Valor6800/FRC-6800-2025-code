@@ -59,13 +59,10 @@ const units::meter_t WHEEL_DIAMETER(0.0973_m);
 Drivetrain::Drivetrain(frc::TimedRobot *_robot) : 
     valor::Swerve<SwerveAzimuthMotor, SwerveDriveMotor>(
         _robot,
-        "SwerveDrive",
-        generateModules(),
-        Constants::moduleDiff(),
-        WHEEL_DIAMETER
+        "SwerveDrive"
     ),
-    teleopStart(999999999999),
-    lidarSensor(_robot, "Front Lidar Sensor", CANIDs::FRONT_LIDAR_SENSOR)
+    teleopStart(999999999999)
+    // lidarSensor(_robot, "Front Lidar Sensor", CANIDs::FRONT_LIDAR_SENSOR)
 {
     // xPIDF.P = KPX;
     // xPIDF.I = KIX;
@@ -284,25 +281,25 @@ void Drivetrain::InitSendable(wpi::SendableBuilder& builder)
 
         builder.SetSmartDashboardType("Subsystem");
 
-        builder.AddDoubleArrayProperty(
-            "Acceleration",
-            [this] {
-                std::vector<double> acceleration;
-                acceleration.push_back(state.accel.x.to<double>());
-                acceleration.push_back(state.accel.y.to<double>());
-                acceleration.push_back(state.accel.z.to<double>());
-                return acceleration;
-            },
-            nullptr
-        );
-        builder.AddBooleanProperty(
-            "Bonk!",
-            [this] {
-                return units::acceleration::meters_per_second_squared_t{
-                sqrtf(powf(state.accel.x.to<double>(), 2) + powf(state.accel.y.to<double>(), 2))
-            } > 20.0_mps_sq; // ~60 kg bot -> 600 N, 5 measurements * 20ms = .1s, 
-                                                                                     // impulse = .1 * 600 = 60 Joules
-            },
-            nullptr
-        );
+        // builder.AddDoubleArrayProperty(
+        //     "Acceleration",
+        //     [this] {
+        //         std::vector<double> acceleration;
+        //         acceleration.push_back(state.accel.x.to<double>());
+        //         acceleration.push_back(state.accel.y.to<double>());
+        //         acceleration.push_back(state.accel.z.to<double>());
+        //         return acceleration;
+        //     },
+        //     nullptr
+        // );
+        // builder.AddBooleanProperty(
+        //     "Bonk!",
+        //     [this] {
+        //         return units::acceleration::meters_per_second_squared_t{
+        //         sqrtf(powf(state.accel.x.to<double>(), 2) + powf(state.accel.y.to<double>(), 2))
+        //     } > 20.0_mps_sq; // ~60 kg bot -> 600 N, 5 measurements * 20ms = .1s, 
+        //                                                                              // impulse = .1 * 600 = 60 Joules
+        //     },
+        //     nullptr
+        // );
     }

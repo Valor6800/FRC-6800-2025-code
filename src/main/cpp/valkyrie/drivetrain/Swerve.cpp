@@ -1,3 +1,4 @@
+#define _USE_MATH_DEFINES
 #include "valkyrie/drivetrain/Swerve.h"
 #include "valkyrie/controllers/PhoenixController.h"
 
@@ -6,6 +7,7 @@
 #include <frc/estimator/SwerveDrivePoseEstimator.h>
 #include <frc/geometry/Translation2d.h>
 #include <frc/DriverStation.h>
+#include <networktables/StructTopic.h>
 #include "Constants.h"
 
 #define MODULE_DIFF_XS {1, 1, -1, -1}
@@ -21,15 +23,11 @@ using namespace valor;
 template class valor::Swerve<valor::PhoenixController, valor::PhoenixController>;
 
 template<class AzimuthMotor, class DriveMotor>
-Swerve<AzimuthMotor, DriveMotor>::Swerve(frc::TimedRobot *_robot,
-    const char* _name,
-    std::vector<std::pair<AzimuthMotor*, DriveMotor*>> modules,
-    units::meter_t _module_radius,
-    units::meter_t _wheelDiameter
-) : valor::BaseSubsystem(_robot, _name), lockingToTarget(false), useCarpetGrain(false)
+Swerve<AzimuthMotor, DriveMotor>::Swerve(frc::TimedRobot *_robot, const char* _name) :
+    valor::BaseSubsystem(_robot, _name), lockingToTarget(false), useCarpetGrain(false)
 {
     frc2::CommandScheduler::GetInstance().RegisterSubsystem(this);
-
+    nt::StructPublisher<frc::Pose2d> test = table->GetStructTopic<frc::Pose2d>("Drivetrain Pose").Publish();
     // int MDX[] = MODULE_DIFF_XS;
     // int MDY[] = MODULE_DIFF_YS;
     // wpi::array<frc::Translation2d, MODULE_COUNT> motorLocations = wpi::array<frc::Translation2d, MODULE_COUNT>(wpi::empty_array);
@@ -73,12 +71,13 @@ void Swerve<AzimuthMotor, DriveMotor>::init()
 template<class AzimuthMotor, class DriveMotor>
 void Swerve<AzimuthMotor, DriveMotor>::assessInputs()
 {
+    if (frc::RobotBase::IsSimulation())
+        drivetrain.UpdateSimState(20_ms, frc::RobotController::GetBatteryVoltage());
     if (!driverGamepad || !driverGamepad->IsConnected())
         return;
 
-    // if (driverGamepad->GetBackButtonPressed()) {
-    //     resetGyro();
-    // }
+    if (driverGamepad->GetBackButtonPressed())
+        drivetrain.ResetRotation(frc::Rotation2d{0_deg});
 
     xSpeed = driverGamepad->leftStickY(2);
     ySpeed = driverGamepad->leftStickX(2);
@@ -194,7 +193,7 @@ void Swerve<AzimuthMotor, DriveMotor>::setSwerveDesiredState(wpi::array<frc::Swe
 template<class AzimuthMotor, class DriveMotor>
 void Swerve<AzimuthMotor, DriveMotor>::resetState()
 {
-    resetOdometry(frc::Pose2d{0_m, 0_m, 0_rad});
+    drivetrain.TareEverything();
     rotTest = false;
     strLineTest = false;
 }

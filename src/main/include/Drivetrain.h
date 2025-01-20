@@ -132,7 +132,7 @@ private:
      valor::PIDF thetaPIDF;
      
      std::vector<valor::AprilTagsSensor*> aprilTagSensors;
-     valor::GrappleLidarSensor lidarSensor;
+     // valor::GrappleLidarSensor lidarSensor;
 
      units::meter_t visionAcceptanceRadius;
 };

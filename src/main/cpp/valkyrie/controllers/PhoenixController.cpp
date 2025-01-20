@@ -1,4 +1,6 @@
+#define _USE_MATH_DEFINES
 #include "valkyrie/controllers/PhoenixController.h"
+#include <iostream>
 
 // Conversion guide: https://v6.docs.ctr-electronics.com/en/latest/docs/migration/migration-guide/closed-loop-guide.html
 
@@ -36,6 +38,7 @@ PhoenixController::PhoenixController(valor::PhoenixControllerType controllerType
     res_position(getMotor()->GetPosition()),
     res_velocity(getMotor()->GetVelocity())
 {
+    std::cout << "Hello World\n";
     init();
 }
 

@@ -90,9 +90,11 @@ namespace CANIDs {
     constexpr static int FRONT_LIDAR_SENSOR = 49;
 }
 
+#ifdef __GNUC__
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wunused-function"
 #pragma GCC diagnostic ignored "-Wunused-variable"
+#endif
 
 // Constants that stay the same across bots should not go here
 namespace Constants { 
@@ -102,7 +104,8 @@ namespace Constants {
         The reason that can't happen here is that for functions/variables to be static, the values they use must also be static.
         Because GetTeamNumber isn't static, team number can't be static, and therefore none of the getters can be static either. 
         */
-        static int teamNumber = frc::RobotController::GetTeamNumber();;
+        // static int teamNumber = frc::RobotController::GetTeamNumber();;
+        static int teamNumber = 6800;
 
         static bool roughTowardsRedAllianceWall = true;
         static double carpetGrainMultipler = 1.05;
@@ -343,4 +346,7 @@ namespace Constants {
                     std::pair("limelight-berry", berryCameraPosition())
         };
 }
+
+#ifdef __GNUC__
 #pragma GCC diagnostic pop
+#endif

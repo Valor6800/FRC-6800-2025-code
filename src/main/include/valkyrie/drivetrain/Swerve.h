@@ -7,6 +7,7 @@
 #include <frc/kinematics/ChassisSpeeds.h>
 #include <frc/kinematics/SwerveDriveKinematics.h>
 #include <frc/estimator/SwerveDrivePoseEstimator.h>
+#include <frc/smartdashboard/Field2d.h>
 
 #include "valkyrie/BaseSubsystem.h"
 #include "valkyrie/drivetrain/SwerveModule.h"
@@ -23,10 +24,7 @@ public:
     CharMode::MODE_OPTIONS selectedTest;
 
     Swerve(frc::TimedRobot *_robot,
-                const char* _name,
-                std::vector<std::pair<AzimuthMotor*, DriveMotor*>> modules,
-                units::meter_t module_radius,
-                units::meter_t _wheelDiameter);
+                const char* _name);
     ~Swerve();
 
     void init() override;
