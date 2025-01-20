@@ -51,7 +51,6 @@ void PhoenixController::init()
     motionPIDF.error = 0_tr;
     motionPIDF.maxVelocity = FALCON_PIDF_KV;
     motionPIDF.maxAcceleration = FALCON_PIDF_KA;
-
     req_position.Slot = 0;
     req_position.UpdateFreqHz = 0_Hz;
     req_velocity.Slot = 0;

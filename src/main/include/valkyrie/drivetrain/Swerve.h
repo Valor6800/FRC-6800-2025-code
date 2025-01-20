@@ -1,17 +1,12 @@
 #pragma once
-
 #include "TunerConstants.h"
-#include <frc2/command/InstantCommand.h>
-#include <ctre/phoenix6/Pigeon2.hpp>
-#include <frc/geometry/Pose2d.h>
-#include <frc/kinematics/ChassisSpeeds.h>
+#include "valkyrie/BaseSubsystem.h"
+#include "valkyrie/CharMode.h"
+#include "valkyrie/drivetrain/SwerveModule.h"
+#include <frc/TimedRobot.h>
+#include <networktables/StructTopic.h>
 #include <frc/kinematics/SwerveDriveKinematics.h>
 #include <frc/estimator/SwerveDrivePoseEstimator.h>
-#include <frc/smartdashboard/Field2d.h>
-
-#include "valkyrie/BaseSubsystem.h"
-#include "valkyrie/drivetrain/SwerveModule.h"
-#include "valkyrie/CharMode.h"
 
 #define MODULE_COUNT 4
 
@@ -128,6 +123,8 @@ private:
 
     // Default uses open loop voltage for drive, position for azimuth
     ctre::phoenix6::swerve::requests::FieldCentric fieldCentricRequest;
+
+    nt::StructPublisher<frc::Pose2d> posePublisher;
     
     CharMode charac;
 };

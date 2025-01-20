@@ -9,6 +9,7 @@
 #include <frc/DriverStation.h>
 #include <networktables/StructTopic.h>
 #include "Constants.h"
+#include <wpi/print.h>
 
 #define MODULE_DIFF_XS {1, 1, -1, -1}
 #define MODULE_DIFF_YS {1, -1, -1, 1}
@@ -24,10 +25,11 @@ template class valor::Swerve<valor::PhoenixController, valor::PhoenixController>
 
 template<class AzimuthMotor, class DriveMotor>
 Swerve<AzimuthMotor, DriveMotor>::Swerve(frc::TimedRobot *_robot, const char* _name) :
-    valor::BaseSubsystem(_robot, _name), lockingToTarget(false), useCarpetGrain(false)
+    valor::BaseSubsystem(_robot, _name), lockingToTarget(false), useCarpetGrain(false),
+    posePublisher{table->GetStructTopic<frc::Pose2d>("Drivetrain Pose").Publish()}
 {
     frc2::CommandScheduler::GetInstance().RegisterSubsystem(this);
-    nt::StructPublisher<frc::Pose2d> test = table->GetStructTopic<frc::Pose2d>("Drivetrain Pose").Publish();
+    drivetrain.SetControl(fieldCentricRequest);
     // int MDX[] = MODULE_DIFF_XS;
     // int MDY[] = MODULE_DIFF_YS;
     // wpi::array<frc::Translation2d, MODULE_COUNT> motorLocations = wpi::array<frc::Translation2d, MODULE_COUNT>(wpi::empty_array);
@@ -42,13 +44,13 @@ Swerve<AzimuthMotor, DriveMotor>::Swerve(frc::TimedRobot *_robot, const char* _n
     // }
 
     // maxDriveSpeed = swerveModules[0]->getMaxDriveSpeed();
-    // maxRotationSpeed = units::radian_t{2.0 * M_PI} * swerveModules[0]->getMaxDriveSpeed() / _module_radius;
+    // maxRotationSpeed = units::meters_per_second_t{5800_rpm} / 0.295_m;
 
     // kinematics = std::make_unique<frc::SwerveDriveKinematics<MODULE_COUNT>>(motorLocations);
     // rawEstimator = std::make_unique<frc::SwerveDrivePoseEstimator<MODULE_COUNT>>(*kinematics, getGyro(), getModuleStates(), frc::Pose2d{0_m, 0_m, 0_rad});
     // calcEstimator = std::make_unique<frc::SwerveDrivePoseEstimator<MODULE_COUNT>>(*kinematics, getGyro(), getModuleStates(), frc::Pose2d{0_m, 0_m, 0_rad});
 
-    // resetState();
+    resetState();
 }
 
 template<class AzimuthMotor, class DriveMotor>
@@ -71,8 +73,6 @@ void Swerve<AzimuthMotor, DriveMotor>::init()
 template<class AzimuthMotor, class DriveMotor>
 void Swerve<AzimuthMotor, DriveMotor>::assessInputs()
 {
-    if (frc::RobotBase::IsSimulation())
-        drivetrain.UpdateSimState(20_ms, frc::RobotController::GetBatteryVoltage());
     if (!driverGamepad || !driverGamepad->IsConnected())
         return;
 
@@ -87,6 +87,9 @@ void Swerve<AzimuthMotor, DriveMotor>::assessInputs()
 template<class AzimuthMotor, class DriveMotor>
 void Swerve<AzimuthMotor, DriveMotor>::analyzeDashboard()
 {
+    if (frc::RobotBase::IsSimulation())
+        drivetrain.UpdateSimState(20_ms, frc::RobotController::GetBatteryVoltage());
+    posePublisher.Set(drivetrain.GetState().Pose);
 //     rawEstimator->UpdateWithTime(frc::Timer::GetFPGATimestamp(), getGyro(), getModuleStates());
 //     calcEstimator->UpdateWithTime(frc::Timer::GetFPGATimestamp(), getGyro(), getModuleStates());
 
@@ -126,12 +129,15 @@ void Swerve<AzimuthMotor, DriveMotor>::analyzeDashboard()
 template<class AzimuthMotor, class DriveMotor>
 void Swerve<AzimuthMotor, DriveMotor>::assignOutputs()
 {
-    drivetrain.SetControl(
-        fieldCentricRequest
-            .WithVelocityX(units::meters_per_second_t{xSpeed})
-            .WithVelocityY(units::meters_per_second_t{ySpeed})
-            .WithRotationalRate(units::radians_per_second_t{rotSpeed * 2 * M_PI})
-    );
+    fieldCentricRequest
+        .WithVelocityX(units::meters_per_second_t{xSpeed * 10_fps})
+        .WithVelocityY(units::meters_per_second_t{ySpeed * 10_fps})
+        // Assuming 1 rotation per second
+        .WithRotationalRate(rotSpeed * 10_tps);
+    // auto state = drivetrain.GetState().Pose;
+    // wpi::println("{}",
+    //     drivetrain.GetModules()[0]->GetPosition(true).distance.to<double>()
+    // );
     // if (rotTest) {
     //     swerveModules[0]->setAzimuthPosition(frc::Rotation2d(-45_deg));
     //     swerveModules[1]->setAzimuthPosition(frc::Rotation2d(-135_deg));

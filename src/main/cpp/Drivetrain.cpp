@@ -202,7 +202,7 @@ void Drivetrain::assessInputs()
 
 void Drivetrain::analyzeDashboard()
 {
-    // Swerve::analyzeDashboard();
+    Swerve::analyzeDashboard();
 
     // visionAcceptanceRadius = (units::meter_t) table->GetNumber("Vision Acceptance", VISION_ACCEPTANCE.to<double>());
 
