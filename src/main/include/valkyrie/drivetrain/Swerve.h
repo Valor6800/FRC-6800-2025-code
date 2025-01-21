@@ -5,6 +5,7 @@
 #include "valkyrie/drivetrain/SwerveModule.h"
 #include <frc/TimedRobot.h>
 #include <networktables/StructTopic.h>
+#include <networktables/StructArrayTopic.h>
 #include <frc/kinematics/SwerveDriveKinematics.h>
 #include <frc/estimator/SwerveDrivePoseEstimator.h>
 
@@ -85,9 +86,6 @@ protected:
     std::unique_ptr<frc::SwerveDrivePoseEstimator<MODULE_COUNT>> rawEstimator;
     std::unique_ptr<frc::SwerveDrivePoseEstimator<MODULE_COUNT>> calcEstimator;
 
-    bool lockingToTarget;
-    units::degree_t targetAngle;
-
     void enableCarpetGrain(double grainMultiplier, bool roughTowardsRed);
     
     frc::ChassisSpeeds getRobotRelativeSpeeds();
@@ -102,6 +100,9 @@ protected:
         TunerConstants::BackRight,
     };
 
+    // Default uses open loop voltage for drive, position for azimuth
+    ctre::phoenix6::swerve::requests::FieldCentric fieldCentricRequest;
+    ctre::phoenix6::swerve::requests::FieldCentricFacingAngle fieldCentricFacingAngleRequest;
 
 private:
 
@@ -123,10 +124,10 @@ private:
     bool rotTest;
     bool strLineTest;
 
-    // Default uses open loop voltage for drive, position for azimuth
-    ctre::phoenix6::swerve::requests::FieldCentric fieldCentricRequest;
-
     nt::StructPublisher<frc::Pose2d> posePublisher;
+    nt::StructPublisher<frc::ChassisSpeeds> chassisSpeedsPublisher;
+    nt::StructArrayPublisher<frc::SwerveModuleState> currentModuleStatesPublisher;
+    nt::StructArrayPublisher<frc::SwerveModuleState> targetModuleStatesPublisher;
     
     CharMode charac;
 };

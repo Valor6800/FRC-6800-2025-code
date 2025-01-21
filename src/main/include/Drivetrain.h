@@ -3,6 +3,7 @@
 #include "valkyrie/controllers/PhoenixController.h"
 #include "valkyrie/sensors/AprilTagsSensor.h"
 #include <frc2/command/FunctionalCommand.h>
+#include <frc/controller/ProfiledPIDController.h>
 
 #define SWERVE_COUNT 4
 
@@ -90,8 +91,84 @@ private:
 
      std::vector<std::pair<SwerveAzimuthMotor*, SwerveDriveMotor*>> generateModules();
 
+     const units::radians_per_second_t MAX_ROTATION_VEL = 16_rad_per_s;
+     const units::radians_per_second_squared_t MAX_ROTATION_ACCEL = 12_rad_per_s_sq;
+     const units::meters_per_second_t MAX_TRANSLATION_VEL = 5.5_mps;
+     const units::meters_per_second_squared_t MAX_TRANSLATION_ACCEL = 1_mps_sq;
+     // frc::TrapezoidProfile<units::radian_t>::Constraints rot_constraints{MAX_ROTATION_VEL, MAX_ROTATION_ACCEL};
+     // frc::ProfiledPIDController<units::radian_t> rot_controller{3, 0, 0.5};
+     frc::TrapezoidProfile<units::meter>::Constraints trans_constraints{MAX_TRANSLATION_VEL, MAX_TRANSLATION_ACCEL};
+     frc::ProfiledPIDController<units::meter> trans_controller{1, 0, 0, trans_constraints};
+
      valor::PIDF xPIDF;
      valor::PIDF thetaPIDF;
+
+     bool alignToTarget;
+     units::meter_t horizontalDistance;
+
+     // frc::Pose3d testAprilTag{
+     //      frc::Translation3d{
+     //           144_in,
+     //           158.5_in,
+     //           12.13_in
+     //      },
+     //      frc::Rotation3d{
+     //           0_deg,
+     //           0_deg,
+     //           180_deg
+     //      }
+     // };
+     // frc::Pose3d testAprilTag{
+     //      frc::Translation3d{
+     //           160.39_in,
+     //           130.17_in,
+     //           12.13_in
+     //      },
+     //      frc::Rotation3d{
+     //           0_deg,
+     //           0_deg,
+     //           240_deg
+     //      }
+     // };
+     // frc::Pose3d testAprilTag{
+     //      frc::Translation3d{
+     //           160.39_in,
+     //           186.83_in,
+     //           12.13_in
+     //      },
+     //      frc::Rotation3d{
+     //           0_deg,
+     //           0_deg,
+     //           120_deg
+     //      }
+     // };
+     // frc::Pose3d testAprilTag{
+     //      frc::Translation3d{
+     //           193.10_in,
+     //           186.83_in,
+     //           12.13_in
+     //      },
+     //      frc::Rotation3d{
+     //           0_deg,
+     //           0_deg,
+     //           60_deg
+     //      }
+     // };
+
+     frc::Pose3d testAprilTag{
+          frc::Translation3d{
+               209.49_in,
+               158.5_in,
+               12.13_in
+          },
+          frc::Rotation3d{
+               0_deg,
+               0_deg,
+               0_deg
+          }
+     };
+
+     nt::StructPublisher<frc::Pose3d> aprilTagPosePublisher;
      
      std::vector<valor::AprilTagsSensor*> aprilTagSensors;
      // valor::GrappleLidarSensor lidarSensor;

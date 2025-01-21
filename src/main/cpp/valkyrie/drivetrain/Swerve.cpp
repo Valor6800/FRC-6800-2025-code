@@ -9,7 +9,6 @@
 #include <frc/DriverStation.h>
 #include <networktables/StructTopic.h>
 #include "Constants.h"
-#include <wpi/print.h>
 
 #define MODULE_DIFF_XS {1, 1, -1, -1}
 #define MODULE_DIFF_YS {1, -1, -1, 1}
@@ -25,8 +24,11 @@ template class valor::Swerve<valor::PhoenixController, valor::PhoenixController>
 
 template<class AzimuthMotor, class DriveMotor>
 Swerve<AzimuthMotor, DriveMotor>::Swerve(frc::TimedRobot *_robot, const char* _name) :
-    valor::BaseSubsystem(_robot, _name), lockingToTarget(false), useCarpetGrain(false),
-    posePublisher{table->GetStructTopic<frc::Pose2d>("Drivetrain Pose").Publish()}
+    valor::BaseSubsystem(_robot, _name),
+    posePublisher{table->GetStructTopic<frc::Pose2d>("Drivetrain Pose").Publish()},
+    chassisSpeedsPublisher{table->GetStructTopic<frc::ChassisSpeeds>("Chassis Speeds").Publish()},
+    currentModuleStatesPublisher{table->GetStructArrayTopic<frc::SwerveModuleState>("Current Module States").Publish()},
+    targetModuleStatesPublisher{table->GetStructArrayTopic<frc::SwerveModuleState>("Target Module States").Publish()}
 {
     drivetrain.SetControl(fieldCentricRequest);
     // int MDX[] = MODULE_DIFF_XS;
@@ -87,70 +89,19 @@ void Swerve<AzimuthMotor, DriveMotor>::analyzeDashboard()
     if (frc::RobotBase::IsSimulation())
         drivetrain.UpdateSimState(20_ms, frc::RobotController::GetBatteryVoltage());
     posePublisher.Set(drivetrain.GetState().Pose);
-//     rawEstimator->UpdateWithTime(frc::Timer::GetFPGATimestamp(), getGyro(), getModuleStates());
-//     calcEstimator->UpdateWithTime(frc::Timer::GetFPGATimestamp(), getGyro(), getModuleStates());
-
-//     if (useCarpetGrain)
-//         calculateCarpetPose();
-
-//     // Rotational Speed calculations
-//     if (lockingToTarget) {
-//         units::radian_t robotRotation = getCalculatedPose().Rotation().Radians();
-//         units::radian_t errorAngle = robotRotation - targetAngle;
-//         units::radian_t error = units::math::fmod(errorAngle + units::radian_t(M_PI), 2 * units::radian_t(M_PI)) - units::radian_t(M_PI);
-//         static units::radian_t prevError = error;
-//         rotSpeedRPS = error * KP_ROTATE + (error - prevError) * KD_ROTATE;
-//         prevError = error;
-//     } else {
-//         rotSpeedRPS = rotSpeed * maxRotationSpeed;
-//     }
-
-//     // Linear Speed calculations
-//     xSpeedMPS = units::meters_per_second_t{xSpeed * maxDriveSpeed};
-//     ySpeedMPS = units::meters_per_second_t{ySpeed * maxDriveSpeed};
-//     if (frc::DriverStation::GetAlliance() == frc::DriverStation::kRed) {
-//         xSpeedMPS *= -1.0;
-//         ySpeedMPS *= -1.0;
-//     }
-
-//    if (selectedTest == CharMode::ROT && driverGamepad->GetAButton()) {
-//         rotTest = true;
-//    } else if (selectedTest == CharMode::STR_LINE && driverGamepad->GetAButton()) {
-//         strLineTest = true;
-//    } else {
-//         rotTest = false;
-//         strLineTest = false;
-//    }
+    chassisSpeedsPublisher.Set(drivetrain.GetState().Speeds);
+    currentModuleStatesPublisher.Set(drivetrain.GetState().ModuleStates);
+    targetModuleStatesPublisher.Set(drivetrain.GetState().ModuleTargets);
 }
 
 template<class AzimuthMotor, class DriveMotor>
 void Swerve<AzimuthMotor, DriveMotor>::assignOutputs()
 {
+    // Random max speed, needs to be tuned to reflect real robot
     fieldCentricRequest
         .WithVelocityX(units::meters_per_second_t{xSpeed * 10_fps})
         .WithVelocityY(units::meters_per_second_t{ySpeed * 10_fps})
-        // Assuming 1 rotation per second
         .WithRotationalRate(rotSpeed * 10_tps);
-    // auto state = drivetrain.GetState().Pose;
-    // wpi::println("{}",
-    //     drivetrain.GetModules()[0]->GetPosition(true).distance.to<double>()
-    // );
-    // if (rotTest) {
-    //     swerveModules[0]->setAzimuthPosition(frc::Rotation2d(-45_deg));
-    //     swerveModules[1]->setAzimuthPosition(frc::Rotation2d(-135_deg));
-    //     swerveModules[2]->setAzimuthPosition(frc::Rotation2d(-225_deg));
-    //     swerveModules[3]->setAzimuthPosition(frc::Rotation2d(45_deg));
-    //     for (size_t i = 0; i < MODULE_COUNT; i++) {
-    //         swerveModules[i]->setDrivePower(units::volt_t (12));
-    //     }
-    // } else if (strLineTest){
-    //     for (size_t i = 0; i < MODULE_COUNT; i++) {
-    //         swerveModules[i]->setAzimuthPosition(frc::Rotation2d());
-    //         swerveModules[i]->setDrivePower(units::volt_t (12));
-    //     }
-    // } else{
-    //     drive(xSpeedMPS, ySpeedMPS, rotSpeedRPS, true);
-    // }
 }
 
 template<class AzimuthMotor, class DriveMotor>

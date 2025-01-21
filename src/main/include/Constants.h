@@ -22,7 +22,6 @@
 #include <cscore.h>
 #include <frc/geometry/Pose3d.h>
 #include <networktables/NetworkTable.h>
-#include <wpi/print.h>
 
 
 #define ALPHA_TEAM_NUMBER 6801

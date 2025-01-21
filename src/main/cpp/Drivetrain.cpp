@@ -4,7 +4,6 @@
 #include <pathplanner/lib/auto/AutoBuilder.h>
 #include <pathplanner/lib/controllers/PPHolonomicDriveController.h>
 #include <frc/DriverStation.h>
-#include <wpi/print.h>
 
 using namespace pathplanner;
 
@@ -39,10 +38,13 @@ const units::meter_t WHEEL_DIAMETER(0.0973_m);
 
 Drivetrain::Drivetrain(frc::TimedRobot *_robot) : 
     valor::Swerve<SwerveAzimuthMotor, SwerveDriveMotor>(_robot, "Drivetrain"),
-    teleopStart(999999999999)
+    teleopStart(999999999999),
+    aprilTagPosePublisher{table->GetStructTopic<frc::Pose3d>("April Tag Pose").Publish()}
     // lidarSensor(_robot, "Front Lidar Sensor", CANIDs::FRONT_LIDAR_SENSOR)
 {
     frc::SmartDashboard::PutData("Drivetrain", this);
+    fieldCentricFacingAngleRequest.HeadingController.SetPID(1, 0, 0);
+    aprilTagPosePublisher.Set(testAprilTag);
     xPIDF.P = KPX;
     xPIDF.I = KIX;
     xPIDF.D = KDX;
@@ -51,40 +53,11 @@ Drivetrain::Drivetrain(frc::TimedRobot *_robot) :
     thetaPIDF.I = KIT;
     thetaPIDF.D = KDT;
 
-    // table->PutNumber("Vision Std", 3.0);
-    // table->PutNumber("Vision Acceptance", VISION_ACCEPTANCE.to<double>() );
-    // table->PutNumber("KPLIMELIGHT", KP_LIMELIGHT);
-    // table->PutBoolean("Accepting Vision Measurements", true);
-
-    // for (std::pair<const char*, frc::Pose3d> aprilCam : Constants::aprilCameras) {
-    //     aprilTagSensors.push_back(new valor::AprilTagsSensor(robot, aprilCam.first, aprilCam.second));  
-    //     aprilTagSensors.back()->setPipe(valor::VisionSensor::PIPELINE_0);
-    // }
-
-    // aprilTagSensors[4]->setPipe(valor::VisionSensor::PIPELINE_1);
-    // aprilTagSensors[4]->setCameraPose(Constants::aprilCameras[4].second);
-
-    // setupGyro(
-    //     CANIDs::PIGEON_CAN,
-    //     PIGEON_CAN_BUS,
-    //     Constants::pigeonMountRoll(),
-    //     Constants::pigeonMountPitch(),
-    //     Constants::pigeonMountYaw()
-    // );
-    
-    // /*
-    //  * 3.8m/s, 5m/s^2, ~125lbs Apr. 2
-    //  */
     AutoBuilder::configure(
         [this]() { return drivetrain.GetState().Pose; },
         [this](frc::Pose2d pose) { drivetrain.ResetPose(pose); }, // Method to reset odometry (will be called if your auto has a starting pose)
-        [this](){
-            wpi::println("Getting current ChassisSpeeds");
-            return drivetrain.GetState().Speeds; }, // ChassisSpeeds supplier. MUST BE ROBOT RELATIVE
-        [this](frc::ChassisSpeeds speeds) {
-            wpi::println("Setting ChassisSpeeds");
-            drivetrain.SetControl(autoRobotSpeedsRequest.WithSpeeds(speeds));
-        }, // Method that will drive the robot given ROBOT RELATIVE ChassisSpeeds
+        [this](){ return drivetrain.GetState().Speeds; }, // ChassisSpeeds supplier. MUST BE ROBOT RELATIVE
+        [this](frc::ChassisSpeeds speeds) { drivetrain.SetControl(autoRobotSpeedsRequest.WithSpeeds(speeds)); }, // Method that will drive the robot given ROBOT RELATIVE ChassisSpeeds
         std::make_shared<PPHolonomicDriveController>(
             PIDConstants(xPIDF.P, xPIDF.I, xPIDF.D), // Translation PID constants
             PIDConstants(thetaPIDF.P, thetaPIDF.I, thetaPIDF.D) // Rotation PID constants
@@ -161,6 +134,14 @@ std::vector<std::pair<SwerveAzimuthMotor*, SwerveDriveMotor*>> Drivetrain::gener
 void Drivetrain::resetState()
 {
     Swerve::resetState();
+    // Roughly facing the center AprilTag
+    // drivetrain.ResetTranslation(frc::Translation2d{7_m, 7_m});
+    drivetrain.ResetPose(
+        frc::Pose2d{
+            frc::Translation2d{7_m, 7_m},
+            45_deg
+        }
+    );
 
     // resetEncoders();
     // resetOdometry(frc::Pose2d{0_m, 0_m, 0_rad});
@@ -171,9 +152,19 @@ void Drivetrain::init()
     // Swerve::init();
 }
 
+#include <wpi/print.h>
 void Drivetrain::assessInputs()
 {
     Swerve::assessInputs();
+    frc::Pose2d aprilTagPose = testAprilTag.ToPose2d();
+    frc::Pose2d botRelativeToTag = drivetrain.GetState().Pose.RelativeTo(aprilTagPose);
+    horizontalDistance = -botRelativeToTag.Y();
+    if (driverGamepad->GetAButtonPressed()) {
+        alignToTarget = true;
+        trans_controller.Reset(horizontalDistance);
+        wpi::println("{}", horizontalDistance);
+        trans_controller.SetGoal(0_m);
+    }
 }
 
 void Drivetrain::analyzeDashboard()
@@ -220,6 +211,19 @@ std::vector<units::ampere_t> Drivetrain::getCurrents() {
 void Drivetrain::assignOutputs()
 {
     Swerve::assignOutputs();
+
+    if (alignToTarget) {
+        units::meters_per_second_t transSpeed = units::meters_per_second_t{trans_controller.Calculate(horizontalDistance)} + trans_controller.GetSetpoint().velocity;
+        frc::Rotation2d transRotation = testAprilTag.Rotation().ToRotation2d() - 90_deg;
+        Eigen::Vector2d transVector{transRotation.Cos(), transRotation.Sin()};
+        transVector *= transSpeed.value();
+
+        fieldCentricFacingAngleRequest
+            .WithVelocityX(units::meters_per_second_t{transVector[0]})
+            .WithVelocityY(units::meters_per_second_t{transVector[1]})
+            .WithTargetDirection(testAprilTag.Rotation().ToRotation2d().RotateBy(180_deg));
+        drivetrain.SetControl(fieldCentricFacingAngleRequest);
+    }
 }
 
 units::meters_per_second_t Drivetrain::getRobotSpeeds(){

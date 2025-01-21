@@ -1,5 +1,4 @@
 #include "valkyrie/Auto.h"
-#include <wpi/print.h>
 #include <pathplanner/lib/commands/PathPlannerAuto.h>
 #include <networktables/NetworkTableInstance.h>
 #include <frc/Filesystem.h>
@@ -17,7 +16,6 @@ Auto::Auto(){
 }
 
 frc2::CommandPtr Auto::makeAuto(std::string autoName){
-    wpi::println("{}", autoName);
     return pathplanner::PathPlannerAuto(autoName).ToPtr();
 }
 
