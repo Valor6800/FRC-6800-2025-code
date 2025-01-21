@@ -22,6 +22,7 @@
 #include <cscore.h>
 #include <frc/geometry/Pose3d.h>
 #include <networktables/NetworkTable.h>
+#include <wpi/print.h>
 
 
 #define ALPHA_TEAM_NUMBER 6801
@@ -104,98 +105,101 @@ namespace Constants {
         The reason that can't happen here is that for functions/variables to be static, the values they use must also be static.
         Because GetTeamNumber isn't static, team number can't be static, and therefore none of the getters can be static either. 
         */
-        // static int teamNumber = frc::RobotController::GetTeamNumber();;
-        static int teamNumber = 6800;
+
+        // frc::RobotController::GetTeamNumber() in simulation doesn't work in a normal static variable, probably because it runs before the HAL is fully initialized
+        static int teamNumber() {
+            return frc::RobotController::GetTeamNumber();
+        }
 
         static bool roughTowardsRedAllianceWall = true;
         static double carpetGrainMultipler = 1.05;
 
-        static units::degree_t pigeonMountPitch(){ switch (teamNumber){ 
+        static units::degree_t pigeonMountPitch(){ switch (teamNumber()){ 
             case ALPHA_TEAM_NUMBER: return 0_deg; 
-            case SIDE_SWIPE_TEAM_NUMBER: return 0_deg;  
+            case SIDE_SWIPE_TEAM_NUMBER: return 0_deg;
             default: return 0.037622284_deg;
         }};
-        static units::degree_t pigeonMountRoll(){ switch (teamNumber){ 
+        static units::degree_t pigeonMountRoll(){ switch (teamNumber()){ 
             case ALPHA_TEAM_NUMBER: return -0.395508_deg;
             case SIDE_SWIPE_TEAM_NUMBER: return 0_deg; // Temp value; TODO: Change it  
             default: return -0.784180343_deg;
         }};
-        static units::degree_t pigeonMountYaw(){ switch (teamNumber){ 
+        static units::degree_t pigeonMountYaw(){ switch (teamNumber()){ 
             case ALPHA_TEAM_NUMBER: return -1.477661_deg; 
             case SIDE_SWIPE_TEAM_NUMBER: return 0_deg; // Temp value; TODO: Change it  
             default: return -90.230049133_deg; 
         }};
 
-        static std::vector<units::turn_t> swerveZeros(){ switch (teamNumber){
+        static std::vector<units::turn_t> swerveZeros(){ switch (teamNumber()){
             case ALPHA_TEAM_NUMBER: return {0.3867_tr, 0.8890_tr, 0.0763_tr, 0.610_tr};
             case SIDE_SWIPE_TEAM_NUMBER: return {0.3106_tr, 0.4369_tr, 0.4780_tr, 0.7372_tr};
             default: return {0.4240722_tr, 0.85498046875_tr, 0.471924_tr, 0.081299_tr};
         }};
-        static double driveGearRatio(){ switch (teamNumber){
+        static double driveGearRatio(){ switch (teamNumber()){
             case ALPHA_TEAM_NUMBER: return 5.51f;
             case SIDE_SWIPE_TEAM_NUMBER: return 5.51f;
             default: return 5.51f;
         }};
-        static double azimuthGearRatio(){ switch (teamNumber){
+        static double azimuthGearRatio(){ switch (teamNumber()){
             case ALPHA_TEAM_NUMBER: return 13.37f;
             case SIDE_SWIPE_TEAM_NUMBER: return 13.37f;
             default: return 13.37f;
         }};
-        static units::meter_t moduleDiff(){ switch (teamNumber){
+        static units::meter_t moduleDiff(){ switch (teamNumber()){
             case ALPHA_TEAM_NUMBER: return 0.2413_m;
             case SIDE_SWIPE_TEAM_NUMBER: return 0.2_m;
             default: return 0.295_m;
         }};
-        static units::meter_t driveBaseRadius(){ switch (teamNumber){
+        static units::meter_t driveBaseRadius(){ switch (teamNumber()){
             case ALPHA_TEAM_NUMBER: return 0.36_m; 
             case SIDE_SWIPE_TEAM_NUMBER: return 0.3_m; 
             default: return 0.4175_m;
         }};
 
-        static std::vector<bool> swerveDrivesReversals(){ switch (teamNumber){
+        static std::vector<bool> swerveDrivesReversals(){ switch (teamNumber()){
             case ALPHA_TEAM_NUMBER: return {true, false, false, false};
             case SIDE_SWIPE_TEAM_NUMBER: return {false, false, false, false};
             default: return {true, false, true, false};
         }};
-        static std::vector<bool> swerveAzimuthsReversals(){ switch (teamNumber){
+        static std::vector<bool> swerveAzimuthsReversals(){ switch (teamNumber()){
             case ALPHA_TEAM_NUMBER: return {true, false, true, true};
             case SIDE_SWIPE_TEAM_NUMBER: return {true, true, true, true};
             default: return {true, false, true, false};
         }};
 
-        static double azimuthKP(){ switch (teamNumber) {
+        static double azimuthKP(){ switch (teamNumber()) {
             case ALPHA_TEAM_NUMBER: return 0.00025;
             case SIDE_SWIPE_TEAM_NUMBER: return 0.00001;
             default: return 100.0;
         }};
-        static units::turns_per_second_t azimuthKVel(){ switch (teamNumber) {
+        static units::turns_per_second_t azimuthKVel(){ switch (teamNumber()) {
             case ALPHA_TEAM_NUMBER: return 6.983_tps;
             case SIDE_SWIPE_TEAM_NUMBER: return 6.983_tps;
             default: return 7.9_tps;
         }};
-        static units::turns_per_second_squared_t azimuthKAcc() { switch (teamNumber) {
+        static units::turns_per_second_squared_t azimuthKAcc() { switch (teamNumber()) {
             case ALPHA_TEAM_NUMBER: return 200_tr_per_s_sq;
             case SIDE_SWIPE_TEAM_NUMBER: return 200_tr_per_s_sq;
             default: return 1000_tr_per_s_sq;
         }};
 
-        static double driveKP(){ switch (teamNumber) {
+        static double driveKP(){ switch (teamNumber()) {
             case ALPHA_TEAM_NUMBER: return 0.00001;
             case SIDE_SWIPE_TEAM_NUMBER: return 0.00001;
             default: return 5.0;
         }};
-        static units::meters_per_second_t driveKVel(){ switch (teamNumber) {
+        static units::meters_per_second_t driveKVel(){ switch (teamNumber()) {
             case ALPHA_TEAM_NUMBER: return 6_mps;
             case SIDE_SWIPE_TEAM_NUMBER: return 6_mps;
             default: return 5.36_mps;
         }};
-        static units::meters_per_second_squared_t driveKAcc(){ switch (teamNumber) {
+        static units::meters_per_second_squared_t driveKAcc(){ switch (teamNumber()) {
             case ALPHA_TEAM_NUMBER: return 120_mps_sq;
             case SIDE_SWIPE_TEAM_NUMBER: return 120_mps_sq;
             default: return 100_mps_sq;
         }};
 
-        static frc::Pose3d mintCameraPosition(){ switch (teamNumber) {
+        static frc::Pose3d mintCameraPosition(){ switch (teamNumber()) {
             case ALPHA_TEAM_NUMBER: return frc::Pose3d();
             case SIDE_SWIPE_TEAM_NUMBER: return frc::Pose3d{
                 0.2921_m, //x
@@ -219,7 +223,7 @@ namespace Constants {
             };
         }};
 
-        static frc::Pose3d vanillaCameraPosition(){ switch (teamNumber) {
+        static frc::Pose3d vanillaCameraPosition(){ switch (teamNumber()) {
             case ALPHA_TEAM_NUMBER: return frc::Pose3d();
             case SIDE_SWIPE_TEAM_NUMBER: return frc::Pose3d(
                 0.2921_m, //x
@@ -242,7 +246,7 @@ namespace Constants {
             );
         }};
 
-        static frc::Pose3d chocolateCameraPosition(){ switch (teamNumber) {
+        static frc::Pose3d chocolateCameraPosition(){ switch (teamNumber()) {
             case ALPHA_TEAM_NUMBER: return frc::Pose3d();
             case SIDE_SWIPE_TEAM_NUMBER: return frc::Pose3d();
             default: return frc::Pose3d(
@@ -257,7 +261,7 @@ namespace Constants {
             );
         }};
 
-        static frc::Pose3d lemonCameraPosition(){ switch (teamNumber){
+        static frc::Pose3d lemonCameraPosition(){ switch (teamNumber()){
             case ALPHA_TEAM_NUMBER: return frc::Pose3d{
                 -0.0635_m,
                 0.3175_m,
@@ -290,7 +294,7 @@ namespace Constants {
             }; // Temp value; TODO: Change it
         }};
 
-        static frc::Pose3d mangoCameraPosition(){ switch (teamNumber){
+        static frc::Pose3d mangoCameraPosition(){ switch (teamNumber()){
             case ALPHA_TEAM_NUMBER: return frc::Pose3d{
                 4_in,
                 -3.5_in,
@@ -323,7 +327,7 @@ namespace Constants {
             };
         }};
 
-        static frc::Pose3d berryCameraPosition(){ switch (teamNumber){
+        static frc::Pose3d berryCameraPosition(){ switch (teamNumber()){
             case ALPHA_TEAM_NUMBER: return frc::Pose3d{}; // Temp value; TODO: Change it
             case SIDE_SWIPE_TEAM_NUMBER: return frc::Pose3d{}; // Temp value; TODO: Change it
             default: return frc::Pose3d{
@@ -338,13 +342,13 @@ namespace Constants {
             };
         }};
 
-        static std::vector<std::pair<const char*, frc::Pose3d>> aprilCameras{
-                    std::pair("limelight-mint", mintCameraPosition()),
-                    std::pair("limelight-choco", chocolateCameraPosition()),
-                    std::pair("limelight-mango", mangoCameraPosition()),
-                    std::pair("limelight-vanilla", vanillaCameraPosition()),
-                    std::pair("limelight-berry", berryCameraPosition())
-        };
+        // static std::vector<std::pair<const char*, frc::Pose3d>> aprilCameras{
+        //             std::pair("limelight-mint", mintCameraPosition()),
+        //             std::pair("limelight-choco", chocolateCameraPosition()),
+        //             std::pair("limelight-mango", mangoCameraPosition()),
+        //             std::pair("limelight-vanilla", vanillaCameraPosition()),
+        //             std::pair("limelight-berry", berryCameraPosition())
+        // };
 }
 
 #ifdef __GNUC__

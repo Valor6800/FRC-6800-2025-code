@@ -44,7 +44,7 @@ class Robot : public frc::TimedRobot {
 
         frc2::CommandPtr autoCommands = frc2::cmd::None();
 
-        Drivetrain drivetrain;
+        // Drivetrain drivetrain;
         valor::Auto valorAuto;
         valor::CharMode charMode;
 };

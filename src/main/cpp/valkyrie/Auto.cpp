@@ -1,19 +1,10 @@
 #include "valkyrie/Auto.h"
-#include <iostream>
-#include "frc2/command/Commands.h"
-#include "pathplanner/lib/auto/AutoBuilder.h"
-#include <frc/Filesystem.h>
-#include <networktables/NetworkTableInstance.h>
-#include <networktables/NetworkTable.h>
-#include <frc/smartdashboard/SmartDashboard.h>
+#include <wpi/print.h>
 #include <pathplanner/lib/commands/PathPlannerAuto.h>
-#include <pathplanner/lib/auto/NamedCommands.h>
-#include <frc2/command/SequentialCommandGroup.h>
-#include <frc2/command/InstantCommand.h>
-#include <frc2/command/WaitCommand.h>
-// 
-#include <filesystem>
-#include <string>
+#include <networktables/NetworkTableInstance.h>
+#include <frc/Filesystem.h>
+#include <frc/smartdashboard/SmartDashboard.h>
+
 using namespace valor;
 using namespace pathplanner;
 
@@ -26,7 +17,8 @@ Auto::Auto(){
 }
 
 frc2::CommandPtr Auto::makeAuto(std::string autoName){
-    return pathplanner::PathPlannerAuto("PP25 Auto - New Main").ToPtr();
+    wpi::println("{}", autoName);
+    return pathplanner::PathPlannerAuto("Test Auto").ToPtr();
     // return pathplanner::PathPlannerAuto(autoName).ToPtr();
 }
 
@@ -37,7 +29,7 @@ frc2::CommandPtr Auto::getSelectedAuto(){
 
 frc2::CommandPtr Auto::getAuto(std::string selection) {
     if (selection == "NONE") return frc2::cmd::None();
-    for (int i = 0; i < loadedAutos.size(); i++) {
+    for (unsigned int i = 0; i < loadedAutos.size(); i++) {
         if (loadedAutos[i].first == selection)
             return std::move(loadedAutos[i].second);
     }
@@ -45,7 +37,7 @@ frc2::CommandPtr Auto::getAuto(std::string selection) {
 }
 
 void Auto::preloadAuto(std::string autoName){
-    for (int i = 0; i < loadedAutos.size(); i++) {
+    for (unsigned int i = 0; i < loadedAutos.size(); i++) {
         if (loadedAutos[i].first == autoName) {
             return ;
         }
@@ -81,7 +73,7 @@ std::string makeFriendlyName(std::string filename){
     // take last part of the path string when divided with /'s - this should be the filename
     filename = filename.substr(filename.find_last_of('/') + 1);
     std::string n_name = "";
-    for (int i = 0; i < filename.length(); i ++){
+    for (unsigned int i = 0; i < filename.length(); i ++){
         // .'s signify the end of the filename and the start of the file extension
         if (filename[i] == '.'){
             break;
