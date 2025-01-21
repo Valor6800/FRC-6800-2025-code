@@ -2,6 +2,7 @@
 #include "frc/AnalogTriggerType.h"
 #include "frc2/command/Commands.h"
 
+#include <frc/simulation/RoboRioSim.h>
 #include <frc/smartdashboard/SmartDashboard.h>
 #include <frc2/command/CommandScheduler.h>
 #include <frc/RobotController.h>
@@ -46,7 +47,11 @@ void Robot::RobotInit() {
  * LiveWindow and SmartDashboard integrated updating.
  */
 void Robot::RobotPeriodic() {
-    frc2::CommandScheduler::GetInstance().Run(); 
+    // std::vector<units::ampere_t> currents{std::move(drivetrain.getCurrents())};
+    // units::volt_t batteryVoltage = batterySim.Calculate(currents);
+    // wpi::println("Battery Voltage: {}", batteryVoltage);
+    // frc::sim::RoboRioSim::SetVInVoltage(batteryVoltage);
+    frc2::CommandScheduler::GetInstance().Run();
 }
 
 /**

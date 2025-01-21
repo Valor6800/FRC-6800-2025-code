@@ -77,41 +77,41 @@ Drivetrain::Drivetrain(frc::TimedRobot *_robot) :
     // /*
     //  * 3.8m/s, 5m/s^2, ~125lbs Apr. 2
     //  */
-    AutoBuilder::configure(
-        [this](){ 
-            wpi::println("Returning current pose...");
-            return drivetrain.GetState().Pose;
-        },
-        [this](frc::Pose2d pose){
-            wpi::println("Resetting current pose...");
-            drivetrain.ResetPose(pose);
-        }, // Method to reset odometry (will be called if your auto has a starting pose)
-        [this](){
-            wpi::println("Getting current ChassisSpeeds");
-            return drivetrain.GetState().Speeds;
-        }, // ChassisSpeeds supplier. MUST BE ROBOT RELATIVE
-        [this](frc::ChassisSpeeds speeds) {
-            wpi::println("Setting ChassisSpeeds");
-            drivetrain.SetControl(autoRobotSpeedsRequest.WithSpeeds(speeds));
-        }, // Method that will drive the robot given ROBOT RELATIVE ChassisSpeeds
-        std::make_shared<PPHolonomicDriveController>(
-            PIDConstants(xPIDF.P, xPIDF.I, xPIDF.D), // Translation PID constants
-            PIDConstants(thetaPIDF.P, thetaPIDF.I, thetaPIDF.D) // Rotation PID constants
-        ),
-        RobotConfig::fromGUISettings(),
-        []() {
-            // Boolean supplier that controls when the path will be mirrored for the red alliance
-            // This will flip the path being followed to the red side of the field.
-            // THE ORIGIN WILL REMAIN ON THE BLUE SIDE
+    // AutoBuilder::configure(
+    //     [this](){ 
+    //         wpi::println("Returning current pose...");
+    //         return drivetrain.GetState().Pose;
+    //     },
+    //     [this](frc::Pose2d pose){
+    //         wpi::println("Resetting current pose...");
+    //         drivetrain.ResetPose(pose);
+    //     }, // Method to reset odometry (will be called if your auto has a starting pose)
+    //     [this](){
+    //         wpi::println("Getting current ChassisSpeeds");
+    //         return drivetrain.GetState().Speeds;
+    //     }, // ChassisSpeeds supplier. MUST BE ROBOT RELATIVE
+    //     [this](frc::ChassisSpeeds speeds) {
+    //         wpi::println("Setting ChassisSpeeds");
+    //         drivetrain.SetControl(autoRobotSpeedsRequest.WithSpeeds(speeds));
+    //     }, // Method that will drive the robot given ROBOT RELATIVE ChassisSpeeds
+    //     std::make_shared<PPHolonomicDriveController>(
+    //         PIDConstants(xPIDF.P, xPIDF.I, xPIDF.D), // Translation PID constants
+    //         PIDConstants(thetaPIDF.P, thetaPIDF.I, thetaPIDF.D) // Rotation PID constants
+    //     ),
+    //     RobotConfig::fromGUISettings(),
+    //     []() {
+    //         // Boolean supplier that controls when the path will be mirrored for the red alliance
+    //         // This will flip the path being followed to the red side of the field.
+    //         // THE ORIGIN WILL REMAIN ON THE BLUE SIDE
 
-            auto alliance = frc::DriverStation::GetAlliance();
-            if (alliance) {
-                return alliance.value() == frc::DriverStation::Alliance::kRed;
-            }
-            return false;
-        },
-        this // Reference to this subsystem to set requirements
-    );
+    //         auto alliance = frc::DriverStation::GetAlliance();
+    //         if (alliance) {
+    //             return alliance.value() == frc::DriverStation::Alliance::kRed;
+    //         }
+    //         return false;
+    //     },
+    //     this // Reference to this subsystem to set requirements
+    // );
     resetState();
     // init();
 }
@@ -214,8 +214,24 @@ void Drivetrain::analyzeDashboard()
     // }
 }
 
+std::vector<units::ampere_t> Drivetrain::getCurrents() {
+    std::vector<units::ampere_t> currents;
+    for (const auto& mod : drivetrain.GetModules()) {
+        currents.insert(
+            currents.end(),
+            {
+                mod->GetDriveMotor().GetSupplyCurrent().GetValue(),
+                mod->GetSteerMotor().GetSupplyCurrent().GetValue(),
+            }
+        );
+    }
+
+    return std::move(currents);
+}
+
 void Drivetrain::assignOutputs()
 {
+    wpi::println("Drivetrain::assignOutputs()");
     Swerve::assignOutputs();
 }
 

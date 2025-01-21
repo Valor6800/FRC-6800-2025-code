@@ -63,6 +63,7 @@ public:
      void analyzeDashboard();
      void assignOutputs();
      void resetState();
+     std::vector<units::ampere_t> getCurrents();
 
      void InitSendable(wpi::SendableBuilder& builder);
 

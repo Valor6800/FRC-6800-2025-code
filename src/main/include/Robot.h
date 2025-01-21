@@ -19,6 +19,7 @@
 #include <frc/DataLogManager.h>
 
 #include <frc/livewindow/LiveWindow.h>
+#include <frc/simulation/BatterySim.h>
 
 #include <fstream>
 #include "frc/DigitalInput.h"
@@ -43,6 +44,7 @@ class Robot : public frc::TimedRobot {
         valor::Gamepad gamepadDriver{OIConstants::GAMEPAD_BASE_LOCATION};
 
         frc2::CommandPtr autoCommands = frc2::cmd::None();
+        frc::sim::BatterySim batterySim;
 
         Drivetrain drivetrain;
         valor::Auto valorAuto;

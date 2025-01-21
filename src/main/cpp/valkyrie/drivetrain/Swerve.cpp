@@ -29,7 +29,7 @@ Swerve<AzimuthMotor, DriveMotor>::Swerve(frc::TimedRobot *_robot, const char* _n
     posePublisher{table->GetStructTopic<frc::Pose2d>("Drivetrain Pose").Publish()}
 {
     frc2::CommandScheduler::GetInstance().RegisterSubsystem(this);
-    // drivetrain.SetControl(fieldCentricRequest);
+    drivetrain.SetControl(fieldCentricRequest);
     // int MDX[] = MODULE_DIFF_XS;
     // int MDY[] = MODULE_DIFF_YS;
     // wpi::array<frc::Translation2d, MODULE_COUNT> motorLocations = wpi::array<frc::Translation2d, MODULE_COUNT>(wpi::empty_array);
@@ -127,6 +127,7 @@ void Swerve<AzimuthMotor, DriveMotor>::analyzeDashboard()
 template<class AzimuthMotor, class DriveMotor>
 void Swerve<AzimuthMotor, DriveMotor>::assignOutputs()
 {
+    wpi::println("{}, {}, {}", xSpeed, ySpeed, rotSpeed);
     fieldCentricRequest
         .WithVelocityX(units::meters_per_second_t{xSpeed * 10_fps})
         .WithVelocityY(units::meters_per_second_t{ySpeed * 10_fps})
