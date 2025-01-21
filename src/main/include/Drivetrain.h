@@ -4,6 +4,7 @@
 #include "valkyrie/sensors/AprilTagsSensor.h"
 #include <frc2/command/FunctionalCommand.h>
 #include <frc/controller/ProfiledPIDController.h>
+#include <frc/smartdashboard/Field2d.h>
 
 #define SWERVE_COUNT 4
 
@@ -106,55 +107,6 @@ private:
      bool alignToTarget;
      units::meter_t horizontalDistance;
 
-     // frc::Pose3d testAprilTag{
-     //      frc::Translation3d{
-     //           144_in,
-     //           158.5_in,
-     //           12.13_in
-     //      },
-     //      frc::Rotation3d{
-     //           0_deg,
-     //           0_deg,
-     //           180_deg
-     //      }
-     // };
-     // frc::Pose3d testAprilTag{
-     //      frc::Translation3d{
-     //           160.39_in,
-     //           130.17_in,
-     //           12.13_in
-     //      },
-     //      frc::Rotation3d{
-     //           0_deg,
-     //           0_deg,
-     //           240_deg
-     //      }
-     // };
-     // frc::Pose3d testAprilTag{
-     //      frc::Translation3d{
-     //           160.39_in,
-     //           186.83_in,
-     //           12.13_in
-     //      },
-     //      frc::Rotation3d{
-     //           0_deg,
-     //           0_deg,
-     //           120_deg
-     //      }
-     // };
-     // frc::Pose3d testAprilTag{
-     //      frc::Translation3d{
-     //           193.10_in,
-     //           186.83_in,
-     //           12.13_in
-     //      },
-     //      frc::Rotation3d{
-     //           0_deg,
-     //           0_deg,
-     //           60_deg
-     //      }
-     // };
-
      frc::Pose3d testAprilTag{
           frc::Translation3d{
                209.49_in,
@@ -169,6 +121,8 @@ private:
      };
 
      nt::StructPublisher<frc::Pose3d> aprilTagPosePublisher;
+     nt::StructPublisher<frc::Pose2d> ppTargetPosePublisher;
+     nt::StructArrayPublisher<frc::Pose2d> ppActivePathPublisher;
      
      std::vector<valor::AprilTagsSensor*> aprilTagSensors;
      // valor::GrappleLidarSensor lidarSensor;

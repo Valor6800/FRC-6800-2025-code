@@ -44,7 +44,7 @@ class Robot : public frc::TimedRobot {
         valor::Gamepad gamepadOperator{OIConstants::GAMEPAD_OPERATOR_LOCATION};
         valor::Gamepad gamepadDriver{OIConstants::GAMEPAD_BASE_LOCATION};
 
-        frc2::CommandPtr autoCommands = frc2::cmd::None();
+        frc2::CommandPtr autoCommand = frc2::cmd::None();
         frc::sim::BatterySim batterySim;
 
         Drivetrain drivetrain;

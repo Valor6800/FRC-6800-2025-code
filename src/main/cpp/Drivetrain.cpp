@@ -3,7 +3,9 @@
 #include "Constants.h"
 #include <pathplanner/lib/auto/AutoBuilder.h>
 #include <pathplanner/lib/controllers/PPHolonomicDriveController.h>
+#include <pathplanner/lib/util/PathPlannerLogging.h>
 #include <frc/DriverStation.h>
+#include <wpi/print.h>
 
 using namespace pathplanner;
 
@@ -39,7 +41,9 @@ const units::meter_t WHEEL_DIAMETER(0.0973_m);
 Drivetrain::Drivetrain(frc::TimedRobot *_robot) : 
     valor::Swerve<SwerveAzimuthMotor, SwerveDriveMotor>(_robot, "Drivetrain"),
     teleopStart(999999999999),
-    aprilTagPosePublisher{table->GetStructTopic<frc::Pose3d>("April Tag Pose").Publish()}
+    aprilTagPosePublisher{table->GetStructTopic<frc::Pose3d>("April Tag Pose").Publish()},
+    ppTargetPosePublisher{table->GetStructTopic<frc::Pose2d>("PP Target Pose").Publish()},
+    ppActivePathPublisher{table->GetStructArrayTopic<frc::Pose2d>("PP Active Path").Publish()}
     // lidarSensor(_robot, "Front Lidar Sensor", CANIDs::FRONT_LIDAR_SENSOR)
 {
     frc::SmartDashboard::PutData("Drivetrain", this);
@@ -76,6 +80,15 @@ Drivetrain::Drivetrain(frc::TimedRobot *_robot) :
         },
         this // Reference to this subsystem to set requirements
     );
+
+    // Current pose is already logged, no need for setLogCurrentPoseCallback
+    PathPlannerLogging::setLogTargetPoseCallback([this](const frc::Pose2d& pose) {
+        ppTargetPosePublisher.Set(pose);
+    });
+    PathPlannerLogging::setLogActivePathCallback([this](const std::vector<frc::Pose2d>& path) {
+        wpi::println("Setting active path");
+        ppActivePathPublisher.Set(path);
+    });
     resetState();
     // init();
 }
@@ -162,7 +175,6 @@ void Drivetrain::assessInputs()
     if (driverGamepad->GetAButtonPressed()) {
         alignToTarget = true;
         trans_controller.Reset(horizontalDistance);
-        wpi::println("{}", horizontalDistance);
         trans_controller.SetGoal(0_m);
     }
 }

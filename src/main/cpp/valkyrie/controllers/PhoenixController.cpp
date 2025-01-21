@@ -38,7 +38,6 @@ PhoenixController::PhoenixController(valor::PhoenixControllerType controllerType
     res_position(getMotor()->GetPosition()),
     res_velocity(getMotor()->GetVelocity())
 {
-    std::cout << "Hello World\n";
     init();
 }
 

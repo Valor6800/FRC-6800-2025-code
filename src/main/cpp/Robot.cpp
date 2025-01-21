@@ -72,18 +72,15 @@ void Robot::DisabledPeriodic() {
  */
 // TODO: re-add the neutral mode back in
 void Robot::AutonomousInit() {
-    // drivetrain.resetState();
-    // drivetrain.doubtX = AUTO_DOUBTX;
-    // drivetrain.doubtY = AUTO_DOUBTY;
-
-    // autoCommands = valorAuto.getSelectedAuto();
-    // autoCommands.Schedule();
-    // autoCommands.clear();
-    // autoCommands.push_back(valorAuto.getSelectedAuto());
-    // autoCommands.back().Schedule();
+    drivetrain.resetState();
+    drivetrain.doubtX = AUTO_DOUBTX;
+    drivetrain.doubtY = AUTO_DOUBTY;
+    autoCommand = valorAuto.getSelectedAuto();
+    autoCommand.Schedule();
 }
 
 void Robot::AutonomousExit() {
+    autoCommand.Cancel();
 }
 
 void Robot::AutonomousPeriodic() {
