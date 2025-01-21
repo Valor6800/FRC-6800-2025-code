@@ -38,13 +38,11 @@ const units::meter_t WHEEL_DIAMETER(0.0973_m);
 #define MT2_POSE true
 
 Drivetrain::Drivetrain(frc::TimedRobot *_robot) : 
-    valor::Swerve<SwerveAzimuthMotor, SwerveDriveMotor>(
-        _robot,
-        "SwerveDrive"
-    ),
+    valor::Swerve<SwerveAzimuthMotor, SwerveDriveMotor>(_robot, "Drivetrain"),
     teleopStart(999999999999)
     // lidarSensor(_robot, "Front Lidar Sensor", CANIDs::FRONT_LIDAR_SENSOR)
 {
+    frc::SmartDashboard::PutData("Drivetrain", this);
     xPIDF.P = KPX;
     xPIDF.I = KIX;
     xPIDF.D = KDX;
@@ -77,41 +75,34 @@ Drivetrain::Drivetrain(frc::TimedRobot *_robot) :
     // /*
     //  * 3.8m/s, 5m/s^2, ~125lbs Apr. 2
     //  */
-    // AutoBuilder::configure(
-    //     [this](){ 
-    //         wpi::println("Returning current pose...");
-    //         return drivetrain.GetState().Pose;
-    //     },
-    //     [this](frc::Pose2d pose){
-    //         wpi::println("Resetting current pose...");
-    //         drivetrain.ResetPose(pose);
-    //     }, // Method to reset odometry (will be called if your auto has a starting pose)
-    //     [this](){
-    //         wpi::println("Getting current ChassisSpeeds");
-    //         return drivetrain.GetState().Speeds;
-    //     }, // ChassisSpeeds supplier. MUST BE ROBOT RELATIVE
-    //     [this](frc::ChassisSpeeds speeds) {
-    //         wpi::println("Setting ChassisSpeeds");
-    //         drivetrain.SetControl(autoRobotSpeedsRequest.WithSpeeds(speeds));
-    //     }, // Method that will drive the robot given ROBOT RELATIVE ChassisSpeeds
-    //     std::make_shared<PPHolonomicDriveController>(
-    //         PIDConstants(xPIDF.P, xPIDF.I, xPIDF.D), // Translation PID constants
-    //         PIDConstants(thetaPIDF.P, thetaPIDF.I, thetaPIDF.D) // Rotation PID constants
-    //     ),
-    //     RobotConfig::fromGUISettings(),
-    //     []() {
-    //         // Boolean supplier that controls when the path will be mirrored for the red alliance
-    //         // This will flip the path being followed to the red side of the field.
-    //         // THE ORIGIN WILL REMAIN ON THE BLUE SIDE
+    AutoBuilder::configure(
+        [this]() { return drivetrain.GetState().Pose; },
+        [this](frc::Pose2d pose) { drivetrain.ResetPose(pose); }, // Method to reset odometry (will be called if your auto has a starting pose)
+        [this](){
+            wpi::println("Getting current ChassisSpeeds");
+            return drivetrain.GetState().Speeds; }, // ChassisSpeeds supplier. MUST BE ROBOT RELATIVE
+        [this](frc::ChassisSpeeds speeds) {
+            wpi::println("Setting ChassisSpeeds");
+            drivetrain.SetControl(autoRobotSpeedsRequest.WithSpeeds(speeds));
+        }, // Method that will drive the robot given ROBOT RELATIVE ChassisSpeeds
+        std::make_shared<PPHolonomicDriveController>(
+            PIDConstants(xPIDF.P, xPIDF.I, xPIDF.D), // Translation PID constants
+            PIDConstants(thetaPIDF.P, thetaPIDF.I, thetaPIDF.D) // Rotation PID constants
+        ),
+        RobotConfig::fromGUISettings(),
+        []() {
+            // Boolean supplier that controls when the path will be mirrored for the red alliance
+            // This will flip the path being followed to the red side of the field.
+            // THE ORIGIN WILL REMAIN ON THE BLUE SIDE
 
-    //         auto alliance = frc::DriverStation::GetAlliance();
-    //         if (alliance) {
-    //             return alliance.value() == frc::DriverStation::Alliance::kRed;
-    //         }
-    //         return false;
-    //     },
-    //     this // Reference to this subsystem to set requirements
-    // );
+            auto alliance = frc::DriverStation::GetAlliance();
+            if (alliance) {
+                return alliance.value() == frc::DriverStation::Alliance::kRed;
+            }
+            return false;
+        },
+        this // Reference to this subsystem to set requirements
+    );
     resetState();
     // init();
 }
@@ -183,9 +174,6 @@ void Drivetrain::init()
 void Drivetrain::assessInputs()
 {
     Swerve::assessInputs();
-
-    // if (!driverGamepad || !driverGamepad->IsConnected() || !operatorGamepad || !operatorGamepad->IsConnected())
-    //     return;
 }
 
 void Drivetrain::analyzeDashboard()
@@ -231,7 +219,6 @@ std::vector<units::ampere_t> Drivetrain::getCurrents() {
 
 void Drivetrain::assignOutputs()
 {
-    wpi::println("Drivetrain::assignOutputs()");
     Swerve::assignOutputs();
 }
 
@@ -280,30 +267,8 @@ frc2::FunctionalCommand* Drivetrain::getResetOdom() {
 // }
 
 void Drivetrain::InitSendable(wpi::SendableBuilder& builder)
-    {
-        Swerve::InitSendable(builder);
+{
+    Swerve::InitSendable(builder);
 
-        builder.SetSmartDashboardType("Subsystem");
-
-        // builder.AddDoubleArrayProperty(
-        //     "Acceleration",
-        //     [this] {
-        //         std::vector<double> acceleration;
-        //         acceleration.push_back(state.accel.x.to<double>());
-        //         acceleration.push_back(state.accel.y.to<double>());
-        //         acceleration.push_back(state.accel.z.to<double>());
-        //         return acceleration;
-        //     },
-        //     nullptr
-        // );
-        // builder.AddBooleanProperty(
-        //     "Bonk!",
-        //     [this] {
-        //         return units::acceleration::meters_per_second_squared_t{
-        //         sqrtf(powf(state.accel.x.to<double>(), 2) + powf(state.accel.y.to<double>(), 2))
-        //     } > 20.0_mps_sq; // ~60 kg bot -> 600 N, 5 measurements * 20ms = .1s, 
-        //                                                                              // impulse = .1 * 600 = 60 Joules
-        //     },
-        //     nullptr
-        // );
-    }
+    builder.SetSmartDashboardType("Subsystem");
+}

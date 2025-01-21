@@ -26,10 +26,9 @@ Robot::Robot() :
 
 void Robot::RobotInit() {
     drivetrain.setGamepads(&gamepadOperator, &gamepadDriver);
-    drivetrain.resetState();
 
-    frc::LiveWindow::EnableAllTelemetry();
-    frc::LiveWindow::SetEnabled(true);
+    // I hate LiveWindow
+    // frc::LiveWindow::EnableAllTelemetry();
     frc::DataLogManager::Start();
 
     // charMode.init();
@@ -47,11 +46,13 @@ void Robot::RobotInit() {
  * LiveWindow and SmartDashboard integrated updating.
  */
 void Robot::RobotPeriodic() {
-    // std::vector<units::ampere_t> currents{std::move(drivetrain.getCurrents())};
-    // units::volt_t batteryVoltage = batterySim.Calculate(currents);
-    // wpi::println("Battery Voltage: {}", batteryVoltage);
-    // frc::sim::RoboRioSim::SetVInVoltage(batteryVoltage);
     frc2::CommandScheduler::GetInstance().Run();
+}
+
+void Robot::SimulationPeriodic() {
+    std::vector<units::ampere_t> currents{std::move(drivetrain.getCurrents())};
+    units::volt_t batteryVoltage = batterySim.Calculate(currents);
+    frc::sim::RoboRioSim::SetVInVoltage(batteryVoltage);
 }
 
 /**
@@ -71,12 +72,12 @@ void Robot::DisabledPeriodic() {
  */
 // TODO: re-add the neutral mode back in
 void Robot::AutonomousInit() {
-    drivetrain.resetState();
-    drivetrain.doubtX = AUTO_DOUBTX;
-    drivetrain.doubtY = AUTO_DOUBTY;
+    // drivetrain.resetState();
+    // drivetrain.doubtX = AUTO_DOUBTX;
+    // drivetrain.doubtY = AUTO_DOUBTY;
 
-    autoCommands = valorAuto.getSelectedAuto();
-    autoCommands.Schedule();
+    // autoCommands = valorAuto.getSelectedAuto();
+    // autoCommands.Schedule();
     // autoCommands.clear();
     // autoCommands.push_back(valorAuto.getSelectedAuto());
     // autoCommands.back().Schedule();
@@ -92,7 +93,7 @@ void Robot::AutonomousPeriodic() {
  * This function is called periodically during operator control.
  */
 void Robot::TeleopPeriodic() {
-    drivetrain.selectedTest = charMode.getSelected();
+    // drivetrain.selectedTest = charMode.getSelected();
 }
 
 /**

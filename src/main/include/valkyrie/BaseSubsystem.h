@@ -9,10 +9,7 @@
 #include <frc/TimedRobot.h>
 
 #include "valkyrie/Gamepad.h"
-
-#include <wpi/sendable/Sendable.h>
-#include <wpi/sendable/SendableBuilder.h>
-#include <wpi/sendable/SendableHelper.h>
+#include <frc/smartdashboard/SmartDashboard.h>
 
 namespace valor {
 
@@ -43,7 +40,7 @@ namespace valor {
  * Descriptions for each function and their intent is listed in the function description
  * 
  */
-class BaseSubsystem : public frc2::Subsystem, public wpi::Sendable, public wpi::SendableHelper<BaseSubsystem> {
+class BaseSubsystem : public frc2::SubsystemBase {
     public:
 
         /**
@@ -57,13 +54,13 @@ class BaseSubsystem : public frc2::Subsystem, public wpi::Sendable, public wpi::
          * @param _robot Pass in the Robot reference so robot state can be auto-determined
          * @param name A human readable name of the subsystem 
          */
-        BaseSubsystem(frc::TimedRobot *_robot, const char* name) :
-            robot(_robot), subsystemName(name),
+        BaseSubsystem(frc::TimedRobot *_robot, std::string name) :
+            frc2::SubsystemBase{name},
+            robot(_robot),
             operatorGamepad(NULL),
             driverGamepad(NULL)
         {
-            table = nt::NetworkTableInstance::GetDefault().GetTable(name);
-            wpi::SendableRegistry::AddLW(this, "BaseSubsystem", subsystemName);
+            table = nt::NetworkTableInstance::GetDefault().GetTable("SmartDashboard/" + name);
         }
         
         /**
@@ -167,7 +164,6 @@ class BaseSubsystem : public frc2::Subsystem, public wpi::Sendable, public wpi::
         std::shared_ptr<nt::NetworkTable> table;
 
         frc::TimedRobot *robot;
-        const char* subsystemName;
 
         valor::Gamepad *operatorGamepad;
         valor::Gamepad *driverGamepad;
@@ -175,7 +171,7 @@ class BaseSubsystem : public frc2::Subsystem, public wpi::Sendable, public wpi::
     private:
         
         void Periodic()
-        {       
+        {
             if (robot->IsTeleop())
                 assessInputs();
 
