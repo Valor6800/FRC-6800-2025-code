@@ -214,7 +214,7 @@ std::vector<units::ampere_t> Drivetrain::getCurrents() {
         );
     }
 
-    return std::move(currents);
+    return currents;
 }
 
 void Drivetrain::assignOutputs()
