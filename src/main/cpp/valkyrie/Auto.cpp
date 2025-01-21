@@ -18,8 +18,7 @@ Auto::Auto(){
 
 frc2::CommandPtr Auto::makeAuto(std::string autoName){
     wpi::println("{}", autoName);
-    return pathplanner::PathPlannerAuto("Test Auto").ToPtr();
-    // return pathplanner::PathPlannerAuto(autoName).ToPtr();
+    return pathplanner::PathPlannerAuto(autoName).ToPtr();
 }
 
 frc2::CommandPtr Auto::getSelectedAuto(){
@@ -29,10 +28,10 @@ frc2::CommandPtr Auto::getSelectedAuto(){
 
 frc2::CommandPtr Auto::getAuto(std::string selection) {
     if (selection == "NONE") return frc2::cmd::None();
-    for (unsigned int i = 0; i < loadedAutos.size(); i++) {
-        if (loadedAutos[i].first == selection)
-            return std::move(loadedAutos[i].second);
-    }
+    // for (unsigned int i = 0; i < loadedAutos.size(); i++) {
+    //     if (loadedAutos[i].first == selection)
+    //         return std::move(loadedAutos[i].second);
+    // }
     return makeAuto(selection);
 }
 
@@ -49,7 +48,7 @@ void Auto::preloadAuto(std::string autoName){
 }
 
 void Auto::preloadSelectedAuto(){
-    if (m_chooser.GetSelected() != "" && m_chooser.GetSelected().find("NONE") == std::string::npos) {
+    if (m_chooser.GetSelected() != "NONE") {
         preloadAuto(m_chooser.GetSelected());
     }
 }
@@ -107,9 +106,20 @@ std::vector<std::string> listDirectory(std::string path_name){
 }
 
 void Auto::fillAutoList(){
-    for (std::string path : listDirectory(frc::filesystem::GetDeployDirectory() + "/pathplanner/autos")){
-        // if (path.find("NONE") != std::string::npos) {continue;}
-        m_chooser.AddOption(path, path);
+    // for (std::string path : listDirectory(frc::filesystem::GetDeployDirectory() + "/pathplanner/autos")){
+    //     // if (path.find("NONE") != std::string::npos) {continue;}
+    //     wpi::println("{}", makeFriendlyName(removeFileType(path)));
+    //     m_chooser.AddOption(path, path);
+    // }
+
+    for (const auto& entry : std::filesystem::directory_iterator{frc::filesystem::GetDeployDirectory() + "/pathplanner/autos"}) {
+        if (!entry.is_regular_file()) continue;
+        std::string name = entry.path().stem().string();
+        if (name.empty()) continue;
+        std::replace(name.begin(), name.end(), '_', ' ');
+        name[0] = std::toupper(name[0]);
+
+        m_chooser.AddOption(name, name);
     }
     frc::SmartDashboard::PutData(&m_chooser);
 }

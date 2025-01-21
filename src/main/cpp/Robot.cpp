@@ -19,13 +19,13 @@
 #define SEGMENTS 2
 
 Robot::Robot() :
-    // drivetrain(this),
+    drivetrain(this),
     valorAuto()
 {}
 
 void Robot::RobotInit() {
-    // drivetrain.setGamepads(&gamepadOperator, &gamepadDriver);
-    // drivetrain.resetState();
+    drivetrain.setGamepads(&gamepadOperator, &gamepadDriver);
+    drivetrain.resetState();
 
     frc::LiveWindow::EnableAllTelemetry();
     frc::LiveWindow::SetEnabled(true);
@@ -57,7 +57,7 @@ void Robot::RobotPeriodic() {
 void Robot::DisabledInit() { }
 
 void Robot::DisabledPeriodic() { 
-    valorAuto.preloadSelectedAuto();
+    // valorAuto.preloadSelectedAuto();
 }
 
 /**
@@ -66,9 +66,9 @@ void Robot::DisabledPeriodic() {
  */
 // TODO: re-add the neutral mode back in
 void Robot::AutonomousInit() {
-    // drivetrain.resetState();
-    // drivetrain.doubtX = AUTO_DOUBTX;
-    // drivetrain.doubtY = AUTO_DOUBTY;
+    drivetrain.resetState();
+    drivetrain.doubtX = AUTO_DOUBTX;
+    drivetrain.doubtY = AUTO_DOUBTY;
 
     autoCommands = valorAuto.getSelectedAuto();
     autoCommands.Schedule();
@@ -87,7 +87,7 @@ void Robot::AutonomousPeriodic() {
  * This function is called periodically during operator control.
  */
 void Robot::TeleopPeriodic() {
-    // drivetrain.selectedTest = charMode.getSelected();
+    drivetrain.selectedTest = charMode.getSelected();
 }
 
 /**
