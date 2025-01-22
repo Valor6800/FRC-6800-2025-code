@@ -52,6 +52,7 @@ void Robot::RobotPeriodic() {
 void Robot::SimulationPeriodic() {
     std::vector<units::ampere_t> currents{std::move(drivetrain.getCurrents())};
     units::volt_t batteryVoltage = batterySim.Calculate(currents);
+    frc::SmartDashboard::PutNumber("Simulated Battery Voltage", batteryVoltage.value());
     frc::sim::RoboRioSim::SetVInVoltage(batteryVoltage);
 }
 

@@ -39,24 +39,26 @@ const units::meter_t WHEEL_DIAMETER(0.0973_m);
 #define MT2_POSE true
 #define MAKE_VECTOR(angle) Eigen::Vector2d{units::math::cos(angle).value(), units::math::sin(angle).value()}
 
-constexpr frc::Translation2d REEF_POS{176.745_in, 158.5_in};
+constexpr frc::Translation2d BLUE_REEF_POS{176.745_in, 158.5_in};
+constexpr frc::Translation2d RED_REEF_POS{514.13_in, 158.5_in};
 
 constexpr int SIMULATION_APRILTAG_ID = 7;
 constexpr frc::Pose3d SIMULATION_APRILTAG{
     frc::Translation3d{
-        144.0_in,
-        158.50_in,
+        546.87_in,
+        158.5_in,
         12.13_in
     },
     frc::Rotation3d{
         0_deg,
         0_deg,
-        180_deg
+        0_deg
     }
 };
-constexpr frc::Pose2d SIMULATION_STARTPOSE{
+// Transformation from the origin of the alliance
+constexpr frc::Transform2d SIMULATION_START{
     frc::Translation2d{1_m, 4_m},
-    0_deg
+    45_deg
 };
 
 Drivetrain::Drivetrain(frc::TimedRobot *_robot) : 
@@ -120,6 +122,7 @@ Drivetrain::Drivetrain(frc::TimedRobot *_robot) :
 
     trans_controller.SetTolerance(40_mm, .01_mps);
     trans_controller.SetGoal(0_m);
+    fieldCentricFacingAngleRequest.RotationalDeadband = 0.5_deg_per_s;
     init();
 }
 
@@ -128,7 +131,16 @@ Drivetrain::~Drivetrain(){}
 void Drivetrain::resetState()
 {
     Swerve::resetState();
-    drivetrain.ResetPose(SIMULATION_STARTPOSE);
+    auto alliance = frc::DriverStation::GetAlliance().value_or(frc::DriverStation::Alliance::kBlue);
+    if (frc::RobotBase::IsSimulation()) {
+        if (alliance == frc::DriverStation::Alliance::kBlue)
+            drivetrain.ResetPose(frc::Pose2d{} + SIMULATION_START);
+        else
+            drivetrain.ResetPose(frc::Pose2d{frc::Translation2d{690.88_in, 317_in}, 180_deg} + SIMULATION_START);
+    }
+    if (alliance == frc::DriverStation::Alliance::kRed)
+        drivetrain.SetOperatorPerspectiveForward(180_deg);
+    drivetrain.SetControl(fieldCentricRequest);
 }
 
 void Drivetrain::init()
@@ -188,8 +200,12 @@ void Drivetrain::analyzeDashboard()
         }
         if (!reefTag) {
             // Align to center of reef
-            frc::Translation2d botReefCenterTrans = REEF_POS - drivetrain.GetState().Pose.Translation();
+            const frc::Translation2d& allianceReef = frc::DriverStation::GetAlliance().value_or(frc::DriverStation::Alliance::kBlue) == frc::DriverStation::Alliance::kBlue ? BLUE_REEF_POS : RED_REEF_POS;
+            frc::Translation2d botReefCenterTrans = allianceReef - drivetrain.GetState().Pose.Translation();
+            if (frc::DriverStation::GetAlliance().value_or(frc::DriverStation::Alliance::kBlue) == frc::DriverStation::Alliance::kRed)
+                botReefCenterTrans = -botReefCenterTrans;
             fieldCentricFacingAngleRequest.TargetDirection = units::math::atan2(botReefCenterTrans.Y(), botReefCenterTrans.X());
+            wpi::println("Target direction: {}", fieldCentricFacingAngleRequest.TargetDirection.Degrees());
             xSpeedMPS = 10_mps * xSpeed;
             ySpeedMPS = 10_mps * ySpeed;
         } else {
