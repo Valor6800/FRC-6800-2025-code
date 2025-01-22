@@ -341,13 +341,15 @@ namespace Constants {
             };
         }};
 
-        // static std::vector<std::pair<const char*, frc::Pose3d>> aprilCameras{
-        //             std::pair("limelight-mint", mintCameraPosition()),
-        //             std::pair("limelight-choco", chocolateCameraPosition()),
-        //             std::pair("limelight-mango", mangoCameraPosition()),
-        //             std::pair("limelight-vanilla", vanillaCameraPosition()),
-        //             std::pair("limelight-berry", berryCameraPosition())
-        // };
+        static std::vector<std::pair<const char*, frc::Pose3d>> aprilCameras() {
+            return {
+                std::make_pair("limelight-mint", mintCameraPosition()),
+                std::make_pair("limelight-choco", chocolateCameraPosition()),
+                std::make_pair("limelight-mango", mangoCameraPosition()),
+                std::make_pair("limelight-vanilla", vanillaCameraPosition()),
+                std::make_pair("limelight-berry", berryCameraPosition())
+            };
+        }
 }
 
 #ifdef __GNUC__

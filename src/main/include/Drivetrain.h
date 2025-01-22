@@ -91,13 +91,10 @@ public:
 private:
 
      std::vector<std::pair<SwerveAzimuthMotor*, SwerveDriveMotor*>> generateModules();
+     units::degree_t getTagAngle(int id);
 
-     const units::radians_per_second_t MAX_ROTATION_VEL = 16_rad_per_s;
-     const units::radians_per_second_squared_t MAX_ROTATION_ACCEL = 12_rad_per_s_sq;
      const units::meters_per_second_t MAX_TRANSLATION_VEL = 5.5_mps;
      const units::meters_per_second_squared_t MAX_TRANSLATION_ACCEL = 1_mps_sq;
-     // frc::TrapezoidProfile<units::radian_t>::Constraints rot_constraints{MAX_ROTATION_VEL, MAX_ROTATION_ACCEL};
-     // frc::ProfiledPIDController<units::radian_t> rot_controller{3, 0, 0.5};
      frc::TrapezoidProfile<units::meter>::Constraints trans_constraints{MAX_TRANSLATION_VEL, MAX_TRANSLATION_ACCEL};
      frc::ProfiledPIDController<units::meter> trans_controller{1, 0, 0, trans_constraints};
 
@@ -107,18 +104,10 @@ private:
      bool alignToTarget;
      units::meter_t horizontalDistance;
 
-     frc::Pose3d testAprilTag{
-          frc::Translation3d{
-               209.49_in,
-               158.5_in,
-               12.13_in
-          },
-          frc::Rotation3d{
-               0_deg,
-               0_deg,
-               0_deg
-          }
-     };
+     double xSpeed, ySpeed, rotSpeed;
+     units::meters_per_second_t xSpeedMPS, ySpeedMPS;
+     units::turns_per_second_t rotSpeedTPS;
+     std::optional<int> reefTag;
 
      nt::StructPublisher<frc::Pose3d> aprilTagPosePublisher;
      nt::StructPublisher<frc::Pose2d> ppTargetPosePublisher;

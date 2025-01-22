@@ -70,14 +70,6 @@ public:
     void InitSendable(wpi::SendableBuilder& builder) override;
 
 protected:
-    double xSpeed;
-    double ySpeed;
-    double rotSpeed;
-
-    units::meters_per_second_t xSpeedMPS;
-    units::meters_per_second_t ySpeedMPS;
-    units::radians_per_second_t rotSpeedRPS;
-
     units::meters_per_second_t maxDriveSpeed;
     units::radians_per_second_t maxRotationSpeed;
 
@@ -113,8 +105,6 @@ private:
                                                                     units::angular_velocity::radians_per_second_t,
                                                                     bool);
     wpi::array<frc::SwerveModuleState, MODULE_COUNT> getModuleStates(frc::ChassisSpeeds chassisSpeeds);
-
-    double _drivetrain_accel;
 
     bool useCarpetGrain;
     double carpetGrainMultiplier;

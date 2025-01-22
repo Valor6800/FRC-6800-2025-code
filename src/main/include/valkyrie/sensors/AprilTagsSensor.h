@@ -37,6 +37,8 @@ namespace valor
                 double doubtX = 1, double doubtY = 1, double doubtRot = 1
             );
             frc::Pose3d getPoseFromAprilTag();
+            frc::Pose3d getTargetToBotPose();
+            frc::Pose3d get_botpose_targetspace();
 
             struct Orientation {
                 units::degree_t yaw, pitch, roll;

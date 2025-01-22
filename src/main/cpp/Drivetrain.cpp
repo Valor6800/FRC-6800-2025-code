@@ -37,6 +37,27 @@ const units::meter_t WHEEL_DIAMETER(0.0973_m);
 #define TIME_TELEOP_VERT 105.0f
 
 #define MT2_POSE true
+#define MAKE_VECTOR(angle) Eigen::Vector2d{units::math::cos(angle).value(), units::math::sin(angle).value()}
+
+constexpr frc::Translation2d REEF_POS{176.745_in, 158.5_in};
+
+constexpr int SIMULATION_APRILTAG_ID = 7;
+constexpr frc::Pose3d SIMULATION_APRILTAG{
+    frc::Translation3d{
+        144.0_in,
+        158.50_in,
+        12.13_in
+    },
+    frc::Rotation3d{
+        0_deg,
+        0_deg,
+        180_deg
+    }
+};
+constexpr frc::Pose2d SIMULATION_STARTPOSE{
+    frc::Translation2d{1_m, 4_m},
+    0_deg
+};
 
 Drivetrain::Drivetrain(frc::TimedRobot *_robot) : 
     valor::Swerve<SwerveAzimuthMotor, SwerveDriveMotor>(_robot, "Drivetrain"),
@@ -47,8 +68,8 @@ Drivetrain::Drivetrain(frc::TimedRobot *_robot) :
     // lidarSensor(_robot, "Front Lidar Sensor", CANIDs::FRONT_LIDAR_SENSOR)
 {
     frc::SmartDashboard::PutData("Drivetrain", this);
-    fieldCentricFacingAngleRequest.HeadingController.SetPID(1, 0, 0);
-    aprilTagPosePublisher.Set(testAprilTag);
+    fieldCentricFacingAngleRequest.HeadingController.SetPID(3, 0, 0.5);
+    aprilTagPosePublisher.Set(SIMULATION_APRILTAG);
     xPIDF.P = KPX;
     xPIDF.I = KIX;
     xPIDF.D = KDX;
@@ -56,6 +77,13 @@ Drivetrain::Drivetrain(frc::TimedRobot *_robot) :
     thetaPIDF.P = KPT;
     thetaPIDF.I = KIT;
     thetaPIDF.D = KDT;
+
+    for (const auto& [name, pos] : Constants::aprilCameras()) {
+        aprilTagSensors.push_back(new valor::AprilTagsSensor{robot, name, pos});
+        aprilTagSensors.back()->setPipe(valor::VisionSensor::PIPELINE_0);
+    }
+    aprilTagSensors[4]->setPipe(valor::VisionSensor::PIPELINE_1);
+    aprilTagSensors[4]->setCameraPose(Constants::aprilCameras()[4].second);
 
     AutoBuilder::configure(
         [this]() { return drivetrain.GetState().Pose; },
@@ -86,10 +114,12 @@ Drivetrain::Drivetrain(frc::TimedRobot *_robot) :
         ppTargetPosePublisher.Set(pose);
     });
     PathPlannerLogging::setLogActivePathCallback([this](const std::vector<frc::Pose2d>& path) {
-        wpi::println("Setting active path");
         ppActivePathPublisher.Set(path);
     });
     resetState();
+
+    trans_controller.SetTolerance(40_mm, .01_mps);
+    trans_controller.SetGoal(0_m);
     // init();
 }
 
@@ -147,17 +177,7 @@ std::vector<std::pair<SwerveAzimuthMotor*, SwerveDriveMotor*>> Drivetrain::gener
 void Drivetrain::resetState()
 {
     Swerve::resetState();
-    // Roughly facing the center AprilTag
-    // drivetrain.ResetTranslation(frc::Translation2d{7_m, 7_m});
-    drivetrain.ResetPose(
-        frc::Pose2d{
-            frc::Translation2d{7_m, 7_m},
-            45_deg
-        }
-    );
-
-    // resetEncoders();
-    // resetOdometry(frc::Pose2d{0_m, 0_m, 0_rad});
+    drivetrain.ResetPose(SIMULATION_STARTPOSE);
 }
 
 void Drivetrain::init()
@@ -165,23 +185,79 @@ void Drivetrain::init()
     // Swerve::init();
 }
 
-#include <wpi/print.h>
 void Drivetrain::assessInputs()
 {
     Swerve::assessInputs();
-    frc::Pose2d aprilTagPose = testAprilTag.ToPose2d();
-    frc::Pose2d botRelativeToTag = drivetrain.GetState().Pose.RelativeTo(aprilTagPose);
-    horizontalDistance = -botRelativeToTag.Y();
+
+    if (!driverGamepad || !driverGamepad->IsConnected())
+        return;
+
+    if (driverGamepad->GetBackButtonPressed())
+        drivetrain.ResetRotation(frc::Rotation2d{0_deg});
+
+    xSpeed = driverGamepad->leftStickY(2);
+    ySpeed = driverGamepad->leftStickX(2);
+    rotSpeed = driverGamepad->rightStickX(3);
+
     if (driverGamepad->GetAButtonPressed()) {
         alignToTarget = true;
+        // To prevent drivetrain from immediately trying to go to 0 degrees or previous setting
+        drivetrain.SetControl(fieldCentricFacingAngleRequest.WithTargetDirection(drivetrain.GetRotation3d().ToRotation2d()));
         trans_controller.Reset(horizontalDistance);
-        trans_controller.SetGoal(0_m);
+    } else if (driverGamepad->GetAButtonReleased()) {
+        alignToTarget = false;
+        reefTag.reset();
+        drivetrain.SetControl(fieldCentricRequest);
     }
 }
 
 void Drivetrain::analyzeDashboard()
 {
     Swerve::analyzeDashboard();
+    if (alignToTarget) {
+        if (frc::RobotBase::IsSimulation()) {
+            // reefTag = SIMULATION_APRILTAG_ID;
+            fieldCentricFacingAngleRequest.TargetDirection = getTagAngle(SIMULATION_APRILTAG_ID);
+            horizontalDistance = drivetrain.GetState().Pose.RelativeTo(SIMULATION_APRILTAG.ToPose2d()).Y();
+        } else {
+            for (valor::AprilTagsSensor *aprilLime : aprilTagSensors) {
+                if (!aprilLime->hasTarget()) continue;
+                int id = aprilLime->getTagID();
+                if (!reefTag) {
+                    // Check if tag belongs on the reef
+                    if (frc::DriverStation::GetAlliance() == frc::DriverStation::Alliance::kRed) {
+                        if (id >= 6 && id <= 11) reefTag = id;
+                    } else if (id >= 17 && id <= 22) reefTag = id;
+                    if (reefTag) fieldCentricFacingAngleRequest.TargetDirection = getTagAngle(id);
+                } else if (id == reefTag.value()) {
+                    // TODO: Only update horizontal distance if new depth is closer than old (if the measurement is more likely to be more accurate)
+                    horizontalDistance = aprilLime->get_botpose_targetspace().X();
+                }
+            }
+        }
+        if (!reefTag) {
+            // Align to center of reef
+            fieldCentricFacingAngleRequest.TargetDirection = units::math::atan2(REEF_POS.Y() - drivetrain.GetState().Pose.Y(), REEF_POS.X() - drivetrain.GetState().Pose.X());
+            wpi::println("Target direction: {}", fieldCentricFacingAngleRequest.TargetDirection.Degrees());
+            xSpeedMPS = 10_mps * xSpeed;
+            ySpeedMPS = 10_mps * ySpeed;
+        } else {
+            // Once center of reef implemented, this check is not necessary
+            units::degree_t reefAngle = getTagAngle(reefTag.value());
+            Eigen::Vector2d joystickVector{xSpeed, ySpeed};
+            Eigen::Vector2d reefVector = MAKE_VECTOR(reefAngle);
+            joystickVector = joystickVector.dot(reefVector) * reefVector;
+
+            Eigen::Vector2d pidVector = MAKE_VECTOR(reefAngle - 90_deg) * (units::meters_per_second_t{trans_controller.Calculate(horizontalDistance)} + trans_controller.GetSetpoint().velocity).value();
+            Eigen::Vector2d powerVector = pidVector + joystickVector;
+            xSpeedMPS = units::meters_per_second_t{powerVector.x()};
+            ySpeedMPS = units::meters_per_second_t{powerVector.y()};
+        }
+    } else {
+        xSpeedMPS = 10_mps * xSpeed;
+        ySpeedMPS = 10_mps * ySpeed;
+        rotSpeedTPS = 10_tps * rotSpeed;
+    }
 
     // visionAcceptanceRadius = (units::meter_t) table->GetNumber("Vision Acceptance", VISION_ACCEPTANCE.to<double>());
 
@@ -225,16 +301,15 @@ void Drivetrain::assignOutputs()
     Swerve::assignOutputs();
 
     if (alignToTarget) {
-        units::meters_per_second_t transSpeed = units::meters_per_second_t{trans_controller.Calculate(horizontalDistance)} + trans_controller.GetSetpoint().velocity;
-        frc::Rotation2d transRotation = testAprilTag.Rotation().ToRotation2d() - 90_deg;
-        Eigen::Vector2d transVector{transRotation.Cos(), transRotation.Sin()};
-        transVector *= transSpeed.value();
-
+        // TargetDirection is already set in analyzeDashboard
         fieldCentricFacingAngleRequest
-            .WithVelocityX(units::meters_per_second_t{transVector[0]})
-            .WithVelocityY(units::meters_per_second_t{transVector[1]})
-            .WithTargetDirection(testAprilTag.Rotation().ToRotation2d().RotateBy(180_deg));
-        drivetrain.SetControl(fieldCentricFacingAngleRequest);
+            .WithVelocityX(xSpeedMPS)
+            .WithVelocityY(ySpeedMPS);
+    } else {
+        fieldCentricRequest
+            .WithVelocityX(xSpeedMPS)
+            .WithVelocityY(ySpeedMPS)
+            .WithRotationalRate(rotSpeedTPS);
     }
 }
 
@@ -273,6 +348,24 @@ frc2::FunctionalCommand* Drivetrain::getResetOdom() {
         },
         {}
     );
+}
+
+units::degree_t Drivetrain::getTagAngle(int id) {
+    if      (id == 6) return -60_deg;
+    else if (id == 7) return 0_deg;
+    else if (id == 8) return 60_deg;
+    else if (id == 9) return 120_deg;
+    else if (id == 10) return 180_deg;
+    else if (id == 11) return -120_deg;
+    else if (id == 17) return 120_deg;
+    else if (id == 18) return 180_deg;
+    else if (id == 19) return -120_deg;
+    else if (id == 20) return -30_deg;
+    else if (id == 21) return 0_deg;
+    else if (id == 22) return 30_deg;
+
+    // FIXME: Panic some other way
+    return 0_deg;
 }
 
 // void Drivetrain::setDriveMotorNeutralMode(valor::NeutralMode mode) {

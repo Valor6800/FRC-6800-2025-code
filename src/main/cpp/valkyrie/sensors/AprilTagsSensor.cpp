@@ -96,6 +96,47 @@ void AprilTagsSensor::applyVisionMeasurement(frc::SwerveDrivePoseEstimator<4> *e
     );
 }
 
+frc::Pose3d AprilTagsSensor::getTargetToBotPose() {
+    if (!hasTarget()) return frc::Pose3d();
+
+    std::vector<double> targetToBot = limeTable->GetNumberArray("targetpose_robotspace", std::span<double>());
+
+    if (targetToBot.size() == 0) return frc::Pose3d();
+
+    return frc::Pose3d(
+        units::meter_t{targetToBot[0]},
+        units::meter_t{targetToBot[1]},
+        units::meter_t{targetToBot[2]},
+        frc::Rotation3d(
+            units::degree_t{targetToBot[3]},
+            units::degree_t{targetToBot[4]},
+            units::degree_t{targetToBot[5]}
+        )
+    );
+
+}
+
+frc::Pose3d AprilTagsSensor::get_botpose_targetspace() {
+    if (!hasTarget()) return frc::Pose3d();
+
+    std::vector<double> targetToBot = limeTable->GetNumberArray("botpose_targetspace", std::span<double>());
+
+    if (targetToBot.size() == 0) return frc::Pose3d();
+
+    return frc::Pose3d(
+        units::meter_t{targetToBot[0]},
+        units::meter_t{targetToBot[1]},
+        units::meter_t{targetToBot[2]},
+        frc::Rotation3d(
+            units::degree_t{targetToBot[3]},
+            units::degree_t{targetToBot[4]},
+            units::degree_t{targetToBot[5]}
+        )
+    );
+
+}
+
+
 int AprilTagsSensor::getTagID(){
     if (!hasTarget()) return -1;
 

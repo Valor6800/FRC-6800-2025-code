@@ -71,17 +71,7 @@ void Swerve<AzimuthMotor, DriveMotor>::init()
 
 template<class AzimuthMotor, class DriveMotor>
 void Swerve<AzimuthMotor, DriveMotor>::assessInputs()
-{
-    if (!driverGamepad || !driverGamepad->IsConnected())
-        return;
-
-    if (driverGamepad->GetBackButtonPressed())
-        drivetrain.ResetRotation(frc::Rotation2d{0_deg});
-
-    xSpeed = driverGamepad->leftStickY(2);
-    ySpeed = driverGamepad->leftStickX(2);
-    rotSpeed = driverGamepad->rightStickX(3);
-}
+{}
 
 template<class AzimuthMotor, class DriveMotor>
 void Swerve<AzimuthMotor, DriveMotor>::analyzeDashboard()
@@ -96,13 +86,7 @@ void Swerve<AzimuthMotor, DriveMotor>::analyzeDashboard()
 
 template<class AzimuthMotor, class DriveMotor>
 void Swerve<AzimuthMotor, DriveMotor>::assignOutputs()
-{
-    // Random max speed, needs to be tuned to reflect real robot
-    fieldCentricRequest
-        .WithVelocityX(units::meters_per_second_t{xSpeed * 10_fps})
-        .WithVelocityY(units::meters_per_second_t{ySpeed * 10_fps})
-        .WithRotationalRate(rotSpeed * 10_tps);
-}
+{}
 
 template<class AzimuthMotor, class DriveMotor>
 void Swerve<AzimuthMotor, DriveMotor>::drive(
