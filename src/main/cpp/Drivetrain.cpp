@@ -93,6 +93,18 @@ Drivetrain::Drivetrain(frc::TimedRobot *_robot) :
     thetaPIDF.I = KIT;
     thetaPIDF.D = KDT;
 
+    table->PutNumber("Rot_Pos_Tol", Swerve::rotPosTolerance.to<double>());
+    table->PutNumber("Rot_Vel_Tol", Swerve::rotVelTolerance.to<double>());
+
+    table->PutNumber("Y_Pos_Tol", Swerve::yPosTolerance.to<double>());
+    table->PutNumber("Y_Vel_Tol", Swerve::yVelTolerance.to<double>());
+
+    table->PutNumber("Y_KP", Swerve::Y_KP);
+    table->PutNumber("Y_KD", Swerve::Y_KD);
+
+    table->PutNumber("Rot_KP", Swerve::ROT_KP);
+    table->PutNumber("Rot_KD", Swerve::ROT_KD);
+
     table->PutNumber("Vision Std", 3.0);
     table->PutNumber("Vision Acceptance", VISION_ACCEPTANCE.to<double>() );
     table->PutNumber("KPLIMELIGHT", KP_LIMELIGHT);
@@ -260,11 +272,19 @@ void Drivetrain::assessInputs()
 
 void Drivetrain::analyzeDashboard()
 {
+    Swerve::ROT_KP = table->GetNumber("Rot_KP", Swerve::ROT_KP);
+    Swerve::ROT_KD = table->GetNumber("Rot_KD", Swerve::ROT_KD);
 
+    Swerve::Y_KP = table->GetNumber("Y_KP", Swerve::Y_KP);
+    Swerve::Y_KD = table->GetNumber("Y_KD", Swerve::Y_KD);
 
-    alignAngleTags();
+    Swerve::rotPosTolerance = table->GetNumber("Rot_Pos_Tol", Swerve::rotPosTolerance.to<double>()) * 1_deg;
+    Swerve::rotVelTolerance = table->GetNumber("Rot_Vel_Tol", Swerve::rotVelTolerance.to<double>()) * 1_deg_per_s;
 
-     
+    Swerve::yPosTolerance = table->GetNumber("Y_Pos_Tol", Swerve::yPosTolerance.to<double>()) * 1_mm;
+    Swerve::yVelTolerance = table->GetNumber("Y_Vel_Tol", Swerve::yVelTolerance.to<double>()) * 1_mps;
+
+    alignAngleTags(); 
 
     Swerve::analyzeDashboard();
 

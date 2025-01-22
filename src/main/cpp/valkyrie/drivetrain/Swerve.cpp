@@ -22,22 +22,6 @@
 const units::hertz_t KP_ROTATE(-90);
 const units::hertz_t KD_ROTATE(-30);
 
-// fix these
-#define BLUE_REEF_17_ANGLE 120_deg
-#define BLUE_REEF_18_ANGLE 180_deg
-#define BLUE_REEF_19_ANGLE -120_deg
-#define BLUE_REEF_20_ANGLE -30_deg
-#define BLUE_REEF_21_ANGLE 0_deg
-#define BLUE_REEF_22_ANGLE  30_deg
-
-// these are correct
-#define RED_REEF_6_ANGLE -60_deg
-#define RED_REEF_7_ANGLE 0_deg
-#define RED_REEF_8_ANGLE 60_deg
-#define RED_REEF_9_ANGLE 120_deg
-#define RED_REEF_10_ANGLE 180_deg
-#define RED_REEF_11_ANGLE -120_deg
-
 
 #define MAKE_VECTOR(angle) Eigen::Vector2d{units::math::cos(angle).value(), units::math::sin(angle).value()}
 
@@ -74,17 +58,9 @@ Swerve<AzimuthMotor, DriveMotor>::Swerve(frc::TimedRobot *_robot,
         ));
     }
 
-    table->PutNumber("Y_KP", 0.0);
-    table->PutNumber("Y_KD", 0.0);
-    table->PutNumber("Y_KI", 0.0);
 
-    table->PutNumber("Rot_KP", ROT_KP);
-    table->PutNumber("Rot_KD", ROT_KD);
-    table->PutNumber("Rot_KI", 0.0);
-
-
-    rot_controller.SetTolerance(2_deg, units::degrees_per_second_t{1});
-    y_controller.SetTolerance(units::millimeter_t{40}, .01_mps);
+    rot_controller.SetTolerance(rotPosTolerance, rotVelTolerance);
+    y_controller.SetTolerance(yPosTolerance, yVelTolerance);
     maxDriveSpeed = swerveModules[0]->getMaxDriveSpeed();
     maxRotationSpeed = units::radian_t{2.0 * M_PI} * swerveModules[0]->getMaxDriveSpeed() / _module_radius;
 
@@ -137,13 +113,14 @@ void Swerve<AzimuthMotor, DriveMotor>::assessInputs()
 template<class AzimuthMotor, class DriveMotor>
 void Swerve<AzimuthMotor, DriveMotor>::analyzeDashboard()
 {
-    y_controller.SetP(table->GetNumber("Y_KP", 0.0));
-    y_controller.SetD(table->GetNumber("Y_KD", 0.0));
-    y_controller.SetI(table->GetNumber("Y_KI", 0.0));
+    y_controller.SetP(Y_KP);
+    y_controller.SetD(Y_KD);
 
-    rot_controller.SetP(table->GetNumber("Rot_KP", 0.0));
-    rot_controller.SetD(table->GetNumber("Rot_KD", 0.0));
-    rot_controller.SetI(table->GetNumber("Rot_KI", 0.0));
+    rot_controller.SetP(ROT_KP);
+    rot_controller.SetD(ROT_KD);
+
+    y_controller.SetTolerance(yPosTolerance, yVelTolerance);
+    rot_controller.SetTolerance(rotPosTolerance, rotVelTolerance);
 
     rawEstimator->UpdateWithTime(frc::Timer::GetFPGATimestamp(), getGyro(), getModuleStates());
     calcEstimator->UpdateWithTime(frc::Timer::GetFPGATimestamp(), getGyro(), getModuleStates());
@@ -154,7 +131,7 @@ void Swerve<AzimuthMotor, DriveMotor>::analyzeDashboard()
     // Linear Speed calculations
     xSpeedMPS = units::meters_per_second_t{xSpeed * maxDriveSpeed};
     ySpeedMPS = units::meters_per_second_t{ySpeed * maxDriveSpeed};
-    if (frc::DriverStation::GetAlliance() == frc::DriverStation::kBlue) {
+    if (frc::DriverStation::GetAlliance() == frc::DriverStation::kRed) {
         xSpeedMPS *= -1.0;
         ySpeedMPS *= -1.0;
     }

@@ -109,15 +109,22 @@ protected:
     frc::ChassisSpeeds getRobotRelativeSpeeds();
     void setSwerveDesiredState(wpi::array<frc::SwerveModuleState, MODULE_COUNT> desiredStates, bool isDriveOpenLoop);
 
+    double ROT_KP = 3;
+    double ROT_KD = 0.5;
+    double Y_KP = 0.0;
+    double Y_KD = 0;
+
+    units::degree_t rotPosTolerance = 2.0_deg;
+    units::degrees_per_second_t rotVelTolerance = 1_deg_per_s;
+
+    units::millimeter_t yPosTolerance = 40_mm;
+    units::meters_per_second_t yVelTolerance = 0.01_mps;
+
 private:
     const units::radians_per_second_t MAX_ROTATION_VEL = 16_rad_per_s;
     const units::radians_per_second_squared_t MAX_ROTATION_ACCEL = 12_rad_per_s_sq;
     const units::meters_per_second_t MAX_Y_VEL = 5.5_mps;
     const units::meters_per_second_squared_t MAX_Y_ACCEL = 3_mps_sq;
-    double ROT_KP = 3;
-    double ROT_KD = 0.5;
-    double Y_KP = 0.0;
-    double Y_KD = 0;
 
     std::vector<valor::SwerveModule<AzimuthMotor, DriveMotor> *> swerveModules;
 
