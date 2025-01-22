@@ -39,7 +39,7 @@ class Robot : public frc::TimedRobot {
         void TestPeriodic() override;
         void AutonomousExit() override;
         void SimulationPeriodic() override;
-        
+
     private:
         valor::Gamepad gamepadOperator{OIConstants::GAMEPAD_OPERATOR_LOCATION};
         valor::Gamepad gamepadDriver{OIConstants::GAMEPAD_BASE_LOCATION};

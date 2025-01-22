@@ -18,63 +18,25 @@ const units::hertz_t KD_ROTATE(-30);
 
 using namespace valor;
 
-// Explicit template instantiation
-// This is needed for linking
-template class valor::Swerve<valor::PhoenixController, valor::PhoenixController>;
-
-template<class AzimuthMotor, class DriveMotor>
-Swerve<AzimuthMotor, DriveMotor>::Swerve(frc::TimedRobot *_robot, const char* _name) :
+Swerve::Swerve(frc::TimedRobot *_robot, std::string _name) :
     valor::BaseSubsystem(_robot, _name),
     posePublisher{table->GetStructTopic<frc::Pose2d>("Drivetrain Pose").Publish()},
     chassisSpeedsPublisher{table->GetStructTopic<frc::ChassisSpeeds>("Chassis Speeds").Publish()},
     currentModuleStatesPublisher{table->GetStructArrayTopic<frc::SwerveModuleState>("Current Module States").Publish()},
     targetModuleStatesPublisher{table->GetStructArrayTopic<frc::SwerveModuleState>("Target Module States").Publish()}
-{
-    drivetrain.SetControl(fieldCentricRequest);
-    // int MDX[] = MODULE_DIFF_XS;
-    // int MDY[] = MODULE_DIFF_YS;
-    // wpi::array<frc::Translation2d, MODULE_COUNT> motorLocations = wpi::array<frc::Translation2d, MODULE_COUNT>(wpi::empty_array);
-    // for (size_t i = 0; i < MODULE_COUNT; i++) {
-    //     motorLocations[i] = frc::Translation2d{_module_radius * MDX[i], _module_radius * MDY[i]};
-    //     swerveModules.push_back(new valor::SwerveModule<AzimuthMotor, DriveMotor>(
-    //         modules[i].first,
-    //         modules[i].second,
-    //         motorLocations[i],
-    //         _wheelDiameter
-    //     ));
-    // }
-
-    // maxDriveSpeed = swerveModules[0]->getMaxDriveSpeed();
-    // maxRotationSpeed = units::meters_per_second_t{5800_rpm} / 0.295_m;
-
-    // kinematics = std::make_unique<frc::SwerveDriveKinematics<MODULE_COUNT>>(motorLocations);
-    // rawEstimator = std::make_unique<frc::SwerveDrivePoseEstimator<MODULE_COUNT>>(*kinematics, getGyro(), getModuleStates(), frc::Pose2d{0_m, 0_m, 0_rad});
-    // calcEstimator = std::make_unique<frc::SwerveDrivePoseEstimator<MODULE_COUNT>>(*kinematics, getGyro(), getModuleStates(), frc::Pose2d{0_m, 0_m, 0_rad});
-}
-
-template<class AzimuthMotor, class DriveMotor>
-Swerve<AzimuthMotor, DriveMotor>::~Swerve()
-{
-    // for (int i = 0; i < MODULE_COUNT; i++)
-    // {
-    //     delete swerveModules[i];
-    // }
-
-    // rawEstimator.release();
-    // calcEstimator.release();
-}
-
-template<class AzimuthMotor, class DriveMotor>
-void Swerve<AzimuthMotor, DriveMotor>::init()
-{
-}
-
-template<class AzimuthMotor, class DriveMotor>
-void Swerve<AzimuthMotor, DriveMotor>::assessInputs()
 {}
 
-template<class AzimuthMotor, class DriveMotor>
-void Swerve<AzimuthMotor, DriveMotor>::analyzeDashboard()
+Swerve::~Swerve()
+{}
+
+void Swerve::init()
+{
+}
+
+void Swerve::assessInputs()
+{}
+
+void Swerve::analyzeDashboard()
 {
     if (frc::RobotBase::IsSimulation())
         drivetrain.UpdateSimState(20_ms, frc::RobotController::GetBatteryVoltage());
@@ -84,87 +46,28 @@ void Swerve<AzimuthMotor, DriveMotor>::analyzeDashboard()
     targetModuleStatesPublisher.Set(drivetrain.GetState().ModuleTargets);
 }
 
-template<class AzimuthMotor, class DriveMotor>
-void Swerve<AzimuthMotor, DriveMotor>::assignOutputs()
+
+void Swerve::assignOutputs()
 {}
 
-template<class AzimuthMotor, class DriveMotor>
-void Swerve<AzimuthMotor, DriveMotor>::drive(
-    units::velocity::meters_per_second_t vx_mps,
-    units::velocity::meters_per_second_t vy_mps,
-    units::angular_velocity::radians_per_second_t omega_radps,
-    bool isFOC
-)
-{
-    auto desiredStates = getModuleStates(vx_mps,
-                                  vy_mps,
-                                  omega_radps,
-                                  isFOC);
-    setSwerveDesiredState(desiredStates, true);
-}
-
-template<class AzimuthMotor, class DriveMotor>
-void Swerve<AzimuthMotor, DriveMotor>::driveRobotRelative(frc::ChassisSpeeds speeds) {
-    auto desiredStates = getModuleStates(speeds);
-    setSwerveDesiredState(desiredStates, false);
-}
-
-template<class AzimuthMotor, class DriveMotor>
-frc::ChassisSpeeds Swerve<AzimuthMotor, DriveMotor>::getRobotRelativeSpeeds(){
-    wpi::array<frc::SwerveModuleState, 4> moduleStates = {
-        swerveModules[0]->getState(),
-        swerveModules[1]->getState(),
-        swerveModules[2]->getState(),
-        swerveModules[3]->getState()
-    };
-    return kinematics->ToChassisSpeeds(moduleStates);
-}
-
-template<class AzimuthMotor, class DriveMotor>
-void Swerve<AzimuthMotor, DriveMotor>::setSwerveDesiredState(wpi::array<frc::SwerveModuleState, MODULE_COUNT> desiredStates, bool isDriveOpenLoop)
-{
-    for (size_t i = 0; i < MODULE_COUNT; i++) {
-        swerveModules[i]->setDesiredState(desiredStates[i], isDriveOpenLoop);
-    }
-}
-
-template<class AzimuthMotor, class DriveMotor>
-void Swerve<AzimuthMotor, DriveMotor>::resetState()
+void Swerve::resetState()
 {
     drivetrain.TareEverything();
     rotTest = false;
     strLineTest = false;
 }
 
-template<class AzimuthMotor, class DriveMotor>
-void Swerve<AzimuthMotor, DriveMotor>::resetOdometry(frc::Pose2d pose)
-{
-    rawEstimator->ResetPosition(getGyro(), getModuleStates(), pose);
-    calcEstimator->ResetPosition(getGyro(), getModuleStates(), pose);
-}
-
-template<class AzimuthMotor, class DriveMotor>
-void Swerve<AzimuthMotor, DriveMotor>::resetEncoders()
-{
-    for (size_t i = 0; i < swerveModules.size(); i++)
-    {
-        swerveModules[i]->resetDriveEncoder();
-    }
-}
-
-template<class AzimuthMotor, class DriveMotor>
-void Swerve<AzimuthMotor, DriveMotor>::enableCarpetGrain(double _grainMultiplier, bool _roughTowardsRed)
+void Swerve::enableCarpetGrain(double _grainMultiplier, bool _roughTowardsRed)
 {
     carpetGrainMultiplier = _grainMultiplier;
     roughTowardsRed = _roughTowardsRed;
     useCarpetGrain = true;
 }
 
-template<class AzimuthMotor, class DriveMotor>
-void  Swerve<AzimuthMotor, DriveMotor>::calculateCarpetPose()
+void  Swerve::calculateCarpetPose()
 {
     static frc::Pose2d previousPose;
-    frc::Pose2d newPose = calcEstimator->GetEstimatedPosition();
+    frc::Pose2d newPose = drivetrain.GetState().Pose;
     units::meter_t deltaX = newPose.X() - previousPose.X();
     double factor = 1.0;
     if (roughTowardsRed) {
@@ -173,7 +76,7 @@ void  Swerve<AzimuthMotor, DriveMotor>::calculateCarpetPose()
         factor = deltaX > 0_m ? carpetGrainMultiplier : 1;
     }
     
-    calcEstimator->AddVisionMeasurement(
+    drivetrain.AddVisionMeasurement(
         frc::Pose2d{
             factor * deltaX + previousPose.X(),
             newPose.Y(),
@@ -182,91 +85,10 @@ void  Swerve<AzimuthMotor, DriveMotor>::calculateCarpetPose()
         frc::Timer::GetFPGATimestamp(),
         {0.1, 0.1, 0.1}
     );
-    previousPose = calcEstimator->GetEstimatedPosition();
+    previousPose = drivetrain.GetState().Pose;
 }
 
-template<class AzimuthMotor, class DriveMotor>
-void Swerve<AzimuthMotor, DriveMotor>::setupGyro(
-    int _pigeonCanID,
-    const char* _pigeonCanBus,
-    units::degree_t mountRoll,
-    units::degree_t mountPitch,
-    units::degree_t mountYaw
-)
-{
-    pigeon.reset();
-    pigeon = std::make_unique<ctre::phoenix6::hardware::Pigeon2>(_pigeonCanID, _pigeonCanBus);
-    pigeon->GetConfigurator().Apply(
-        ctre::phoenix6::configs::Pigeon2Configuration{}
-        .WithMountPose(
-            ctre::phoenix6::configs::MountPoseConfigs{}
-            .WithMountPoseRoll(mountRoll)
-            .WithMountPosePitch(mountPitch)
-            .WithMountPoseYaw(mountYaw)
-        )
-    );
-}
-
-template<class AzimuthMotor, class DriveMotor>
-void Swerve<AzimuthMotor, DriveMotor>::resetGyro(){
-    frc::Pose2d initialPose = getRawPose();
-    frc::Pose2d desiredPose = frc::Pose2d(initialPose.X(), initialPose.Y(), frc::Rotation2d(0_deg));
-    resetOdometry(desiredPose);
-}
-
-template<class AzimuthMotor, class DriveMotor>
-frc::Rotation2d Swerve<AzimuthMotor, DriveMotor>::getGyro() {
-    if (pigeon)
-        return pigeon->GetRotation2d();
-    return frc::Rotation2d();
-}
-
-template<class AzimuthMotor, class DriveMotor>
-frc::Pose2d Swerve<AzimuthMotor, DriveMotor>::getRawPose()
-{
-    return rawEstimator->GetEstimatedPosition();
-}
-
-template<class AzimuthMotor, class DriveMotor>
-frc::Pose2d Swerve<AzimuthMotor, DriveMotor>::getCalculatedPose()
-{
-    return calcEstimator->GetEstimatedPosition();
-}
-
-template<class AzimuthMotor, class DriveMotor>
-wpi::array<frc::SwerveModulePosition, MODULE_COUNT> Swerve<AzimuthMotor, DriveMotor>::getModuleStates()
-{
-    wpi::array<frc::SwerveModulePosition, MODULE_COUNT> modulePositions = wpi::array<frc::SwerveModulePosition, MODULE_COUNT>(wpi::empty_array);
-    for (size_t i = 0; i < swerveModules.size(); i++) {
-        modulePositions[i] = swerveModules[i]->getModulePosition();
-    }
-    return modulePositions;
-}
-
-template<class AzimuthMotor, class DriveMotor>
-wpi::array<frc::SwerveModuleState, MODULE_COUNT> Swerve<AzimuthMotor, DriveMotor>::getModuleStates(units::velocity::meters_per_second_t vx_mps,
-                                                                  units::velocity::meters_per_second_t vy_mps,
-                                                                  units::angular_velocity::radians_per_second_t omega_radps,
-                                                                  bool isFOC)
-{
-    frc::ChassisSpeeds chassisSpeeds = isFOC ? frc::ChassisSpeeds::FromFieldRelativeSpeeds(vx_mps,
-                                                                                           vy_mps,
-                                                                                           omega_radps,
-                                                                                           rawEstimator->GetEstimatedPosition().Rotation())
-                                             : frc::ChassisSpeeds{vx_mps, vy_mps, omega_radps};
-    return getModuleStates(chassisSpeeds);
-}
-
-template<class AzimuthMotor, class DriveMotor>
-wpi::array<frc::SwerveModuleState, MODULE_COUNT> Swerve<AzimuthMotor, DriveMotor>::getModuleStates(frc::ChassisSpeeds chassisSpeeds)
-{
-    auto states = kinematics->ToSwerveModuleStates(chassisSpeeds);
-    kinematics->DesaturateWheelSpeeds(&states, maxDriveSpeed);
-    return states;
-}
-
-template<class AzimuthMotor, class DriveMotor>
-void Swerve<AzimuthMotor, DriveMotor>::InitSendable(wpi::SendableBuilder& builder)
+void Swerve::InitSendable(wpi::SendableBuilder& builder)
 {
     builder.SetSmartDashboardType("Subsystem");
     // builder.AddDoubleProperty(

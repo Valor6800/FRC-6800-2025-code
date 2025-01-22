@@ -60,7 +60,7 @@ constexpr frc::Pose2d SIMULATION_STARTPOSE{
 };
 
 Drivetrain::Drivetrain(frc::TimedRobot *_robot) : 
-    valor::Swerve<SwerveAzimuthMotor, SwerveDriveMotor>(_robot, "Drivetrain"),
+    valor::Swerve(_robot, "Drivetrain"),
     teleopStart(999999999999),
     aprilTagPosePublisher{table->GetStructTopic<frc::Pose3d>("April Tag Pose").Publish()},
     ppTargetPosePublisher{table->GetStructTopic<frc::Pose2d>("PP Target Pose").Publish()},
@@ -120,59 +120,10 @@ Drivetrain::Drivetrain(frc::TimedRobot *_robot) :
 
     trans_controller.SetTolerance(40_mm, .01_mps);
     trans_controller.SetGoal(0_m);
-    // init();
+    init();
 }
 
 Drivetrain::~Drivetrain(){}
-
-std::vector<std::pair<SwerveAzimuthMotor*, SwerveDriveMotor*>> Drivetrain::generateModules()
-{
-    std::vector<std::pair<SwerveAzimuthMotor*, SwerveDriveMotor*>> modules;
-
-    valor::PIDF azimuthPID;
-    azimuthPID.maxVelocity = Constants::azimuthKVel();
-    azimuthPID.maxAcceleration = Constants::azimuthKAcc();
-    azimuthPID.P = Constants::azimuthKP();
-    azimuthPID.error = 0.0027_tr;
-
-    valor::PIDF drivePID;
-    drivePID.setMaxVelocity(Constants::driveKVel(), WHEEL_DIAMETER);
-    drivePID.setMaxAcceleration(Constants::driveKAcc(), WHEEL_DIAMETER);
-    drivePID.P = Constants::driveKP();
-    drivePID.error = 0.0027_tr;
-
-    for (size_t i = 0; i < 4; i++) {
-        SwerveAzimuthMotor* azimuthMotor = new SwerveAzimuthMotor(
-            valor::PhoenixControllerType::FALCON_FOC,
-            CANIDs::AZIMUTH_CANS[i],
-            valor::NeutralMode::Brake,
-            Constants::swerveAzimuthsReversals()[i],
-            PIGEON_CAN_BUS
-        );
-        azimuthMotor->setGearRatios(Constants::azimuthGearRatio(), 1.0);
-        azimuthMotor->setPIDF(azimuthPID, 0);
-        azimuthMotor->enableFOC(true);
-        azimuthMotor->setupCANCoder(CANIDs::CANCODER_CANS[i], Constants::swerveZeros()[i], false, PIGEON_CAN_BUS);
-        azimuthMotor->setContinuousWrap(true);
-        azimuthMotor->applyConfig();
-
-        SwerveAzimuthMotor* driveMotor = new SwerveDriveMotor(
-            valor::PhoenixControllerType::KRAKEN_X60_FOC,
-            CANIDs::DRIVE_CANS[i],
-            valor::NeutralMode::Coast,
-            Constants::swerveDrivesReversals()[i],
-            PIGEON_CAN_BUS
-        );
-        driveMotor->setGearRatios(1.0, Constants::driveGearRatio());
-        driveMotor->setPIDF(drivePID, 0);
-        driveMotor->enableFOC(true);
-        driveMotor->setOpenLoopRamp(1_s);
-        driveMotor->applyConfig();
-
-        modules.push_back(std::make_pair(azimuthMotor, driveMotor));
-    }
-    return modules;
-}
 
 void Drivetrain::resetState()
 {
@@ -182,7 +133,7 @@ void Drivetrain::resetState()
 
 void Drivetrain::init()
 {
-    // Swerve::init();
+    Swerve::init();
 }
 
 void Drivetrain::assessInputs()
@@ -237,8 +188,8 @@ void Drivetrain::analyzeDashboard()
         }
         if (!reefTag) {
             // Align to center of reef
-            fieldCentricFacingAngleRequest.TargetDirection = units::math::atan2(REEF_POS.Y() - drivetrain.GetState().Pose.Y(), REEF_POS.X() - drivetrain.GetState().Pose.X());
-            wpi::println("Target direction: {}", fieldCentricFacingAngleRequest.TargetDirection.Degrees());
+            frc::Translation2d botReefCenterTrans = REEF_POS - drivetrain.GetState().Pose.Translation();
+            fieldCentricFacingAngleRequest.TargetDirection = units::math::atan2(botReefCenterTrans.Y(), botReefCenterTrans.X());
             xSpeedMPS = 10_mps * xSpeed;
             ySpeedMPS = 10_mps * ySpeed;
         } else {
@@ -263,16 +214,13 @@ void Drivetrain::analyzeDashboard()
 
     // for (valor::AprilTagsSensor* aprilLime : aprilTagSensors) {
     //     aprilLime->applyVisionMeasurement(
-    //         calcEstimator.get(),
+    //         drivetrain,
     //         getRobotSpeeds(),
     //         table->GetBoolean("Accepting Vision Measurements", true),
     //         doubtX,
     //         doubtY
     //     );
     // }
-
-    // if (!driverGamepad || !driverGamepad->IsConnected() || !operatorGamepad || !operatorGamepad->IsConnected())
-    //     return;
 
     // if (frc::Timer::GetFPGATimestamp().to<double>() - teleopStart > TIME_TELEOP_VERT && frc::Timer::GetFPGATimestamp().to<double>() - teleopStart < TIME_TELEOP_VERT + 3) {
     //     operatorGamepad->setRumble(true);
@@ -313,43 +261,6 @@ void Drivetrain::assignOutputs()
     }
 }
 
-units::meters_per_second_t Drivetrain::getRobotSpeeds(){
-    return units::meters_per_second_t{sqrtf(powf(getRobotRelativeSpeeds().vx.to<double>(), 2) + powf(getRobotRelativeSpeeds().vy.to<double>(), 2))};
-}
-
-frc2::FunctionalCommand* Drivetrain::getResetOdom() {
-    return new frc2::FunctionalCommand(
-        [&]{ // onBegin
-            for (valor::AprilTagsSensor* aprilLime : aprilTagSensors) {
-                aprilLime->setPipe(valor::VisionSensor::PIPELINE_0);
-            }
-
-            state.startTimestamp = frc::Timer::GetFPGATimestamp();
-        },
-        [&]{ // continuously running
-            table->PutNumber("resetting maybe", true);
-
-            for (valor::AprilTagsSensor* aprilLime : aprilTagSensors) {
-                if (aprilLime->hasTarget() && (aprilLime->getSensor().ToPose2d().X() > 0_m && aprilLime->getSensor().ToPose2d().Y() > 0_m)) {
-                    table->PutNumber("resetting odom", table->GetNumber("resetting odom", 0) + 1);
-                    //aprilLime->applyVisionMeasurement(estimator);
-                    table->PutBoolean("resetting", true);
-                    break;
-                } else {
-                    table->PutBoolean("resetting", false);
-                }
-            }
-        },
-        [&](bool){ // onEnd
-                
-        },
-        [&]{ // isFinished
-            return (frc::Timer::GetFPGATimestamp() - state.startTimestamp) > 1.0_s;
-        },
-        {}
-    );
-}
-
 units::degree_t Drivetrain::getTagAngle(int id) {
     if      (id == 6) return -60_deg;
     else if (id == 7) return 0_deg;
@@ -367,13 +278,6 @@ units::degree_t Drivetrain::getTagAngle(int id) {
     // FIXME: Panic some other way
     return 0_deg;
 }
-
-// void Drivetrain::setDriveMotorNeutralMode(valor::NeutralMode mode) {
-//     for (int i = 0; i < SWERVE_COUNT; i++)
-//     {
-//         driveControllers[i]->setNeutralMode(mode);
-//     }
-// }
 
 void Drivetrain::InitSendable(wpi::SendableBuilder& builder)
 {

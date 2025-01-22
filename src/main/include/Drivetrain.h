@@ -8,31 +8,7 @@
 
 #define SWERVE_COUNT 4
 
-
-
-/**
- * @brief Quick way to select the drive motor controller
- * To change what motor controller runs the drive motor, change this to either:
- * * valor::PhoenixController
- * * valor::NeoController
- */
-typedef valor::PhoenixController SwerveDriveMotor;
-
-/**
- * @brief Quick way to select the azimuth motor controller
- * To change what motor controller runs the azimuth motor, change this to either:
- * * valor::PhoenixController
- * * valor::NeoController
- */
-typedef valor::PhoenixController SwerveAzimuthMotor;
-
-/**
- * @brief Subsystem - Drivetrain
- * 
- * Subsystem responsible for driving the robot chassis, and housing all the logic to control the
- * 4 swerve modules on the robot.
- */
-class Drivetrain : public valor::Swerve<SwerveAzimuthMotor, SwerveDriveMotor>
+class Drivetrain : public valor::Swerve
 {
 public:
 
@@ -89,8 +65,6 @@ public:
      double doubtX, doubtY;
 
 private:
-
-     std::vector<std::pair<SwerveAzimuthMotor*, SwerveDriveMotor*>> generateModules();
      units::degree_t getTagAngle(int id);
 
      const units::meters_per_second_t MAX_TRANSLATION_VEL = 5.5_mps;
@@ -112,7 +86,7 @@ private:
      nt::StructPublisher<frc::Pose3d> aprilTagPosePublisher;
      nt::StructPublisher<frc::Pose2d> ppTargetPosePublisher;
      nt::StructArrayPublisher<frc::Pose2d> ppActivePathPublisher;
-     
+
      std::vector<valor::AprilTagsSensor*> aprilTagSensors;
      // valor::GrappleLidarSensor lidarSensor;
 
