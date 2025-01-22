@@ -101,7 +101,7 @@ void Climber::analyzeDashboard()
     currentSensor.setCacheSize(state.cacheSize);
 
     //crab sensor
-    if (state.crabState == CRAB_STATE::CRABBED) {
+    if (driverGamepad->GetAButton()) { //state.crabState == CRAB_STATE::CRABBED
         state.climbState = CLIMB_STATE::CLIMB;
     }
 
