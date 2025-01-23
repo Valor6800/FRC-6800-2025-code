@@ -28,6 +28,7 @@
 #define TROUGH_HEIGHT 0.0f        // Trough position (ground level)
 #define MOTOR_TO_SENSOR 1.0f
 #define SENSOR_TO_MECH 1.0f
+#define ELEVATOR_TOLERANCE 0.5f
 
 Scorer::Scorer(frc::TimedRobot *_robot, Drivetrain *_drive) :
     valor::BaseSubsystem(_robot, "Scorer"),
@@ -43,14 +44,14 @@ Scorer::Scorer(frc::TimedRobot *_robot, Drivetrain *_drive) :
         frc2::SequentialCommandGroup(
             frc2::InstantCommand(
                 [this]() {
-                    // shooter->state.isShooting = true;
+                    
                     state.scoringState = Scorer::SCORING_SPEED::SCORING;
                 }
             ),
             frc2::WaitCommand(1_s),
             frc2::InstantCommand(
                 [this]() {
-                    // shooter->state.isShooting = false;
+                    
                     state.scoringState = Scorer::SCORING_SPEED::HOLD;
                 }
             )
@@ -61,7 +62,7 @@ Scorer::Scorer(frc::TimedRobot *_robot, Drivetrain *_drive) :
         frc2::SequentialCommandGroup(
             frc2::InstantCommand(
                 [this]() {
-                    // shooter->state.isShooting = true;
+                    
                     state.scoringState = Scorer::SCORING_SPEED::INTAKING;
                 }
             )
@@ -71,7 +72,7 @@ Scorer::Scorer(frc::TimedRobot *_robot, Drivetrain *_drive) :
         frc2::SequentialCommandGroup(
             frc2::InstantCommand(
                 [this]() {
-                    // shooter->state.isShooting = true;
+                    
                     state.scoringState = Scorer::SCORING_SPEED::SCORING;
                 }
             )
@@ -81,7 +82,7 @@ Scorer::Scorer(frc::TimedRobot *_robot, Drivetrain *_drive) :
         frc2::SequentialCommandGroup(
             frc2::InstantCommand(
                 [this]() {
-                    // shooter->state.isShooting = true;
+                    
                     state.scoringState = Scorer::SCORING_SPEED::HOLD;
                 }
             )
@@ -95,7 +96,7 @@ Scorer::Scorer(frc::TimedRobot *_robot, Drivetrain *_drive) :
     void Scorer::resetState()
     {
         state.scoringState = SCORING_SPEED::HOLD;
-        state.coralLevel = ELEV_LVL::TROUGH;
+        state.coralLevel = ELEV_LVL::HP;
 
     }
 
@@ -118,13 +119,12 @@ Scorer::Scorer(frc::TimedRobot *_robot, Drivetrain *_drive) :
         
         scorerMotor->setPIDF(scorerPID, 0);
 
-    //     scorerDebounceSensor.setGetter([this] { return (!->GetInWindow()); });
-    //     scorerDebounceSensor.setRisingEdgeCallback([this] {
+        scorerDebounceSensor.setGetter([this] { return this->isBeamBroken();});
+        scorerDebounceSensor.setRisingEdgeCallback([this] {
+         state.sensorTwoTripped = true;
+         });
 
-    //         //TODO: RISING SENSOR 2 EDGE
-      
-        
-    // });
+         //scorerMotor->setPosition(units::turn_t(state));
 
         resetState();
     }
@@ -137,41 +137,76 @@ Scorer::Scorer(frc::TimedRobot *_robot, Drivetrain *_drive) :
         if (operatorGamepad == nullptr || !operatorGamepad->IsConnected())
         return;
 
-        if (driverGamepad->GetAButton()) {
-            state.coralLevel = ELEV_LVL::TWO;
-        } else if (driverGamepad->GetBButton() ) {
-            state.coralLevel = ELEV_LVL::THREE;
-        } else if (driverGamepad->GetXButton()){
-            state.coralLevel = ELEV_LVL::FOUR;
-        } else if (driverGamepad->GetYButton()){
-            state.coralLevel = ELEV_LVL::TROUGH;
-        } else{
-        state.coralLevel = ELEV_LVL::HP;
-        }
 
-    }
+        double joystickInput = operatorGamepad->GetLeftY();
+    
+    
+        double motorVoltage = joystickInput * 12.0; 
+
+        scorerMotor->setPower(units::volt_t(motorVoltage));
+
+        // if (state.sensorTwoTripped) {
+        //     if (driverGamepad->GetAButton()) {
+        //         if (isAligned) {
+        //             state.coralLevel = ELEV_LVL::FOUR;
+                    
+        //         } else {
+        //             state.coralLevel = ELEV_LVL::STOWED;
+        //         }
+        //     } 
+        //     else if (driverGamepad->GetBButton()) {
+        //         if (isAligned) {
+        //             state.coralLevel = ELEV_LVL::THREE;
+        //         } else {
+        //             state.coralLevel = ELEV_LVL::STOWED;
+        //         }
+        //     }
+        //     else if (driverGamepad->GetXButton()) {
+        //         if (isAligned) {
+        //             state.coralLevel = ELEV_LVL::TWO;
+        //         } else {
+        //             state.coralLevel = ELEV_LVL::STOWED;
+        //         }
+        //     }
+        //     else if (driverGamepad->GetYButton()) {
+        //         if (isAligned) {
+        //             state.coralLevel = ELEV_LVL::TROUGH;
+        //         } else {
+        //             state.coralLevel = ELEV_LVL::STOWED;
+        //         }
+        //     }
+        // }
+        // else{
+        //     state.coralLevel = ELEV_LVL::HP;
+        // }
+
+        units::turn_t currentPosition = scorerMotor->getPosition();
+
+        if ((currentPosition.value() - state.targetRotations) <= ELEVATOR_TOLERANCE) {
+
+            
+        }
+}
 
     void Scorer::analyzeDashboard()
     {
-    //     if (aligned && properlyElevated && !state.sensor2Broken) {
-    //         state.scoringState = SCORING_SPEED::SCORING;  // Move to placing state
-    // } 
-    //     else if (state.sensor2Broken){
-    //     state.scoringState = SCORING_SPEED::HOLD;
-    // }
-    //     else if (state.senssor1Broken){
-    //     state.scoringState = SCORING_SPEED::INTAKING;
-    // }
 
     }
+
+     bool Scorer::isBeamBroken() 
+     {
+    //     const units::millimeter_t beamBreakThreshold{100};  
+    //     units::millimeter_t currentDistance = lidarSensor.getLidarData();
+    //     return currentDistance < beamBreakThreshold;
+    }
+
 
     void Scorer::assignOutputs()
     {
         units::length::meter_t targetHeightInMeters = coralHMap[state.coralLevel];
-        double wheelDiameter = 0.1;
         // TODO: check whether chain or pulley system
-        double targetRotations = targetHeightInMeters.value() / (wheelDiameter * M_PI);  // Convert meters to rotations (turns)
-        scorerMotor->setPosition(units::turn_t(targetRotations));
+        state.targetRotations = targetHeightInMeters.value() / (wheelDiameter * M_PI);  // Convert meters to rotations (turns)
+        scorerMotor->setPosition(units::turn_t(state.targetRotations));
     }
 
 
@@ -194,11 +229,6 @@ Scorer::Scorer(frc::TimedRobot *_robot, Drivetrain *_drive) :
             [this] {return scorerMotor->getCurrent().to<double>();},
             nullptr
         );
-
-
-
-
-
 
     }
 

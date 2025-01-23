@@ -32,7 +32,7 @@ public:
     void assessInputs();
     void analyzeDashboard();
     void assignOutputs();
-    
+    bool isBeamBroken();
     void InitSendable(wpi::SendableBuilder& builder);
 
     enum SCORING_SPEED
@@ -45,6 +45,7 @@ public:
      enum ELEV_LVL
     {
         HP,
+        STOWED,
         TROUGH,
         TWO,
         THREE,
@@ -53,14 +54,14 @@ public:
         PROCESSOR,
         ALGEE2,
         ALGEE3,
-
     };
-
 
     struct x
     {
         SCORING_SPEED scoringState;
         ELEV_LVL coralLevel;
+        bool sensorTwoTripped;
+        double targetRotations;
     } state;
 
     std::unordered_map<ELEV_LVL, units::meter_t> coralHMap = {
@@ -82,4 +83,5 @@ private:
     valor::PhoenixController *scorerMotor;
     valor::GrappleLidarSensor lidarSensor;
     double wheelDiameter = 0.1;
+    units::turn_t currentPosition;
 };
