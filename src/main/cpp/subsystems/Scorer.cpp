@@ -17,7 +17,7 @@
 #define ELEV_K_ERROR units::angle::turn_t (0)
 #define ELEV_K_AFF 0
 
-#define SCORER_MAX_SPEED units::angular_velocity::turns_per_second_t (0)
+#define SCORER_MAX_SPEED units::angular_velocity::turns_per_second_t ()
 #define SCORER_MAX_ACCEL units::angular_acceleration::turns_per_second_squared_t (0)
 #define SCORER_K_P 0
 
@@ -26,7 +26,7 @@
 #define CORAL_LEVEL_3_HEIGHT 3.5f  // Example height for Coral Level 3
 #define CORAL_LEVEL_4_HEIGHT 5.5f  // Example height for Coral Level 4
 #define TROUGH_HEIGHT 0.0f        // Trough position (ground level)
-#define MOTOR_TO_SENSOR 1.0f
+#define MOTOR_TO_SENSOR 8.02f
 #define SENSOR_TO_MECH 1.0f
 #define ELEVATOR_TOLERANCE 0.5f
 
@@ -200,12 +200,13 @@ Scorer::Scorer(frc::TimedRobot *_robot, Drivetrain *_drive) :
     //     return currentDistance < beamBreakThreshold;
     }
 
+    
+
 
     void Scorer::assignOutputs()
     {
         units::length::meter_t targetHeightInMeters = coralHMap[state.coralLevel];
-        // TODO: check whether chain or pulley system
-        state.targetRotations = targetHeightInMeters.value() / (wheelDiameter * M_PI);  // Convert meters to rotations (turns)
+        state.targetRotations = targetHeightInMeters.value() / (wheelDiameter * M_PI);
         scorerMotor->setPosition(units::turn_t(state.targetRotations));
     }
 
