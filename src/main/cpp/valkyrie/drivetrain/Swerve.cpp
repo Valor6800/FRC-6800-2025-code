@@ -131,7 +131,7 @@ void Swerve<AzimuthMotor, DriveMotor>::assignOutputs()
         fieldCentricRequest
             .WithVelocityX(units::meters_per_second_t{xSpeed})
             .WithVelocityY(units::meters_per_second_t{ySpeed})
-            .WithRotationalRate(units::radians_per_second_t{rotSpeed * 2 * M_PI})
+            .WithRotationalRate(units::radians_per_second_t{rotSpeed})
     );
     // if (rotTest) {
     //     swerveModules[0]->setAzimuthPosition(frc::Rotation2d(-45_deg));

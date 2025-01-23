@@ -17,22 +17,21 @@ class TunerConstants {
     // The steer motor uses any SwerveModule.SteerRequestType control request with the
     // output type specified by SwerveModuleConstants::SteerMotorClosedLoopOutput
     static constexpr configs::Slot0Configs steerGains = configs::Slot0Configs{}
-        .WithKP(100).WithKI(0).WithKD(0.5)
+        .WithKP(800).WithKI(1).WithKD(20)
         .WithKS(0.1).WithKV(1.66).WithKA(0)
         .WithStaticFeedforwardSign(signals::StaticFeedforwardSignValue::UseClosedLoopSign);
     // When using closed-loop control, the drive motor uses the control
     // output type specified by SwerveModuleConstants::DriveMotorClosedLoopOutput
     static constexpr configs::Slot0Configs driveGains = configs::Slot0Configs{}
-        .WithKP(5).WithKI(0).WithKD(0)
-        .WithKS(0).WithKV(0.124)
-        .WithStaticFeedforwardSign(signals::StaticFeedforwardSignValue::UseVelocitySign);
+        .WithKP(0.1).WithKI(0).WithKD(0)
+        .WithKS(0).WithKV(0.124);
 
     // The closed-loop output type to use for the steer motors;
     // This affects the PID/FF gains for the steer motors
-    static constexpr swerve::ClosedLoopOutputType kSteerClosedLoopOutput = swerve::ClosedLoopOutputType::Voltage;
+    static constexpr swerve::ClosedLoopOutputType kSteerClosedLoopOutput = swerve::ClosedLoopOutputType::TorqueCurrentFOC;
     // The closed-loop output type to use for the drive motors;
     // This affects the PID/FF gains for the drive motors
-    static constexpr swerve::ClosedLoopOutputType kDriveClosedLoopOutput = swerve::ClosedLoopOutputType::Voltage;
+    static constexpr swerve::ClosedLoopOutputType kDriveClosedLoopOutput = swerve::ClosedLoopOutputType::TorqueCurrentFOC;
 
     // The type of motor used for the drive motor
     static constexpr swerve::DriveMotorArrangement kDriveMotorType = swerve::DriveMotorArrangement::TalonFX_Integrated;
@@ -54,10 +53,7 @@ class TunerConstants {
             configs::CurrentLimitsConfigs{}
                 .WithStatorCurrentLimit(80_A)
                 .WithStatorCurrentLimitEnable(true)
-                .WithSupplyCurrentLimit(45_A)
-                .WithSupplyCurrentLimitEnable(true)
         );
-
     static constexpr configs::TalonFXConfiguration steerInitialConfigs = configs::TalonFXConfiguration{}
         .WithCurrentLimits(
             configs::CurrentLimitsConfigs{}
@@ -65,6 +61,10 @@ class TunerConstants {
                 // stator current limit to help avoid brownouts without impacting performance.
                 .WithStatorCurrentLimit(60_A)
                 .WithStatorCurrentLimitEnable(true)
+        ).WithTorqueCurrent(
+            configs::TorqueCurrentConfigs{}
+                .WithPeakForwardTorqueCurrent(60_A)
+                .WithPeakReverseTorqueCurrent(60_A)
         );
     static constexpr configs::CANcoderConfiguration encoderInitialConfigs{};
     // Configs for the Pigeon 2; leave this nullopt to skip applying Pigeon 2 configs
@@ -137,7 +137,7 @@ private:
     static constexpr int kFrontLeftDriveMotorId = 2;
     static constexpr int kFrontLeftSteerMotorId = 1;
     static constexpr int kFrontLeftEncoderId = 20;
-    static constexpr units::turn_t kFrontLeftEncoderOffset = -0.42529296875_tr;
+    static constexpr units::turn_t kFrontLeftEncoderOffset = -0.427734375_tr;
     static constexpr bool kFrontLeftSteerMotorInverted = true;
     static constexpr bool kFrontLeftEncoderInverted = false;
 
@@ -148,7 +148,7 @@ private:
     static constexpr int kFrontRightDriveMotorId = 4;
     static constexpr int kFrontRightSteerMotorId = 3;
     static constexpr int kFrontRightEncoderId = 21;
-    static constexpr units::turn_t kFrontRightEncoderOffset = -0.35546875_tr;
+    static constexpr units::turn_t kFrontRightEncoderOffset = -0.360595703125_tr;
     static constexpr bool kFrontRightSteerMotorInverted = false;
     static constexpr bool kFrontRightEncoderInverted = false;
 
@@ -159,7 +159,7 @@ private:
     static constexpr int kBackLeftDriveMotorId = 8;
     static constexpr int kBackLeftSteerMotorId = 7;
     static constexpr int kBackLeftEncoderId = 23;
-    static constexpr units::turn_t kBackLeftEncoderOffset = -0.084716796875_tr;
+    static constexpr units::turn_t kBackLeftEncoderOffset = -0.084228515625_tr;
     static constexpr bool kBackLeftSteerMotorInverted = false;
     static constexpr bool kBackLeftEncoderInverted = false;
 
@@ -170,13 +170,12 @@ private:
     static constexpr int kBackRightDriveMotorId = 6;
     static constexpr int kBackRightSteerMotorId = 5;
     static constexpr int kBackRightEncoderId = 22;
-    static constexpr units::turn_t kBackRightEncoderOffset = 0.025146484375_tr;
+    static constexpr units::turn_t kBackRightEncoderOffset = 0.027099609375_tr;
     static constexpr bool kBackRightSteerMotorInverted = true;
     static constexpr bool kBackRightEncoderInverted = false;
 
     static constexpr units::inch_t kBackRightXPos = -11.61417_in;
     static constexpr units::inch_t kBackRightYPos = -11.61417_in;
-
 
 public:
     static constexpr swerve::SwerveModuleConstants FrontLeft = ConstantCreator.CreateModuleConstants(

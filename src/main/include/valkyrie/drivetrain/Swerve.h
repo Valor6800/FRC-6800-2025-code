@@ -129,7 +129,9 @@ private:
     };
 
     // Default uses open loop voltage for drive, position for azimuth
-    ctre::phoenix6::swerve::requests::FieldCentric fieldCentricRequest;
+    ctre::phoenix6::swerve::requests::FieldCentric fieldCentricRequest = ctre::phoenix6::swerve::requests::FieldCentric{}
+        .WithDriveRequestType(ctre::phoenix6::swerve::DriveRequestType::Velocity)
+        .WithSteerRequestType(ctre::phoenix6::swerve::SteerRequestType::Position);
     
     CharMode charac;
 };
