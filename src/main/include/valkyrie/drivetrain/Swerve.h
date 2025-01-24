@@ -129,6 +129,8 @@ protected:
     units::millimeter_t yPosTolerance = 40_mm;
     units::meters_per_second_t yVelTolerance = 0.01_mps;
 
+    units::meter_t goalAlign = 0.0_m;
+
 private:
     const units::radians_per_second_t MAX_ROTATION_VEL = 16_rad_per_s;
     const units::radians_per_second_squared_t MAX_ROTATION_ACCEL = 12_rad_per_s_sq;
