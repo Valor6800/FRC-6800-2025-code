@@ -135,6 +135,9 @@ public:
      // align the robot using the position on the field
      void alignAngleZoning();
 
+     // choose a pole to align to and score, true is right, false is left
+     void choosePoleScore(bool isRight);
+
      double teleopStart;
 
      double doubtX, doubtY;

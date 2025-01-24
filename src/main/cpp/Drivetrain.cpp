@@ -74,6 +74,8 @@ const units::meter_t WHEEL_DIAMETER(0.0973_m);
 #define RED_REEF_10_ANGLE 180_deg
 #define RED_REEF_11_ANGLE -120_deg
 
+#define POLE_OFFSET 0.2_m
+
 Drivetrain::Drivetrain(frc::TimedRobot *_robot) : 
     valor::Swerve<SwerveAzimuthMotor, SwerveDriveMotor>(
         _robot,
@@ -104,6 +106,8 @@ Drivetrain::Drivetrain(frc::TimedRobot *_robot) :
 
     table->PutNumber("Rot_KP", Swerve::ROT_KP);
     table->PutNumber("Rot_KD", Swerve::ROT_KD);
+
+    table->PutNumber("Pole Offset", POLE_OFFSET.to<double>());
 
     table->PutNumber("Vision Std", 3.0);
     table->PutNumber("Vision Acceptance", VISION_ACCEPTANCE.to<double>() );
@@ -230,11 +234,15 @@ void Drivetrain::init()
 
 void Drivetrain::assessInputs()
 {
-
-
     if (!driverGamepad || !driverGamepad->IsConnected() || !operatorGamepad || !operatorGamepad->IsConnected())
         return;
 
+    if(driverGamepad->DPadLeft()){
+        choosePoleScore(false);
+    }
+    if(driverGamepad->DPadRight()){
+        choosePoleScore(true);
+    }
     // state.lockingToReef = driverGamepad->GetAButtonPressed();
     state.getTag = false;
     if (driverGamepad->leftTriggerActive() && state.reefTag == -1) {
@@ -292,6 +300,8 @@ void Drivetrain::analyzeDashboard()
 
     Swerve::yPosTolerance = table->GetNumber("Y_Pos_Tol", Swerve::yPosTolerance.to<double>()) * 1_mm;
     Swerve::yVelTolerance = table->GetNumber("Y_Vel_Tol", Swerve::yVelTolerance.to<double>()) * 1_mps;
+
+    Swerve::goalAlign = table->GetNumber("Pole Offset", Swerve::goalAlign.to<double>()) * 1_m;
 
     alignAngleTags(); 
 
@@ -434,6 +444,11 @@ void Drivetrain::alignAngleZoning()
     else{
 
     }
+}
+
+void Drivetrain::choosePoleScore(bool isRight){
+    if(isRight) Swerve::goalAlign = -abs(Swerve::goalAlign.to<double>()) * 1_m;
+    else Swerve::goalAlign = abs(Swerve::goalAlign.to<double>()) * 1_m;
 }
 // void Drivetrain::setDriveMotorNeutralMode(valor::NeutralMode mode) {
 //     for (int i = 0; i < SWERVE_COUNT; i++)
