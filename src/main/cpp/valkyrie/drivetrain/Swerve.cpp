@@ -370,7 +370,7 @@ template<class AzimuthMotor, class DriveMotor>
 wpi::array<frc::SwerveModuleState, MODULE_COUNT> Swerve<AzimuthMotor, DriveMotor>::getModuleStates(frc::ChassisSpeeds chassisSpeeds)
 {
     auto states = kinematics->ToSwerveModuleStates(chassisSpeeds);
-    kinematics->DesaturateWheelSpeeds(&states, maxDriveSpeed);
+    kinematics->DesaturateWheelSpeeds(&states, chassisSpeeds, maxDriveSpeed, maxDriveSpeed, maxRotationSpeed);
     return states;
 }
 
