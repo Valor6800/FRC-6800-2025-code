@@ -16,6 +16,8 @@
 #include "valkyrie/drivetrain/SwerveModule.h"
 #include "valkyrie/CharMode.h"
 
+#include "Constants.h"
+
 #define MODULE_COUNT 4
 
 namespace valor {

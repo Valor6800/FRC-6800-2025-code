@@ -142,6 +142,14 @@ void Swerve<AzimuthMotor, DriveMotor>::analyzeDashboard()
     else {
         rotSpeedRPS = rotSpeed * maxRotationSpeed;
     }
+    units::meters_per_second_t moduleSpeedsRotation = units::meters_per_second_t{rotSpeedRPS.to<double>() * Constants::driveBaseRadius().to<double>()};
+    units::meters_per_second_t moduleSpeedsTranslation = units::meters_per_second_t{sqrtf(powf(xSpeedMPS.to<double>(), 2) + powf(ySpeedMPS.to<double>(), 2))};
+    
+    if (moduleSpeedsTranslation + moduleSpeedsRotation > maxDriveSpeed) {
+        units::meters_per_second_t adjustedModuleSpeedsTranslation = std::max(maxDriveSpeed - moduleSpeedsRotation, 0_mps);
+        xSpeedMPS *= adjustedModuleSpeedsTranslation / moduleSpeedsTranslation;
+        ySpeedMPS *= adjustedModuleSpeedsTranslation / moduleSpeedsTranslation;
+    }
 
     joystickVector = Eigen::Vector2d{xSpeed, ySpeed};
     double dotProduct = joystickVector.dot(MAKE_VECTOR(targetAngle));
