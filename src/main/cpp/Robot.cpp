@@ -20,6 +20,7 @@
 
 Robot::Robot() :
     drivetrain(this),
+    climber(this),
     valorAuto()
 {
     frc::TimedRobot();
@@ -34,6 +35,9 @@ Robot::Robot() :
 void Robot::RobotInit() {
     drivetrain.setGamepads(&gamepadOperator, &gamepadDriver);
     drivetrain.resetState();
+
+    climber.setGamepads(&gamepadOperator, &gamepadDriver);
+    climber.resetState();
 
     frc::LiveWindow::EnableAllTelemetry();
     frc::DataLogManager::Start();

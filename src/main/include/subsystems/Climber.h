@@ -34,6 +34,7 @@ public:
 
     enum CLIMB_STATE
     {
+        MANUAL,
         STOW,
         DEPLOY,
         CLIMB
@@ -57,6 +58,7 @@ public:
 
     }state;
 
+    units::angular_velocity::turns_per_second_t manualSpeed;
 private:
     valor::PhoenixController *climbMotor;
     valor::PhoenixController *crabMotor;

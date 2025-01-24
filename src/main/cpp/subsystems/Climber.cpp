@@ -10,8 +10,9 @@
 
 #define FORWARD_LIMIT 
 
-#define CLIMB_MAX_SPEED units::angular_velocity::turns_per_second_t (0)
-#define CLIMB_MAX_ACCEL units::angular_acceleration::turns_per_second_squared_t (0)
+#define CLIMB_MANUAL_SPEED units::angular_velocity::turns_per_second_t (0)
+#define CLIMB_MAX_SPEED units::angular_velocity::turns_per_second_t (0.5503)
+#define CLIMB_MAX_ACCEL units::angular_acceleration::turns_per_second_squared_t (0.5503)
 #define CLIMB_K_P 0
 #define CLIMB_K_D 0
 #define CLIMB_K_ERROR units::angle::turn_t (0)
@@ -25,7 +26,7 @@
 #define CRAB_K_ERROR units::angle::turn_t (0)
 #define CRAB_K_AFF 0
 
-#define CLIMB_GEAR_RATIO 0
+#define CLIMB_GEAR_RATIO 181.7
 #define CRAB_GEAR_RATIO 0
 
 #define CLIMBED_POS units::angle::turn_t (0)
@@ -57,6 +58,7 @@ void Climber::resetState()
 {
     state.climbState = CLIMB_STATE::STOW;
     state.crabState = CRAB_STATE::NO_CRAB;
+    state.climbed = false;
     currentSensor.reset();
 }
 
@@ -70,7 +72,7 @@ void Climber::init()
 
     currentSensor.setSpikeSetpoint(state.spikeCurrent);
     currentSensor.setGetter([this]() { return crabMotor->getCurrent().to<double>(); });
-    currentSensor.setSpikeCallback([this]() { state.crabState == CRAB_STATE::CRABBED;});
+    currentSensor.setSpikeCallback([this]() {state.crabState == CRAB_STATE::CRABBED;});
     currentSensor.setCacheSize(state.cacheSize);
     
     table->PutNumber("Spike Current", state.spikeCurrent);
@@ -84,7 +86,9 @@ void Climber::assessInputs()
     if (driverGamepad == nullptr || !driverGamepad->IsConnected()) return;
     if (operatorGamepad == nullptr || !operatorGamepad->IsConnected()) return;
 
-    if (operatorGamepad->rightTriggerActive()) {
+    if (operatorGamepad->rightStickYActive()) {
+        state.climbState = CLIMB_STATE::MANUAL;
+    } else if (operatorGamepad->rightTriggerActive()) {
         state.crabState = CRAB_STATE::CRABBING;
         state.climbState = CLIMB_STATE::DEPLOY;
     } else {
@@ -121,7 +125,10 @@ void Climber::assignOutputs()
         crabMotor->setPower(units::voltage::volt_t (0));
     }
 
-    if (state.climbState == CLIMB_STATE::DEPLOY) {
+    if (state.climbState == CLIMB_STATE::MANUAL) {
+        manualSpeed = units::angular_velocity::turns_per_second_t {operatorGamepad->leftStickY(2) * CLIMB_MANUAL_SPEED};
+        climbMotor->setSpeed(manualSpeed);
+    } else if (state.climbState == CLIMB_STATE::DEPLOY) {
         climbMotor->setPosition(DEPLOY_POS);
     } else if (state.climbState == CLIMB_STATE::CLIMB) {
         climbMotor->setPosition(CLIMBED_POS);

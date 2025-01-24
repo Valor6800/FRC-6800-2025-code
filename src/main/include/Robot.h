@@ -10,6 +10,7 @@
 #include "valkyrie/Gamepad.h"
 
 #include "valkyrie/drivetrain/Swerve.h"
+#include "subsystems/Climber.h"
 
 #include "valkyrie/Auto.h"
 #include "Drivetrain.h"
@@ -45,6 +46,8 @@ class Robot : public frc::TimedRobot {
         frc2::CommandPtr autoCommands = frc2::cmd::None();
 
         Drivetrain drivetrain;
+        Climber climber;
+
         valor::Auto valorAuto;
         valor::CharMode charMode;
 };
