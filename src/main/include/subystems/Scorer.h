@@ -44,6 +44,7 @@ public:
 
      enum ELEV_LVL
     {
+        MANUAL,
         HP,
         STOWED,
         TROUGH,
@@ -56,10 +57,11 @@ public:
         ALGEE3,
     };
 
+
     struct x
     {
         SCORING_SPEED scoringState;
-        ELEV_LVL coralLevel;
+        ELEV_LVL coralState;
         bool sensorTwoTripped;
         double targetRotations;
     } state;
@@ -84,4 +86,6 @@ private:
     valor::GrappleLidarSensor lidarSensor;
     double wheelDiameter = 0.1;
     units::turn_t currentPosition;
+    double joystickInput;
+    double motorVoltage;
 };

@@ -17,7 +17,7 @@
 #define ELEV_K_ERROR units::angle::turn_t (0)
 #define ELEV_K_AFF 0
 
-#define SCORER_MAX_SPEED units::angular_velocity::turns_per_second_t ()
+#define SCORER_MAX_SPEED units::angular_velocity::turns_per_second_t (12.469)
 #define SCORER_MAX_ACCEL units::angular_acceleration::turns_per_second_squared_t (0)
 #define SCORER_K_P 0
 
@@ -96,7 +96,7 @@ Scorer::Scorer(frc::TimedRobot *_robot, Drivetrain *_drive) :
     void Scorer::resetState()
     {
         state.scoringState = SCORING_SPEED::HOLD;
-        state.coralLevel = ELEV_LVL::HP;
+        state.coralState = ELEV_LVL::HP;
 
     }
 
@@ -123,70 +123,44 @@ Scorer::Scorer(frc::TimedRobot *_robot, Drivetrain *_drive) :
         scorerDebounceSensor.setRisingEdgeCallback([this] {
          state.sensorTwoTripped = true;
          });
-
-         //scorerMotor->setPosition(units::turn_t(state));
-
         resetState();
     }
 
-    void Scorer::assessInputs()
-    {
-        if (driverGamepad == nullptr || !driverGamepad->IsConnected())
+   void Scorer::assessInputs()
+{
+    if (driverGamepad == nullptr || !driverGamepad->IsConnected() ||
+        operatorGamepad == nullptr || !operatorGamepad->IsConnected())
         return;
 
-        if (operatorGamepad == nullptr || !operatorGamepad->IsConnected())
-        return;
-
-
-        double joystickInput = operatorGamepad->GetLeftY();
-    
-    
-        double motorVoltage = joystickInput * 12.0; 
-
-        scorerMotor->setPower(units::volt_t(motorVoltage));
-
-        // if (state.sensorTwoTripped) {
-        //     if (driverGamepad->GetAButton()) {
-        //         if (isAligned) {
-        //             state.coralLevel = ELEV_LVL::FOUR;
-                    
-        //         } else {
-        //             state.coralLevel = ELEV_LVL::STOWED;
-        //         }
-        //     } 
-        //     else if (driverGamepad->GetBButton()) {
-        //         if (isAligned) {
-        //             state.coralLevel = ELEV_LVL::THREE;
-        //         } else {
-        //             state.coralLevel = ELEV_LVL::STOWED;
-        //         }
-        //     }
-        //     else if (driverGamepad->GetXButton()) {
-        //         if (isAligned) {
-        //             state.coralLevel = ELEV_LVL::TWO;
-        //         } else {
-        //             state.coralLevel = ELEV_LVL::STOWED;
-        //         }
-        //     }
-        //     else if (driverGamepad->GetYButton()) {
-        //         if (isAligned) {
-        //             state.coralLevel = ELEV_LVL::TROUGH;
-        //         } else {
-        //             state.coralLevel = ELEV_LVL::STOWED;
-        //         }
-        //     }
-        // }
-        // else{
-        //     state.coralLevel = ELEV_LVL::HP;
-        // }
-
-        units::turn_t currentPosition = scorerMotor->getPosition();
-
-        if ((currentPosition.value() - state.targetRotations) <= ELEVATOR_TOLERANCE) {
-
-            
+    if (operatorGamepad->rightStickYActive()) {
+        state.coralState = MANUAL;
+    } else {
+        if (state.sensorTwoTripped) {
+            if (driverGamepad->GetAButton()) {
+                state.coralState = drivetrain->state.getTag ? ELEV_LVL::FOUR : ELEV_LVL::STOWED;
+            } 
+            else if (driverGamepad->GetBButton()) {
+                state.coralState = drivetrain->state.getTag ? ELEV_LVL::THREE : ELEV_LVL::STOWED;
+            }
+            else if (driverGamepad->GetXButton()) {
+                state.coralState = drivetrain->state.getTag ? ELEV_LVL::TWO : ELEV_LVL::STOWED;
+            }
+            else if (driverGamepad->GetYButton()) {
+                state.coralState = drivetrain->state.getTag ? ELEV_LVL::TROUGH : ELEV_LVL::STOWED;
+            }
+            else {
+                state.coralState = ELEV_LVL::HP;
+            }
+        } else {
+            state.coralState = ELEV_LVL::HP;
         }
+    }
+
+     //units::turn_t currentPosition = scorerMotor->getPosition();
+
+        //if ((currentPosition.value() - state.targetRotations) <= ELEVATOR_TOLERANCE) {
 }
+
 
     void Scorer::analyzeDashboard()
     {
@@ -205,9 +179,16 @@ Scorer::Scorer(frc::TimedRobot *_robot, Drivetrain *_drive) :
 
     void Scorer::assignOutputs()
     {
-        units::length::meter_t targetHeightInMeters = coralHMap[state.coralLevel];
-        state.targetRotations = targetHeightInMeters.value() / (wheelDiameter * M_PI);
-        scorerMotor->setPosition(units::turn_t(state.targetRotations));
+        if (state.coralState == ELEV_LVL::MANUAL){
+            joystickInput = operatorGamepad->leftStickY(2);
+            motorVoltage = joystickInput * 12.0;
+            scorerMotor->setPower(units::volt_t(motorVoltage));
+        } else{
+            units::length::meter_t targetHeightInMeters = coralHMap[state.coralState];
+            state.targetRotations = targetHeightInMeters.value() / (wheelDiameter * M_PI);
+            scorerMotor->setPosition(units::turn_t(state.targetRotations));
+        }
+    
     }
 
 
