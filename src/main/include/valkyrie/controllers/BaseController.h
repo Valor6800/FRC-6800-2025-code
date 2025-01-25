@@ -49,8 +49,8 @@ public:
      * 
      * @param _motor The motor that will be controlled. Setup by the implemented class
      */
-    BaseController(T* _motor, bool _inverted, valor::NeutralMode _neutralMode, units::turns_per_second_t _maxMechSpeed) :
-        maxMechSpeed(_maxMechSpeed),
+    BaseController(T* _motor, bool _inverted, valor::NeutralMode _neutralMode, units::turns_per_second_t _maxMotorSpeed) :
+        maxMotorSpeed(_maxMotorSpeed),
         voltageCompenstation(units::volt_t{12.0}),
         motor(_motor),
         inverted(_inverted),
@@ -83,9 +83,9 @@ public:
      * @brief Get the motor's maximum motor speed
      * 
      * @return units::turns_per_second_t Motor's maximum motor angular speed (at the rotor)
-     * TODO: change name and definition to getMaxMechSpeed(), returns the maxMechSpeed
+     * TODO: change name and definition to getmaxMotorSpeed(), returns the maxMotorSpeed
      */
-    units::turns_per_second_t getMaxMechSpeed() { return maxMechSpeed; }
+    units::turns_per_second_t getmaxMotorSpeed() { return maxMotorSpeed; }
 
     /**
      * @brief Setup the voltage compensation for the motor
@@ -298,8 +298,7 @@ public:
 
 protected:
 
-    // TODO: change name to maxMechSpeed mps
-    units::turns_per_second_t maxMechSpeed;
+    units::turns_per_second_t maxMotorSpeed;
     units::volt_t voltageCompenstation;
     
     T* motor;

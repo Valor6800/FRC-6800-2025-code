@@ -166,11 +166,10 @@ void PhoenixController::setPIDF(valor::PIDF _pidf, int slot, bool saveImmediatel
 
     // Generic PIDF configurations
     // Numerator for closed loop controls will be in volts
-    // Feedback and feedforward gains are in volts / rpm of motor, NOT mechanism
     config.Slot0.kP = pidf.P;
     config.Slot0.kI = pidf.I;
     config.Slot0.kD = pidf.D;
-    config.Slot0.kV = (voltageCompenstation / (maxMechSpeed / (rotorToSensor * sensorToMech))).value();
+    config.Slot0.kV = (voltageCompenstation * rotorToSensor * sensorToMech / maxMotorSpeed).value();
     config.Slot0.kS = pidf.S;
 
     // Feedforward gain configuration
@@ -196,8 +195,6 @@ void PhoenixController::setGearRatios(double _rotorToSensor, double _sensorToMec
 {
     rotorToSensor = _rotorToSensor;
     sensorToMech = _sensorToMech;
-
-    maxMechSpeed /= (rotorToSensor * sensorToMech);
 
     config.Feedback.RotorToSensorRatio = rotorToSensor;
     config.Feedback.SensorToMechanismRatio = sensorToMech;
@@ -387,7 +384,7 @@ void PhoenixController::InitSendable(wpi::SendableBuilder& builder)
         );
     builder.AddDoubleProperty(
         "Module Max Speed TPS",
-        [this] {return getMaxMechSpeed().value();},
+        [this] {return getmaxMotorSpeed().value();},
         nullptr
     );
 }
