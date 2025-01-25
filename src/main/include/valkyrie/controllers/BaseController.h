@@ -80,12 +80,18 @@ public:
     virtual void applyConfig() = 0;
 
     /**
-     * @brief Get the motor's maximum motor speed
+     * @brief Get the motor's maximum speed
      * 
-     * @return units::turns_per_second_t Motor's maximum motor angular speed (at the rotor)
-     * TODO: change name and definition to getmaxMotorSpeed(), returns the maxMotorSpeed
+     * @return units::turns_per_second_t Motor's maximum angular speed (at the rotor)
      */
-    units::turns_per_second_t getmaxMotorSpeed() { return maxMotorSpeed; }
+    units::turns_per_second_t getMaxMotorSpeed() { return maxMotorSpeed; }
+
+    /**
+     * @brief Get the mechanisms's maximum speed
+     * 
+     * @return units::turns_per_second_t Mechanism's maximum angular speed (at the mech)
+     */
+    units::turns_per_second_t getMaxMechSpeed() { return maxMotorSpeed / (rotorToSensor * sensorToMech); }
 
     /**
      * @brief Setup the voltage compensation for the motor

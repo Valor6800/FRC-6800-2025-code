@@ -169,7 +169,7 @@ void PhoenixController::setPIDF(valor::PIDF _pidf, int slot, bool saveImmediatel
     config.Slot0.kP = pidf.P;
     config.Slot0.kI = pidf.I;
     config.Slot0.kD = pidf.D;
-    config.Slot0.kV = (voltageCompenstation * rotorToSensor * sensorToMech / maxMotorSpeed).value();
+    config.Slot0.kV = (voltageCompenstation / getMaxMechSpeed()).value();
     config.Slot0.kS = pidf.S;
 
     // Feedforward gain configuration
@@ -384,7 +384,7 @@ void PhoenixController::InitSendable(wpi::SendableBuilder& builder)
         );
     builder.AddDoubleProperty(
         "Module Max Speed TPS",
-        [this] {return getmaxMotorSpeed().value();},
+        [this] {return getMaxMotorSpeed().value();},
         nullptr
     );
 }
