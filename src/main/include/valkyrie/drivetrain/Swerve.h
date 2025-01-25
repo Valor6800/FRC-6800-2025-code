@@ -150,6 +150,8 @@ private:
     bool roughTowardsRed;
     void calculateCarpetPose();
 
+    frc::ChassisSpeeds discretize(frc::ChassisSpeeds speeds);
+
     bool rotTest;
     bool strLineTest;
     

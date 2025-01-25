@@ -20,6 +20,7 @@
 #define MODULE_DIFF_YS {1, -1, -1, 1}
 
 #define LOOP_TIME 0.02_s
+#define COMPENSATION 4
 
 const units::hertz_t KP_ROTATE(-90);
 const units::hertz_t KD_ROTATE(-30);
@@ -371,14 +372,13 @@ wpi::array<frc::SwerveModuleState, MODULE_COUNT> Swerve<AzimuthMotor, DriveMotor
                                                                                            omega_radps,
                                                                                            rawEstimator->GetEstimatedPosition().Rotation())
                                              : frc::ChassisSpeeds{vx_mps, vy_mps, omega_radps};
-    chassisSpeeds = chassisSpeeds.Discretize(chassisSpeeds.vx, chassisSpeeds.vy, chassisSpeeds.omega, LOOP_TIME);
     return getModuleStates(chassisSpeeds);
 }
 
 template<class AzimuthMotor, class DriveMotor>
 wpi::array<frc::SwerveModuleState, MODULE_COUNT> Swerve<AzimuthMotor, DriveMotor>::getModuleStates(frc::ChassisSpeeds chassisSpeeds)
 {
-    chassisSpeeds = chassisSpeeds.Discretize(chassisSpeeds, LOOP_TIME);
+    chassisSpeeds = discretize(chassisSpeeds);
     auto states = kinematics->ToSwerveModuleStates(chassisSpeeds);
     kinematics->DesaturateWheelSpeeds(&states, maxDriveSpeed);
     return states;
@@ -421,6 +421,14 @@ bool Swerve<AzimuthMotor, DriveMotor>::isRobotSkidding()
 {
     // should be better than this but this is good enough for now i think
     return getSkiddingRatio() >= 1.5;
+}
+
+template<class AzimuthMotor, class DriveMotor>
+frc::ChassisSpeeds Swerve<AzimuthMotor, DriveMotor>::discretize(frc::ChassisSpeeds speeds){
+    frc::Pose2d desiredPose{speeds.vx * LOOP_TIME, speeds.vy * LOOP_TIME, frc::Rotation2d(speeds.omega * LOOP_TIME * COMPENSATION)};
+    frc::Twist2d twist = desiredPose.Log(desiredPose);
+    frc::ChassisSpeeds finalSpeeds{(twist.dx / LOOP_TIME), (twist.dy / LOOP_TIME), (speeds.omega)};
+    return finalSpeeds;
 }
 
 template<class AzimuthMotor, class DriveMotor>
