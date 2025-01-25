@@ -2,6 +2,7 @@
 #include "subsystems/Scorer.h"
 #include "valkyrie/controllers/NeutralMode.h"
 #include "valkyrie/controllers/PIDF.h"
+#include <iostream>
 
 #include <pathplanner/lib/auto/NamedCommands.h>
 
@@ -18,8 +19,8 @@
 
 #define SCORER_K_P 0
 
-#define ELEVATOR_FORWARD_LIMIT 0.0_tr
-#define ELEVATOR_REVERSE_LIMIT 0.0_tr
+#define ELEVATOR_FORWARD_LIMIT 4_tr
+#define ELEVATOR_REVERSE_LIMIT 0.5_tr
 
 #define SEGMENTS 0.0f
 #define CIRCUM 1.432* M_Pi
@@ -27,7 +28,7 @@
 #define SENSOR_TO_MECH 8.02f
 #define ELEVATOR_TOLERANCE 0.5f
 #define GEAR_CIRCUMFERENCE units::meter_t{1.432_in} * M_PI // meters
-#define CONVERSION_FACTOR units::turn_t{1} / GEAR_CIRCUMFERENCE // turns/meter
+#define CONVERSION_FACTOR units::turn_t{1} / GEAR_CIRCUMFERENCE
 
 Scorer::Scorer(frc::TimedRobot *_robot, Drivetrain *_drive) :
     valor::BaseSubsystem(_robot, "Scorer"),
@@ -35,8 +36,8 @@ Scorer::Scorer(frc::TimedRobot *_robot, Drivetrain *_drive) :
     scorerDebounceSensor(_robot, "ScorerDebounce"),
     hallEffectDebounceSensor(_robot, "HallEffectDebounce"),
     hallEffectDigitalSensor(DIOPorts::HALL_EFFECT),
-    elevatorMotor(new valor::PhoenixController(valor::PhoenixControllerType::KRAKEN_X60, CANIDs::ELEV_WHEEL, valor::NeutralMode::Brake, false, "baseCAN")),
-    scorerMotor(new valor::PhoenixController(valor::PhoenixControllerType::KRAKEN_X60, CANIDs::SCORER_WHEEL, valor::NeutralMode::Brake, false, "baseCAN")),
+    elevatorMotor(new valor::PhoenixController(valor::PhoenixControllerType::KRAKEN_X60, CANIDs::ELEV_WHEEL, valor::NeutralMode::Brake, true, "baseCAN")),
+    // scorerMotor(new valor::PhoenixController(valor::PhoenixControllerType::KRAKEN_X60, CANIDs::SCORER_WHEEL, valor::NeutralMode::Brake, false, "baseCAN")),
     lidarSensor(_robot, "Front Lidar Sensor", CANIDs::FRONT_LIDAR_SENSOR)
     {
 
@@ -106,7 +107,7 @@ Scorer::Scorer(frc::TimedRobot *_robot, Drivetrain *_drive) :
     void Scorer::init()
     {
         elevatorMotor->setGearRatios(MOTOR_TO_SENSOR, SENSOR_TO_MECH);
-        scorerMotor->setGearRatios(1, 1);
+        // scorerMotor->setGearRatios(1, 1);
 
         valor::PIDF elevatorPID;
         elevatorPID.maxVelocity = elevatorMotor->getMaxMechSpeed();
@@ -117,21 +118,22 @@ Scorer::Scorer(frc::TimedRobot *_robot, Drivetrain *_drive) :
         elevatorPID.aFFType = valor::FeedForwardType::LINEAR;
 
         valor::PIDF scorerPID;
-        scorerPID.maxVelocity = scorerMotor->getMaxMechSpeed();
-        scorerPID.maxAcceleration = scorerMotor->getMaxMechSpeed()/(1.0_s/2);
+        // scorerPID.maxVelocity = scorerMotor->getMaxMechSpeed();
+        // scorerPID.maxAcceleration = scorerMotor->getMaxMechSpeed()/(1.0_s/2);
         scorerPID.P = SCORER_K_P;
         
-        scorerMotor->setPIDF(scorerPID, 0);
-        elevatorMotor->setPIDF(scorerPID, 0);
+        // scorerMotor->setPIDF(scorerPID, 0);
+        elevatorMotor->setPIDF(elevatorPID, 0);
 
         elevatorMotor->setForwardLimit(ELEVATOR_FORWARD_LIMIT);
         elevatorMotor->setReverseLimit(ELEVATOR_REVERSE_LIMIT);
         elevatorMotor->applyConfig();
 
 
-       hallEffectDebounceSensor.setGetter([this] { return hallEffectDigitalSensor.Get();});
-        hallEffectDebounceSensor.setFallingEdgeCallback([this] {
-         elevatorMotor->setEncoderPosition(0_tr);
+       hallEffectDebounceSensor.setGetter([this] { return !hallEffectDigitalSensor.Get();});
+        hallEffectDebounceSensor.setRisingEdgeCallback([this] {
+            std::cout << "HALLEFFECT RESET FOR ELEVATOR" << std::endl;
+            elevatorMotor->setEncoderPosition(0_tr);
          });
         resetState();
 
@@ -146,27 +148,26 @@ Scorer::Scorer(frc::TimedRobot *_robot, Drivetrain *_drive) :
 
    void Scorer::assessInputs()
 {
-    if (driverGamepad == nullptr || !driverGamepad->IsConnected() ||
-        operatorGamepad == nullptr || !operatorGamepad->IsConnected())
+    if (operatorGamepad == nullptr || !operatorGamepad->IsConnected())
         return;
 
     if (operatorGamepad->rightStickYActive()) {
         state.coralState = MANUAL;
-        state.manualSpeed = operatorGamepad->leftStickY(2) * 12_V;
-    } else if (driverGamepad->GetAButton()) {
-        state.coralState = drivetrain->state.getTag ? ELEV_LVL::FOUR : ELEV_LVL::STOWED;
-    } else if (driverGamepad->GetBButton()) {
-        state.coralState = drivetrain->state.getTag ? ELEV_LVL::THREE : ELEV_LVL::STOWED;
-    } else if (driverGamepad->GetXButton()) {
-        state.coralState = drivetrain->state.getTag ? ELEV_LVL::TWO : ELEV_LVL::STOWED;
-    } else if (driverGamepad->GetYButton()) {
-        state.coralState = drivetrain->state.getTag ? ELEV_LVL::TROUGH : ELEV_LVL::STOWED;
-    // } else {
-    //     state.coralState = ELEV_LVL::HP;
+        state.manualSpeed = operatorGamepad->rightStickY(2) * 12_V;
+    } else if (operatorGamepad->GetYButtonPressed()){
+        state.coralState = ELEV_LVL::HP;
+    } else if (operatorGamepad->GetYButtonPressed()){
+        state.coralState = ELEV_LVL::TROUGH;
     }
+    // } else if (driverGamepad->GetYButtonPressed()) {
+    //     state.coralState = drivetrain->state.getTag ? ELEV_LVL::HP : ELEV_LVL::STOWED;
+    // } else if (driverGamepad->GetAButtonPressed()) {
+    //     state.coralState = drivetrain->state.getTag ? ELEV_LVL::TROUGH: ELEV_LVL::STOWED;
+    // }
 
-} 
 
+
+}
 
     void Scorer::analyzeDashboard()
     {
@@ -179,10 +180,10 @@ Scorer::Scorer(frc::TimedRobot *_robot, Drivetrain *_drive) :
     {
         if (state.coralState == ELEV_LVL::MANUAL){
 
-            elevatorMotor->setPower(units::volt_t(state.manualSpeed));
+            elevatorMotor->setPower(state.manualSpeed);
         } else{
             state.targetHeight = coralHMap[state.coralState];
-            units::turn_t targetRotations = (state.targetHeight * CONVERSION_FACTOR);
+            units::turn_t targetRotations = (state.targetHeight * (1/GEAR_CIRCUMFERENCE));
             elevatorMotor->setPosition(targetRotations);
         }
     
@@ -207,7 +208,13 @@ Scorer::Scorer(frc::TimedRobot *_robot, Drivetrain *_drive) :
 
         builder.AddDoubleProperty(
             "Current position (in)",
-            [this] {return (elevatorMotor->getPosition() * (1/CONVERSION_FACTOR)).value();},
+            [this] {return (elevatorMotor->getPosition() * (GEAR_CIRCUMFERENCE)).value();},
+            nullptr
+        );
+
+         builder.AddDoubleProperty(
+            "Current position (inches version 2)",
+            [this] { return (elevatorMotor->getPosition().value() * 1.432 * M_PI); },
             nullptr
         );
 

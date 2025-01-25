@@ -63,11 +63,12 @@ public:
         bool sensorTwoTripped;
         units::meter_t targetHeight;
         units::volt_t manualSpeed;
+        bool hasZeroed;
     } state;
 
     std::unordered_map<ELEV_LVL, units::meter_t> coralHMap = {
-        {ELEV_LVL::HP, 1.3_m},
-        {ELEV_LVL::TROUGH, 1.4_m},
+        {ELEV_LVL::HP, 0.5_m},
+        {ELEV_LVL::TROUGH, 1_m},
         {ELEV_LVL::TWO, 1.5_m},
         {ELEV_LVL::THREE, 1.6_m},
         {ELEV_LVL::FOUR, 1.7_m},
@@ -83,6 +84,6 @@ private:
     valor::DebounceSensor hallEffectDebounceSensor;
     valor::DebounceSensor scorerDebounceSensor;
     valor::PhoenixController *elevatorMotor;
-    valor::PhoenixController *scorerMotor;
+    // valor::PhoenixController *scorerMotor;
     valor::GrappleLidarSensor lidarSensor;
 };

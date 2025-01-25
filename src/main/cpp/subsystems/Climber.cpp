@@ -110,14 +110,13 @@ void Climber::init()
 void Climber::assessInputs()
 {
     if (operatorGamepad == nullptr || !operatorGamepad->IsConnected()) return;
-    state.climbState = CLIMB_STATE::MANUAL;
-    state.manualSpeed = operatorGamepad->leftStickY(2) * 12_V;
 
     if (operatorGamepad->leftStickYActive()) {
         state.climbState = CLIMB_STATE::MANUAL;
-    } else if (operatorGamepad->GetYButton()) {
+        state.manualSpeed = operatorGamepad->leftStickY(2) * 12_V;
+    } else if (operatorGamepad->GetBButtonPressed()) {
         state.climbState = CLIMB_STATE::DEPLOYED;
-    } else if (operatorGamepad->GetAButton()) {
+    } else if (operatorGamepad->GetXButtonPressed()) {
         state.climbState = CLIMB_STATE::RETRACTED;
     }
 
