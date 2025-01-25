@@ -55,7 +55,7 @@ Climber::~Climber()
 
 void Climber::resetState()
 {
-    state.climbState = CLIMB_STATE::STOW;
+    state.climbState = CLIMB_STATE::MANUAL;
     state.crabState = CRAB_STATE::NO_CRAB;
     state.climbed = false;
     currentSensor.reset();
@@ -111,9 +111,9 @@ void Climber::assessInputs()
 {
     if (operatorGamepad == nullptr || !operatorGamepad->IsConnected()) return;
 
-    if (operatorGamepad->leftStickYActive()) {
+    if (operatorGamepad->rightStickYActive()) {
         state.climbState = CLIMB_STATE::MANUAL;
-        state.manualSpeed = operatorGamepad->leftStickY(2) * 12_V;
+        state.manualSpeed = operatorGamepad->rightStickY(2) * 12_V;
     } else if (operatorGamepad->GetBButtonPressed()) {
         state.climbState = CLIMB_STATE::DEPLOYED;
     } else if (operatorGamepad->GetXButtonPressed()) {

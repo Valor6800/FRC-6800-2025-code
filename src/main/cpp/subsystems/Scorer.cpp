@@ -12,15 +12,16 @@
 
 #include <frc/DriverStation.h>
 // 
-#define ELEV_K_P 0
+#define ELEV_K_P 10
 #define ELEV_K_ERROR units::angle::turn_t (0)
-#define ELEV_K_AFF 0
+#define ELEV_K_AFF 0.4
 #define MOTOR_TO_MECH_IN 6000/SENSOR_TO_MECH*
 
 #define SCORER_K_P 0
 
-#define ELEVATOR_FORWARD_LIMIT 4_tr
-#define ELEVATOR_REVERSE_LIMIT 0.5_tr
+#define ELEVATOR_FORWARD_LIMIT 5.75_tr
+#define ELEVATOR_REVERSE_LIMIT 0.0_tr
+#define ELEVATOR_OFFSET 3_in
 
 #define SEGMENTS 0.0f
 #define CIRCUM 1.432* M_Pi
@@ -106,16 +107,18 @@ Scorer::Scorer(frc::TimedRobot *_robot, Drivetrain *_drive) :
 
     void Scorer::init()
     {
+        state.hasZeroed = false;
         elevatorMotor->setGearRatios(MOTOR_TO_SENSOR, SENSOR_TO_MECH);
         // scorerMotor->setGearRatios(1, 1);
 
         valor::PIDF elevatorPID;
         elevatorPID.maxVelocity = elevatorMotor->getMaxMechSpeed();
-        elevatorPID.maxAcceleration = elevatorMotor->getMaxMechSpeed()/(1.0_s/2);
+        elevatorPID.maxAcceleration = elevatorMotor->getMaxMechSpeed()/(1.0_s/5);
         elevatorPID.P =ELEV_K_P ;
         elevatorPID.error = ELEV_K_ERROR;
         elevatorPID.aFF = ELEV_K_AFF;
         elevatorPID.aFFType = valor::FeedForwardType::LINEAR;
+        // elevatorPID.kG = 0.4
 
         valor::PIDF scorerPID;
         // scorerPID.maxVelocity = scorerMotor->getMaxMechSpeed();
@@ -132,6 +135,7 @@ Scorer::Scorer(frc::TimedRobot *_robot, Drivetrain *_drive) :
 
        hallEffectDebounceSensor.setGetter([this] { return !hallEffectDigitalSensor.Get();});
         hallEffectDebounceSensor.setRisingEdgeCallback([this] {
+            state.hasZeroed = true;
             std::cout << "HALLEFFECT RESET FOR ELEVATOR" << std::endl;
             elevatorMotor->setEncoderPosition(0_tr);
          });
@@ -151,13 +155,13 @@ Scorer::Scorer(frc::TimedRobot *_robot, Drivetrain *_drive) :
     if (operatorGamepad == nullptr || !operatorGamepad->IsConnected())
         return;
 
-    if (operatorGamepad->rightStickYActive()) {
+    if (operatorGamepad->leftStickYActive()) {
         state.coralState = MANUAL;
-        state.manualSpeed = operatorGamepad->rightStickY(2) * 12_V;
+        state.manualSpeed = operatorGamepad->leftStickY(2) * 12_V;
     } else if (operatorGamepad->GetYButtonPressed()){
-        state.coralState = ELEV_LVL::HP;
-    } else if (operatorGamepad->GetYButtonPressed()){
-        state.coralState = ELEV_LVL::TROUGH;
+        state.coralState = ELEV_LVL::FOUR;
+    } else if (operatorGamepad->GetAButtonPressed()){
+        state.coralState = ELEV_LVL::TWO;
     }
     // } else if (driverGamepad->GetYButtonPressed()) {
     //     state.coralState = drivetrain->state.getTag ? ELEV_LVL::HP : ELEV_LVL::STOWED;
@@ -174,23 +178,35 @@ Scorer::Scorer(frc::TimedRobot *_robot, Drivetrain *_drive) :
 
     }
 
+    units::meter_t Scorer::convertToMechSpace(units::turn_t turns) 
+    {
+        return units::meter_t{turns * units::meter_t {1.432_in * M_PI}/1_tr} + ELEVATOR_OFFSET;
+    }
+
+    units::turn_t Scorer::convertToMotorSpace(units::meter_t meters)     
+    {
+        return (meters - ELEVATOR_OFFSET) / units::meter_t {1.432_in * M_PI} * 1_tr;
+    }
 
 
     void Scorer::assignOutputs()
     {
-        if (state.coralState == ELEV_LVL::MANUAL){
-
-            elevatorMotor->setPower(state.manualSpeed);
-        } else{
-            state.targetHeight = coralHMap[state.coralState];
-            units::turn_t targetRotations = (state.targetHeight * (1/GEAR_CIRCUMFERENCE));
-            elevatorMotor->setPosition(targetRotations);
+        if (state.hasZeroed) {
+            if (state.coralState == ELEV_LVL::MANUAL) {
+                elevatorMotor->setPower(state.manualSpeed);
+            } else {
+                state.targetHeight = coralHMap[state.coralState];
+                units::turn_t targetRotations = convertToMotorSpace(state.targetHeight);
+                elevatorMotor->setPosition(targetRotations);
+            }
+        } else {
+            elevatorMotor->setPower(-2.0_V);
         }
-    
     }
 
 
-    void Scorer::InitSendable(wpi::SendableBuilder& builder)
+
+void Scorer::InitSendable(wpi::SendableBuilder& builder)
     {
 
         builder.SetSmartDashboardType("Subsystem");
@@ -205,18 +221,12 @@ Scorer::Scorer(frc::TimedRobot *_robot, Drivetrain *_drive) :
             [this] {return state.targetHeight.value();},
             nullptr
         );
-
-        builder.AddDoubleProperty(
-            "Current position (in)",
-            [this] {return (elevatorMotor->getPosition() * (GEAR_CIRCUMFERENCE)).value();},
-            nullptr
-        );
-
          builder.AddDoubleProperty(
-            "Current position (inches version 2)",
-            [this] { return (elevatorMotor->getPosition().value() * 1.432 * M_PI); },
+            "Current position (in)",
+            [this] { return units::inch_t{convertToMechSpace(elevatorMotor->getPosition())}.value();},
             nullptr
         );
 
     }
+
 

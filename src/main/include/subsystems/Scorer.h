@@ -28,6 +28,8 @@ public:
     
     void resetState();
     void init();
+    units::meter_t convertToMechSpace(units::turn_t turns);
+    units::turn_t convertToMotorSpace(units::meter_t meters);
     void assessInputs();
     void analyzeDashboard();
     void assignOutputs();
@@ -67,11 +69,11 @@ public:
     } state;
 
     std::unordered_map<ELEV_LVL, units::meter_t> coralHMap = {
-        {ELEV_LVL::HP, 0.5_m},
+        {ELEV_LVL::HP, 0.7_m},
         {ELEV_LVL::TROUGH, 1_m},
-        {ELEV_LVL::TWO, 1.5_m},
+        {ELEV_LVL::TWO, 0.25_m},
         {ELEV_LVL::THREE, 1.6_m},
-        {ELEV_LVL::FOUR, 1.7_m},
+        {ELEV_LVL::FOUR, 0.5_m},
         {ELEV_LVL::BARGE, 1.8_m},
         {ELEV_LVL::PROCESSOR, 1.9_m},
         {ELEV_LVL::ALGEE2, 2.0_m},
