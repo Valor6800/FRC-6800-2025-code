@@ -168,6 +168,15 @@ void SwerveModule<AzimuthMotor, DriveMotor>::setDriveClosedLoop(units::meters_pe
 }
 
 template<class AzimuthMotor, class DriveMotor>
+void SwerveModule<AzimuthMotor, DriveMotor>::setUpdateFrequency(units::frequency::hertz_t freq)
+{
+    azimuthMotor->setPositionUpdateFrequency(freq);
+    azimuthMotor->setSpeedUpdateFrequency(freq);
+    driveMotor->setPositionUpdateFrequency(freq);
+    driveMotor->setSpeedUpdateFrequency(freq);
+}
+
+template<class AzimuthMotor, class DriveMotor>
 void SwerveModule<AzimuthMotor, DriveMotor>::InitSendable(wpi::SendableBuilder& builder)
 {
     builder.SetSmartDashboardType("Subsystem");

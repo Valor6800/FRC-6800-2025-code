@@ -90,6 +90,8 @@ public:
     void setAzimuthPower(units::volt_t voltage);
     void setDrivePower(units::volt_t voltage);
 
+    void setUpdateFrequency(units::frequency::hertz_t);
+
     void InitSendable(wpi::SendableBuilder& builder) override;
 
 private:
