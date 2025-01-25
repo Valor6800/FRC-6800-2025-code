@@ -88,7 +88,7 @@ void Swerve<AzimuthMotor, DriveMotor>::init()
 {
     rot_controller.EnableContinuousInput(units::radian_t{-M_PI}, units::radian_t{M_PI});
     for(size_t i = 0; i < MODULE_COUNT; i++){
-        swerveModules[i]->setUpdateFrequency(4_Hz);
+        swerveModules[i]->setUpdateFrequency(250_Hz);
     }
 }
 

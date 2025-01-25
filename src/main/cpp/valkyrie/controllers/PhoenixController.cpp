@@ -236,12 +236,22 @@ units::turns_per_second_t PhoenixController::getSpeed()
 void PhoenixController::setPositionUpdateFrequency(units::frequency::hertz_t hertz)
 {
     res_position.SetUpdateFrequency(hertz);
+    cancoder->GetPosition().SetUpdateFrequency(hertz);
 }
 
 // Sets signal update rate for speed
 void PhoenixController::setSpeedUpdateFrequency(units::frequency::hertz_t hertz)
 {
     res_velocity.SetUpdateFrequency(hertz);
+    cancoder->GetVelocity().SetUpdateFrequency(hertz);
+}
+
+units::frequency::hertz_t PhoenixController::getPositionUpdateFrequency(){
+    return cancoder->GetPosition().GetAppliedUpdateFrequency();
+}
+
+units::frequency::hertz_t PhoenixController::getSpeedUpdateFrequency(){
+    return cancoder->GetVelocity().GetAppliedUpdateFrequency();
 }
 
 /**
@@ -389,6 +399,16 @@ void PhoenixController::InitSendable(wpi::SendableBuilder& builder)
     builder.AddDoubleProperty(
         "Module Max Speed TPS",
         [this] {return getMaxMotorSpeed().value();},
+        nullptr
+    );
+    builder.AddDoubleProperty(
+        "Position Update Freq",
+        [this] {return getPositionUpdateFrequency().to<double>();},
+        nullptr
+    );
+    builder.AddDoubleProperty(
+        "Speed Update Freq",
+        [this] {return getSpeedUpdateFrequency().to<double>();},
         nullptr
     );
 }

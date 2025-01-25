@@ -94,6 +94,9 @@ public:
     
     void setOpenLoopRamp(units::second_t time, bool saveImmediately = false) override;
 
+    units::frequency::hertz_t getPositionUpdateFrequency();
+    units::frequency::hertz_t getSpeedUpdateFrequency();
+
     void InitSendable(wpi::SendableBuilder& builder) override;
 
 private:
