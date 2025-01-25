@@ -145,8 +145,8 @@ Scorer::Scorer(frc::TimedRobot *_robot, Drivetrain *_drive) :
         state.coralState = drivetrain->state.getTag ? ELEV_LVL::TWO : ELEV_LVL::STOWED;
     } else if (driverGamepad->GetYButton()) {
         state.coralState = drivetrain->state.getTag ? ELEV_LVL::TROUGH : ELEV_LVL::STOWED;
-    } else {
-        state.coralState = ELEV_LVL::HP;
+    // } else {
+    //     state.coralState = ELEV_LVL::HP;
     }
 
 } 
