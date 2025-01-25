@@ -27,8 +27,7 @@ public:
     void analyzeDashboard();
     void assignOutputs();
 
-    void setClimberPID();
-    void setCrabPID();
+    // void setCrabPID();
 
     void InitSendable(wpi::SendableBuilder& builder);
 
@@ -36,8 +35,8 @@ public:
     {
         MANUAL,
         STOW,
-        DEPLOY,
-        CLIMB
+        DEPLOYED,
+        RETRACTED
     };
 
     enum CRAB_STATE
@@ -55,12 +54,12 @@ public:
         bool climbed;
         double spikeCurrent;
         double cacheSize;
+        units::volt_t manualSpeed;
 
     }state;
 
-    units::angular_velocity::turns_per_second_t manualSpeed;
 private:
-    valor::PhoenixController *climbMotor;
+    valor::PhoenixController *climbMotors;
     valor::PhoenixController *crabMotor;
 
     valor::CurrentSensor currentSensor;

@@ -22,9 +22,10 @@
 #include <cscore.h>
 #include <frc/geometry/Pose3d.h>
 #include <networktables/NetworkTable.h>
+#include "valkyrie/controllers/PhoenixController.h"
 
 
-#define ALPHA_TEAM_NUMBER 6801
+#define ALPHA_TEAM_NUMBER 6800
 #define SIDE_SWIPE_TEAM_NUMBER 6808
 // When trying to compile against other targets for simulation, cmath doesn't include M_PI
 //   Therefore if not defined, define M_PI for use on other targets
@@ -83,12 +84,11 @@ namespace CANIDs {
     constexpr static int LEFT_SHOOTER_WHEEL = 15; // Relative to shooter being forward
     constexpr static int LEFT_SHOOTER_WHEEL2 = 17;
     constexpr static int FEEDER = 14;
-    constexpr static int CLIMBER_LEAD = 32;
-    constexpr static int CLIMBER_FOLLOW = 33;
+    constexpr static int CLIMBER_LEAD = 53;
+    constexpr static int CLIMBER_FOLLOW = 54;
     constexpr static int AMP = 10;
     constexpr static int CANDLE = 60;
     constexpr static int FRONT_LIDAR_SENSOR = 49;
-    constexpr static int CLIMBER = 55;
     constexpr static int CRABB = 56;
 }
 
@@ -109,6 +109,11 @@ namespace Constants {
         static bool roughTowardsRedAllianceWall = true;
         static double carpetGrainMultipler = 1.05;
 
+        static valor::PhoenixControllerType climberMotorType(){ switch (teamNumber){ 
+            case ALPHA_TEAM_NUMBER: return valor::PhoenixControllerType::FALCON_FOC; 
+            case SIDE_SWIPE_TEAM_NUMBER: return valor::PhoenixControllerType::KRAKEN_X60_FOC;  
+            default: return valor::PhoenixControllerType::KRAKEN_X60_FOC;
+        }};
         static units::degree_t pigeonMountPitch(){ switch (teamNumber){ 
             case ALPHA_TEAM_NUMBER: return 0_deg; 
             case SIDE_SWIPE_TEAM_NUMBER: return 0_deg;  
