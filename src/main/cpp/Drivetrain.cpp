@@ -401,7 +401,7 @@ void Drivetrain::setAngleBasedOnTag(int tagID)
             Swerve::targetAngle = BLUE_REEF_22_ANGLE; // 22
             break;
         default:
-            ;
+            alignAngleZoning();
     }
 }
 
@@ -423,7 +423,16 @@ void Drivetrain::alignAngleZoning()
     }
     // blue alliance TODO
     else{
-
+        if(robotX >= 4.5_m){
+            if(robotY >= 4.5_m) Swerve::targetAngle == BLUE_REEF_20_ANGLE;
+            if(robotY <= 3.5_m) Swerve::targetAngle == BLUE_REEF_22_ANGLE;
+            else Swerve::targetAngle == BLUE_REEF_21_ANGLE;
+        }
+        else{
+            if(robotY >= 4.5_m) Swerve::targetAngle == BLUE_REEF_19_ANGLE;
+            if(robotY <= 3.5_m) Swerve::targetAngle == BLUE_REEF_17_ANGLE;
+            else Swerve::targetAngle == BLUE_REEF_18_ANGLE;
+        }
     }
 }
 // void Drivetrain::setDriveMotorNeutralMode(valor::NeutralMode mode) {
