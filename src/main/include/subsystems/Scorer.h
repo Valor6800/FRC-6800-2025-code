@@ -69,10 +69,10 @@ public:
     } state;
 
     std::unordered_map<ELEV_LVL, units::meter_t> coralHMap = {
-        {ELEV_LVL::HP, 0.7_m},
-        {ELEV_LVL::TROUGH, 1_m},
-        {ELEV_LVL::TWO, 0.25_m},
-        {ELEV_LVL::THREE, 1.6_m},
+        {ELEV_LVL::HP, 5_in},
+        {ELEV_LVL::TROUGH, 13.57_in},
+        {ELEV_LVL::TWO, 17.0_in},
+        {ELEV_LVL::THREE, 25.05_in},
         {ELEV_LVL::FOUR, 0.5_m},
         {ELEV_LVL::BARGE, 1.8_m},
         {ELEV_LVL::PROCESSOR, 1.9_m},
@@ -82,6 +82,7 @@ public:
 
 private:
     Drivetrain *drivetrain;
+    bool hallEffectSensorActive();
     frc::DigitalInput hallEffectDigitalSensor;
     valor::DebounceSensor hallEffectDebounceSensor;
     valor::DebounceSensor scorerDebounceSensor;

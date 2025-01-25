@@ -176,7 +176,7 @@ class BaseSubsystem : public frc2::Subsystem, public wpi::Sendable, public wpi::
         
         void Periodic()
         {       
-            if (robot->IsTeleop())
+            if (robot->IsTeleop() && robot->IsEnabled())
                 assessInputs();
 
             analyzeDashboard();

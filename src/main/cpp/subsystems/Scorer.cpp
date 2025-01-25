@@ -14,7 +14,7 @@
 // 
 #define ELEV_K_P 10
 #define ELEV_K_ERROR units::angle::turn_t (0)
-#define ELEV_K_AFF 0.4
+#define ELEV_K_AFF 0.5
 #define MOTOR_TO_MECH_IN 6000/SENSOR_TO_MECH*
 
 #define SCORER_K_P 0
@@ -104,10 +104,14 @@ Scorer::Scorer(frc::TimedRobot *_robot, Drivetrain *_drive) :
 
     }
 
+    bool Scorer::hallEffectSensorActive(){
+        return !hallEffectDigitalSensor.Get();
+    }
+
 
     void Scorer::init()
     {
-        state.hasZeroed = false;
+        state.hasZeroed = hallEffectSensorActive();
         elevatorMotor->setGearRatios(MOTOR_TO_SENSOR, SENSOR_TO_MECH);
         // scorerMotor->setGearRatios(1, 1);
 
@@ -133,7 +137,7 @@ Scorer::Scorer(frc::TimedRobot *_robot, Drivetrain *_drive) :
         elevatorMotor->applyConfig();
 
 
-       hallEffectDebounceSensor.setGetter([this] { return !hallEffectDigitalSensor.Get();});
+       hallEffectDebounceSensor.setGetter([this] { return hallEffectSensorActive();});
         hallEffectDebounceSensor.setRisingEdgeCallback([this] {
             state.hasZeroed = true;
             std::cout << "HALLEFFECT RESET FOR ELEVATOR" << std::endl;
@@ -158,10 +162,16 @@ Scorer::Scorer(frc::TimedRobot *_robot, Drivetrain *_drive) :
     if (operatorGamepad->leftStickYActive()) {
         state.coralState = MANUAL;
         state.manualSpeed = operatorGamepad->leftStickY(2) * 12_V;
-    } else if (operatorGamepad->GetYButtonPressed()){
+    } else if (operatorGamepad->GetYButton()){
         state.coralState = ELEV_LVL::FOUR;
-    } else if (operatorGamepad->GetAButtonPressed()){
+    } else if (operatorGamepad->GetBButton()) {
+        state.coralState = ELEV_LVL::THREE;
+    } else if (operatorGamepad->GetAButton()) {
         state.coralState = ELEV_LVL::TWO;
+    } else if (operatorGamepad->GetXButton()){
+        state.coralState = ELEV_LVL::TROUGH;
+    } else if(operatorGamepad->DPadRight()){
+        state.coralState = ELEV_LVL::HP;
     }
     // } else if (driverGamepad->GetYButtonPressed()) {
     //     state.coralState = drivetrain->state.getTag ? ELEV_LVL::HP : ELEV_LVL::STOWED;
@@ -215,6 +225,11 @@ void Scorer::InitSendable(wpi::SendableBuilder& builder)
             [this] { return state.scoringState; },
             nullptr
         );
+        builder.AddDoubleProperty(
+            "State elevator level",
+            [this] { return state.coralState; },
+            nullptr
+        );
 
         builder.AddDoubleProperty(
             "Target position",
@@ -224,6 +239,11 @@ void Scorer::InitSendable(wpi::SendableBuilder& builder)
          builder.AddDoubleProperty(
             "Current position (in)",
             [this] { return units::inch_t{convertToMechSpace(elevatorMotor->getPosition())}.value();},
+            nullptr
+        );
+        builder.AddBooleanProperty(
+            "zeroed?",
+            [this] { return hallEffectSensorActive();},
             nullptr
         );
 

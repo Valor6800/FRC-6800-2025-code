@@ -8,8 +8,8 @@
 #include <pathplanner/lib/auto/NamedCommands.h>
 #include <frc/DriverStation.h>
 
-#define FORWARD_LIMIT 0.15_tr
-#define REVERSE_LIMIT -0.15_tr
+#define FORWARD_LIMIT 0.25_tr
+#define REVERSE_LIMIT -0.20_tr
 
 #define CLIMB_MANUAL_SPEED units::angular_velocity::turns_per_second_t (0)
 #define CLIMB_K_P 100
@@ -114,11 +114,12 @@ void Climber::assessInputs()
     if (operatorGamepad->rightStickYActive()) {
         state.climbState = CLIMB_STATE::MANUAL;
         state.manualSpeed = operatorGamepad->rightStickY(2) * 12_V;
-    } else if (operatorGamepad->GetBButtonPressed()) {
-        state.climbState = CLIMB_STATE::DEPLOYED;
-    } else if (operatorGamepad->GetXButtonPressed()) {
-        state.climbState = CLIMB_STATE::RETRACTED;
     }
+    // } else if (operatorGamepad->DPadUp()) {
+    //     state.climbState = CLIMB_STATE::DEPLOYED;
+    // } else if (operatorGamepad->DPadDown()) {
+    //     state.climbState = CLIMB_STATE::RETRACTED;
+    // }
 
 }
 

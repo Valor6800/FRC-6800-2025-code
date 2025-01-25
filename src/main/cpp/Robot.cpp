@@ -34,6 +34,8 @@ Robot::Robot() :
 }
 
 void Robot::RobotInit() {
+    gamepadOperator.setDeadbandY(0.13);
+    gamepadOperator.setDeadbandX(0.13);
     drivetrain.setGamepads(&gamepadOperator, &gamepadDriver);
     drivetrain.resetState();
 
@@ -98,6 +100,9 @@ void Robot::AutonomousExit() {
 void Robot::AutonomousPeriodic() {
 }
 
+void Robot::TeleopInit() {
+    scorer.resetState();
+}
 /**
  * This function is called periodically during operator control.
  */
