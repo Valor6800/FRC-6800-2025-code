@@ -371,13 +371,14 @@ wpi::array<frc::SwerveModuleState, MODULE_COUNT> Swerve<AzimuthMotor, DriveMotor
                                                                                            omega_radps,
                                                                                            rawEstimator->GetEstimatedPosition().Rotation())
                                              : frc::ChassisSpeeds{vx_mps, vy_mps, omega_radps};
-    chassisSpeeds.Discretize(chassisSpeeds.vx, chassisSpeeds.vy, chassisSpeeds.omega, LOOP_TIME);
+    chassisSpeeds = chassisSpeeds.Discretize(chassisSpeeds.vx, chassisSpeeds.vy, chassisSpeeds.omega, LOOP_TIME);
     return getModuleStates(chassisSpeeds);
 }
 
 template<class AzimuthMotor, class DriveMotor>
 wpi::array<frc::SwerveModuleState, MODULE_COUNT> Swerve<AzimuthMotor, DriveMotor>::getModuleStates(frc::ChassisSpeeds chassisSpeeds)
 {
+    chassisSpeeds = chassisSpeeds.Discretize(chassisSpeeds, LOOP_TIME);
     auto states = kinematics->ToSwerveModuleStates(chassisSpeeds);
     kinematics->DesaturateWheelSpeeds(&states, maxDriveSpeed);
     return states;
