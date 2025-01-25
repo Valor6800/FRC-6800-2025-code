@@ -14,7 +14,7 @@
 
 #include "valkyrie/Auto.h"
 #include "Drivetrain.h"
-#include "subystems/Scorer.h"
+#include "subsystems/Scorer.h"
 #include "valkyrie/CharMode.h"
 
 #include <frc/DriverStation.h>
