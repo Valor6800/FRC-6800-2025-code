@@ -12,7 +12,7 @@
 #define REVERSE_LIMIT -0.15_tr
 
 #define CLIMB_MANUAL_SPEED units::angular_velocity::turns_per_second_t (0)
-#define CLIMB_K_P 0
+#define CLIMB_K_P 100
 #define CLIMB_K_D 0
 #define CLIMB_K_ERROR units::angle::turn_t (0)
 #define CLIMB_K_JERK units::angular_jerk::turns_per_second_cubed_t (0)
@@ -63,19 +63,8 @@ void Climber::resetState()
 
 void Climber::init()
 {
-    units::angular_velocity::revolutions_per_minute_t motorSpeed = valor::PhoenixController::getPhoenixControllerMotorSpeed(Constants::climberMotorType());
 
     valor::PIDF climbPID;
-
-    climbPID.maxVelocity = (motorSpeed / CLIMB_GEAR_RATIO) * 0.8; //0.5_tps;
-    climbPID.maxAcceleration = ((motorSpeed / CLIMB_GEAR_RATIO)) / 1.0_s;; //2_tr_per_s_sq;
-    climbPID.P = CLIMB_K_P;
-    climbPID.D = CLIMB_K_D;
-    climbPID.error = CLIMB_K_ERROR;
-    climbPID.aFF = CLIMB_K_AFF;
-    climbPID.maxJerk = CLIMB_K_JERK;
-    climbPID.aFFType = valor::FeedForwardType::CIRCULAR;
-    climbPID.S = CLIMB_K_S;
 
     climbMotors = new valor::PhoenixController(
         valor::PhoenixControllerType::FALCON_FOC,
@@ -85,10 +74,21 @@ void Climber::init()
         "baseCAN"
     );
 
+    climbMotors->setGearRatios(1.0, CLIMB_GEAR_RATIO);
+
+    climbPID.maxVelocity = climbMotors->getMaxMechSpeed(); //0.5_tps;
+    climbPID.maxAcceleration = climbMotors->getMaxMechSpeed() / (1.0_s / 3);
+    climbPID.P = CLIMB_K_P;
+    climbPID.D = CLIMB_K_D;
+    climbPID.error = CLIMB_K_ERROR;
+    climbPID.aFF = CLIMB_K_AFF;
+    climbPID.maxJerk = CLIMB_K_JERK;
+    climbPID.aFFType = valor::FeedForwardType::CIRCULAR;
+    climbPID.S = CLIMB_K_S;
+
     climbMotors->setForwardLimit(FORWARD_LIMIT);
     climbMotors->setReverseLimit(REVERSE_LIMIT);
     climbMotors->setupFollower(CANIDs::CLIMBER_FOLLOW, false);
-    climbMotors->setGearRatios(1.0, CLIMB_GEAR_RATIO);
     climbMotors->setPIDF(climbPID, 0);
     climbMotors->setContinuousWrap(true);
     climbMotors->applyConfig();
@@ -113,13 +113,13 @@ void Climber::assessInputs()
     state.climbState = CLIMB_STATE::MANUAL;
     state.manualSpeed = operatorGamepad->leftStickY(2) * 12_V;
 
-    // if (operatorGamepad->leftStickYActive()) {
-    //     state.climbState = CLIMB_STATE::MANUAL;
-    // } else if (operatorGamepad->GetYButton()) {
-    //     state.climbState = CLIMB_STATE::DEPLOYED;
-    // } else if (operatorGamepad->GetAButton()) {
-    //     state.climbState = CLIMB_STATE::RETRACTED;
-    // }
+    if (operatorGamepad->leftStickYActive()) {
+        state.climbState = CLIMB_STATE::MANUAL;
+    } else if (operatorGamepad->GetYButton()) {
+        state.climbState = CLIMB_STATE::DEPLOYED;
+    } else if (operatorGamepad->GetAButton()) {
+        state.climbState = CLIMB_STATE::RETRACTED;
+    }
 
 }
 
