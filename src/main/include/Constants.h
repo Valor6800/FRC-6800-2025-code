@@ -197,7 +197,16 @@ namespace Constants {
         }};
 
         static frc::Pose3d mintCameraPosition(){ switch (teamNumber) {
-            case ALPHA_TEAM_NUMBER: return frc::Pose3d();
+            case ALPHA_TEAM_NUMBER: return frc::Pose3d(
+                14_in - (6_in + 1.5625_in),
+                6.75_in,
+                1.25_in + 1.75_in + 1.5_in + 6_in,
+                frc::Rotation3d(
+                    -2.1_deg,
+                    -1.6_deg,
+                    90_deg
+                )
+            );
             case GOLD_TEAM_NUMBER: return frc::Pose3d();
             default: return frc::Pose3d();
         }};
@@ -221,7 +230,16 @@ namespace Constants {
         }};
 
         static frc::Pose3d mangoCameraPosition(){ switch (teamNumber){
-            case ALPHA_TEAM_NUMBER: return frc::Pose3d();
+            case ALPHA_TEAM_NUMBER: return frc::Pose3d(
+                (1.5625_in + 5.875_in) - 14_in,
+                8.5_in,
+                10.625_in,
+                frc::Rotation3d(
+                    1.4_deg,
+                    0.4_deg,
+                    90_deg
+                )
+            );
             case GOLD_TEAM_NUMBER: return frc::Pose3d();
             default: return frc::Pose3d();
         }};
