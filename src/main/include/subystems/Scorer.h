@@ -63,7 +63,7 @@ public:
         SCORING_SPEED scoringState;
         ELEV_LVL coralState;
         bool sensorTwoTripped;
-        double targetRotations;
+        units::meter_t targetHeight;
     } state;
 
     std::unordered_map<ELEV_LVL, units::meter_t> coralHMap = {
@@ -88,4 +88,5 @@ private:
     units::turn_t currentPosition;
     double joystickInput;
     double motorVoltage;
+    units::turn_t targetRotations;
 };

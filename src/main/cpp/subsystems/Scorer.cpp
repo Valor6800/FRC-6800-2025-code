@@ -29,6 +29,8 @@
 #define MOTOR_TO_SENSOR 8.02f
 #define SENSOR_TO_MECH 1.0f
 #define ELEVATOR_TOLERANCE 0.5f
+#define GEAR_CIRCUMFERENCE units::meter_t{1.432_in} * M_PI // meters
+#define CONVERSION_FACTOR units::turn_t{1} / GEAR_CIRCUMFERENCE // turns/meter
 
 Scorer::Scorer(frc::TimedRobot *_robot, Drivetrain *_drive) :
     valor::BaseSubsystem(_robot, "Scorer"),
@@ -184,9 +186,9 @@ Scorer::Scorer(frc::TimedRobot *_robot, Drivetrain *_drive) :
             motorVoltage = joystickInput * 12.0;
             scorerMotor->setPower(units::volt_t(motorVoltage));
         } else{
-            units::length::meter_t targetHeightInMeters = coralHMap[state.coralState];
-            state.targetRotations = targetHeightInMeters.value() / (wheelDiameter * M_PI);
-            scorerMotor->setPosition(units::turn_t(state.targetRotations));
+            state.targetHeight = coralHMap[state.coralState];
+            targetRotations = (state.targetHeight * CONVERSION_FACTOR);
+            scorerMotor->setPosition(targetRotations);
         }
     
     }
@@ -209,6 +211,18 @@ Scorer::Scorer(frc::TimedRobot *_robot, Drivetrain *_drive) :
         builder.AddDoubleProperty(
             "Scorer current",
             [this] {return scorerMotor->getCurrent().to<double>();},
+            nullptr
+        );
+
+        builder.AddDoubleProperty(
+            "Target position",
+            [this] {return state.targetHeight.value();},
+            nullptr
+        );
+
+        builder.AddDoubleProperty(
+            "Current position",
+            [this] {return (scorerMotor->getPosition() * (1/CONVERSION_FACTOR)).value();},
             nullptr
         );
 
