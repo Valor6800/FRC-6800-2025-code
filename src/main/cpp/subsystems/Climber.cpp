@@ -25,7 +25,7 @@
 #define CRAB_K_ERROR units::angle::turn_t (0)
 #define CRAB_K_AFF 0
 
-#define CLIMB_GEAR_RATIO 181.7
+#define CLIMB_GEAR_RATIO 227.12
 #define CRAB_GEAR_RATIO 0
 
 #define DEPLOYED_POS units::angle::turn_t (0.1)
@@ -67,8 +67,8 @@ void Climber::init()
 
     valor::PIDF climbPID;
 
-    climbPID.maxVelocity = (motorSpeed / 181.7) * 0.5;
-    climbPID.maxAcceleration = ((motorSpeed / 181.7) * 0.5) / 1.0_s;
+    climbPID.maxVelocity = (motorSpeed / CLIMB_GEAR_RATIO) * 0.8; //0.5_tps;
+    climbPID.maxAcceleration = ((motorSpeed / CLIMB_GEAR_RATIO)) / 1.0_s;; //2_tr_per_s_sq;
     climbPID.P = CLIMB_K_P;
     climbPID.D = CLIMB_K_D;
     climbPID.error = CLIMB_K_ERROR;
@@ -113,13 +113,13 @@ void Climber::assessInputs()
     state.climbState = CLIMB_STATE::MANUAL;
     state.manualSpeed = operatorGamepad->leftStickY(2) * 12_V;
 
-    if (operatorGamepad->rightStickYActive()) {
-        state.climbState = CLIMB_STATE::MANUAL;
-    } else if (operatorGamepad->GetYButton()) {
-        state.climbState = CLIMB_STATE::DEPLOYED;
-    } else if (operatorGamepad->GetAButton()) {
-        state.climbState = CLIMB_STATE::RETRACTED;
-    }
+    // if (operatorGamepad->leftStickYActive()) {
+    //     state.climbState = CLIMB_STATE::MANUAL;
+    // } else if (operatorGamepad->GetYButton()) {
+    //     state.climbState = CLIMB_STATE::DEPLOYED;
+    // } else if (operatorGamepad->GetAButton()) {
+    //     state.climbState = CLIMB_STATE::RETRACTED;
+    // }
 
 }
 

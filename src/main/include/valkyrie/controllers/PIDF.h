@@ -49,12 +49,16 @@ struct PIDF
         maxJerk = _maxJerk;
     }
 
+
+
     /// Proportion control of the feedback term
     double P = 0.0;
     /// Integral control of the feedback term
     double I = 0.0;
     /// Derivative control of the feedback term
     double D = 0.0;
+    
+    double kV = -1;
     /// Max velocity: revolutions per 1s
     units::turns_per_second_t maxVelocity = 0_tps;
     /// Max acceleration: revolutions per 1s^2
