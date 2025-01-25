@@ -154,12 +154,6 @@ private:
 
      units::meter_t visionAcceptanceRadius;
 
-
-     valor::CANdleSensor *leds;
-
-     
-
-
      valor::CANdleSensor *leds;
 
      
