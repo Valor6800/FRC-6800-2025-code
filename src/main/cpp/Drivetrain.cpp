@@ -159,6 +159,91 @@ Drivetrain::Drivetrain(frc::TimedRobot *_robot) :
     );
     resetState();
     init();
+    // commands here
+    pathplanner::NamedCommands::registerCommand("Test Straight", std::move(
+        frc2::SequentialCommandGroup(
+            frc2::InstantCommand(
+                [this] () {
+                    Swerve::setAzimuthPositions(frc::Rotation2d{0_deg});
+                    Swerve::setDriveSpeeds(3_mps);
+                }
+            ),
+            frc2::WaitCommand(1_s),
+                frc2::InstantCommand(
+                    [this] () {
+                    Swerve::setDriveSpeeds(0_mps);
+                }
+            )
+        )
+    ).ToPtr());
+
+    pathplanner::NamedCommands::registerCommand("Test Right", std::move(
+        frc2::SequentialCommandGroup(
+            frc2::InstantCommand(
+                [this] () {
+                    Swerve::setAzimuthPositions(frc::Rotation2d{90_deg});
+                    Swerve::setDriveSpeeds(3_mps);
+                }
+            ),
+            frc2::WaitCommand(1_s),
+                frc2::InstantCommand(
+                    [this] () {
+                    Swerve::setDriveSpeeds(0_mps);
+                }
+            )
+        )
+    ).ToPtr());
+
+    pathplanner::NamedCommands::registerCommand("Test Back", std::move(
+        frc2::SequentialCommandGroup(
+            frc2::InstantCommand(
+                [this] () {
+                    Swerve::setAzimuthPositions(frc::Rotation2d{180_deg});
+                    Swerve::setDriveSpeeds(3_mps);
+                }
+            ),
+            frc2::WaitCommand(1_s),
+                frc2::InstantCommand(
+                    [this] () {
+                    Swerve::setDriveSpeeds(0_mps);
+                }
+            )
+        )
+    ).ToPtr());
+
+    pathplanner::NamedCommands::registerCommand("Test Left", std::move(
+        frc2::SequentialCommandGroup(
+            frc2::InstantCommand(
+                [this] () {
+                    Swerve::setAzimuthPositions(frc::Rotation2d{270_deg});
+                    Swerve::setDriveSpeeds(3_mps);
+                }
+            ),
+            frc2::WaitCommand(1_s),
+                frc2::InstantCommand(
+                    [this] () {
+                    Swerve::setDriveSpeeds(0_mps);
+                }
+            )
+        )
+    ).ToPtr());
+
+    pathplanner::NamedCommands::registerCommand("Test Rotate", std::move(
+        frc2::SequentialCommandGroup(
+            frc2::InstantCommand(
+                [this] () {
+                    Swerve::setAzimuthPositions(frc::Rotation2d{-45_deg}, frc::Rotation2d{-135_deg}, frc::Rotation2d{-225_deg}, frc::Rotation2d{45_deg});
+                    Swerve::setDriveSpeeds(3_mps);
+                }
+            ),
+            frc2::WaitCommand(1_s),
+                frc2::InstantCommand(
+                    [this] () {
+                    Swerve::setDriveSpeeds(0_mps);
+                }
+            )
+        )
+    ).ToPtr());
 }
 
 Drivetrain::~Drivetrain(){}

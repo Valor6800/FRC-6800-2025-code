@@ -367,6 +367,28 @@ wpi::array<frc::SwerveModuleState, MODULE_COUNT> Swerve<AzimuthMotor, DriveMotor
 }
 
 template<class AzimuthMotor, class DriveMotor>
+void Swerve<AzimuthMotor, DriveMotor>::setAzimuthPositions(frc::Rotation2d rot){
+    for (size_t i = 0; i < swerveModules.size(); i++){
+        swerveModules[i]->setAzimuthPosition(rot);
+    }
+}
+
+template<class AzimuthMotor, class DriveMotor>
+void Swerve<AzimuthMotor, DriveMotor>::setAzimuthPositions(frc::Rotation2d rot1, frc::Rotation2d rot2, frc::Rotation2d rot3, frc::Rotation2d rot4){
+    swerveModules[0]->setAzimuthPosition(rot1);
+    swerveModules[1]->setAzimuthPosition(rot2);
+    swerveModules[2]->setAzimuthPosition(rot3);
+    swerveModules[3]->setAzimuthPosition(rot4);
+}
+
+template<class AzimuthMotor, class DriveMotor>
+void Swerve<AzimuthMotor, DriveMotor>::setDriveSpeeds(units::meters_per_second_t speed){
+    for (size_t i = 0; i < swerveModules.size(); i++){
+        swerveModules[i]->setDesiredState(frc::SwerveModuleState{speed, swerveModules[i]->getAzimuthPosition()});
+    }
+}
+
+template<class AzimuthMotor, class DriveMotor>
 void Swerve<AzimuthMotor, DriveMotor>::InitSendable(wpi::SendableBuilder& builder)
 {
     builder.SetSmartDashboardType("Subsystem");

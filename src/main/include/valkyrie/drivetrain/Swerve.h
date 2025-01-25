@@ -76,6 +76,11 @@ public:
 
     void driveRobotRelative(frc::ChassisSpeeds speeds);
 
+    void setAzimuthPositions(frc::Rotation2d);
+    void setAzimuthPositions(frc::Rotation2d, frc::Rotation2d, frc::Rotation2d, frc::Rotation2d);
+
+    void setDriveSpeeds(units::meters_per_second_t);
+
     void InitSendable(wpi::SendableBuilder& builder) override;
 
 protected:
