@@ -9,6 +9,7 @@ GrappleSensor::GrappleSensor(frc::TimedRobot *_robot, const char *_name, int _ca
     device->set_ranging_mode(grpl::LaserCanRangingMode::Short);
     device->set_timing_budget(grpl::LaserCanTimingBudget::TB50ms);
     device->set_roi(grpl::LaserCanROI{ 8, 8, 16, 16 });
+    setMaxDistance(units::millimeter_t{300});
 
     LaserProximitySensor<units::millimeter_t>::setGetter([this](){
         std::optional<grpl::LaserCanMeasurement> measurement = device->get_measurement();

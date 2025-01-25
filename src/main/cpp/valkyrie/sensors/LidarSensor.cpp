@@ -1,4 +1,5 @@
 #include "valkyrie/sensors/LidarSensor.h"
+#include <iostream>
 
 using namespace valor;
 
