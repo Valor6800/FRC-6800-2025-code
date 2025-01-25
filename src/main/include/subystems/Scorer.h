@@ -1,7 +1,6 @@
 # pragma once 
 #include "Drivetrain.h"
 #include "valkyrie/BaseSubsystem.h"
-#include "valkyrie/controllers/NeoController.h"
 #include "valkyrie/controllers/PhoenixController.h"
 #include "Constants.h"
 #include <vector>
@@ -13,7 +12,7 @@
 #include <frc/geometry/Pose2d.h>
 #include <frc/geometry/Rotation2d.h>
 #include <frc/trajectory/TrajectoryGenerator.h>
-#include <frc/DigitalOutput.h>
+#include <frc/DigitalInput.h>
 #include "valkyrie/sensors/DebounceSensor.h"
 #include <frc2/command/FunctionalCommand.h>
 #include <unordered_map>
@@ -80,6 +79,8 @@ public:
 
 private:
     Drivetrain *drivetrain;
+    frc::DigitalInput hallEffectDigitalSensor;
+    valor::DebounceSensor hallEffectDebounceSensor;
     valor::DebounceSensor scorerDebounceSensor;
     valor::PhoenixController *elevatorMotor;
     valor::PhoenixController *scorerMotor;

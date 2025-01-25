@@ -14,6 +14,7 @@
 
 #include "valkyrie/Auto.h"
 #include "Drivetrain.h"
+#include "subystems/Scorer.h"
 #include "valkyrie/CharMode.h"
 
 #include <frc/DriverStation.h>
@@ -44,8 +45,8 @@ class Robot : public frc::TimedRobot {
         valor::Gamepad gamepadDriver{OIConstants::GAMEPAD_BASE_LOCATION};
 
         frc2::CommandPtr autoCommands = frc2::cmd::None();
-
         Drivetrain drivetrain;
+        Scorer scorer;
         Climber climber;
 
         valor::Auto valorAuto;

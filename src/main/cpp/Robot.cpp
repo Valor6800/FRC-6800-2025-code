@@ -20,6 +20,7 @@
 
 Robot::Robot() :
     drivetrain(this),
+    scorer(this, &drivetrain),
     climber(this),
     valorAuto()
 {
@@ -35,6 +36,9 @@ Robot::Robot() :
 void Robot::RobotInit() {
     drivetrain.setGamepads(&gamepadOperator, &gamepadDriver);
     drivetrain.resetState();
+
+    scorer.setGamepads(&gamepadOperator, &gamepadDriver);
+    scorer.resetState();
 
     climber.setGamepads(&gamepadOperator, &gamepadDriver);
     climber.resetState();

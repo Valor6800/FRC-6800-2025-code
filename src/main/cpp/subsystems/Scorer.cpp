@@ -10,18 +10,19 @@
 #include <frc2/command/WaitCommand.h>
 
 #include <frc/DriverStation.h>
-
-#define ELEV_MAX_SPEED units::angular_velocity::turns_per_second_t (12.469)
-#define ELEV_MAX_ACCEL units::angular_acceleration::turns_per_second_squared_t (0)
+// 
 #define ELEV_K_P 0
 #define ELEV_K_ERROR units::angle::turn_t (0)
 #define ELEV_K_AFF 0
+#define MOTOR_TO_MECH_IN 6000/SENSOR_TO_MECH*
 
-#define SCORER_MAX_SPEED units::angular_velocity::turns_per_second_t (0)
-#define SCORER_MAX_ACCEL units::angular_acceleration::turns_per_second_squared_t (0)
 #define SCORER_K_P 0
 
+#define ELEVATOR_FORWARD_LIMIT 0.0_tr
+#define ELEVATOR_REVERSE_LIMIT 0.0_tr
 
+#define SEGMENTS 0.0f
+#define CIRCUM 1.432* M_Pi
 #define MOTOR_TO_SENSOR 1.0f
 #define SENSOR_TO_MECH 8.02f
 #define ELEVATOR_TOLERANCE 0.5f
@@ -31,9 +32,11 @@
 Scorer::Scorer(frc::TimedRobot *_robot, Drivetrain *_drive) :
     valor::BaseSubsystem(_robot, "Scorer"),
     drivetrain(_drive),
-    scorerDebounceSensor(_robot, "FeederBanner"),
-    elevatorMotor(new valor::PhoenixController(valor::PhoenixControllerType::KRAKEN_X60, CANIDs::ELEV_WHEEL, valor::NeutralMode::Coast, true)),
-    scorerMotor(new valor::PhoenixController(valor::PhoenixControllerType::KRAKEN_X60, CANIDs::SCORER_WHEEL, valor::NeutralMode::Coast, true)),
+    scorerDebounceSensor(_robot, "ScorerDebounce"),
+    hallEffectDebounceSensor(_robot, "HallEffectDebounce"),
+    hallEffectDigitalSensor(DIOPorts::HALL_EFFECT),
+    elevatorMotor(new valor::PhoenixController(valor::PhoenixControllerType::KRAKEN_X60, CANIDs::ELEV_WHEEL, valor::NeutralMode::Brake, false, "baseCAN")),
+    scorerMotor(new valor::PhoenixController(valor::PhoenixControllerType::KRAKEN_X60, CANIDs::SCORER_WHEEL, valor::NeutralMode::Brake, false, "baseCAN")),
     lidarSensor(_robot, "Front Lidar Sensor", CANIDs::FRONT_LIDAR_SENSOR)
     {
 
@@ -87,9 +90,7 @@ Scorer::Scorer(frc::TimedRobot *_robot, Drivetrain *_drive) :
             )
         )
     ).ToPtr());
-        
-        
-        elevatorMotor->setGearRatios(MOTOR_TO_SENSOR, SENSOR_TO_MECH);
+
         init();
 
     }
@@ -104,28 +105,43 @@ Scorer::Scorer(frc::TimedRobot *_robot, Drivetrain *_drive) :
 
     void Scorer::init()
     {
+        elevatorMotor->setGearRatios(MOTOR_TO_SENSOR, SENSOR_TO_MECH);
+        scorerMotor->setGearRatios(1, 1);
 
         valor::PIDF elevatorPID;
-        elevatorPID.maxVelocity = ELEV_MAX_SPEED;
-        elevatorPID.maxAcceleration = ELEV_MAX_ACCEL;
+        elevatorPID.maxVelocity = elevatorMotor->getMaxMechSpeed();
+        elevatorPID.maxAcceleration = elevatorMotor->getMaxMechSpeed()/(1.0_s/2);
         elevatorPID.P =ELEV_K_P ;
         elevatorPID.error = ELEV_K_ERROR;
         elevatorPID.aFF = ELEV_K_AFF;
         elevatorPID.aFFType = valor::FeedForwardType::LINEAR;
 
         valor::PIDF scorerPID;
-        scorerPID.maxVelocity = SCORER_MAX_SPEED;
-        scorerPID.maxAcceleration = SCORER_MAX_ACCEL;
+        scorerPID.maxVelocity = scorerMotor->getMaxMechSpeed();
+        scorerPID.maxAcceleration = scorerMotor->getMaxMechSpeed()/(1.0_s/2);
         scorerPID.P = SCORER_K_P;
         
         scorerMotor->setPIDF(scorerPID, 0);
         elevatorMotor->setPIDF(scorerPID, 0);
+
+        elevatorMotor->setForwardLimit(ELEVATOR_FORWARD_LIMIT);
+        elevatorMotor->setReverseLimit(ELEVATOR_REVERSE_LIMIT);
+        elevatorMotor->applyConfig();
+
+
+       hallEffectDebounceSensor.setGetter([this] { return hallEffectDigitalSensor.Get();});
+        hallEffectDebounceSensor.setFallingEdgeCallback([this] {
+         elevatorMotor->setEncoderPosition(0_tr);
+         });
+        resetState();
 
         // scorerDebounceSensor.setGetter([this] { return this->isBeamBroken();});
         // scorerDebounceSensor.setRisingEdgeCallback([this] {
         //  state.sensorTwoTripped = true;
         //  });
         // resetState();
+
+
     }
 
    void Scorer::assessInputs()
