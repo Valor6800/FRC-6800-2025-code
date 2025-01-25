@@ -90,7 +90,7 @@ Scorer::Scorer(frc::TimedRobot *_robot, Drivetrain *_drive) :
             )
         )
     ).ToPtr());
-        scorerMotor->setGearRatios(MOTOR_TO_SENSOR, SENSOR_TO_MECH);
+        elevatorMotor->setGearRatios(MOTOR_TO_SENSOR, SENSOR_TO_MECH);
         init();
 
     }
@@ -158,7 +158,7 @@ Scorer::Scorer(frc::TimedRobot *_robot, Drivetrain *_drive) :
         }
     }
 
-     //units::turn_t currentPosition = scorerMotor->getPosition();
+     //units::turn_t currentPosition = elevatorMotor->getPosition();
 
         //if ((currentPosition.value() - state.targetRotations) <= ELEVATOR_TOLERANCE) {
 }
@@ -184,11 +184,11 @@ Scorer::Scorer(frc::TimedRobot *_robot, Drivetrain *_drive) :
         if (state.coralState == ELEV_LVL::MANUAL){
             joystickInput = operatorGamepad->leftStickY(2);
             motorVoltage = joystickInput * 12.0;
-            scorerMotor->setPower(units::volt_t(motorVoltage));
+            elevatorMotor->setPower(units::volt_t(motorVoltage));
         } else{
             state.targetHeight = coralHMap[state.coralState];
             targetRotations = (state.targetHeight * CONVERSION_FACTOR);
-            scorerMotor->setPosition(targetRotations);
+            elevatorMotor->setPosition(targetRotations);
         }
     
     }
@@ -222,7 +222,7 @@ Scorer::Scorer(frc::TimedRobot *_robot, Drivetrain *_drive) :
 
         builder.AddDoubleProperty(
             "Current position",
-            [this] {return (scorerMotor->getPosition() * (1/CONVERSION_FACTOR)).value();},
+            [this] {return (elevatorMotor->getPosition() * (1/CONVERSION_FACTOR)).value();},
             nullptr
         );
 
