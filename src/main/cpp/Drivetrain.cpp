@@ -307,18 +307,9 @@ void Drivetrain::analyzeDashboard()
 
     visionAcceptanceRadius = (units::meter_t) table->GetNumber("Vision Acceptance", VISION_ACCEPTANCE.to<double>());
 
-    for (valor::AprilTagsSensor* aprilLime : aprilTagSensors) {
-        aprilLime->applyVisionMeasurement(
-            calcEstimator.get(),
-            getRobotSpeeds(),
-            table->GetBoolean("Accepting Vision Measurements", true),
-            doubtX,
-            doubtY
-        );
-
-        for (int i = 0; i < 4; i++) {
+    for (int i = 0; i < 4; i++) {
         int color = 0xAC41FF;
-        switch (azimuthControllers[i]->getMagnetHealth().value) {
+        switch (getAzimuthMagnetHealth(i).value) {
             case 1: 
                 color = 0xFF0000;
                 break;
@@ -330,10 +321,18 @@ void Drivetrain::analyzeDashboard()
                 break;
         }
         leds->setLED(i, color);
-        }
-        for (int i = 5; i < 8; i++)
-            leds->setLED(i, 0x000000);
+    }
+    for (int i = 5; i < 8; i++)
+        leds->setLED(i, 0x000000);
 
+    for (valor::AprilTagsSensor* aprilLime : aprilTagSensors) {
+        aprilLime->applyVisionMeasurement(
+            calcEstimator.get(),
+            getRobotSpeeds(),
+            table->GetBoolean("Accepting Vision Measurements", true),
+            doubtX,
+            doubtY
+        );
     }
 
     if (!driverGamepad || !driverGamepad->IsConnected() || !operatorGamepad || !operatorGamepad->IsConnected())

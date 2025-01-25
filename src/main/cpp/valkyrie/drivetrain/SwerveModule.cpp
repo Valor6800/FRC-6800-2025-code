@@ -74,6 +74,12 @@ frc::SwerveModuleState SwerveModule<AzimuthMotor, DriveMotor>::getState()
 }
 
 template<class AzimuthMotor, class DriveMotor>
+ctre::phoenix6::signals::MagnetHealthValue SwerveModule<AzimuthMotor, DriveMotor>::getAzimuthMagnetHealth() 
+{
+    return azimuthMotor->getMagnetHealth();
+}
+
+template<class AzimuthMotor, class DriveMotor>
 void SwerveModule<AzimuthMotor, DriveMotor>::setDesiredState(frc::SwerveModuleState _desiredState, bool isDriveOpenLoop)
 {
     // Deadband
