@@ -22,8 +22,8 @@ Robot::Robot() :
     scorer(this, &drivetrain),
     climber(this),
     valorAuto(),
-    leds(this, LED_COUNT, SEGMENTS, CANIDs::CANDLE, ""),
-    drivetrain(this, &leds)
+    drivetrain(this, &leds),
+    leds(this, LED_COUNT, SEGMENTS, CANIDs::CANDLE, "")
 
     /* valorAuto(), */
 {
