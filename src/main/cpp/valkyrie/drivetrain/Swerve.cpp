@@ -19,6 +19,8 @@
 #define MODULE_DIFF_XS {1, 1, -1, -1}
 #define MODULE_DIFF_YS {1, -1, -1, 1}
 
+#define LOOP_TIME 0.02_s
+
 const units::hertz_t KP_ROTATE(-90);
 const units::hertz_t KD_ROTATE(-30);
 
@@ -369,6 +371,7 @@ wpi::array<frc::SwerveModuleState, MODULE_COUNT> Swerve<AzimuthMotor, DriveMotor
                                                                                            omega_radps,
                                                                                            rawEstimator->GetEstimatedPosition().Rotation())
                                              : frc::ChassisSpeeds{vx_mps, vy_mps, omega_radps};
+    chassisSpeeds.Discretize(chassisSpeeds.vx, chassisSpeeds.vy, chassisSpeeds.omega, LOOP_TIME);
     return getModuleStates(chassisSpeeds);
 }
 
