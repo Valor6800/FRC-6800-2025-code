@@ -11,13 +11,15 @@
 #include <frc2/command/WaitCommand.h>
 
 #include <frc/DriverStation.h>
-// 
+
 #define ELEV_K_P 10
 #define ELEV_K_ERROR units::angle::turn_t (0)
 #define ELEV_K_AFF 0.5
 #define MOTOR_TO_MECH_IN 6000/SENSOR_TO_MECH*
 
 #define SCORER_K_P 0
+#define INTAKE_SPEED 4_V
+#define SCORE_SPEED -4_V
 
 #define ELEVATOR_FORWARD_LIMIT 5.75_tr
 #define ELEVATOR_REVERSE_LIMIT 0.0_tr
@@ -38,7 +40,7 @@ Scorer::Scorer(frc::TimedRobot *_robot, Drivetrain *_drive) :
     hallEffectDebounceSensor(_robot, "HallEffectDebounce"),
     hallEffectDigitalSensor(DIOPorts::HALL_EFFECT),
     elevatorMotor(new valor::PhoenixController(valor::PhoenixControllerType::KRAKEN_X60, CANIDs::ELEV_WHEEL, valor::NeutralMode::Brake, true, "baseCAN")),
-    // scorerMotor(new valor::PhoenixController(valor::PhoenixControllerType::KRAKEN_X60, CANIDs::SCORER_WHEEL, valor::NeutralMode::Brake, false, "baseCAN")),
+    scorerMotor(new valor::PhoenixController(valor::PhoenixControllerType::KRAKEN_X60, CANIDs::SCORER_WHEEL, valor::NeutralMode::Coast, false, "baseCAN")),
     lidarSensor(_robot, "Front Lidar Sensor", CANIDs::FRONT_LIDAR_SENSOR)
     {
 
@@ -101,6 +103,7 @@ Scorer::Scorer(frc::TimedRobot *_robot, Drivetrain *_drive) :
     {
         state.scoringState = SCORING_SPEED::HOLD;
         state.coralState = ELEV_LVL::MANUAL;
+        state.algeeOrCoral = CORAL;
 
     }
 
@@ -114,7 +117,7 @@ Scorer::Scorer(frc::TimedRobot *_robot, Drivetrain *_drive) :
         state.hasZeroed = hallEffectSensorActive();
         elevatorMotor->setGearRatios(MOTOR_TO_SENSOR, SENSOR_TO_MECH);
         elevatorMotor->enableFOC(true);
-        // scorerMotor->setGearRatios(1, 1);
+        scorerMotor->setGearRatios(1, 1);
 
         valor::PIDF elevatorPID;
         elevatorPID.maxVelocity = elevatorMotor->getMaxMechSpeed();
@@ -123,11 +126,10 @@ Scorer::Scorer(frc::TimedRobot *_robot, Drivetrain *_drive) :
         elevatorPID.error = ELEV_K_ERROR;
         elevatorPID.aFF = ELEV_K_AFF;
         elevatorPID.aFFType = valor::FeedForwardType::LINEAR;
-        // elevatorPID.kG = 0.4
 
         valor::PIDF scorerPID;
-        // scorerPID.maxVelocity = scorerMotor->getMaxMechSpeed();
-        // scorerPID.maxAcceleration = scorerMotor->getMaxMechSpeed()/(1.0_s/2);
+        scorerPID.maxVelocity = scorerMotor->getMaxMechSpeed();
+        scorerPID.maxAcceleration = scorerMotor->getMaxMechSpeed()/(1.0_s/2);
         scorerPID.P = SCORER_K_P;
         
         // scorerMotor->setPIDF(scorerPID, 0);
@@ -160,29 +162,72 @@ Scorer::Scorer(frc::TimedRobot *_robot, Drivetrain *_drive) :
     if (operatorGamepad == nullptr || !operatorGamepad->IsConnected())
         return;
 
+    if(operatorGamepad->leftTriggerActive())
+    {
+        state.algeeOrCoral = ALGEE;
+    }
+
+    if(operatorGamepad->rightTriggerActive())
+    {
+        state.algeeOrCoral = CORAL;
+    }
+
+      
     if (operatorGamepad->leftStickYActive()) {
         state.coralState = MANUAL;
         state.manualSpeed = operatorGamepad->leftStickY(2) * 12_V;
     } else if (operatorGamepad->GetYButton()){
         state.coralState = ELEV_LVL::FOUR;
     } else if (operatorGamepad->GetBButton()) {
-        state.coralState = ELEV_LVL::THREE;
+        if(state.algeeOrCoral== ALGEE){
+            state.algeeLevel = ALGEE_LVL::ALGEE3;
+        }else{
+            state.coralState = ELEV_LVL::THREE;
+        }        
+
     } else if (operatorGamepad->GetAButton()) {
-        state.coralState = ELEV_LVL::TWO;
+        if(state.algeeOrCoral == ALGEE){
+            state.algeeLevel = ALGEE_LVL::ALGEE2;
+        }else{
+            state.coralState = ELEV_LVL::TWO;
+        }
     } else if (operatorGamepad->GetXButton()){
         state.coralState = ELEV_LVL::TROUGH;
     } else if(operatorGamepad->DPadRight()){
         state.coralState = ELEV_LVL::HP;
     }
-    // } else if (driverGamepad->GetYButtonPressed()) {
-    //     state.coralState = drivetrain->state.getTag ? ELEV_LVL::HP : ELEV_LVL::STOWED;
-    // } else if (driverGamepad->GetAButtonPressed()) {
-    //     state.coralState = drivetrain->state.getTag ? ELEV_LVL::TROUGH: ELEV_LVL::STOWED;
-    // }
 
 
+    if (driverGamepad->GetRightBumperButton()) {
+        state.scoringState =  SCORING_SPEED::SCORING;
+    }
+    else if (driverGamepad->GetLeftBumperButton()) {
+        state.scoringState = SCORING_SPEED::INTAKING;
+    } else{
+        state.scoringState = SCORING_SPEED::HOLD;
+    }
 
-}
+
+// if(driverGamepad->GetRightBumperButton()){
+//     state.scoringState = SCORING_SPEED::INTAKING;
+// } else if (driverGamepad->GetRightTrigge
+
+//     units::turn_t currentPosition = elevatorMotor->getPosition() * CONVERSION_FACTOR;
+//         if (drivetrain->state.getTag) {
+//             if (abs((currentPosition - state.targetHeight).to<double>()) <= ELEVATOR_TOLERANCE) {
+//                 state.scoringState = SCORING_SPEED::SCORING;
+//             } else {
+//                 state.scoringState = SCORING_SPEED::HOLD;
+//             }
+//         } else {
+//             state.scoringState = SCORING_SPEED::HOLD;
+//         }
+//     } else {
+//         state.scoringState = SCORING_SPEED::HOLD;
+//     }  
+
+} 
+
 
     void Scorer::analyzeDashboard()
     {
@@ -213,6 +258,19 @@ Scorer::Scorer(frc::TimedRobot *_robot, Drivetrain *_drive) :
         } else {
             elevatorMotor->setPower(-2.0_V);
         }
+
+        if (state.scoringState == SCORING_SPEED::INTAKING){
+            scorerMotor->setPower(INTAKE_SPEED);
+        }
+        else if(state.scoringState == SCORING_SPEED::SCORING){
+            scorerMotor->setPower(SCORE_SPEED);
+    
+        }else{
+            scorerMotor->setPower(units::volt_t(0));
+        }
+
+        
+    
     }
 
 

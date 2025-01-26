@@ -53,9 +53,20 @@ public:
         FOUR,
         BARGE,
         PROCESSOR,
+    };
+
+     enum ALGEE_OR_CORAL
+    {
+        ALGEE,
+        CORAL,
+    };
+
+    enum ALGEE_LVL
+    {
         ALGEE2,
         ALGEE3,
     };
+
 
 
     struct x
@@ -66,7 +77,11 @@ public:
         units::meter_t targetHeight;
         units::volt_t manualSpeed;
         bool hasZeroed;
+        ALGEE_OR_CORAL algeeOrCoral;
+        ALGEE_LVL algeeLevel;
     } state;
+
+
 
     std::unordered_map<ELEV_LVL, units::meter_t> coralHMap = {
         {ELEV_LVL::HP, 5_in},
@@ -75,18 +90,24 @@ public:
         {ELEV_LVL::THREE, 25.05_in},
         {ELEV_LVL::FOUR, 0.5_m},
         {ELEV_LVL::BARGE, 1.8_m},
-        {ELEV_LVL::PROCESSOR, 1.9_m},
-        {ELEV_LVL::ALGEE2, 2.0_m},
-        {ELEV_LVL::ALGEE3, 2.1_m}
+        {ELEV_LVL::PROCESSOR, 1.9_m}
+    };
+
+    std::unordered_map<ALGEE_LVL, units::meter_t> algeeHmap = {
+    {ALGEE_LVL::ALGEE2, 2.0_m},
+    {ALGEE_LVL::ALGEE3, 2.1_m}
     };
 
 private:
+
     Drivetrain *drivetrain;
     bool hallEffectSensorActive();
     valor::DebounceSensor scorerDebounceSensor;
     valor::DebounceSensor hallEffectDebounceSensor;
     frc::DigitalInput hallEffectDigitalSensor;  
     valor::PhoenixController *elevatorMotor;
-    // valor::PhoenixController *scorerMotor;
+    valor::PhoenixController *scorerMotor;
     valor::GrappleSensor lidarSensor;
+    bool hallEffectSensorActive();
+
 };
