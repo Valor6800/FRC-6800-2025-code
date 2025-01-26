@@ -91,6 +91,7 @@ void Climber::init()
     climbMotors->setupFollower(CANIDs::CLIMBER_FOLLOW, false);
     climbMotors->setPIDF(climbPID, 0);
     climbMotors->setContinuousWrap(true);
+    climbMotors->enableFOC(true);
     climbMotors->applyConfig();
 
     // state.spikeCurrent = SPIKE_CURRENT;

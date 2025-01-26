@@ -113,6 +113,7 @@ Scorer::Scorer(frc::TimedRobot *_robot, Drivetrain *_drive) :
     {
         state.hasZeroed = hallEffectSensorActive();
         elevatorMotor->setGearRatios(MOTOR_TO_SENSOR, SENSOR_TO_MECH);
+        elevatorMotor->enableFOC(true);
         // scorerMotor->setGearRatios(1, 1);
 
         valor::PIDF elevatorPID;
