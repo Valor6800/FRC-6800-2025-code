@@ -36,6 +36,9 @@
 #define SPIKE_CURRENT 0
 #define CACHE_SIZE 0
 
+#define CANCODER_OFFSET units::angle::turn_t (0)
+#define CAN_ABS_RANGE units::turn_t (0)
+
 using namespace valor;
 
 Climber::Climber(frc::TimedRobot *_robot) : valor::BaseSubsystem(_robot, "Climber"),
@@ -90,6 +93,7 @@ void Climber::init()
     climbMotors->setReverseLimit(REVERSE_LIMIT);
     climbMotors->setupFollower(CANIDs::CLIMBER_FOLLOW, false);
     climbMotors->setPIDF(climbPID, 0);
+    climbMotors->setupCANCoder(CANIDs::CLIMBER_CANCODER, CANCODER_OFFSET, false, "baseCAN", CAN_ABS_RANGE);
     climbMotors->setContinuousWrap(true);
     climbMotors->applyConfig();
 
