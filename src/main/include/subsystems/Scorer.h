@@ -17,7 +17,7 @@
 #include <frc2/command/FunctionalCommand.h>
 #include <unordered_map>
 #include "valkyrie/Gamepad.h"
-
+#include <ctre/phoenix6/core/CoreCANdi.hpp>
 
 
 class Scorer : public valor::BaseSubsystem
@@ -83,7 +83,7 @@ public:
 private:
     Drivetrain *drivetrain;
     bool hallEffectSensorActive();
-    frc::DigitalInput hallEffectDigitalSensor;
+    ctre::phoenix6::hardware::core::CoreCANdi candi;
     valor::DebounceSensor hallEffectDebounceSensor;
     valor::DebounceSensor scorerDebounceSensor;
     valor::PhoenixController *elevatorMotor;

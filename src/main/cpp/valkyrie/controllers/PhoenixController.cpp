@@ -123,12 +123,12 @@ void PhoenixController::setupFollower(int canID, bool followerInverted)
     followerMotor->SetControl(controls::StrictFollower{getMotor()->GetDeviceID()});
 }
 
-void PhoenixController::setupReverseHardwareLimit(int canID, ctre::phoenix6::signals::ReverseLimitTypeValue type, units::turn_t autosetLimit, bool saveImmediately)
+void PhoenixController::setupReverseHardwareLimit(int canID, ctre::phoenix6::signals::ReverseLimitTypeValue type, units::turn_t autosetPosition, bool saveImmediately)
 {
     config.HardwareLimitSwitch.ReverseLimitType = type;
     config.HardwareLimitSwitch.ReverseLimitEnable = true;
     config.HardwareLimitSwitch.ReverseLimitRemoteSensorID = canID;
-    config.HardwareLimitSwitch.ReverseLimitAutosetPositionValue = autosetLimit;
+    config.HardwareLimitSwitch.ReverseLimitAutosetPositionValue = autosetPosition;
     config.HardwareLimitSwitch.ReverseLimitAutosetPositionEnable = true;
     config.HardwareLimitSwitch.ReverseLimitSource = ctre::phoenix6::signals::ReverseLimitSourceValue::RemoteCANdiS1;
 
@@ -137,12 +137,12 @@ void PhoenixController::setupReverseHardwareLimit(int canID, ctre::phoenix6::sig
     }
 }
 
-void PhoenixController::setupForwardHardwareLimit(int canID, ctre::phoenix6::signals::ForwardLimitTypeValue type, units::turn_t autosetLimit, bool saveImmediately)
+void PhoenixController::setupForwardHardwareLimit(int canID, ctre::phoenix6::signals::ForwardLimitTypeValue type, units::turn_t autosetPosition, bool saveImmediately)
 {
     config.HardwareLimitSwitch.ForwardLimitType = type;
     config.HardwareLimitSwitch.ForwardLimitEnable = true;
     config.HardwareLimitSwitch.ForwardLimitRemoteSensorID = canID;
-    config.HardwareLimitSwitch.ForwardLimitAutosetPositionValue = autosetLimit;
+    config.HardwareLimitSwitch.ForwardLimitAutosetPositionValue = autosetPosition;
     config.HardwareLimitSwitch.ForwardLimitAutosetPositionEnable = true;
     config.HardwareLimitSwitch.ForwardLimitSource = ctre::phoenix6::signals::ReverseLimitSourceValue::RemoteCANdiS1;
 
