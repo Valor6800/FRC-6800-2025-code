@@ -38,7 +38,7 @@ Scorer::Scorer(frc::TimedRobot *_robot, Drivetrain *_drive) :
     drivetrain(_drive),
     scorerDebounceSensor(_robot, "ScorerDebounce"),
     hallEffectDebounceSensor(_robot, "HallEffectDebounce"),
-    hallEffectDigitalSensor(DIOPorts::HALL_EFFECT),
+    candi(CANIDs::HALL_EFFECT, "baseCAN"),
     elevatorMotor(new valor::PhoenixController(valor::PhoenixControllerType::KRAKEN_X60, CANIDs::ELEV_WHEEL, valor::NeutralMode::Brake, true, "baseCAN")),
     scorerMotor(new valor::PhoenixController(valor::PhoenixControllerType::KRAKEN_X60, CANIDs::SCORER_WHEEL, valor::NeutralMode::Coast, false, "baseCAN")),
     lidarSensor(_robot, "Front Lidar Sensor", CANIDs::FRONT_LIDAR_SENSOR)
@@ -108,7 +108,7 @@ Scorer::Scorer(frc::TimedRobot *_robot, Drivetrain *_drive) :
     }
 
     bool Scorer::hallEffectSensorActive(){
-        return !hallEffectDigitalSensor.Get();
+        return candi.GetS1Closed().GetValue();
     }
 
 
@@ -136,15 +136,19 @@ Scorer::Scorer(frc::TimedRobot *_robot, Drivetrain *_drive) :
         elevatorMotor->setPIDF(elevatorPID, 0);
 
         elevatorMotor->setForwardLimit(ELEVATOR_FORWARD_LIMIT);
-        elevatorMotor->setReverseLimit(ELEVATOR_REVERSE_LIMIT);
+        elevatorMotor->setupReverseHardwareLimit(CANIDs::HALL_EFFECT, ctre::phoenix6::signals::ReverseLimitTypeValue::NormallyOpen);
         elevatorMotor->applyConfig();
 
+        ctre::phoenix6::configs::CANdiConfiguration candiConfig;
+        candiConfig.DigitalInputs.S1CloseState = ctre::phoenix6::signals::S1CloseStateValue::CloseWhenLow;
+        candiConfig.DigitalInputs.S1FloatState = ctre::phoenix6::signals::S1FloatStateValue::FloatDetect;
+        // @todo LED flash if float detected - map to CANDle LED states like CANCoders
+        candi.GetConfigurator().Apply(candiConfig.DigitalInputs);
 
-       hallEffectDebounceSensor.setGetter([this] { return hallEffectSensorActive();});
+        hallEffectDebounceSensor.setGetter([this] { return hallEffectSensorActive();});
         hallEffectDebounceSensor.setRisingEdgeCallback([this] {
             state.hasZeroed = true;
             std::cout << "HALLEFFECT RESET FOR ELEVATOR" << std::endl;
-            elevatorMotor->setEncoderPosition(0_tr);
          });
 
 
@@ -283,7 +287,7 @@ Scorer::Scorer(frc::TimedRobot *_robot, Drivetrain *_drive) :
                 
             }
         } else {
-            elevatorMotor->setPower(-2.0_V);
+            elevatorMotor->setPower(-3.0_V);
         }
 
         if (state.scoringState == SCORING_SPEED::INTAKING){

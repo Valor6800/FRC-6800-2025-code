@@ -59,7 +59,6 @@ namespace LimelightConstants {
 namespace DIOPorts {
     constexpr static int MAG_ENCODER_PORTS[4] = {1, 2, 3, 4};
     constexpr static int BEAM_BREAK_PORT = 0;
-    constexpr static int HALL_EFFECT = 2; //rando number
     constexpr static int BLINKIN = 0;
 }
 
@@ -89,6 +88,7 @@ namespace CANIDs {
     constexpr static int CLIMBER_LEAD = 53;
     constexpr static int CLIMBER_FOLLOW = 54;
     constexpr static int AMP = 10;
+    constexpr static int HALL_EFFECT = 46;
     constexpr static int CANDLE = 60;
     constexpr static int FRONT_LIDAR_SENSOR = 49;
     constexpr static int CRABB = 56;

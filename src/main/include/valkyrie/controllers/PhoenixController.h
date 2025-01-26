@@ -77,6 +77,9 @@ public:
     
     void setPIDF(valor::PIDF pidf, int slot, bool saveImmediately = false) override;
 
+    void setupReverseHardwareLimit(int canID, ctre::phoenix6::signals::ReverseLimitTypeValue type, units::turn_t autosetPosition = 0_tr, bool saveImmediately = false);
+    void setupForwardHardwareLimit(int canID, ctre::phoenix6::signals::ForwardLimitTypeValue type, units::turn_t autosetPosition = 0_tr, bool saveImmediately = false);
+
     void setForwardLimit(units::turn_t forward, bool saveImmediately = false) override;
     void setReverseLimit(units::turn_t reverse, bool saveImmediately = false) override;
     
