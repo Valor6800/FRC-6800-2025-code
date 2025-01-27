@@ -4,7 +4,7 @@
 #include "valkyrie/controllers/PhoenixController.h"
 #include "Constants.h"
 #include <vector>
-#include "valkyrie/sensors/GrappleLidarSensor.h"
+#include "valkyrie/sensors/GrappleSensor.h"
 #include "valkyrie/controllers/PIDF.h"
 #include <frc/smartdashboard/SendableChooser.h>
 #include <frc/smartdashboard/SmartDashboard.h>
@@ -88,5 +88,5 @@ private:
     frc::DigitalInput hallEffectDigitalSensor;  
     valor::PhoenixController *elevatorMotor;
     // valor::PhoenixController *scorerMotor;
-    valor::GrappleLidarSensor lidarSensor;
+    valor::GrappleSensor lidarSensor;
 };
