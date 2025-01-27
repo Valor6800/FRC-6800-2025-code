@@ -103,7 +103,7 @@ void Swerve<AzimuthMotor, DriveMotor>::assessInputs()
     ySpeed = driverGamepad->leftStickX(2);
     rotSpeed = driverGamepad->rightStickX(3);
 
-    alignToTarget = driverGamepad->GetAButton();
+    alignToTarget = driverGamepad->leftTriggerActive();
     if (driverGamepad->GetAButtonPressed()) {
         rot_controller.Reset(getCalculatedPose().Rotation().Radians());
         y_controller.Reset(yDistance);
@@ -152,17 +152,17 @@ void Swerve<AzimuthMotor, DriveMotor>::analyzeDashboard()
     joystickVector *= maxDriveSpeed.value();
     // joystickVector = Eigen::Vector2d{joystickVector[0], joystickVector[1]};
 
-    if (alignToTarget){
-        y_controller.SetGoal(0.0_m);
-        calculated_y_controller_val = y_controller.Calculate(yDistance, 0.0_m);
-        relativeToTagSpeed = units::meters_per_second_t{calculated_y_controller_val} + y_controller.GetSetpoint().velocity;
-
-        pidVector = MAKE_VECTOR(targetAngle - 90_deg) * relativeToTagSpeed.value();
-        powerVector = joystickVector + pidVector;
-        // powerVector *= dotProduct / fabs(dotProduct);
-        xSpeedMPS = units::meters_per_second_t{powerVector[0]};
-        ySpeedMPS = units::meters_per_second_t{powerVector[1]};
-    }
+    // if (alignToTarget){
+    //     y_controller.SetGoal(0.0_m);
+    //     calculated_y_controller_val = y_controller.Calculate(yDistance, 0.0_m);
+    //     relativeToTagSpeed = units::meters_per_second_t{calculated_y_controller_val} + y_controller.GetSetpoint().velocity;
+    //
+    //     pidVector = MAKE_VECTOR(targetAngle - 90_deg) * relativeToTagSpeed.value();
+    //     powerVector = joystickVector + pidVector;
+    //     // powerVector *= dotProduct / fabs(dotProduct);
+    //     xSpeedMPS = units::meters_per_second_t{powerVector[0]};
+    //     ySpeedMPS = units::meters_per_second_t{powerVector[1]};
+    // }
 
     
     // Linear Speed calculations

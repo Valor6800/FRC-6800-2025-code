@@ -237,9 +237,9 @@ void Drivetrain::assessInputs()
 
     // state.lockingToReef = driverGamepad->GetAButtonPressed();
     state.getTag = false;
-    if ((driverGamepad->GetBButton() || driverGamepad->GetAButton()) && state.reefTag == -1) {
+    if (driverGamepad->leftTriggerActive() && state.reefTag == -1) {
         state.getTag = true;
-    } else if (!driverGamepad->GetBButton() && !driverGamepad->GetAButton()) {
+    } else if (!driverGamepad->leftTriggerActive()) {
         state.reefTag = -1;
     }
 
