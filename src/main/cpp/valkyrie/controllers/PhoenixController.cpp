@@ -235,21 +235,29 @@ units::turns_per_second_t PhoenixController::getSpeed()
 // Sets signal update rate for position
 void PhoenixController::setPositionUpdateFrequency(units::frequency::hertz_t hertz)
 {
+    if(cancoder != nullptr)
     cancoder->GetPosition().SetUpdateFrequency(hertz);
+    else res_position.SetUpdateFrequency(hertz);
 }
 
 // Sets signal update rate for speed
 void PhoenixController::setSpeedUpdateFrequency(units::frequency::hertz_t hertz)
 {
+    if(cancoder != nullptr)
     cancoder->GetVelocity().SetUpdateFrequency(hertz);
+    else res_velocity.SetUpdateFrequency(hertz);
 }
 
 units::frequency::hertz_t PhoenixController::getPositionUpdateFrequency(){
+    if(cancoder != nullptr)
     return cancoder->GetPosition().GetAppliedUpdateFrequency();
+    else return res_position.GetAppliedUpdateFrequency();
 }
 
 units::frequency::hertz_t PhoenixController::getSpeedUpdateFrequency(){
+    if(cancoder != nullptr)
     return cancoder->GetVelocity().GetAppliedUpdateFrequency();
+    else return res_velocity.GetAppliedUpdateFrequency();
 }
 
 /**
