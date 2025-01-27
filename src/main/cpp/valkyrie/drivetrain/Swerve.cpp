@@ -105,12 +105,6 @@ void Swerve<AzimuthMotor, DriveMotor>::assessInputs()
     xSpeed = driverGamepad->leftStickY(2);
     ySpeed = driverGamepad->leftStickX(2);
     rotSpeed = driverGamepad->rightStickX(3);
-
-    alignToTarget = driverGamepad->leftTriggerActive();
-    if (driverGamepad->GetAButtonPressed()) {
-        rot_controller.Reset(getCalculatedPose().Rotation().Radians());
-        y_controller.Reset(yDistance);
-    }
 }
 
 template<class AzimuthMotor, class DriveMotor>
@@ -267,6 +261,12 @@ void Swerve<AzimuthMotor, DriveMotor>::enableCarpetGrain(double _grainMultiplier
     carpetGrainMultiplier = _grainMultiplier;
     roughTowardsRed = _roughTowardsRed;
     useCarpetGrain = true;
+}
+
+template<class AzimuthMotor, class DriveMotor>
+void Swerve<AzimuthMotor, DriveMotor>::resetAlignControllers() {
+    rot_controller.Reset(getCalculatedPose().Rotation().Radians());
+    y_controller.Reset(yDistance);
 }
 
 template<class AzimuthMotor, class DriveMotor>

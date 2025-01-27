@@ -241,6 +241,7 @@ void Drivetrain::assessInputs()
         state.getTag = true;
     } else if (!driverGamepad->leftTriggerActive()) {
         state.reefTag = -1;
+        hasReset = false;
     }
 
     bool isRed = frc::DriverStation::GetAlliance() == frc::DriverStation::Alliance::kRed ? true : false;
@@ -264,6 +265,12 @@ void Drivetrain::assessInputs()
 
     if(aprilTagSensors[4]->hasTarget() && aprilTagSensors[4]->getTagID() == state.reefTag) {
         Swerve::yDistance = aprilTagSensors[4]->get_botpose_targetspace().X();
+    }
+
+    Swerve::alignToTarget = driverGamepad->leftTriggerActive();
+    if (driverGamepad->leftTriggerActive() && !hasReset) {
+        Swerve::resetAlignControllers();
+        hasReset = true;
     }
 
     Swerve::assessInputs();

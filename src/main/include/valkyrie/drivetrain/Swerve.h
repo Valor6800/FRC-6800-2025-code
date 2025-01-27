@@ -102,6 +102,7 @@ protected:
     bool lockingToTarget;
     units::degree_t targetAngle;
     void setRotAlignOffset(units::degree_t angle);
+    void resetAlignControllers();
 
     bool alignToTarget = false;
     units::meter_t yDistance = 0.0_m;
