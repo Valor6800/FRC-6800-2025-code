@@ -13,6 +13,7 @@
 #include "frc2/command/SequentialCommandGroup.h"
 #include "units/acceleration.h"
 #include "units/length.h"
+#include "units/math.h"
 #include "units/velocity.h"
 #include "valkyrie/sensors/AprilTagsSensor.h"
 #include "units/length.h"
@@ -237,11 +238,10 @@ void Drivetrain::assessInputs()
     if (!driverGamepad || !driverGamepad->IsConnected() || !operatorGamepad || !operatorGamepad->IsConnected())
         return;
 
-    if(driverGamepad->DPadLeft()){
-        choosePoleScore(false);
-    }
-    if(driverGamepad->DPadRight()){
-        choosePoleScore(true);
+    if(operatorGamepad->GetLeftBumperButton()){
+        state.dir = LEFT;
+    } else if(operatorGamepad->GetRightBumperButton()){
+        state.dir = RIGHT;
     }
     // state.lockingToReef = driverGamepad->GetAButtonPressed();
     state.getTag = false;
@@ -289,6 +289,8 @@ void Drivetrain::assessInputs()
 
 void Drivetrain::analyzeDashboard()
 {
+    choosePoleDirection(state.dir);
+
     Swerve::ROT_KP = table->GetNumber("Rot_KP", Swerve::ROT_KP);
     Swerve::ROT_KD = table->GetNumber("Rot_KD", Swerve::ROT_KD);
 
@@ -446,9 +448,15 @@ void Drivetrain::alignAngleZoning()
     }
 }
 
-void Drivetrain::choosePoleScore(bool isRight){
-    if(isRight) Swerve::goalAlign = -abs(Swerve::goalAlign.to<double>()) * 1_m;
-    else Swerve::goalAlign = abs(Swerve::goalAlign.to<double>()) * 1_m;
+void Drivetrain::choosePoleDirection(Drivetrain::Direction dir){
+    switch (dir) {
+        case RIGHT:
+            Swerve::goalAlign = -units::math::abs(Swerve::goalAlign);
+            break;
+        case LEFT:
+            Swerve::goalAlign = units::math::abs(Swerve::goalAlign);
+            break;
+    }
 }
 // void Drivetrain::setDriveMotorNeutralMode(valor::NeutralMode mode) {
 //     for (int i = 0; i < SWERVE_COUNT; i++)
