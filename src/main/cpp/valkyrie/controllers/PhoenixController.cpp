@@ -235,14 +235,12 @@ units::turns_per_second_t PhoenixController::getSpeed()
 // Sets signal update rate for position
 void PhoenixController::setPositionUpdateFrequency(units::frequency::hertz_t hertz)
 {
-    res_position.SetUpdateFrequency(hertz);
     cancoder->GetPosition().SetUpdateFrequency(hertz);
 }
 
 // Sets signal update rate for speed
 void PhoenixController::setSpeedUpdateFrequency(units::frequency::hertz_t hertz)
 {
-    res_velocity.SetUpdateFrequency(hertz);
     cancoder->GetVelocity().SetUpdateFrequency(hertz);
 }
 
