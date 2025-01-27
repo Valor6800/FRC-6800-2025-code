@@ -72,7 +72,10 @@ typedef valor::PhoenixController SwerveAzimuthMotor;
 class Drivetrain : public valor::Swerve<SwerveAzimuthMotor, SwerveDriveMotor>
 {
 public:
-
+    enum Direction {
+        LEFT,
+        RIGHT
+     };
      /**
       * @brief Construct a new Drivetrain object
       * 
@@ -118,6 +121,7 @@ public:
 
           int reefTag;
           bool getTag;
+          Direction dir;
      } state;
 
      frc2::FunctionalCommand* getResetOdom();
@@ -135,8 +139,7 @@ public:
      // align the robot using the position on the field
      void alignAngleZoning();
 
-     // choose a pole to align to and score, true is right, false is left
-     void choosePoleScore(bool isRight);
+     void choosePoleDirection(Direction dir);
 
      double teleopStart;
 
