@@ -21,6 +21,12 @@ void PoseTracker::addReading(frc::Pose2d pose, units::second_t timestamp) {
             }
             velBuffer.push_back({vel, timestamp});
             units::degrees_per_second_t angVel = (pose.Rotation() - poseBuffer.back().first.Rotation()).Degrees() / (timestamp - poseBuffer.back().second);
+            if(angVelBuffer.size() != 0){
+                angAccelBuffer.push_back({
+                    (angVel - angVelBuffer.back().first) / (timestamp - angVelBuffer.back().second),
+                    timestamp
+                });
+            }
             angVelBuffer.push_back({angVel, timestamp});
         }    
     }
@@ -33,6 +39,7 @@ void PoseTracker::resetBuffers(uint count){
     while (velBuffer.size() > count) velBuffer.pop_front(); 
     while (accelBuffer.size() > count) accelBuffer.pop_front();
     while (angVelBuffer.size() > count) angVelBuffer.pop_front();
+    while (angAccelBuffer.size() > count) angAccelBuffer.pop_front();
 }
 
 units::meters_per_second_squared_t PoseTracker::getAverageAcceleration() {
@@ -58,3 +65,13 @@ units::degrees_per_second_t PoseTracker::getAverageAngularVelocity() {
     }
     return t / angVelBuffer.size();
 }
+
+units::degrees_per_second_squared_t PoseTracker::getAverageAngularAcceleration() {
+    units::degrees_per_second_squared_t t = units::degrees_per_second_squared_t{0};
+    for (auto e = angAccelBuffer.begin(); e != angAccelBuffer.end(); e++) {
+        t += (*e).first;
+    }
+    return t / angAccelBuffer.size();
+}
+
+
