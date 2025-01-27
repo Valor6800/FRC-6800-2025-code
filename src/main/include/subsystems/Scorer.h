@@ -83,9 +83,9 @@ public:
 private:
     Drivetrain *drivetrain;
     bool hallEffectSensorActive();
-    frc::DigitalInput hallEffectDigitalSensor;
-    valor::DebounceSensor hallEffectDebounceSensor;
     valor::DebounceSensor scorerDebounceSensor;
+    valor::DebounceSensor hallEffectDebounceSensor;
+    frc::DigitalInput hallEffectDigitalSensor;  
     valor::PhoenixController *elevatorMotor;
     // valor::PhoenixController *scorerMotor;
     valor::GrappleLidarSensor lidarSensor;
