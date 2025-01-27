@@ -15,6 +15,7 @@
 #include "valkyrie/BaseSubsystem.h"
 #include "valkyrie/drivetrain/SwerveModule.h"
 #include "valkyrie/CharMode.h"
+#include "valkyrie/PoseTracker.h"
 
 #define MODULE_COUNT 4
 
@@ -158,6 +159,7 @@ private:
 
     Eigen::Vector2d joystickVector, pidVector, powerVector;
     units::angle::degree_t rotAlignOffset;
+    PoseTracker currentPoseTracker;
 };
 
 }

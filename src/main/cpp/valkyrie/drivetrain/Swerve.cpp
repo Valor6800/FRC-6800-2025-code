@@ -130,6 +130,8 @@ void Swerve<AzimuthMotor, DriveMotor>::analyzeDashboard()
 
     if (useCarpetGrain)
         calculateCarpetPose();
+    
+    currentPoseTracker.addReading(calcEstimator->GetEstimatedPosition(), frc::Timer::GetFPGATimestamp());
 
     // Linear Speed calculations
     xSpeedMPS = units::meters_per_second_t{xSpeed * maxDriveSpeed};
@@ -599,6 +601,24 @@ void Swerve<AzimuthMotor, DriveMotor>::InitSendable(wpi::SendableBuilder& builde
     builder.AddBooleanProperty(
         "Locking on Target",
         [this] {return alignToTarget;},
+        nullptr
+    );
+
+    builder.AddDoubleProperty(
+        "Current Velocity",
+        [this] {return currentPoseTracker.getAverageVelocity().value();},
+        nullptr
+    );
+
+    builder.AddDoubleProperty(
+        "Current Angular Velocity",
+        [this] {return currentPoseTracker.getAverageAngularVelocity().value();},
+        nullptr
+    );
+
+    builder.AddDoubleProperty(
+        "Current Acceleration",
+        [this] {return currentPoseTracker.getAverageAcceleration().value();},
         nullptr
     );
 }
