@@ -27,6 +27,7 @@ public:
     Scorer(frc::TimedRobot *robot, Drivetrain *drivetrain);
     
     void resetState();
+     
     void init();
     units::meter_t convertToMechSpace(units::turn_t turns);
     units::turn_t convertToMotorSpace(units::meter_t meters);
@@ -45,17 +46,17 @@ public:
      enum ELEV_LVL
     {
         MANUAL,
-        HP,
         STOWED,
         TROUGH,
         TWO,
         THREE,
         FOUR,
-        BARGE,
+        NET,
         PROCESSOR,
+        HP,
     };
 
-     enum ALGEE_OR_CORAL
+     enum GAME_PIECE
     {
         ALGEE,
         CORAL,
@@ -67,35 +68,56 @@ public:
         ALGEE3,
     };
 
+    enum SCOPED_STATE
+    {
+        SCOPED,
+        UNSCOPED,
+    };
+
+    struct Positions {
+        Positions() {
+            Positions(0);
+
+        }
+        Positions(double _h){
+            h = _h;
+        }
+        double h;
+    };
 
 
     struct x
     {
         SCORING_SPEED scoringState;
-        ELEV_LVL coralState;
+        ELEV_LVL elevState;
         bool sensorTwoTripped;
         units::meter_t targetHeight;
         units::volt_t manualSpeed;
         bool hasZeroed;
-        ALGEE_OR_CORAL algeeOrCoral;
+        GAME_PIECE gamePiece;
         ALGEE_LVL algeeLevel;
+        SCOPED_STATE scopedState;
+
     } state;
 
-
-
-    std::unordered_map<ELEV_LVL, units::meter_t> coralHMap = {
-        {ELEV_LVL::HP, 5_in},
-        {ELEV_LVL::TROUGH, 13.57_in},
-        {ELEV_LVL::TWO, 17.0_in},
-        {ELEV_LVL::THREE, 25.05_in},
-        {ELEV_LVL::FOUR, 0.5_m},
-        {ELEV_LVL::BARGE, 1.8_m},
-        {ELEV_LVL::PROCESSOR, 1.9_m}
+    std::unordered_map<std::string, ELEV_LVL> elevMap = {
+        {"STOW", ELEV_LVL::STOWED},
+        {"TROUGH", ELEV_LVL::TROUGH},
+        {"TWO", ELEV_LVL::TWO},
+        {"THREE", ELEV_LVL::THREE},
+        {"FOUR", ELEV_LVL::FOUR},
+        {"NET",ELEV_LVL::NET},
+        {"PROCESSOR", ELEV_LVL::PROCESSOR},  
+        {"MANUAL", ELEV_LVL::MANUAL},
+        {"HP", ELEV_LVL::HP}        
     };
+    // ELEV_LVL elevatorMap(std::string name){
+    //     return elevatorMap[name];
+    // }
 
-    std::unordered_map<ALGEE_LVL, units::meter_t> algeeHmap = {
-    {ALGEE_LVL::ALGEE2, 2.0_m},
-    {ALGEE_LVL::ALGEE3, 2.1_m}
+    std::unordered_map<std::string, GAME_PIECE> gamePieceHMap = {
+        {"CORAL", GAME_PIECE::CORAL},
+        {"ALGEE", GAME_PIECE::ALGEE}
     };
 
 private:
@@ -109,5 +131,5 @@ private:
     valor::PhoenixController *scorerMotor;
     valor::GrappleSensor lidarSensor;
     bool hallEffectSensorActive();
-
+    std::map<GAME_PIECE, std::map<ELEV_LVL, units::meter_t>> posMap;
 };

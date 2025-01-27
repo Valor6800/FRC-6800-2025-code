@@ -102,8 +102,8 @@ Scorer::Scorer(frc::TimedRobot *_robot, Drivetrain *_drive) :
     void Scorer::resetState()
     {
         state.scoringState = SCORING_SPEED::HOLD;
-        state.coralState = ELEV_LVL::MANUAL;
-        state.algeeOrCoral = CORAL;
+        state.elevState = ELEV_LVL::MANUAL;
+        state.gamePiece = CORAL;
 
     }
 
@@ -146,7 +146,25 @@ Scorer::Scorer(frc::TimedRobot *_robot, Drivetrain *_drive) :
             std::cout << "HALLEFFECT RESET FOR ELEVATOR" << std::endl;
             elevatorMotor->setEncoderPosition(0_tr);
          });
+
+
+
+        posMap[GAME_PIECE::CORAL][ELEV_LVL::STOWED] = units::meter_t(5_in);
+        posMap[GAME_PIECE::CORAL][ELEV_LVL::HP] = units::meter_t(5_in);
+        posMap[GAME_PIECE::CORAL][ELEV_LVL::TROUGH] = units::meter_t(13.57_in);
+        posMap[GAME_PIECE::CORAL][ELEV_LVL::TWO] = units::meter_t(17.0_in);
+        posMap[GAME_PIECE::CORAL][ELEV_LVL::THREE] = units::meter_t(25.05_in);
+        posMap[GAME_PIECE::CORAL][ELEV_LVL::FOUR] = units::meter_t(5_in);
+
+        posMap[GAME_PIECE::ALGEE][ELEV_LVL::TROUGH] = units::meter_t(5_in); //Processor
+        posMap[GAME_PIECE::ALGEE][ELEV_LVL::TWO] = units::meter_t(5_in);
+        posMap[GAME_PIECE::ALGEE][ELEV_LVL::THREE] = units::meter_t(5_in);
+        posMap[GAME_PIECE::ALGEE][ELEV_LVL::FOUR] = units::meter_t(5_in); //Net
+        
         resetState();
+
+
+
 
         // scorerDebounceSensor.setGetter([this] { return this->isBeamBroken();});
         // scorerDebounceSensor.setRisingEdgeCallback([this] {
@@ -162,39 +180,38 @@ Scorer::Scorer(frc::TimedRobot *_robot, Drivetrain *_drive) :
     if (operatorGamepad == nullptr || !operatorGamepad->IsConnected())
         return;
 
+    if (driverGamepad == nullptr || !driverGamepad->IsConnected())
+        return;
+
+    // if(operatorGamepad->rightTriggerActive())
+    // {
+    //     state.gamePiece = CORAL;
+    // }
+
     if(operatorGamepad->leftTriggerActive())
     {
-        state.algeeOrCoral = ALGEE;
+        state.gamePiece = ALGEE;
+    } else if(operatorGamepad->rightTriggerActive()){
+        state.gamePiece = CORAL;
     }
-
-    if(operatorGamepad->rightTriggerActive())
-    {
-        state.algeeOrCoral = CORAL;
-    }
-
       
     if (operatorGamepad->leftStickYActive()) {
-        state.coralState = MANUAL;
+        state.elevState = MANUAL;
         state.manualSpeed = operatorGamepad->leftStickY(2) * 12_V;
     } else if (operatorGamepad->GetYButton()){
-        state.coralState = ELEV_LVL::FOUR;
+        if (driverGamepad->leftTriggerActive()) {state.elevState = ELEV_LVL::FOUR;} 
+        else {state.elevState = ELEV_LVL::STOWED;}
     } else if (operatorGamepad->GetBButton()) {
-        if(state.algeeOrCoral== ALGEE){
-            state.algeeLevel = ALGEE_LVL::ALGEE3;
-        }else{
-            state.coralState = ELEV_LVL::THREE;
-        }        
-
+        if (driverGamepad->leftTriggerActive()) {state.elevState = ELEV_LVL::THREE;} 
+        else {state.elevState = ELEV_LVL::STOWED;} 
     } else if (operatorGamepad->GetAButton()) {
-        if(state.algeeOrCoral == ALGEE){
-            state.algeeLevel = ALGEE_LVL::ALGEE2;
-        }else{
-            state.coralState = ELEV_LVL::TWO;
-        }
+        if (driverGamepad->leftTriggerActive()) {state.elevState = ELEV_LVL::TWO;} 
+        else {state.elevState = ELEV_LVL::STOWED;}
     } else if (operatorGamepad->GetXButton()){
-        state.coralState = ELEV_LVL::TROUGH;
+        if (driverGamepad->leftTriggerActive()) {state.elevState = ELEV_LVL::TROUGH;} 
+        else {state.elevState = ELEV_LVL::STOWED;}
     } else if(operatorGamepad->DPadRight()){
-        state.coralState = ELEV_LVL::HP;
+        state.elevState = ELEV_LVL::STOWED;
     }
 
 
@@ -248,10 +265,10 @@ Scorer::Scorer(frc::TimedRobot *_robot, Drivetrain *_drive) :
     void Scorer::assignOutputs()
     {
         if (state.hasZeroed) {
-            if (state.coralState == ELEV_LVL::MANUAL) {
+            if (state.elevState == ELEV_LVL::MANUAL) {
                 elevatorMotor->setPower(state.manualSpeed);
             } else {
-                state.targetHeight = coralHMap[state.coralState];
+                state.targetHeight = posMap[state.gamePiece][state.elevState];
                 units::turn_t targetRotations = convertToMotorSpace(state.targetHeight);
                 elevatorMotor->setPosition(targetRotations);
             }
@@ -286,7 +303,7 @@ void Scorer::InitSendable(wpi::SendableBuilder& builder)
         );
         builder.AddDoubleProperty(
             "State elevator level",
-            [this] { return state.coralState; },
+            [this] { return state.elevState; },
             nullptr
         );
 
