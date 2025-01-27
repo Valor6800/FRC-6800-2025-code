@@ -10,6 +10,7 @@
 #include <frc/trajectory/TrapezoidProfile.h>
 
 #include "Eigen/Core"
+#include "units/angle.h"
 #include "units/velocity.h"
 #include "valkyrie/BaseSubsystem.h"
 #include "valkyrie/drivetrain/SwerveModule.h"
@@ -100,6 +101,7 @@ protected:
 
     bool lockingToTarget;
     units::degree_t targetAngle;
+    void setRotAlignOffset(units::degree_t angle);
 
     bool alignToTarget = false;
     units::meter_t yDistance = 0.0_m;
@@ -155,6 +157,7 @@ private:
     units::meters_per_second_t relativeToTagSpeed;
 
     Eigen::Vector2d joystickVector, pidVector, powerVector;
+    units::angle::degree_t rotAlignOffset;
 };
 
 }

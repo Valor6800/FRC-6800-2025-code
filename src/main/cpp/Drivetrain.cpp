@@ -110,6 +110,8 @@ Drivetrain::Drivetrain(frc::TimedRobot *_robot) :
     table->PutNumber("KPLIMELIGHT", KP_LIMELIGHT);
     table->PutBoolean("Accepting Vision Measurements", true);
 
+    setRotAlignOffset(90_deg);
+
     for (std::pair<const char*, frc::Pose3d> aprilCam : Constants::aprilCameras) {
         aprilTagSensors.push_back(new valor::AprilTagsSensor(robot, aprilCam.first, aprilCam.second));  
         aprilTagSensors.back()->setPipe(valor::VisionSensor::PIPELINE_0);

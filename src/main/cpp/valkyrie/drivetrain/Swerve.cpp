@@ -137,7 +137,7 @@ void Swerve<AzimuthMotor, DriveMotor>::analyzeDashboard()
     }
     // Rotational Speed calculations
     if (alignToTarget) {
-        rot_controller.SetGoal(units::radian_t{targetAngle});
+        rot_controller.SetGoal(units::radian_t{targetAngle + rotAlignOffset});
         units::radian_t robotRotation = getCalculatedPose().Rotation().Radians();
         rot_controller.Calculate(robotRotation);
         rotSpeedRPS = units::radians_per_second_t{rot_controller.Calculate(robotRotation)} + rot_controller.GetSetpoint().velocity;
@@ -202,6 +202,11 @@ void Swerve<AzimuthMotor, DriveMotor>::drive(
                                   omega_radps,
                                   isFOC);
     setSwerveDesiredState(desiredStates, true);
+}
+
+template<class AzimuthMotor, class DriveMotor>
+void Swerve<AzimuthMotor, DriveMotor>::setRotAlignOffset(units::degree_t angle) {
+    rotAlignOffset = angle;
 }
 
 template<class AzimuthMotor, class DriveMotor>
