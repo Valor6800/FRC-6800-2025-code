@@ -23,7 +23,7 @@ NeoController::NeoController(valor::NeoControllerType controllerType,
                                     valor::NeutralMode _mode,
                                     bool _inverted,
                                     std::string canbus) :
-    BaseController(new rev::spark::SparkMax(canID, rev::spark::SparkMax::MotorType::kBrushless), _inverted, _mode, getNeoControllerMotorSpeed(controllerType)),
+    BaseController(new rev::spark::SparkMax(canID, rev::spark::SparkMax::MotorType::kBrushless), _inverted, _mode, valor::ControlType::Voltage, getNeoControllerMotorSpeed(controllerType)),
     cancoder(nullptr),
     pidController(motor->GetClosedLoopController())
 {
@@ -121,11 +121,11 @@ units::turns_per_second_t NeoController::getSpeed()
 /**
  * Set a position in mechanism rotations
 */
-void NeoController::setPosition(units::turn_t position)
+void NeoController::setPosition(units::turn_t position, bool)
 {
 }
 
-void NeoController::setSpeed(units::turns_per_second_t speed)
+void NeoController::setSpeed(units::turns_per_second_t speed, bool)
 {
 }
 

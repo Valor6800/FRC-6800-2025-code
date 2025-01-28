@@ -26,12 +26,10 @@ using namespace ctre::phoenix6;
 PhoenixController::PhoenixController(valor::PhoenixControllerType controllerType,
                                     int canID,
                                     valor::NeutralMode _mode,
+                                    valor::ControlType _controlType,
                                     bool _inverted,
                                     std::string canbus) :
-    BaseController(new hardware::TalonFX{canID, canbus}, _inverted, _mode, getPhoenixControllerMotorSpeed(controllerType)),
-    req_position(units::turn_t{0}),
-    req_velocity(units::turns_per_second_t{0}),
-    req_voltage(units::volt_t{0}),
+    BaseController(new hardware::TalonFX{canID, canbus}, _inverted, _mode, _controlType, getPhoenixControllerMotorSpeed(controllerType)),
     cancoder(nullptr),
     res_position(getMotor()->GetPosition()),
     res_velocity(getMotor()->GetVelocity())
@@ -49,10 +47,19 @@ void PhoenixController::init()
     motionPIDF.maxVelocity = FALCON_PIDF_KV;
     motionPIDF.maxAcceleration = FALCON_PIDF_KA;
 
-    req_position.Slot = 0;
-    req_position.UpdateFreqHz = 0_Hz;
-    req_velocity.Slot = 0;
-    req_velocity.UpdateFreqHz = 0_Hz;
+    if (controlType == valor::ControlType::Voltage) {
+        req_position_mm_voltage.WithUpdateFreqHz(0_Hz).WithSlot(0);
+        req_position_voltage.WithUpdateFreqHz(0_Hz).WithSlot(0);
+        req_velocity_mm_voltage.WithUpdateFreqHz(0_Hz).WithSlot(0);
+        req_velocity_voltage.WithUpdateFreqHz(0_Hz).WithSlot(0);
+        req_voltage.UpdateFreqHz = 0_Hz;
+    } else {
+        req_position_mm_current.WithUpdateFreqHz(0_Hz).WithSlot(0);
+        req_position_current.WithUpdateFreqHz(0_Hz).WithSlot(0);
+        req_velocity_mm_current.WithUpdateFreqHz(0_Hz).WithSlot(0);
+        req_velocity_current.WithUpdateFreqHz(0_Hz).WithSlot(0);
+        req_current.UpdateFreqHz = 0_Hz;
+    }
 
     setNeutralMode(neutralMode);
     setCurrentLimits(STATOR_CURRENT_LIMIT, SUPPLY_CURRENT_LIMIT, SUPPLY_CURRENT_THRESHOLD, SUPPLY_TIME_THRESHOLD);
@@ -291,29 +298,52 @@ units::frequency::hertz_t PhoenixController::getSpeedUpdateFrequency(){
 /**
  * Set a position in mechanism rotations
 */
-void PhoenixController::setPosition(units::turn_t position)
+void PhoenixController::setPosition(units::turn_t position, bool motionMagic)
 {
-    req_position.Position = position; // Mechanism rotations
-    getMotor()->SetControl(req_position);
+    if (controlType == valor::ControlType::Voltage) {
+        if (motionMagic)
+            getMotor()->SetControl(req_position_mm_voltage.WithPosition(position));
+        else
+            getMotor()->SetControl(req_position_voltage.WithPosition(position));
+    } else {
+        if (motionMagic)
+            getMotor()->SetControl(req_position_mm_current.WithPosition(position));
+        else
+            getMotor()->SetControl(req_position_current.WithPosition(position));
+    }
 }                    
 
 void PhoenixController::enableFOC(bool enableFOC)
 {
-    req_position.EnableFOC = enableFOC;
-    req_velocity.EnableFOC = enableFOC;
+    req_position_voltage.EnableFOC = enableFOC;
+    req_velocity_voltage.EnableFOC = enableFOC;
     req_voltage.EnableFOC = enableFOC;
 }
 
-void PhoenixController::setSpeed(units::turns_per_second_t speed)
+void PhoenixController::setSpeed(units::turns_per_second_t speed, bool motionMagic)
 {
-    req_velocity.Velocity = speed;
-    getMotor()->SetControl(req_velocity);
+    if (controlType == valor::ControlType::Voltage) {
+        if (motionMagic)
+            getMotor()->SetControl(req_velocity_mm_voltage.WithVelocity(speed));
+        else
+            getMotor()->SetControl(req_velocity_voltage.WithVelocity(speed));
+    } else {
+        if (motionMagic)
+            getMotor()->SetControl(req_velocity_mm_current.WithVelocity(speed));
+        else
+            getMotor()->SetControl(req_velocity_current.WithVelocity(speed));
+    }
 }
 
 void PhoenixController::setPower(units::volt_t voltage)
 {
     req_voltage.Output = voltage;
     getMotor()->SetControl(req_voltage);
+}
+
+void PhoenixController::setCurrent(units::ampere_t current) {
+    req_current.Output = current;
+    getMotor()->SetControl(req_current);
 }
 
 void PhoenixController::setProfile(int profile)
@@ -396,12 +426,20 @@ void PhoenixController::InitSendable(wpi::SendableBuilder& builder)
         [this] { return getCANCoder().to<double>(); },
         nullptr);
     builder.AddDoubleProperty(
-        "reqPosition", 
-        [this] { return req_position.Position.to<double>(); },
+        "Req Position Voltage", 
+        [this] { return req_position_voltage.Position.to<double>(); },
         nullptr);
     builder.AddDoubleProperty(
-        "reqSpeed", 
-        [this] { return req_velocity.Velocity.to<double>(); },
+        "Req Position Current", 
+        [this] { return req_position_current.Position.to<double>(); },
+        nullptr);
+    builder.AddDoubleProperty(
+        "Req Velocity Voltage", 
+        [this] { return req_velocity_voltage.Velocity.to<double>(); },
+        nullptr);
+    builder.AddDoubleProperty(
+        "Req Velocity Current", 
+        [this] { return req_velocity_current.Velocity.to<double>(); },
         nullptr);
     builder.AddIntegerProperty(
         "Magnet Health",

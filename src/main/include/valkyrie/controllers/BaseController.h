@@ -20,6 +20,11 @@
 
 namespace valor {
 
+enum ControlType {
+    Voltage,
+    Torque
+};
+
 /**
  * @brief Abstract class that all Valor controllers's should implement
  * @tparam T Motor data type
@@ -49,14 +54,15 @@ public:
      * 
      * @param _motor The motor that will be controlled. Setup by the implemented class
      */
-    BaseController(T* _motor, bool _inverted, valor::NeutralMode _neutralMode, units::turns_per_second_t _maxMotorSpeed) :
+    BaseController(T* _motor, bool _inverted, valor::NeutralMode _neutralMode, valor::ControlType _controlType, units::turns_per_second_t _maxMotorSpeed) :
         maxMotorSpeed(_maxMotorSpeed),
         voltageCompenstation(units::volt_t{12.0}),
         motor(_motor),
         inverted(_inverted),
         neutralMode(_neutralMode),
         rotorToSensor(1),
-        sensorToMech(1) {}
+        sensorToMech(1),
+        controlType(_controlType) {}
 
     /**
      * @brief Destroy the Valor Controller object
@@ -169,7 +175,7 @@ public:
      * 
      * @param position The position to send the motor to
      */
-    virtual void setPosition(units::turn_t position) = 0;
+    virtual void setPosition(units::turn_t position, bool motionMagic = true) = 0;
 
     /**
      * @brief Send the motor to a specific speed
@@ -181,7 +187,7 @@ public:
      * 
      * @param speed The speed to set the motor to
      */
-    virtual void setSpeed(units::turns_per_second_t speed) = 0;
+    virtual void setSpeed(units::turns_per_second_t speed, bool motionMagic = true) = 0;
 
     /**
      * @brief Set the motor power
@@ -314,5 +320,6 @@ protected:
     double rotorToSensor;
     double sensorToMech;
     T* followerMotor;
+    ControlType controlType;
 };
 }

@@ -27,7 +27,7 @@ enum PhoenixControllerType {
 class PhoenixController : public BaseController<ctre::phoenix6::hardware::TalonFX>
 {
 public:
-    PhoenixController(valor::PhoenixControllerType, int _canID, valor::NeutralMode _mode, bool _inverted, std::string _canbus = "");
+    PhoenixController(valor::PhoenixControllerType, int _canID, valor::NeutralMode _mode, valor::ControlType _controlType, bool _inverted, std::string _canbus = "");
 
     static units::revolutions_per_minute_t getPhoenixControllerMotorSpeed(PhoenixControllerType controllerType)
     {
@@ -69,8 +69,9 @@ public:
     void setEncoderPosition(units::turn_t position) override;
     void setContinuousWrap(bool, bool saveImmediately = false);
     
-    void setPosition(units::turn_t) override;
-    void setSpeed(units::turns_per_second_t) override;
+    void setPosition(units::turn_t, bool motionMagic = true) override;
+    void setSpeed(units::turns_per_second_t, bool motionMagic = true) override;
+    void setCurrent(units::ampere_t);
     void setPower(units::volt_t) override;
 
     void setupFollower(int, bool = false) override;
@@ -106,9 +107,20 @@ private:
     valor::PIDF pidf;
     int currentProfile;
 
-    ctre::phoenix6::controls::MotionMagicVoltage req_position;
-    ctre::phoenix6::controls::VelocityVoltage req_velocity;
-    ctre::phoenix6::controls::VoltageOut req_voltage;
+    ctre::phoenix6::controls::MotionMagicVoltage req_position_mm_voltage{0_tr};
+    ctre::phoenix6::controls::MotionMagicTorqueCurrentFOC req_position_mm_current{0_tr};
+
+    ctre::phoenix6::controls::PositionVoltage req_position_voltage{0_tr};
+    ctre::phoenix6::controls::PositionTorqueCurrentFOC req_position_current{0_tr};
+
+    ctre::phoenix6::controls::MotionMagicVelocityVoltage req_velocity_mm_voltage{0_tps};
+    ctre::phoenix6::controls::MotionMagicVelocityTorqueCurrentFOC req_velocity_mm_current{0_tps};
+
+    ctre::phoenix6::controls::VelocityVoltage req_velocity_voltage{0_tps};
+    ctre::phoenix6::controls::VelocityTorqueCurrentFOC req_velocity_current{0_tps};
+
+    ctre::phoenix6::controls::VoltageOut req_voltage{0_V};
+    ctre::phoenix6::controls::TorqueCurrentFOC req_current{0_A};
 
     ctre::phoenix6::hardware::CANcoder *cancoder;
 

@@ -47,8 +47,8 @@ public:
 
     void setEncoderPosition(units::turn_t position) override;
     
-    void setPosition(units::turn_t) override;
-    void setSpeed(units::turns_per_second_t) override;
+    void setPosition(units::turn_t, bool) override;
+    void setSpeed(units::turns_per_second_t, bool) override;
     void setPower(units::volt_t) override;
 
     void setupFollower(int, bool = false) override;

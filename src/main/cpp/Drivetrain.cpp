@@ -186,6 +186,7 @@ std::vector<std::pair<SwerveAzimuthMotor*, SwerveDriveMotor*>> Drivetrain::gener
             valor::PhoenixControllerType::FALCON_FOC,
             CANIDs::AZIMUTH_CANS[i],
             valor::NeutralMode::Brake,
+            valor::ControlType::Voltage,
             Constants::swerveAzimuthsReversals()[i],
             PIGEON_CAN_BUS
         );
@@ -200,6 +201,7 @@ std::vector<std::pair<SwerveAzimuthMotor*, SwerveDriveMotor*>> Drivetrain::gener
             valor::PhoenixControllerType::KRAKEN_X60_FOC,
             CANIDs::DRIVE_CANS[i],
             valor::NeutralMode::Coast,
+            valor::ControlType::Voltage,
             Constants::swerveDrivesReversals()[i],
             PIGEON_CAN_BUS
         );

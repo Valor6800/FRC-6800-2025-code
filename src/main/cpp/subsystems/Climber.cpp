@@ -69,6 +69,7 @@ void Climber::init()
         valor::PhoenixControllerType::FALCON_FOC,
         CANIDs::CLIMBER_LEAD,
         valor::NeutralMode::Brake,
+        valor::ControlType::Voltage,
         false,
         "baseCAN"
     );

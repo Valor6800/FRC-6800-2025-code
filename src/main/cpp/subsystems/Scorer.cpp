@@ -40,8 +40,8 @@ Scorer::Scorer(frc::TimedRobot *_robot, Drivetrain *_drive) :
     scorerDebounceSensor(_robot, "ScorerDebounce"),
     hallEffectDebounceSensor(_robot, "HallEffectDebounce"),
     candi(CANIDs::HALL_EFFECT, "baseCAN"),
-    elevatorMotor(new valor::PhoenixController(valor::PhoenixControllerType::KRAKEN_X60, CANIDs::ELEV_WHEEL, valor::NeutralMode::Brake, true, "baseCAN")),
-    scorerMotor(new valor::PhoenixController(valor::PhoenixControllerType::FALCON_FOC, CANIDs::SCORER_WHEEL, valor::NeutralMode::Brake, false, "baseCAN")),
+    elevatorMotor(new valor::PhoenixController(valor::PhoenixControllerType::KRAKEN_X60, CANIDs::ELEV_WHEEL, valor::NeutralMode::Brake, valor::ControlType::Voltage, true, "baseCAN")),
+    scorerMotor(new valor::PhoenixController(valor::PhoenixControllerType::FALCON_FOC, CANIDs::SCORER_WHEEL, valor::NeutralMode::Brake, valor::ControlType::Voltage, false, "baseCAN")),
     lidarSensor(_robot, "Front Lidar Sensor", CANIDs::FRONT_LIDAR_SENSOR)
     {
 
