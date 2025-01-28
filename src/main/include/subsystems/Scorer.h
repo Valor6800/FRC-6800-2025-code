@@ -38,22 +38,20 @@ public:
 
     enum SCORING_SPEED
     {
+        HOLD,
         INTAKING,
         SCORING,
-        HOLD,
     };
 
      enum ELEV_LVL
     {
         MANUAL,
         STOWED,
+        HP,
         ONE,
         TWO,
         THREE,
         FOUR,
-        NET,
-        PROCESSOR,
-        HP,
     };
 
      enum GAME_PIECE
@@ -62,29 +60,11 @@ public:
         ALGEE,
     };
 
-    enum ALGEE_LVL
-    {
-        ALGEE2,
-        ALGEE3,
-    };
-
     enum SCOPED_STATE
     {
         UNSCOPED,
         SCOPED,
     };
-
-    struct Positions {
-        Positions() {
-            Positions(0);
-
-        }
-        Positions(double _h){
-            h = _h;
-        }
-        double h;
-    };
-
 
     struct x
     {
@@ -95,26 +75,20 @@ public:
         units::volt_t manualSpeed;
         bool hasZeroed;
         GAME_PIECE gamePiece;
-        ALGEE_LVL algeeLevel;
         SCOPED_STATE scopedState;
 
     } state;
 
     std::unordered_map<std::string, ELEV_LVL> elevMap = {
+        {"MANUAL", ELEV_LVL::MANUAL},
         {"STOW", ELEV_LVL::STOWED},
+        {"HP", ELEV_LVL::HP},      
         {"ONE", ELEV_LVL::ONE},
         {"TWO", ELEV_LVL::TWO},
         {"THREE", ELEV_LVL::THREE},
-        {"FOUR", ELEV_LVL::FOUR},
-        {"NET",ELEV_LVL::NET},
-        {"PROCESSOR", ELEV_LVL::PROCESSOR},  
-        {"MANUAL", ELEV_LVL::MANUAL},
-        {"HP", ELEV_LVL::HP}        
+        {"FOUR", ELEV_LVL::FOUR}
     };
-    // ELEV_LVL elevatorMap(std::string name){
-    //     return elevatorMap[name];
-    // }
-
+ 
     std::unordered_map<std::string, GAME_PIECE> gamePieceHMap = {
         {"CORAL", GAME_PIECE::CORAL},
         {"ALGEE", GAME_PIECE::ALGEE}

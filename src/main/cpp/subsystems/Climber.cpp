@@ -40,7 +40,6 @@ using namespace valor;
 
 Climber::Climber(frc::TimedRobot *_robot) : valor::BaseSubsystem(_robot, "Climber"),
     climbMotors(nullptr),
-    crabMotor(nullptr),
     currentSensor(_robot, "Climber")
 {
     frc2::CommandScheduler::GetInstance().RegisterSubsystem(this);
@@ -76,7 +75,7 @@ void Climber::init()
 
     climbMotors->setGearRatios(1.0, CLIMB_GEAR_RATIO);
 
-    climbPID.maxVelocity = climbMotors->getMaxMechSpeed(); //0.5_tps;
+    climbPID.maxVelocity = climbMotors->getMaxMechSpeed();
     climbPID.maxAcceleration = climbMotors->getMaxMechSpeed() / (1.0_s / 3);
     climbPID.P = CLIMB_K_P;
     climbPID.D = CLIMB_K_D;
@@ -93,14 +92,6 @@ void Climber::init()
     climbMotors->setContinuousWrap(true);
     climbMotors->enableFOC(true);
     climbMotors->applyConfig();
-
-    // state.spikeCurrent = SPIKE_CURRENT;
-    // state.cacheSize = CACHE_SIZE;
-
-    // currentSensor.setSpikeSetpoint(state.spikeCurrent);
-    // currentSensor.setGetter([this]() { return crabMotor->getCurrent().to<double>(); });
-    // currentSensor.setSpikeCallback([this]() {state.crabState = CRAB_STATE::CRABBED;});
-    // currentSensor.setCacheSize(state.cacheSize);
     
     table->PutNumber("Spike Current", state.spikeCurrent);
     table->PutNumber("Cache Size", state.cacheSize);
@@ -116,39 +107,16 @@ void Climber::assessInputs()
         state.climbState = CLIMB_STATE::MANUAL;
         state.manualSpeed = operatorGamepad->rightStickY(2) * 12_V;
     }
-    // } else if (operatorGamepad->DPadUp()) {
-    //     state.climbState = CLIMB_STATE::DEPLOYED;
-    // } else if (operatorGamepad->DPadDown()) {
-    //     state.climbState = CLIMB_STATE::RETRACTED;
-    // }
 
 }
 
 void Climber::analyzeDashboard()
 {
-    // state.spikeCurrent = table->GetNumber("Spike Current", SPIKE_CURRENT);
-    // state.cacheSize = table->GetNumber("Cache Size", CACHE_SIZE);
-
-    // currentSensor.setSpikeSetpoint(state.spikeCurrent);
-    // currentSensor.setCacheSize(state.cacheSize);
-
-    //crab sensor
-
-    // if(climbMotors->getPosition() == CLIMBED_POS) {
-    //     state.climbed = true;
-    // } else {
-    //     state.climbed = false;
-    // }
 
 }
 
 void Climber::assignOutputs()
 {
-    // if (state.crabState == CRAB_STATE::CRABBING) {
-    //     crabMotor->setPower(CRAB_SPEED);
-    // } else{
-    //     crabMotor->setPower(units::voltage::volt_t (0));
-    // }
 
      if (state.climbState == CLIMB_STATE::MANUAL) {
          climbMotors->setPower(state.manualSpeed);
@@ -160,30 +128,6 @@ void Climber::assignOutputs()
          climbMotors->setPosition(STOW_POS);
      }
 }
-
-// void Climber::setCrabPID() {
-
-//     valor::PIDF crabPID;
-
-//     crabPID.maxVelocity = CRAB_MAX_SPEED;
-//     crabPID.maxAcceleration = CRAB_MAX_ACCEL;
-//     crabPID.P = CRAB_K_P;
-
-//     bool crabInversion = false;
-
-//     crabMotor = new valor::PhoenixController(
-//         valor::PhoenixControllerType::FALCON,
-//         CANIDs::CRABB,
-//         valor::NeutralMode::Brake,
-//         crabInversion,
-//         "baseCAN"
-//     );
-
-//     crabMotor->setGearRatios(CRAB_GEAR_RATIO, 1.0);
-//     crabMotor->setPIDF(crabPID, 0);
-//     crabMotor->setContinuousWrap(true);
-//     crabMotor->applyConfig();
-// }
 
 
 void Climber::InitSendable(wpi::SendableBuilder& builder)

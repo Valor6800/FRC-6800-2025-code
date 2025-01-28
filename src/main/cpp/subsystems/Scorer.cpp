@@ -31,7 +31,7 @@
 #define ELEVATOR_SENSOR_TO_MECH 8.02f
 #define SCORER_SENSOR_TO_MECH 1.66666f
 #define ELEVATOR_TOLERANCE 0.5f
-#define GEAR_CIRCUMFERENCE units::meter_t{1.432_in} * M_PI // meters
+#define GEAR_CIRCUMFERENCE units::meter_t{1.432_in} * M_PI
 #define CONVERSION_FACTOR units::turn_t{1} / GEAR_CIRCUMFERENCE
 
 Scorer::Scorer(frc::TimedRobot *_robot, Drivetrain *_drive) :
@@ -256,22 +256,12 @@ Scorer::Scorer(frc::TimedRobot *_robot, Drivetrain *_drive) :
         posMap[GAME_PIECE::CORAL][ELEV_LVL::THREE] = units::meter_t(25.05_in);
         posMap[GAME_PIECE::CORAL][ELEV_LVL::FOUR] = units::meter_t(5_in);
 
-        posMap[GAME_PIECE::ALGEE][ELEV_LVL::ONE] = units::meter_t(5_in); //Processor
+        posMap[GAME_PIECE::ALGEE][ELEV_LVL::ONE] = units::meter_t(5_in);
         posMap[GAME_PIECE::ALGEE][ELEV_LVL::TWO] = units::meter_t(5_in);
         posMap[GAME_PIECE::ALGEE][ELEV_LVL::THREE] = units::meter_t(5_in);
-        posMap[GAME_PIECE::ALGEE][ELEV_LVL::FOUR] = units::meter_t(5_in); //Net
+        posMap[GAME_PIECE::ALGEE][ELEV_LVL::FOUR] = units::meter_t(5_in);
         
         resetState();
-
-
-
-
-        // scorerDebounceSensor.setGetter([this] { return this->isBeamBroken();});
-        // scorerDebounceSensor.setRisingEdgeCallback([this] {
-        //  state.sensorTwoTripped = true;
-        //  });
-        // resetState();
-
 
     }
 
@@ -282,11 +272,6 @@ Scorer::Scorer(frc::TimedRobot *_robot, Drivetrain *_drive) :
 
     if (driverGamepad == nullptr || !driverGamepad->IsConnected())
         return;
-
-    // if(operatorGamepad->rightTriggerActive())
-    // {
-    //     state.gamePiece = CORAL;
-    // }
 
     if(operatorGamepad->leftTriggerActive())
     {
@@ -324,26 +309,6 @@ Scorer::Scorer(frc::TimedRobot *_robot, Drivetrain *_drive) :
     } else{
         state.scoringState = SCORING_SPEED::HOLD;
     }
-
-
-// if(driverGamepad->GetRightBumperButton()){
-//     state.scoringState = SCORING_SPEED::INTAKING;
-// } else if (driverGamepad->GetRightTrigge
-
-//     units::turn_t currentPosition = elevatorMotor->getPosition() * CONVERSION_FACTOR;
-//         if (drivetrain->state.getTag) {
-//             if (abs((currentPosition - state.targetHeight).to<double>()) <= ELEVATOR_TOLERANCE) {
-//                 state.scoringState = SCORING_SPEED::SCORING;
-//             } else {
-//                 state.scoringState = SCORING_SPEED::HOLD;
-//             }
-//         } else {
-//             state.scoringState = SCORING_SPEED::HOLD;
-//         }
-//     } else {
-//         state.scoringState = SCORING_SPEED::HOLD;
-//     }  
-
 } 
 
 
@@ -395,11 +360,7 @@ Scorer::Scorer(frc::TimedRobot *_robot, Drivetrain *_drive) :
         }else{
             scorerMotor->setSpeed(0_tps);
         }
-
-        
-    
     }
-
 
 
 void Scorer::InitSendable(wpi::SendableBuilder& builder)
