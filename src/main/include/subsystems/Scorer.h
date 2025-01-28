@@ -95,7 +95,6 @@ public:
     };
 
 private:
-
     Drivetrain *drivetrain;
     bool hallEffectSensorActive();
     valor::DebounceSensor scorerDebounceSensor;
@@ -105,4 +104,7 @@ private:
     valor::PhoenixController *scorerMotor;
     valor::GrappleSensor lidarSensor;
     std::map<GAME_PIECE, std::map<ELEV_LVL, units::meter_t>> posMap;
+
+    bool hallEffectSensorActive();
+
 };

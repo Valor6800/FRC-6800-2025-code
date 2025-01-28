@@ -230,6 +230,7 @@ Scorer::Scorer(frc::TimedRobot *_robot, Drivetrain *_drive) :
         scorerMotor->applyConfig();
 
         elevatorMotor->setPIDF(elevatorPID, 0);
+        scorerMotor->setPIDF(scorerPID, 0);
 
         elevatorMotor->setForwardLimit(ELEVATOR_FORWARD_LIMIT);
         elevatorMotor->setupReverseHardwareLimit(CANIDs::HALL_EFFECT, ctre::phoenix6::signals::ReverseLimitTypeValue::NormallyOpen);
