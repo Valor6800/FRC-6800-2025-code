@@ -150,13 +150,13 @@ Scorer::Scorer(frc::TimedRobot *_robot, Drivetrain *_drive) :
 
 
         posMap[GAME_PIECE::CORAL][ELEV_LVL::STOWED] = units::meter_t(5_in);
-        posMap[GAME_PIECE::CORAL][ELEV_LVL::HP] = units::meter_t(5_in);
-        posMap[GAME_PIECE::CORAL][ELEV_LVL::TROUGH] = units::meter_t(13.57_in);
+        posMap[GAME_PIECE::CORAL][ELEV_LVL::HP] = units::meter_t(8.425_in);
+        posMap[GAME_PIECE::CORAL][ELEV_LVL::ONE] = units::meter_t(13.57_in);
         posMap[GAME_PIECE::CORAL][ELEV_LVL::TWO] = units::meter_t(17.0_in);
         posMap[GAME_PIECE::CORAL][ELEV_LVL::THREE] = units::meter_t(25.05_in);
         posMap[GAME_PIECE::CORAL][ELEV_LVL::FOUR] = units::meter_t(5_in);
 
-        posMap[GAME_PIECE::ALGEE][ELEV_LVL::TROUGH] = units::meter_t(5_in); //Processor
+        posMap[GAME_PIECE::ALGEE][ELEV_LVL::ONE] = units::meter_t(5_in); //Processor
         posMap[GAME_PIECE::ALGEE][ELEV_LVL::TWO] = units::meter_t(5_in);
         posMap[GAME_PIECE::ALGEE][ELEV_LVL::THREE] = units::meter_t(5_in);
         posMap[GAME_PIECE::ALGEE][ELEV_LVL::FOUR] = units::meter_t(5_in); //Net
@@ -195,31 +195,32 @@ Scorer::Scorer(frc::TimedRobot *_robot, Drivetrain *_drive) :
         state.gamePiece = CORAL;
     }
       
+    if (driverGamepad->leftTriggerActive()){
+        state.scopedState = SCOPED;
+    } else {
+        state.scopedState = UNSCOPED;
+    }
     if (operatorGamepad->leftStickYActive()) {
         state.elevState = MANUAL;
         state.manualSpeed = operatorGamepad->leftStickY(2) * 12_V;
     } else if (operatorGamepad->GetYButton()){
-        if (driverGamepad->leftTriggerActive()) {state.elevState = ELEV_LVL::FOUR;} 
-        else {state.elevState = ELEV_LVL::STOWED;}
+         state.elevState = ELEV_LVL::FOUR;
     } else if (operatorGamepad->GetBButton()) {
-        if (driverGamepad->leftTriggerActive()) {state.elevState = ELEV_LVL::THREE;} 
-        else {state.elevState = ELEV_LVL::STOWED;} 
-    } else if (operatorGamepad->GetAButton()) {
-        if (driverGamepad->leftTriggerActive()) {state.elevState = ELEV_LVL::TWO;} 
-        else {state.elevState = ELEV_LVL::STOWED;}
+        state.elevState = ELEV_LVL::THREE;
+    } else if (operatorGamepad->GetAButton()){
+        state.elevState = ELEV_LVL::TWO;
     } else if (operatorGamepad->GetXButton()){
-        if (driverGamepad->leftTriggerActive()) {state.elevState = ELEV_LVL::TROUGH;} 
-        else {state.elevState = ELEV_LVL::STOWED;}
+        state.elevState = ELEV_LVL::ONE;
     } else if(operatorGamepad->DPadRight()){
-        state.elevState = ELEV_LVL::STOWED;
+        state.elevState = ELEV_LVL::HP;
     }
 
 
     if (driverGamepad->GetRightBumperButton()) {
-        state.scoringState =  SCORING_SPEED::SCORING;
+        state.scoringState =  SCORING_SPEED::INTAKING;
     }
-    else if (driverGamepad->GetLeftBumperButton()) {
-        state.scoringState = SCORING_SPEED::INTAKING;
+    else if (driverGamepad->rightTriggerActive()) {
+        state.scoringState = SCORING_SPEED::SCORING;
     } else{
         state.scoringState = SCORING_SPEED::HOLD;
     }
@@ -268,9 +269,18 @@ Scorer::Scorer(frc::TimedRobot *_robot, Drivetrain *_drive) :
             if (state.elevState == ELEV_LVL::MANUAL) {
                 elevatorMotor->setPower(state.manualSpeed);
             } else {
-                state.targetHeight = posMap[state.gamePiece][state.elevState];
+                if(state.scopedState == SCOPED){
+                    state.targetHeight = posMap[state.gamePiece][state.elevState];
+                } else{
+                    if(state.elevState == HP){
+                        state.targetHeight = posMap[CORAL][HP];
+                    }else{
+                        state.targetHeight = posMap[CORAL][STOWED];
+                    }
+                }
                 units::turn_t targetRotations = convertToMotorSpace(state.targetHeight);
                 elevatorMotor->setPosition(targetRotations);
+                
             }
         } else {
             elevatorMotor->setPower(-2.0_V);
@@ -283,7 +293,7 @@ Scorer::Scorer(frc::TimedRobot *_robot, Drivetrain *_drive) :
             scorerMotor->setPower(SCORE_SPEED);
     
         }else{
-            scorerMotor->setPower(units::volt_t(0));
+            scorerMotor->setSpeed(9_tps);
         }
 
         
@@ -319,6 +329,29 @@ void Scorer::InitSendable(wpi::SendableBuilder& builder)
         );
         builder.AddBooleanProperty(
             "zeroed?",
+            [this] { return hallEffectSensorActive();},
+            nullptr
+        );
+
+         builder.AddIntegerProperty(
+            "Gamepiece state",
+            [this] { return state.gamePiece;},
+            nullptr
+        );
+         builder.AddIntegerProperty(
+            "Level state",
+            [this] { return state.elevState;},
+            nullptr
+        );
+
+        builder.AddBooleanProperty(
+            "Scoped state",
+            [this] { return state.scopedState;},
+            nullptr
+        );
+
+         builder.AddBooleanProperty(
+            "Zeroed state",
             [this] { return hallEffectSensorActive();},
             nullptr
         );

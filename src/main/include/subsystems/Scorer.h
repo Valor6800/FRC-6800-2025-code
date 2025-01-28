@@ -47,7 +47,7 @@ public:
     {
         MANUAL,
         STOWED,
-        TROUGH,
+        ONE,
         TWO,
         THREE,
         FOUR,
@@ -58,8 +58,8 @@ public:
 
      enum GAME_PIECE
     {
-        ALGEE,
         CORAL,
+        ALGEE,
     };
 
     enum ALGEE_LVL
@@ -70,8 +70,8 @@ public:
 
     enum SCOPED_STATE
     {
-        SCOPED,
         UNSCOPED,
+        SCOPED,
     };
 
     struct Positions {
@@ -102,7 +102,7 @@ public:
 
     std::unordered_map<std::string, ELEV_LVL> elevMap = {
         {"STOW", ELEV_LVL::STOWED},
-        {"TROUGH", ELEV_LVL::TROUGH},
+        {"ONE", ELEV_LVL::ONE},
         {"TWO", ELEV_LVL::TWO},
         {"THREE", ELEV_LVL::THREE},
         {"FOUR", ELEV_LVL::FOUR},
@@ -130,6 +130,5 @@ private:
     valor::PhoenixController *elevatorMotor;
     valor::PhoenixController *scorerMotor;
     valor::GrappleSensor lidarSensor;
-    bool hallEffectSensorActive();
     std::map<GAME_PIECE, std::map<ELEV_LVL, units::meter_t>> posMap;
 };
