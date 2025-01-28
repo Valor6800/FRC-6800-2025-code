@@ -117,7 +117,7 @@ Scorer::Scorer(frc::TimedRobot *_robot, Drivetrain *_drive) :
         state.hasZeroed = hallEffectSensorActive();
         elevatorMotor->setGearRatios(MOTOR_TO_SENSOR, SENSOR_TO_MECH);
         elevatorMotor->enableFOC(true);
-        scorerMotor->setGearRatios(1, 1);
+        scorerMotor->setGearRatios(1, 1.666);
 
         valor::PIDF elevatorPID;
         elevatorPID.maxVelocity = elevatorMotor->getMaxMechSpeed();
@@ -133,6 +133,7 @@ Scorer::Scorer(frc::TimedRobot *_robot, Drivetrain *_drive) :
         scorerPID.P = SCORER_K_P;
         
         elevatorMotor->setPIDF(elevatorPID, 0);
+        scorerMotor->setPIDF(scorerPID, 0);
 
         elevatorMotor->setForwardLimit(ELEVATOR_FORWARD_LIMIT);
         elevatorMotor->setupReverseHardwareLimit(CANIDs::HALL_EFFECT, ctre::phoenix6::signals::ReverseLimitTypeValue::NormallyOpen);
@@ -261,7 +262,7 @@ Scorer::Scorer(frc::TimedRobot *_robot, Drivetrain *_drive) :
             scorerMotor->setPower(SCORE_SPEED);
     
         }else{
-            scorerMotor->setSpeed(9_tps);
+            scorerMotor->setSpeed(0_tps);
         }
     }
 

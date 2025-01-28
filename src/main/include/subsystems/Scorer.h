@@ -95,14 +95,15 @@ public:
     };
 
 private:
-
     Drivetrain *drivetrain;
-    bool hallEffectSensorActive();
+    valor::PhoenixController *elevatorMotor;
+    valor::PhoenixController *scorerMotor;
     ctre::phoenix6::hardware::core::CoreCANdi candi;
     valor::DebounceSensor scorerDebounceSensor;
     valor::DebounceSensor hallEffectDebounceSensor;
-    valor::PhoenixController *elevatorMotor;
-    valor::PhoenixController *scorerMotor;
     valor::GrappleSensor lidarSensor;
     std::map<GAME_PIECE, std::map<ELEV_LVL, units::meter_t>> posMap;
+
+    bool hallEffectSensorActive();
+
 };
