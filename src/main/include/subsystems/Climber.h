@@ -27,8 +27,6 @@ public:
     void analyzeDashboard();
     void assignOutputs();
 
-    // void setCrabPID();
-
     void InitSendable(wpi::SendableBuilder& builder);
 
     enum CLIMB_STATE
@@ -60,8 +58,6 @@ public:
 
 private:
     valor::PhoenixController *climbMotors;
-    valor::PhoenixController *crabMotor;
-
     valor::CurrentSensor currentSensor;
 };
 
