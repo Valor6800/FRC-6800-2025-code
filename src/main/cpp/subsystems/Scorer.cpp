@@ -15,11 +15,11 @@
 #define ELEV_K_P 10
 #define ELEV_K_ERROR units::angle::turn_t (0)
 #define ELEV_K_AFF 0.5
-#define MOTOR_TO_MECH_IN 6000/SENSOR_TO_MECH*
+#define MOTOR_TO_MECH_IN 6000/ELEVATOR_SENSOR_TO_MECH*
 
-#define SCORER_K_P 0
-#define INTAKE_SPEED 4_V
-#define SCORE_SPEED -4_V
+#define SCORER_K_P 0.5
+#define INTAKE_SPEED 5_tps
+#define SCORE_SPEED -15_tps
 
 #define ELEVATOR_FORWARD_LIMIT 5.75_tr
 #define ELEVATOR_REVERSE_LIMIT 0.0_tr
@@ -27,8 +27,9 @@
 
 #define SEGMENTS 0.0f
 #define CIRCUM 1.432* M_Pi
-#define MOTOR_TO_SENSOR 1.0f
-#define SENSOR_TO_MECH 8.02f
+#define ELEVATOR_MOTOR_TO_SENSOR 1.0f
+#define ELEVATOR_SENSOR_TO_MECH 8.02f
+#define SCORER_SENSOR_TO_MECH 1.66666f
 #define ELEVATOR_TOLERANCE 0.5f
 #define GEAR_CIRCUMFERENCE units::meter_t{1.432_in} * M_PI // meters
 #define CONVERSION_FACTOR units::turn_t{1} / GEAR_CIRCUMFERENCE
@@ -40,7 +41,7 @@ Scorer::Scorer(frc::TimedRobot *_robot, Drivetrain *_drive) :
     hallEffectDebounceSensor(_robot, "HallEffectDebounce"),
     candi(CANIDs::HALL_EFFECT, "baseCAN"),
     elevatorMotor(new valor::PhoenixController(valor::PhoenixControllerType::KRAKEN_X60, CANIDs::ELEV_WHEEL, valor::NeutralMode::Brake, true, "baseCAN")),
-    scorerMotor(new valor::PhoenixController(valor::PhoenixControllerType::KRAKEN_X60, CANIDs::SCORER_WHEEL, valor::NeutralMode::Coast, false, "baseCAN")),
+    scorerMotor(new valor::PhoenixController(valor::PhoenixControllerType::FALCON_FOC, CANIDs::SCORER_WHEEL, valor::NeutralMode::Brake, false, "baseCAN")),
     lidarSensor(_robot, "Front Lidar Sensor", CANIDs::FRONT_LIDAR_SENSOR)
     {
 
@@ -115,9 +116,10 @@ Scorer::Scorer(frc::TimedRobot *_robot, Drivetrain *_drive) :
     void Scorer::init()
     {
         state.hasZeroed = hallEffectSensorActive();
-        elevatorMotor->setGearRatios(MOTOR_TO_SENSOR, SENSOR_TO_MECH);
+        elevatorMotor->setGearRatios(ELEVATOR_MOTOR_TO_SENSOR, ELEVATOR_SENSOR_TO_MECH);
         elevatorMotor->enableFOC(true);
-        scorerMotor->setGearRatios(1, 1);
+        scorerMotor->setGearRatios(1, SCORER_SENSOR_TO_MECH);
+        scorerMotor->enableFOC(true);
 
         valor::PIDF elevatorPID;
         elevatorPID.maxVelocity = elevatorMotor->getMaxMechSpeed();
@@ -132,7 +134,9 @@ Scorer::Scorer(frc::TimedRobot *_robot, Drivetrain *_drive) :
         scorerPID.maxAcceleration = scorerMotor->getMaxMechSpeed()/(1.0_s/2);
         scorerPID.P = SCORER_K_P;
         
-        // scorerMotor->setPIDF(scorerPID, 0);
+        scorerMotor->setPIDF(scorerPID, 0);
+        scorerMotor->applyConfig();
+
         elevatorMotor->setPIDF(elevatorPID, 0);
 
         elevatorMotor->setForwardLimit(ELEVATOR_FORWARD_LIMIT);
@@ -291,13 +295,13 @@ Scorer::Scorer(frc::TimedRobot *_robot, Drivetrain *_drive) :
         }
 
         if (state.scoringState == SCORING_SPEED::INTAKING){
-            scorerMotor->setPower(INTAKE_SPEED);
+            scorerMotor->setSpeed(INTAKE_SPEED);
         }
         else if(state.scoringState == SCORING_SPEED::SCORING){
-            scorerMotor->setPower(SCORE_SPEED);
+            scorerMotor->setSpeed(SCORE_SPEED);
     
         }else{
-            scorerMotor->setSpeed(9_tps);
+            scorerMotor->setSpeed(0_tps);
         }
 
         
