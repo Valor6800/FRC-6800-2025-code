@@ -79,6 +79,9 @@ public:
 
     void driveRobotRelative(frc::ChassisSpeeds speeds);
 
+    double getSkiddingRatio();
+    wpi::array<frc::SwerveModuleState, MODULE_COUNT> getAllModuleStates();
+
     void InitSendable(wpi::SendableBuilder& builder) override;
 
 protected:

@@ -177,6 +177,12 @@ void SwerveModule<AzimuthMotor, DriveMotor>::setUpdateFrequency(units::frequency
 }
 
 template<class AzimuthMotor, class DriveMotor>
+frc::Translation2d SwerveModule<AzimuthMotor, DriveMotor>::convertSwerveStateToVelocityVector(frc::SwerveModuleState state)
+{
+    return frc::Translation2d{units::meter_t{state.speed.to<double>()}, state.angle};
+}
+
+template<class AzimuthMotor, class DriveMotor>
 void SwerveModule<AzimuthMotor, DriveMotor>::InitSendable(wpi::SendableBuilder& builder)
 {
     builder.SetSmartDashboardType("Subsystem");

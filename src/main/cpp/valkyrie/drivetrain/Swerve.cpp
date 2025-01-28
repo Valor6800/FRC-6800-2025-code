@@ -383,6 +383,38 @@ wpi::array<frc::SwerveModuleState, MODULE_COUNT> Swerve<AzimuthMotor, DriveMotor
 }
 
 template<class AzimuthMotor, class DriveMotor>
+wpi::array<frc::SwerveModuleState, MODULE_COUNT> Swerve<AzimuthMotor, DriveMotor>::getAllModuleStates(){
+    wpi::array<frc::SwerveModuleState, MODULE_COUNT> moduleStates = wpi::array<frc::SwerveModuleState, MODULE_COUNT>(wpi::empty_array);
+    for (size_t i = 0; i < swerveModules.size(); i++) {
+        moduleStates[i] = swerveModules[i]->getState();
+    }
+    return moduleStates;
+}
+
+template<class AzimuthMotor, class DriveMotor>
+double Swerve<AzimuthMotor, DriveMotor>::getSkiddingRatio()
+{
+    wpi::array<frc::SwerveModuleState, MODULE_COUNT> measuredModuleStates = getAllModuleStates();
+    double angularVelocityMeasured = kinematics->ToChassisSpeeds(measuredModuleStates).omega.value();
+    wpi::array<frc::SwerveModuleState, MODULE_COUNT> swerveStatesRotPart = kinematics->ToSwerveModuleStates(frc::ChassisSpeeds{0_mps, 0_mps, units::degrees_per_second_t{angularVelocityMeasured}});
+    wpi::array<double, MODULE_COUNT> swerveStatesTranslationalPartMag = wpi::array<double, MODULE_COUNT>(wpi::empty_array);
+
+    for(int i = 0; i < MODULE_COUNT; i++){
+        frc::Translation2d swerveStateAsVector = swerveModules[i]->convertSwerveStateToVelocityVector(measuredModuleStates[i]),
+                                                 swerveStatesRotPartAsVector = swerveModules[i]->convertSwerveStateToVelocityVector(swerveStatesRotPart[i]),
+                                                 swerveStatesTranslationalPartAsVector = swerveStateAsVector - swerveStatesRotPartAsVector;
+        swerveStatesTranslationalPartMag[i] = swerveStatesTranslationalPartAsVector.Norm().to<double>();
+    }
+    double maxTransSpeed = 0.0; double minTransSpeed = 0.0;
+    for(size_t i = 0; i < swerveStatesTranslationalPartMag.size(); i++){
+        maxTransSpeed = std::max(maxTransSpeed, swerveStatesTranslationalPartMag[i]);
+        minTransSpeed = std::min(minTransSpeed, swerveStatesTranslationalPartMag[i]);
+    }
+
+    return maxTransSpeed/minTransSpeed;
+}
+
+template<class AzimuthMotor, class DriveMotor>
 void Swerve<AzimuthMotor, DriveMotor>::InitSendable(wpi::SendableBuilder& builder)
 {
     builder.SetSmartDashboardType("Subsystem");

@@ -92,6 +92,8 @@ public:
 
     void setUpdateFrequency(units::frequency::hertz_t);
 
+    frc::Translation2d convertSwerveStateToVelocityVector(frc::SwerveModuleState state);
+
     void InitSendable(wpi::SendableBuilder& builder) override;
 
 private:
