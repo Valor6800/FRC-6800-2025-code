@@ -168,9 +168,7 @@ void Swerve<AzimuthMotor, DriveMotor>::analyzeDashboard()
     //     xSpeedMPS = units::meters_per_second_t{powerVector[0]};
     //     ySpeedMPS = units::meters_per_second_t{powerVector[1]};
     // }
-
-    
-    // Linear Speed calculations
+    getSkiddingRatio();
 }
 
 template<class AzimuthMotor, class DriveMotor>
@@ -415,6 +413,13 @@ double Swerve<AzimuthMotor, DriveMotor>::getSkiddingRatio()
 }
 
 template<class AzimuthMotor, class DriveMotor>
+bool Swerve<AzimuthMotor, DriveMotor>::isRobotSkidding()
+{
+    // should be better than this but this is good enough for now i think
+    return getSkiddingRatio() >= 1.0;
+}
+
+template<class AzimuthMotor, class DriveMotor>
 void Swerve<AzimuthMotor, DriveMotor>::InitSendable(wpi::SendableBuilder& builder)
 {
     builder.SetSmartDashboardType("Subsystem");
@@ -639,6 +644,18 @@ void Swerve<AzimuthMotor, DriveMotor>::InitSendable(wpi::SendableBuilder& builde
     builder.AddBooleanProperty(
         "Locking on Target",
         [this] {return alignToTarget;},
+        nullptr
+    );
+
+    builder.AddDoubleProperty(
+        "Skidding Ratio",
+        [this] {return getSkiddingRatio();},
+        nullptr
+    );
+
+    builder.AddBooleanProperty(
+        "Is Robot Skidding",
+        [this] {return isRobotSkidding();},
         nullptr
     );
 }
