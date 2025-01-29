@@ -96,6 +96,64 @@ Scorer::Scorer(frc::TimedRobot *_robot, Drivetrain *_drive) :
         )
     ).ToPtr());
 
+
+    pathplanner::NamedCommands::registerCommand("TROUGH POSITION", std::move(
+        frc2::SequentialCommandGroup(
+            frc2::InstantCommand(
+                [this]() {
+                    
+                    state.elevState = Scorer::ELEV_LVL::ONE;
+                }
+            )
+        )
+    ).ToPtr());
+
+    pathplanner::NamedCommands::registerCommand("LEVEL TWO POSITION", std::move(
+        frc2::SequentialCommandGroup(
+            frc2::InstantCommand(
+                [this]() {
+                    
+                    state.elevState = Scorer::ELEV_LVL::TWO;
+                }
+            )
+        )
+    ).ToPtr());
+
+
+    pathplanner::NamedCommands::registerCommand("LEVEL THREE POSITION", std::move(
+        frc2::SequentialCommandGroup(
+            frc2::InstantCommand(
+                [this]() {
+                    
+                    state.elevState = Scorer::ELEV_LVL::THREE;
+                }
+            )
+        )
+    ).ToPtr());
+
+
+    pathplanner::NamedCommands::registerCommand("LEVEL FOUR POSITION", std::move(
+        frc2::SequentialCommandGroup(
+            frc2::InstantCommand(
+                [this]() {
+                    
+                    state.elevState = Scorer::ELEV_LVL::FOUR;
+                }
+            )
+        )
+    ).ToPtr());
+
+    pathplanner::NamedCommands::registerCommand("STOWED POSITION", std::move(
+        frc2::SequentialCommandGroup(
+            frc2::InstantCommand(
+                [this]() {
+                    
+                    state.elevState = Scorer::ELEV_LVL::STOWED;
+                }
+            )
+        )
+    ).ToPtr());
+
         init();
 
     }

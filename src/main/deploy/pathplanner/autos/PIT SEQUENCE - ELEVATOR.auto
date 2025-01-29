@@ -1,0 +1,85 @@
+{
+  "version": "2025.0",
+  "command": {
+    "type": "sequential",
+    "data": {
+      "commands": [
+        {
+          "type": "named",
+          "data": {
+            "name": "Wait For Driver Input"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "STOWED POSITION"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Wait For Driver Input"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "TROUGH POSITION"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Wait For Driver Input"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "LEVEL TWO POSITION"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Wait For Driver Input"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "LEVEL THREE POSITION"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Wait For Driver Input"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "LEVEL FOUR POSITION"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Wait For Driver Input"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "STOWED POSITION"
+          }
+        }
+      ]
+    }
+  },
+  "resetOdom": true,
+  "folder": null,
+  "choreoAuto": false
+}
