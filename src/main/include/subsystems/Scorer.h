@@ -124,9 +124,9 @@ private:
 
     Drivetrain *drivetrain;
     bool hallEffectSensorActive();
-    ctre::phoenix6::hardware::core::CoreCANdi candi;
     valor::DebounceSensor scorerDebounceSensor;
     valor::DebounceSensor hallEffectDebounceSensor;
+    ctre::phoenix6::hardware::core::CoreCANdi candi;
     valor::PhoenixController *elevatorMotor;
     valor::PhoenixController *scorerMotor;
     valor::GrappleSensor lidarSensor;
