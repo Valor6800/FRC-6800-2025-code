@@ -403,7 +403,7 @@ double Swerve<AzimuthMotor, DriveMotor>::getSkiddingRatio()
                                                  swerveStatesTranslationalPartAsVector = swerveStateAsVector - swerveStatesRotPartAsVector;
         swerveStatesTranslationalPartMag[i] = swerveStatesTranslationalPartAsVector.Norm().to<double>();
     }
-    double maxTransSpeed = 0.0; double minTransSpeed = 0.0;
+    double maxTransSpeed = 0.0; double minTransSpeed = 10000.0;
     for(size_t i = 0; i < swerveStatesTranslationalPartMag.size(); i++){
         maxTransSpeed = std::max(maxTransSpeed, swerveStatesTranslationalPartMag[i]);
         minTransSpeed = std::min(minTransSpeed, swerveStatesTranslationalPartMag[i]);
@@ -416,7 +416,7 @@ template<class AzimuthMotor, class DriveMotor>
 bool Swerve<AzimuthMotor, DriveMotor>::isRobotSkidding()
 {
     // should be better than this but this is good enough for now i think
-    return getSkiddingRatio() >= 1.0;
+    return getSkiddingRatio() >= 1.5;
 }
 
 template<class AzimuthMotor, class DriveMotor>
