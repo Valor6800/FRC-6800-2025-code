@@ -6,6 +6,9 @@
 #include "Constants.h"
 
 #include <pathplanner/lib/auto/NamedCommands.h>
+#include <frc2/command/SequentialCommandGroup.h>
+#include <frc2/command/InstantCommand.h>
+#include <frc2/command/WaitCommand.h>
 #include <frc/DriverStation.h>
 
 #define FORWARD_LIMIT 0.25_tr
@@ -45,6 +48,23 @@ Climber::Climber(frc::TimedRobot *_robot) : valor::BaseSubsystem(_robot, "Climbe
     frc2::CommandScheduler::GetInstance().RegisterSubsystem(this);
     table->PutBoolean("Climbed?", state.climbed);
     init();
+    pathplanner::NamedCommands::registerCommand("Climb PIT Sequence", std::move(
+        frc2::SequentialCommandGroup(
+            frc2::InstantCommand(
+                [this]() {
+                    
+                    state.climbState = Climber::CLIMB_STATE::DEPLOYED;
+                }
+            ),
+            frc2::WaitCommand(1_s),
+            frc2::InstantCommand(
+                [this]() {
+                    
+                    state.climbState = Climber::CLIMB_STATE::RETRACTED;
+                }
+            )
+        )
+    ).ToPtr());
 }
 
 Climber::~Climber()
