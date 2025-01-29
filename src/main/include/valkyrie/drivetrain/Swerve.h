@@ -151,6 +151,7 @@ private:
     void calculateCarpetPose();
 
     frc::ChassisSpeeds discretize(frc::ChassisSpeeds speeds);
+    frc::Twist2d log(frc::Pose2d transform);
 
     bool rotTest;
     bool strLineTest;

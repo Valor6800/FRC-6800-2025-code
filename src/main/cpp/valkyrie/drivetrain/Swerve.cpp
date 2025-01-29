@@ -20,7 +20,7 @@
 #define MODULE_DIFF_YS {1, -1, -1, 1}
 
 #define LOOP_TIME 0.02_s
-#define COMPENSATION 4
+#define EPS 1e-9
 
 const units::hertz_t KP_ROTATE(-90);
 const units::hertz_t KD_ROTATE(-30);
@@ -425,10 +425,23 @@ bool Swerve<AzimuthMotor, DriveMotor>::isRobotSkidding()
 
 template<class AzimuthMotor, class DriveMotor>
 frc::ChassisSpeeds Swerve<AzimuthMotor, DriveMotor>::discretize(frc::ChassisSpeeds speeds){
-    frc::Pose2d desiredPose{speeds.vx * LOOP_TIME, speeds.vy * LOOP_TIME, frc::Rotation2d(speeds.omega * LOOP_TIME * COMPENSATION)};
-    frc::Twist2d twist = desiredPose.Log(desiredPose);
+    frc::Pose2d desiredPose{speeds.vx * LOOP_TIME, speeds.vy * LOOP_TIME, frc::Rotation2d(speeds.omega * LOOP_TIME)};
+    frc::Twist2d twist = log(desiredPose);
     frc::ChassisSpeeds finalSpeeds{(twist.dx / LOOP_TIME), (twist.dy / LOOP_TIME), (speeds.omega)};
     return finalSpeeds;
+}
+
+template<class AzimuthMotor, class DriveMotor>
+frc::Twist2d Swerve<AzimuthMotor, DriveMotor>::log(frc::Pose2d transform){
+    double dtheta = transform.Rotation().Radians().value();
+    double half_dtheta = dtheta * 0.5;
+    double cos_minus_one = std::cos(half_dtheta) - 1.0;
+    double halftheta_by_tan_of_halfdtheta;
+    if(std::abs(cos_minus_one) < EPS) halftheta_by_tan_of_halfdtheta = 1.0 - 1.0 / 12.0 * dtheta * dtheta;
+    else halftheta_by_tan_of_halfdtheta = -(half_dtheta*std::sin(dtheta)) / cos_minus_one;
+
+    frc::Translation2d translation_part = transform.Translation().RotateBy(frc::Rotation2d(halftheta_by_tan_of_halfdtheta, -half_dtheta));
+    return frc::Twist2d{translation_part.X(), translation_part.Y(), units::radian_t{dtheta}};
 }
 
 template<class AzimuthMotor, class DriveMotor>
