@@ -65,6 +65,21 @@ Climber::Climber(frc::TimedRobot *_robot) : valor::BaseSubsystem(_robot, "Climbe
             )
         )
     ).ToPtr());
+    frc2::SequentialCommandGroup(
+            frc2::FunctionalCommand(
+                [this]() { //onInit
+                    state.climbState = Climber::CLIMB_STATE::DEPLOYED;
+                },
+                [this](){}, //onExecute
+                [this](bool){ //onEnd
+                    state.climbState = Climber::CLIMB_STATE::MANUAL;
+                },
+                [this](){ //isFinished
+                    return climbMotors->getPosition() == DEPLOYED_POS && driverGamepad->GetAButton();
+                },
+                {}
+            )
+    ).ToPtr();
 }
 
 Climber::~Climber()
