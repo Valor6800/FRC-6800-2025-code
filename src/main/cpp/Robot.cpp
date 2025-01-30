@@ -38,7 +38,7 @@ Robot::Robot() :
         [](bool _b){ // onEnd
             },
             [this](){ // isFinished
-                return gamepadOperator.GetAButtonPressed();
+                return gamepadOperator.DPadLeft();
             },
             {} // requirements
         ).ToPtr())

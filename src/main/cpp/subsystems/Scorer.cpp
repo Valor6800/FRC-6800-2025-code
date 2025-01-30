@@ -47,7 +47,7 @@ Scorer::Scorer(frc::TimedRobot *_robot, Drivetrain *_drive) :
 
         frc2::CommandScheduler::GetInstance().RegisterSubsystem(this);
     init();
-    pathplanner::NamedCommands::registerCommand("Score sequence Scorer", std::move(
+    pathplanner::NamedCommands::registerCommand("OUTTAKE, INTAKE, HOLD", std::move(
         frc2::SequentialCommandGroup(
             frc2::InstantCommand(
                 [this]() {
@@ -55,7 +55,14 @@ Scorer::Scorer(frc::TimedRobot *_robot, Drivetrain *_drive) :
                     state.scoringState = Scorer::SCORING_SPEED::SCORING;
                 }
             ),
-            frc2::WaitCommand(1_s),
+            frc2::WaitCommand(5_s),
+            frc2::InstantCommand(
+                [this]() {
+                    
+                    state.scoringState = Scorer::SCORING_SPEED::INTAKING;
+                }
+            ),
+            frc2::WaitCommand(5_s),
             frc2::InstantCommand(
                 [this]() {
                     
@@ -101,8 +108,9 @@ Scorer::Scorer(frc::TimedRobot *_robot, Drivetrain *_drive) :
         frc2::SequentialCommandGroup(
             frc2::InstantCommand(
                 [this]() {
-                    
+                    state.scopedState = Scorer::SCOPED_STATE::SCOPED;
                     state.elevState = Scorer::ELEV_LVL::ONE;
+                    state.gamePiece = Scorer::GAME_PIECE::CORAL;
                 }
             )
         )
@@ -113,7 +121,9 @@ Scorer::Scorer(frc::TimedRobot *_robot, Drivetrain *_drive) :
             frc2::InstantCommand(
                 [this]() {
                     
+                    state.scopedState = Scorer::SCOPED_STATE::SCOPED;
                     state.elevState = Scorer::ELEV_LVL::TWO;
+                    state.gamePiece = Scorer::GAME_PIECE::CORAL;
                 }
             )
         )
@@ -124,8 +134,9 @@ Scorer::Scorer(frc::TimedRobot *_robot, Drivetrain *_drive) :
         frc2::SequentialCommandGroup(
             frc2::InstantCommand(
                 [this]() {
-                    
+                    state.scopedState = Scorer::SCOPED_STATE::SCOPED;
                     state.elevState = Scorer::ELEV_LVL::THREE;
+                    state.gamePiece = Scorer::GAME_PIECE::CORAL;
                 }
             )
         )
@@ -136,8 +147,9 @@ Scorer::Scorer(frc::TimedRobot *_robot, Drivetrain *_drive) :
         frc2::SequentialCommandGroup(
             frc2::InstantCommand(
                 [this]() {
-                    
+                    state.scopedState = Scorer::SCOPED_STATE::SCOPED;
                     state.elevState = Scorer::ELEV_LVL::FOUR;
+                    state.gamePiece = Scorer::GAME_PIECE::CORAL;
                 }
             )
         )
@@ -147,16 +159,38 @@ Scorer::Scorer(frc::TimedRobot *_robot, Drivetrain *_drive) :
         frc2::SequentialCommandGroup(
             frc2::InstantCommand(
                 [this]() {
-                    
+                    state.scopedState = Scorer::SCOPED_STATE::SCOPED;
                     state.elevState = Scorer::ELEV_LVL::STOWED;
+                    state.gamePiece = Scorer::GAME_PIECE::CORAL;
                 }
             )
         )
     ).ToPtr());
 
+
+    pathplanner::NamedCommands::registerCommand("ZEROING PROCEDURE", std::move(
+        frc2::FunctionalCommand(
+            [this](){ 
+                state.hasZeroed = false;
+                
+            },
+            [this](){ // onExecute
+                if (!state.hasZeroed) {
+                elevatorMotor->setPower(-2_V);
+            }
+            },
+        [this](bool _b){ // onEnd
+            elevatorMotor->setPower(0_V);
+            },
+            [this](){ // isFinished
+                return state.hasZeroed;
+            },
+            {} // requirements
+        ).ToPtr())
+    );
         init();
 
-    }
+}
 
     void Scorer::resetState()
     {
@@ -215,7 +249,7 @@ Scorer::Scorer(frc::TimedRobot *_robot, Drivetrain *_drive) :
 
 
 
-        posMap[GAME_PIECE::CORAL][ELEV_LVL::STOWED] = units::meter_t(5_in);
+        posMap[GAME_PIECE::CORAL][ELEV_LVL::STOWED] = units::meter_t(3_in);
         posMap[GAME_PIECE::CORAL][ELEV_LVL::HP] = units::meter_t(8.425_in);
         posMap[GAME_PIECE::CORAL][ELEV_LVL::ONE] = units::meter_t(13.57_in);
         posMap[GAME_PIECE::CORAL][ELEV_LVL::TWO] = units::meter_t(17.0_in);
