@@ -7,6 +7,9 @@
 #include <frc/kinematics/SwerveModulePosition.h>
 #include <frc/DutyCycleEncoder.h>
 #include <units/voltage.h>
+#include <frc/fmt/Eigen.h>
+#include <frc/kinematics/ChassisSpeeds.h>
+#include <cmath>
 
 #include <wpi/sendable/Sendable.h>
 #include <wpi/sendable/SendableBuilder.h>
@@ -84,6 +87,8 @@ public:
      * @return if the mag encoder was successfully 
      */
     bool loadAndSetAzimuthZeroReference(std::vector<units::turn_t> offsets);
+
+    frc::SwerveModuleState getRealModuleVelocity(frc::ChassisSpeeds, frc::Translation2d);
 
     void setAzimuthPosition(frc::Rotation2d angle);
 
