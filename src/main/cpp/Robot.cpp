@@ -1,8 +1,6 @@
 #include "Robot.h"
 #include "frc/AnalogTriggerType.h"
 #include "frc2/command/Commands.h"
-#include "frc2/command/FunctionalCommand.h"
-#include "frc2/command/SequentialCommandGroup.h"
 #include <frc/smartdashboard/SmartDashboard.h>
 #include <frc2/command/CommandScheduler.h>
 #include <frc/RobotController.h>
@@ -27,26 +25,13 @@ Robot::Robot() :
 {
     frc::TimedRobot();
 
-    pathplanner::NamedCommands::registerCommand("Wait For Driver Input", std::move(
-        frc2::FunctionalCommand(
-            [](){ // onInit
-                
-            },
-            [](){ // onExecute
-                // continuously running
-            },
-        [](bool _b){ // onEnd
-            },
-            [this](){ // isFinished
-                return gamepadOperator.DPadLeft();
-            },
-            {} // requirements
-        ).ToPtr())
-    );
-
-
-
+    // pathplanner::NamedCommands::registerCommand("Reschedule", std::move(
+    //     frc2::InstantCommand([this](){
+    //         autoCommands.back().Schedule();
+    //     })
+    // ).ToPtr());
 }
+
 
 
 void Robot::RobotInit() {
