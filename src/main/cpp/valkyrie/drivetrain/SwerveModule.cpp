@@ -96,6 +96,35 @@ void SwerveModule<AzimuthMotor, DriveMotor>::setDesiredState(frc::SwerveModuleSt
 }
 
 template<class AzimuthMotor, class DriveMotor>
+frc::SwerveModuleState SwerveModule<AzimuthMotor, DriveMotor>::getRealModuleVelocity(frc::ChassisSpeeds speeds, frc::Translation2d moduleLocation)
+{
+    Eigen::MatrixXd inputMatrix(3, 1);
+    Eigen::MatrixXd firstOrderMatrix(2, 3);
+    Eigen::MatrixXd outputMatrix(2, 1);
+    
+    inputMatrix(0, 0) = speeds.vx.value();
+    inputMatrix(1, 0) = speeds.vy.value();
+    inputMatrix(2, 0) = speeds.omega.value();
+
+    firstOrderMatrix(0, 0) = 0; firstOrderMatrix(0, 1) = 0; firstOrderMatrix(0, 2) = 1;
+    firstOrderMatrix(1, 0) = 1; firstOrderMatrix(1, 1) = 1; firstOrderMatrix(1, 2) = 1;
+
+    frc::Rotation2d moduleAngle = frc::Rotation2d(units::radian_t{atan2(moduleLocation.Y().value(), moduleLocation.X().value())});
+    double moduleX = moduleLocation.Norm().value() * cos(moduleAngle.Radians().value());
+    double moduleY = moduleLocation.Norm().value() * sin(moduleAngle.Radians().value());
+
+    firstOrderMatrix(0, 2) = -moduleY;
+    firstOrderMatrix(1, 2) = +moduleX;
+    
+    outputMatrix = firstOrderMatrix * inputMatrix;
+    
+    units::meters_per_second_t vel = units::meters_per_second_t{sqrt(outputMatrix.array().pow(2).sum())};
+    units::radian_t angle = units::radian_t{atan2(outputMatrix(1, 0), outputMatrix(0, 0))};
+
+    return frc::SwerveModuleState{vel, angle};
+}
+
+template<class AzimuthMotor, class DriveMotor>
 void SwerveModule<AzimuthMotor, DriveMotor>::resetDriveEncoder()
 {
     driveMotor->reset();

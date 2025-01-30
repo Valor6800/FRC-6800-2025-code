@@ -9,6 +9,9 @@
 #include <units/voltage.h>
 #include <ctre/phoenix6/CANcoder.hpp>
 #include "valkyrie/controllers/PhoenixController.h"
+#include <frc/fmt/Eigen.h>
+#include <frc/kinematics/ChassisSpeeds.h>
+#include <cmath>
 
 #include <wpi/sendable/Sendable.h>
 #include <wpi/sendable/SendableBuilder.h>
@@ -86,6 +89,8 @@ public:
      * @return if the mag encoder was successfully 
      */
     bool loadAndSetAzimuthZeroReference(std::vector<units::turn_t> offsets);
+
+    frc::SwerveModuleState getRealModuleVelocity(frc::ChassisSpeeds, frc::Translation2d);
 
     void setAzimuthPosition(frc::Rotation2d angle);
 
