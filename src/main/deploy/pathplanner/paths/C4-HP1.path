@@ -3,32 +3,37 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 0.5221325272120786,
-        "y": 1.6689525544241577
+        "x": 5.463168041087962,
+        "y": 2.7678862847222216
       },
       "prevControl": null,
       "nextControl": {
-        "x": 1.4811325272120779,
-        "y": 1.6689525544241577
+        "x": 4.928830656828702,
+        "y": 2.1156872106481477
       },
       "isLocked": false,
-      "linkedName": null
+      "linkedName": "C"
     },
     {
       "anchor": {
-        "x": 1.818971537043539,
-        "y": 1.6689525544241577
+        "x": 0.5,
+        "y": 1.7103920717592587
       },
       "prevControl": {
-        "x": 0.7492940658458489,
-        "y": 1.6689525544241577
+        "x": 1.5315227141203704,
+        "y": 2.391532479745371
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": null
+      "linkedName": "HP1"
     }
   ],
-  "rotationTargets": [],
+  "rotationTargets": [
+    {
+      "waypointRelativePos": 0.75,
+      "rotationDegrees": -125.00000000000001
+    }
+  ],
   "constraintZones": [],
   "pointTowardsZones": [],
   "eventMarkers": [],
@@ -42,13 +47,13 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 0.0
+    "rotation": -179.40859765768087
   },
   "reversed": false,
-  "folder": null,
+  "folder": "Reef to HP",
   "idealStartingState": {
     "velocity": 0,
-    "rotation": 0.0
+    "rotation": 119.22959886808808
   },
   "useDefaultConstraints": true
 }

@@ -34,11 +34,11 @@ using namespace pathplanner;
 #define KLIMELIGHT -29.8f
 #define KP_LIMELIGHT 0.7f
 
-#define KPX 7.0f // 30
-#define KIX 0.0f //0
-#define KDX 0.1f //.1
+#define KPX 4.0f
+#define KIX 0.0f
+#define KDX 0.1f
 
-#define KPT 8.0f //15
+#define KPT 5.0f
 #define KIT 0.0f
 #define KDT 0.0f
 
