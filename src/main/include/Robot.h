@@ -36,10 +36,11 @@ class Robot : public frc::TimedRobot {
         void DisabledPeriodic() override;
         void AutonomousInit() override;
         void AutonomousPeriodic() override;
+        void AutonomousExit() override;
         void TeleopInit() override;
         void TeleopPeriodic() override;
+        void TestInit() override;
         void TestPeriodic() override;
-        void AutonomousExit() override;
         
     private:
         valor::Gamepad gamepadOperator{OIConstants::GAMEPAD_OPERATOR_LOCATION};
@@ -52,4 +53,6 @@ class Robot : public frc::TimedRobot {
 
         valor::Auto valorAuto;
         valor::CharMode charMode;
+
+        frc::SendableChooser<frc2::Command*> pitSequenceChooser;
 };

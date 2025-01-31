@@ -17,6 +17,13 @@
 #define LED_COUNT 86
 #define SEGMENTS 2
 
+// Both an unordered_map and array would work here, but unordered_map will set up a lot more memory than we need
+// We aren't actually using the map functionality because SendableChooser can directly store Command*
+const auto PIT_SEQUENCES = std::to_array<std::pair<std::string_view, frc2::CommandPtr>>({
+    { "Pit Sequence 1", frc2::cmd::None() },
+    { "Pit Sequence 2", frc2::cmd::None() }
+});
+
 Robot::Robot() :
     drivetrain(this),
     scorer(this, &drivetrain),
@@ -32,9 +39,15 @@ Robot::Robot() :
     // ).ToPtr());
 }
 
-
-
 void Robot::RobotInit() {
+    // We could use frc2::cmd::None() instead of nullptr but it means that we have to hardcode the index
+    // of the command in PIT_SEQUENCES or store it elsewhere otherwise Command* will be dangling
+    // Probably easier to use nullptr and check when scheduling
+    pitSequenceChooser.SetDefaultOption("None", nullptr);
+    frc::SmartDashboard::PutData("PIT Sequence", &pitSequenceChooser);
+    for (const auto& [key, value] : PIT_SEQUENCES)
+        pitSequenceChooser.AddOption(key, value.get());
+
     gamepadOperator.setDeadbandY(0.13);
     gamepadOperator.setDeadbandX(0.13);
     drivetrain.setGamepads(&gamepadOperator, &gamepadDriver);
@@ -109,6 +122,13 @@ void Robot::TeleopInit() {
  */
 void Robot::TeleopPeriodic() {
     drivetrain.selectedTest = charMode.getSelected();
+}
+
+void Robot::TestInit() {
+    frc2::Command *selected = pitSequenceChooser.GetSelected();
+    if (!selected) return;
+
+    selected->Schedule();
 }
 
 /**
