@@ -469,10 +469,10 @@ void Drivetrain::alignAngleZoning()
 void Drivetrain::choosePoleDirection(Drivetrain::Direction dir){
     switch (dir) {
         case LEFT:
-            Swerve::goalAlign = -units::math::abs(6.5_in);
+            Swerve::goalAlign = -units::math::abs(POLE_OFFSET);
             break;
         case RIGHT:
-            Swerve::goalAlign = units::math::abs(6.5_in);
+            Swerve::goalAlign = units::math::abs(POLE_OFFSET);
             break;
         default:
             Swerve::goalAlign = 0_m;
