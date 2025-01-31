@@ -20,8 +20,7 @@
 // Both an unordered_map and array would work here, but unordered_map will set up a lot more memory than we need
 // We aren't actually using the map functionality because SendableChooser can directly store Command*
 const auto PIT_SEQUENCES = std::to_array<std::pair<std::string_view, frc2::CommandPtr>>({
-    { "Pit Sequence 1", frc2::cmd::None() },
-    { "Pit Sequence 2", frc2::cmd::None() }
+    { "Pit Sequence 1", frc2::cmd::None() }
 });
 
 Robot::Robot() :
