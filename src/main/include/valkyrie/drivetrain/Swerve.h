@@ -126,7 +126,7 @@ protected:
     units::degree_t rotPosTolerance = 2.0_deg;
     units::degrees_per_second_t rotVelTolerance = 1_deg_per_s;
 
-    units::millimeter_t yPosTolerance = 40_mm;
+    units::millimeter_t yPosTolerance = 60_mm;
     units::meters_per_second_t yVelTolerance = 0.01_mps;
 
     units::meter_t goalAlign = 0.0_m;

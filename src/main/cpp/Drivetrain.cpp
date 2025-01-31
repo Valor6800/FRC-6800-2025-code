@@ -71,12 +71,12 @@ const units::meter_t WHEEL_DIAMETER(0.0973_m);
 #define BLUE_REEF_22_ANGLE  30_deg
 
 // these are correct
-#define RED_REEF_6_ANGLE -60_deg
-#define RED_REEF_7_ANGLE 0_deg
-#define RED_REEF_8_ANGLE 60_deg
-#define RED_REEF_9_ANGLE 120_deg
-#define RED_REEF_10_ANGLE 180_deg
-#define RED_REEF_11_ANGLE -120_deg
+#define RED_REEF_6_ANGLE -60_deg + 180_deg
+#define RED_REEF_7_ANGLE 0_deg + 180_deg
+#define RED_REEF_8_ANGLE 60_deg - 180_deg
+#define RED_REEF_9_ANGLE 120_deg - 180_deg
+#define RED_REEF_10_ANGLE 180_deg - 180_deg
+#define RED_REEF_11_ANGLE -120_deg + 180_deg
 
 #define POLE_OFFSET 6.5_in
 
@@ -269,16 +269,20 @@ void Drivetrain::assessInputs()
     for(valor::AprilTagsSensor* aprilLime : aprilTagSensors) {
         if (state.getTag){
             if (aprilLime->hasTarget()) {
-                if (isRed) {
-                    if(aprilLime->getTagID() >= 6 && aprilLime->getTagID() <= 11){
-                        state.reefTag = aprilLime->getTagID();
-                    }
+                if(aprilLime->getTagID() >= 6 && aprilLime->getTagID() <= 11){ 
+                    state.reefTag = aprilLime->getTagID();                     // if (isRed) {
+                }                                                              //     if(aprilLime->getTagID() >= 6 && aprilLime->getTagID() <= 11){
+                //         state.reefTag = aprilLime->getTagID();
+                //     }
+                // }
+                if(aprilLime->getTagID()>=17 && aprilLime->getTagID() <= 22){
+                    state.reefTag = aprilLime->getTagID();
                 }
-                if (!isRed) {
-                    if(aprilLime->getTagID()>=17 && aprilLime->getTagID() <= 22){
-                        state.reefTag = aprilLime->getTagID();
-                    }
-                }
+                // if (!isRed) {
+                //     if(aprilLime->getTagID()>=17 && aprilLime->getTagID() <= 22){
+                //         state.reefTag = aprilLime->getTagID();
+                //     }
+                // }
             }
         }
         if (aprilLime->hasTarget() && aprilLime->getTagID() == state.reefTag){
