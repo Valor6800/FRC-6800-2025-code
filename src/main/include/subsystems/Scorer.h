@@ -95,6 +95,9 @@ public:
     };
 
 private:
+    frc2::SequentialCommandGroup createScoringSequence();
+    frc2::SequentialCommandGroup elevatorSequence();
+
     Drivetrain *drivetrain;
     bool hallEffectSensorActive();
     valor::DebounceSensor scorerDebounceSensor;

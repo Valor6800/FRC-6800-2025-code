@@ -45,8 +45,9 @@ Scorer::Scorer(frc::TimedRobot *_robot, Drivetrain *_drive) :
     lidarSensor(_robot, "Front Lidar Sensor", CANIDs::FRONT_LIDAR_SENSOR)
     {
 
-        frc2::CommandScheduler::GetInstance().RegisterSubsystem(this);
+    frc2::CommandScheduler::GetInstance().RegisterSubsystem(this);
     init();
+
     pathplanner::NamedCommands::registerCommand("OUTTAKE, INTAKE, HOLD", std::move(
         frc2::SequentialCommandGroup(
             frc2::InstantCommand(
@@ -71,7 +72,7 @@ Scorer::Scorer(frc::TimedRobot *_robot, Drivetrain *_drive) :
             )
         )
     ).ToPtr());
-
+    
     pathplanner::NamedCommands::registerCommand("Intaking", std::move(
         frc2::SequentialCommandGroup(
             frc2::InstantCommand(
@@ -265,6 +266,49 @@ Scorer::Scorer(frc::TimedRobot *_robot, Drivetrain *_drive) :
         resetState();
 
     }
+
+    frc2::SequentialCommandGroup Scorer::createScoringSequence() {
+    return frc2::SequentialCommandGroup(
+        frc2::InstantCommand([this]() { state.scoringState = Scorer::SCORING_SPEED::SCORING; }),
+        frc2::WaitCommand(5_s),
+        frc2::InstantCommand([this]() { state.scoringState = Scorer::SCORING_SPEED::INTAKING; }),
+        frc2::WaitCommand(5_s),
+        frc2::InstantCommand([this]() { state.scoringState = Scorer::SCORING_SPEED::HOLD; })
+    );
+}
+
+frc2::SequentialCommandGroup Scorer::elevatorSequence() {
+    return frc2::SequentialCommandGroup(
+        frc2::InstantCommand([this]() { 
+            state.scopedState = Scorer::SCOPED_STATE::SCOPED;
+            state.gamePiece = Scorer::GAME_PIECE::CORAL;
+        }),
+        frc2::InstantCommand([this]() { state.elevState = Scorer::ELEV_LVL::THREE; }),
+        frc2::WaitCommand(1_s),
+        frc2::InstantCommand([this]() { state.elevState = Scorer::ELEV_LVL::STOWED; }),
+        frc2::WaitCommand(1_s),
+        frc2::InstantCommand([this]() { state.elevState = Scorer::ELEV_LVL::ONE; }),
+        frc2::WaitCommand(1_s),
+        frc2::InstantCommand([this]() { state.elevState = Scorer::ELEV_LVL::STOWED; }),
+        frc2::WaitCommand(1_s),
+        frc2::InstantCommand([this]() { state.elevState = Scorer::ELEV_LVL::ONE; }),
+        frc2::WaitCommand(1_s),
+        frc2::InstantCommand([this]() { state.elevState = Scorer::ELEV_LVL::STOWED; }),
+        frc2::WaitCommand(1_s),
+        frc2::InstantCommand([this]() { state.elevState = Scorer::ELEV_LVL::TWO; }),
+        frc2::WaitCommand(1_s),
+        frc2::InstantCommand([this]() { state.elevState = Scorer::ELEV_LVL::STOWED; }),
+        frc2::WaitCommand(1_s),
+        frc2::InstantCommand([this]() { state.elevState = Scorer::ELEV_LVL::THREE; }),
+        frc2::WaitCommand(1_s),
+        frc2::InstantCommand([this]() { state.elevState = Scorer::ELEV_LVL::STOWED; }),
+        frc2::WaitCommand(1_s),
+        frc2::InstantCommand([this]() { state.elevState = Scorer::ELEV_LVL::FOUR; }),
+        frc2::WaitCommand(1_s),
+        frc2::InstantCommand([this]() { state.elevState = Scorer::ELEV_LVL::STOWED; })
+    );
+}
+
 
    void Scorer::assessInputs()
 {
