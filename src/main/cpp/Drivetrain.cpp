@@ -59,6 +59,9 @@ const units::meter_t WHEEL_DIAMETER(0.0973_m);
 
 #define MT2_POSE true
 
+#define Y_ALIGN_KP 1
+#define Y_ALIGN_KD 0.025
+
 // fix these
 #define BLUE_REEF_17_ANGLE 120_deg
 #define BLUE_REEF_18_ANGLE 180_deg
@@ -75,7 +78,7 @@ const units::meter_t WHEEL_DIAMETER(0.0973_m);
 #define RED_REEF_10_ANGLE 180_deg
 #define RED_REEF_11_ANGLE -120_deg
 
-#define POLE_OFFSET 0.2_m
+#define POLE_OFFSET 6.5_in
 
 Drivetrain::Drivetrain(frc::TimedRobot *_robot) : 
     valor::Swerve<SwerveAzimuthMotor, SwerveDriveMotor>(
@@ -102,6 +105,9 @@ Drivetrain::Drivetrain(frc::TimedRobot *_robot) :
     table->PutNumber("Y_Pos_Tol", Swerve::yPosTolerance.to<double>());
     table->PutNumber("Y_Vel_Tol", Swerve::yVelTolerance.to<double>());
 
+    Swerve::Y_KP = Y_ALIGN_KP;
+    Swerve::Y_KD = Y_ALIGN_KD;
+
     table->PutNumber("Y_KP", Swerve::Y_KP);
     table->PutNumber("Y_KD", Swerve::Y_KD);
 
@@ -124,6 +130,8 @@ Drivetrain::Drivetrain(frc::TimedRobot *_robot) :
 
     aprilTagSensors[4]->setPipe(valor::VisionSensor::PIPELINE_1);
     aprilTagSensors[4]->setCameraPose(Constants::aprilCameras[4].second);
+
+    state.dir = NONE;
 
     setupGyro(
         CANIDs::PIGEON_CAN,
@@ -252,10 +260,14 @@ void Drivetrain::assessInputs()
         hasReset = false;
     }
 
+    if(!driverGamepad->leftTriggerActive() && state.aligned) {
+        state.dir = NONE;
+    }
+
     bool isRed = frc::DriverStation::GetAlliance() == frc::DriverStation::Alliance::kRed ? true : false;
 
-    if (state.getTag){
-        for(valor::AprilTagsSensor* aprilLime : aprilTagSensors) {
+    for(valor::AprilTagsSensor* aprilLime : aprilTagSensors) {
+        if (state.getTag){
             if (aprilLime->hasTarget()) {
                 if (isRed) {
                     if(aprilLime->getTagID() >= 6 && aprilLime->getTagID() <= 11){
@@ -269,10 +281,10 @@ void Drivetrain::assessInputs()
                 }
             }
         }
-    }
+        if (aprilLime->hasTarget() && aprilLime->getTagID() == state.reefTag){
+            Swerve::yDistance = aprilLime->get_botpose_targetspace().X();
+        }
 
-    if(aprilTagSensors[4]->hasTarget() && aprilTagSensors[4]->getTagID() == state.reefTag) {
-        Swerve::yDistance = aprilTagSensors[4]->get_botpose_targetspace().X();
     }
 
     Swerve::alignToTarget = driverGamepad->leftTriggerActive();
@@ -289,7 +301,6 @@ void Drivetrain::assessInputs()
 
 void Drivetrain::analyzeDashboard()
 {
-    choosePoleDirection(state.dir);
 
     Swerve::ROT_KP = table->GetNumber("Rot_KP", Swerve::ROT_KP);
     Swerve::ROT_KD = table->GetNumber("Rot_KD", Swerve::ROT_KD);
@@ -303,7 +314,14 @@ void Drivetrain::analyzeDashboard()
     Swerve::yPosTolerance = table->GetNumber("Y_Pos_Tol", Swerve::yPosTolerance.to<double>()) * 1_mm;
     Swerve::yVelTolerance = table->GetNumber("Y_Vel_Tol", Swerve::yVelTolerance.to<double>()) * 1_mps;
 
-    Swerve::goalAlign = table->GetNumber("Pole Offset", Swerve::goalAlign.to<double>()) * 1_m;
+    // Swerve::goalAlign = units::meter_t{table->GetNumber("Pole Offset", Swerve::goalAlign.to<double>())};
+    choosePoleDirection(state.dir);
+    std::cout << "\n\n" << (units::math::abs(Swerve::yDistance - Swerve::goalAlign).value()) << "\n\n";
+    if (state.reefTag != -1){
+        state.aligned = (units::math::abs(Swerve::yDistance - Swerve::goalAlign) <= yPosTolerance);
+    } else {
+        state.aligned = false;
+    }
 
     alignAngleTags(); 
 
@@ -450,11 +468,14 @@ void Drivetrain::alignAngleZoning()
 
 void Drivetrain::choosePoleDirection(Drivetrain::Direction dir){
     switch (dir) {
-        case RIGHT:
-            Swerve::goalAlign = -units::math::abs(Swerve::goalAlign);
-            break;
         case LEFT:
-            Swerve::goalAlign = units::math::abs(Swerve::goalAlign);
+            Swerve::goalAlign = -units::math::abs(6.5_in);
+            break;
+        case RIGHT:
+            Swerve::goalAlign = units::math::abs(6.5_in);
+            break;
+        default:
+            Swerve::goalAlign = 0_m;
             break;
     }
 }
@@ -495,6 +516,18 @@ void Drivetrain::InitSendable(wpi::SendableBuilder& builder)
         builder.AddDoubleProperty(
             "Locking Tag ID",
             [this] {return state.reefTag;},
+            nullptr
+        );
+
+        builder.AddDoubleProperty(
+            "Direction",
+            [this] {return state.dir;},
+            nullptr
+        );
+        
+        builder.AddBooleanProperty(
+            "Aligned",
+            [this] {return state.aligned;},
             nullptr
         );
     }

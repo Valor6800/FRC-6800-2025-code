@@ -74,7 +74,8 @@ class Drivetrain : public valor::Swerve<SwerveAzimuthMotor, SwerveDriveMotor>
 public:
     enum Direction {
         LEFT,
-        RIGHT
+        RIGHT,
+        NONE
      };
      /**
       * @brief Construct a new Drivetrain object
@@ -122,6 +123,7 @@ public:
           int reefTag;
           bool getTag;
           Direction dir;
+          bool aligned;
      } state;
 
      frc2::FunctionalCommand* getResetOdom();
