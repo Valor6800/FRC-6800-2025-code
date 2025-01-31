@@ -24,6 +24,7 @@ SwerveModule<AzimuthMotor, DriveMotor>::SwerveModule(AzimuthMotor* _azimuthMotor
                                                     DriveMotor* _driveMotor,
                                                     frc::Translation2d _wheelLocation,
                                                     units::meter_t wheelDiameter) :
+    wheelLocation(_wheelLocation),
     azimuthMotor(_azimuthMotor),
     driveMotor(_driveMotor),
     wheelConversion(M_PI * wheelDiameter / 1_tr)
@@ -122,6 +123,29 @@ frc::SwerveModuleState SwerveModule<AzimuthMotor, DriveMotor>::getRealModuleVelo
     units::radian_t angle = units::radian_t{atan2(outputMatrix(1, 0), outputMatrix(0, 0))};
 
     return frc::SwerveModuleState{vel, angle};
+}
+
+template<class AzimuthMotor, class DriveMotor>
+units::meters_per_second_t SwerveModule<AzimuthMotor, DriveMotor>::getParallelVelocity(frc::SwerveModuleState state, frc::ChassisSpeeds speeds)
+{
+    frc::SwerveModuleState inertialState = getRealModuleVelocity(speeds, wheelLocation);
+
+    Eigen::Vector2d interialVelocity = {inertialState.speed.value() * cos(inertialState.angle.Radians().value()),
+        inertialState.speed.value() * sin(inertialState.angle.Radians().value())};
+    
+    Eigen::Vector2d desiredVelocity = {state.speed.value() * cos(state.angle.Radians().value()),
+        state.speed.value() * sin(state.angle.Radians().value())};
+    
+    units::radian_t angle = units::radian_t{acos(interialVelocity.dot(desiredVelocity) / (interialVelocity.norm() * desiredVelocity.norm()))};
+
+    Eigen::Vector2d parallelVelocity = desiredVelocity*(desiredVelocity.norm() != 0 ?
+        interialVelocity.dot(desiredVelocity) / pow(desiredVelocity.norm(), 2) : 1.0);
+    
+    units::meters_per_second_t parallelModuleVelocity = units::meters_per_second_t{parallelVelocity.norm()};
+
+    if(angle.value() > M_PI/2.0) parallelModuleVelocity = -parallelModuleVelocity;
+
+    return parallelModuleVelocity;
 }
 
 template<class AzimuthMotor, class DriveMotor>
