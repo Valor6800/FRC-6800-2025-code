@@ -93,6 +93,7 @@ public:
     bool loadAndSetAzimuthZeroReference(std::vector<units::turn_t> offsets);
 
     frc::SwerveModuleState getRealModuleVelocity(frc::ChassisSpeeds, frc::Translation2d);
+    units::meters_per_second_t getParallelVelocity(frc::SwerveModuleState, frc::ChassisSpeeds);
 
     void setAzimuthPosition(frc::Rotation2d angle);
 
@@ -117,6 +118,7 @@ private:
     void setDriveClosedLoop(units::meters_per_second_t mps);
 
     frc::SwerveModuleState desiredState;
+    frc::Translation2d wheelLocation;
 
     AzimuthMotor* azimuthMotor;
     DriveMotor* driveMotor;
