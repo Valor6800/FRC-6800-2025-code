@@ -27,6 +27,8 @@ public:
     void analyzeDashboard();
     void assignOutputs();
 
+    frc2::CommandPtr climberPitSequence();
+
     void InitSendable(wpi::SendableBuilder& builder);
 
     enum CLIMB_STATE
@@ -49,7 +51,6 @@ public:
         CLIMB_STATE climbState;
         CRAB_STATE crabState;
 
-        bool climbed;
         double spikeCurrent;
         double cacheSize;
         units::volt_t manualSpeed;

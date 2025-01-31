@@ -14,7 +14,6 @@
 #define FORWARD_LIMIT 0.25_tr
 #define REVERSE_LIMIT -0.20_tr
 
-#define CLIMB_MANUAL_SPEED units::angular_velocity::turns_per_second_t (0)
 #define CLIMB_K_P 100
 #define CLIMB_K_D 0
 #define CLIMB_K_ERROR units::angle::turn_t (0)
@@ -22,7 +21,6 @@
 #define CLIMB_K_AFF 0
 #define CLIMB_K_S 0
 
-#define CRAB_MAX_SPEED units::angular_velocity::turns_per_second_t (0)
 #define CRAB_MAX_ACCEL units::angular_acceleration::turns_per_second_squared_t (0)
 #define CRAB_K_P 0
 #define CRAB_K_ERROR units::angle::turn_t (0)
@@ -36,8 +34,6 @@
 #define STOW_POS units::angle::turn_t (0)
 
 #define CRAB_SPEED units::voltage::volt_t (0)
-#define SPIKE_CURRENT 0
-#define CACHE_SIZE 0
 
 using namespace valor;
 
@@ -46,40 +42,7 @@ Climber::Climber(frc::TimedRobot *_robot) : valor::BaseSubsystem(_robot, "Climbe
     currentSensor(_robot, "Climber")
 {
     frc2::CommandScheduler::GetInstance().RegisterSubsystem(this);
-    table->PutBoolean("Climbed?", state.climbed);
     init();
-    pathplanner::NamedCommands::registerCommand("Climb PIT Sequence", std::move(
-        frc2::SequentialCommandGroup(
-            frc2::InstantCommand(
-                [this]() {
-                    
-                    state.climbState = Climber::CLIMB_STATE::DEPLOYED;
-                }
-            ),
-            frc2::WaitCommand(1_s),
-            frc2::InstantCommand(
-                [this]() {
-                    
-                    state.climbState = Climber::CLIMB_STATE::RETRACTED;
-                }
-            )
-        )
-    ).ToPtr());
-    frc2::SequentialCommandGroup(
-            frc2::FunctionalCommand(
-                [this]() { //onInit
-                    state.climbState = Climber::CLIMB_STATE::DEPLOYED;
-                },
-                [this](){}, //onExecute
-                [this](bool){ //onEnd
-                    state.climbState = Climber::CLIMB_STATE::MANUAL;
-                },
-                [this](){ //isFinished
-                    return climbMotors->getPosition() == DEPLOYED_POS && driverGamepad->GetAButton();
-                },
-                {}
-            )
-    ).ToPtr();
 }
 
 Climber::~Climber()
@@ -91,7 +54,6 @@ void Climber::resetState()
 {
     state.climbState = CLIMB_STATE::MANUAL;
     state.crabState = CRAB_STATE::NO_CRAB;
-    state.climbed = false;
     currentSensor.reset();
 }
 
@@ -164,13 +126,36 @@ void Climber::assignOutputs()
      }
 }
 
+frc2::CommandPtr Climber::climberPitSequence() 
+{
+    return frc2::SequentialCommandGroup(
+        frc2::InstantCommand(
+            [this]() {
+                state.climbState = Climber::CLIMB_STATE::STOW;
+            }
+        ),
+        frc2::WaitCommand(2_s),
+        frc2::InstantCommand(
+            [this]() {
+                state.climbState = Climber::CLIMB_STATE::DEPLOYED;
+            }
+        ),
+        frc2::WaitCommand(2_s),
+        frc2::InstantCommand(
+            [this]() {
+                state.climbState = Climber::CLIMB_STATE::RETRACTED;
+            }
+        )
+    ).ToPtr();
+
+}
 
 void Climber::InitSendable(wpi::SendableBuilder& builder)
 {
     builder.SetSmartDashboardType("Subsystem");
     builder.AddBooleanProperty(
-        "Climbed?",
-        [this]{return state.climbed;},
+        "Climb state",
+        [this]{return state.climbState;},
         nullptr
     );
     builder.AddDoubleProperty(
