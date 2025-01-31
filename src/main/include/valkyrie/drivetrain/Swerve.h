@@ -102,8 +102,10 @@ protected:
 
     std::unique_ptr<ctre::phoenix6::hardware::Pigeon2> pigeon;
     std::unique_ptr<frc::SwerveDriveKinematics<MODULE_COUNT>> kinematics;
+    // TODO: Move into private because it is UB to access estimators without odometryLock and may not be able to rely on other subsystems to lock and unlock mutex
     std::unique_ptr<frc::SwerveDrivePoseEstimator<MODULE_COUNT>> rawEstimator;
     std::unique_ptr<frc::SwerveDrivePoseEstimator<MODULE_COUNT>> calcEstimator;
+    std::mutex odometryLock;
 
     bool lockingToTarget;
     units::degree_t targetAngle;
@@ -145,6 +147,9 @@ private:
                                                                     bool);
     wpi::array<frc::SwerveModuleState, MODULE_COUNT> getModuleStates(frc::ChassisSpeeds chassisSpeeds);
 
+    void runOdometryThread();
+
+
     double _drivetrain_accel;
 
     bool useCarpetGrain;
@@ -170,6 +175,8 @@ private:
 
     Eigen::Vector2d joystickVector, pidVector, powerVector;
     units::angle::degree_t rotAlignOffset;
+
+    std::thread odometryThread;
 };
 
 }

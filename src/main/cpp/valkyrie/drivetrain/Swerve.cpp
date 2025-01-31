@@ -71,19 +71,30 @@ Swerve<AzimuthMotor, DriveMotor>::Swerve(frc::TimedRobot *_robot,
     rawEstimator = std::make_unique<frc::SwerveDrivePoseEstimator<MODULE_COUNT>>(*kinematics, getGyro(), getModuleStates(), frc::Pose2d{0_m, 0_m, 0_rad});
     calcEstimator = std::make_unique<frc::SwerveDrivePoseEstimator<MODULE_COUNT>>(*kinematics, getGyro(), getModuleStates(), frc::Pose2d{0_m, 0_m, 0_rad});
 
+    // Only start odometry thread after creating the pose estimators
+    odometryThread = std::thread{&Swerve::runOdometryThread, this};
+    sched_param param;
+    param.__sched_priority = 1; // 1 - 99, 1 is the lowest
+    // SCHED_FIFO > SCHED_RR > SCHED_OTHER (most processes fall here)
+    // This thread basically runs at a higher priority than most userspace threads but lower priority than kernel threads
+    // Ideally, the thread should have very low overhead (all it does is UpdateWithTime on two estimators) and sleeps for n milliseconds
+    pthread_setschedparam(odometryThread.native_handle(), SCHED_FIFO, &param);
+
     resetState();
 }
 
 template<class AzimuthMotor, class DriveMotor>
 Swerve<AzimuthMotor, DriveMotor>::~Swerve()
 {
-    for (int i = 0; i < MODULE_COUNT; i++)
-    {
-        delete swerveModules[i];
-    }
+    // TODO: Find out if destructors actually run in robot code and simulation
+    // This code could cause odom thread to access destroyed memory which is bad :(
+    // for (int i = 0; i < MODULE_COUNT; i++)
+    // {
+    //     delete swerveModules[i];
+    // }
 
-    rawEstimator.release();
-    calcEstimator.release();
+    // rawEstimator.release();
+    // calcEstimator.release();
 }
 
 template<class AzimuthMotor, class DriveMotor>
@@ -121,9 +132,6 @@ void Swerve<AzimuthMotor, DriveMotor>::analyzeDashboard()
 
     y_controller.SetTolerance(yPosTolerance, yVelTolerance);
     rot_controller.SetTolerance(rotPosTolerance, rotVelTolerance);
-
-    rawEstimator->UpdateWithTime(frc::Timer::GetFPGATimestamp(), getGyro(), getModuleStates());
-    calcEstimator->UpdateWithTime(frc::Timer::GetFPGATimestamp(), getGyro(), getModuleStates());
 
     if (useCarpetGrain)
         calculateCarpetPose();
@@ -249,10 +257,35 @@ void Swerve<AzimuthMotor, DriveMotor>::resetState()
 }
 
 template<class AzimuthMotor, class DriveMotor>
+void Swerve<AzimuthMotor, DriveMotor>::runOdometryThread() {
+    // TODO: Consider using using Timesync + CTRE Base Status Signal WaitForAll to get more accurate values
+    // Assuming target signals are publishing at 250hz we don't want to run odom thread at 250hz, way too much load on a system with two cores
+    // Maybe running every 8 ms?
+    // WaitForAll -> Update estimators -> Sleep 6-7 ms (not 8) to make sure the new signals haven't been published yet -> Repeat
+    // With this maybe no need for 250 hz publishing, maybe every 125 hz since the signals are being processed as soon as they are published
+
+    auto gyro = getGyro();
+    auto moduleStates = getModuleStates();
+    auto timestamp = frc::Timer::GetFPGATimestamp();
+
+    odometryLock.lock();
+    rawEstimator->UpdateWithTime(timestamp, gyro, moduleStates);
+    calcEstimator->UpdateWithTime(timestamp, gyro, moduleStates);
+    odometryLock.unlock();
+
+    std::this_thread::sleep_for(std::chrono::milliseconds{10});
+}
+
+template<class AzimuthMotor, class DriveMotor>
 void Swerve<AzimuthMotor, DriveMotor>::resetOdometry(frc::Pose2d pose)
 {
-    rawEstimator->ResetPosition(getGyro(), getModuleStates(), pose);
-    calcEstimator->ResetPosition(getGyro(), getModuleStates(), pose);
+    auto gyro = getGyro();
+    auto moduleStates = getModuleStates();
+
+    odometryLock.lock();
+    rawEstimator->ResetPosition(gyro, moduleStates, pose);
+    calcEstimator->ResetPosition(gyro, moduleStates, pose);
+    odometryLock.unlock();
 }
 
 template<class AzimuthMotor, class DriveMotor>
@@ -282,6 +315,7 @@ template<class AzimuthMotor, class DriveMotor>
 void  Swerve<AzimuthMotor, DriveMotor>::calculateCarpetPose()
 {
     static frc::Pose2d previousPose;
+    std::lock_guard lock{odometryLock};
     frc::Pose2d newPose = calcEstimator->GetEstimatedPosition();
     units::meter_t deltaX = newPose.X() - previousPose.X();
     double factor = 1.0;
@@ -290,7 +324,7 @@ void  Swerve<AzimuthMotor, DriveMotor>::calculateCarpetPose()
     } else {
         factor = deltaX > 0_m ? carpetGrainMultiplier : 1;
     }
-    
+
     calcEstimator->AddVisionMeasurement(
         frc::Pose2d{
             factor * deltaX + previousPose.X(),
@@ -342,12 +376,14 @@ frc::Rotation2d Swerve<AzimuthMotor, DriveMotor>::getGyro() {
 template<class AzimuthMotor, class DriveMotor>
 frc::Pose2d Swerve<AzimuthMotor, DriveMotor>::getRawPose()
 {
+    std::lock_guard lock{odometryLock};
     return rawEstimator->GetEstimatedPosition();
 }
 
 template<class AzimuthMotor, class DriveMotor>
 frc::Pose2d Swerve<AzimuthMotor, DriveMotor>::getCalculatedPose()
 {
+    std::lock_guard lock{odometryLock};
     return calcEstimator->GetEstimatedPosition();
 }
 

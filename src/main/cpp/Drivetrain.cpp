@@ -332,16 +332,20 @@ void Drivetrain::analyzeDashboard()
     Swerve::analyzeDashboard();
 
     visionAcceptanceRadius = (units::meter_t) table->GetNumber("Vision Acceptance", VISION_ACCEPTANCE.to<double>());
+    auto speeds = getRobotSpeeds();
+    bool acceptingVisionMeasurements = table->GetBoolean("Accepting Vision Measurements", true);
 
+    odometryLock.lock();
     for (valor::AprilTagsSensor* aprilLime : aprilTagSensors) {
         aprilLime->applyVisionMeasurement(
             calcEstimator.get(),
-            getRobotSpeeds(),
-            table->GetBoolean("Accepting Vision Measurements", true),
+            speeds,
+            acceptingVisionMeasurements,
             doubtX,
             doubtY
         );
     }
+    odometryLock.unlock();
 
     if (!driverGamepad || !driverGamepad->IsConnected() || !operatorGamepad || !operatorGamepad->IsConnected())
         return;

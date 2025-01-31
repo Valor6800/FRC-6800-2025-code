@@ -1,6 +1,6 @@
 #pragma once
 
-#include "frc/geometry/Pose3d.h" 
+#include "frc/geometry/Pose3d.h"
 #include "units/acceleration.h"
 #include "units/length.h"
 #include "valkyrie/sensors/AprilTagsSensor.h"
@@ -150,7 +150,7 @@ public:
 private:
      bool aprilTagOnReef(int id);
 
-      bool hasReset;
+     bool hasReset;
 
      std::vector<std::pair<SwerveAzimuthMotor*, SwerveDriveMotor*>> generateModules();
 

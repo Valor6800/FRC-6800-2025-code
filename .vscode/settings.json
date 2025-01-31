@@ -17,9 +17,37 @@
   "C_Cpp.default.configurationProvider": "vscode-wpilib",
   "files.associations": {
     "unordered_map": "cpp",
+<<<<<<< HEAD
     "any": "cpp",
     "array": "cpp",
     "atomic": "cpp",
+=======
+    "atomic": "cpp",
+    "compare": "cpp",
+    "concepts": "cpp",
+    "cstddef": "cpp",
+    "cstdint": "cpp",
+    "cstdio": "cpp",
+    "cstdlib": "cpp",
+    "cstring": "cpp",
+    "ctime": "cpp",
+    "cwchar": "cpp",
+    "exception": "cpp",
+    "initializer_list": "cpp",
+    "iosfwd": "cpp",
+    "limits": "cpp",
+    "memory": "cpp",
+    "new": "cpp",
+    "tuple": "cpp",
+    "type_traits": "cpp",
+    "typeinfo": "cpp",
+    "utility": "cpp",
+    "xmemory": "cpp",
+    "xtr1common": "cpp",
+    "xutility": "cpp",
+    "any": "cpp",
+    "array": "cpp",
+>>>>>>> fb38a94 (feat: Odom thread running at 100 hz)
     "bit": "cpp",
     "*.tcc": "cpp",
     "bitset": "cpp",
@@ -30,6 +58,7 @@
     "clocale": "cpp",
     "cmath": "cpp",
     "codecvt": "cpp",
+<<<<<<< HEAD
     "compare": "cpp",
     "complex": "cpp",
     "concepts": "cpp",
@@ -42,6 +71,11 @@
     "cstring": "cpp",
     "ctime": "cpp",
     "cwchar": "cpp",
+=======
+    "complex": "cpp",
+    "condition_variable": "cpp",
+    "cstdarg": "cpp",
+>>>>>>> fb38a94 (feat: Odom thread running at 100 hz)
     "cwctype": "cpp",
     "deque": "cpp",
     "forward_list": "cpp",
@@ -51,12 +85,18 @@
     "string": "cpp",
     "unordered_set": "cpp",
     "vector": "cpp",
+<<<<<<< HEAD
     "exception": "cpp",
+=======
+>>>>>>> fb38a94 (feat: Odom thread running at 100 hz)
     "expected": "cpp",
     "algorithm": "cpp",
     "functional": "cpp",
     "iterator": "cpp",
+<<<<<<< HEAD
     "memory": "cpp",
+=======
+>>>>>>> fb38a94 (feat: Odom thread running at 100 hz)
     "memory_resource": "cpp",
     "numeric": "cpp",
     "optional": "cpp",
@@ -66,6 +106,7 @@
     "source_location": "cpp",
     "string_view": "cpp",
     "system_error": "cpp",
+<<<<<<< HEAD
     "tuple": "cpp",
     "type_traits": "cpp",
     "utility": "cpp",
@@ -79,6 +120,14 @@
     "limits": "cpp",
     "mutex": "cpp",
     "new": "cpp",
+=======
+    "fstream": "cpp",
+    "future": "cpp",
+    "iomanip": "cpp",
+    "iostream": "cpp",
+    "istream": "cpp",
+    "mutex": "cpp",
+>>>>>>> fb38a94 (feat: Odom thread running at 100 hz)
     "numbers": "cpp",
     "ostream": "cpp",
     "ranges": "cpp",
@@ -91,11 +140,16 @@
     "thread": "cpp",
     "cinttypes": "cpp",
     "typeindex": "cpp",
+<<<<<<< HEAD
     "typeinfo": "cpp",
     "valarray": "cpp",
     "variant": "cpp",
     "xmemory": "cpp",
     "xtr1common": "cpp",
     "xutility": "cpp"
+=======
+    "valarray": "cpp",
+    "variant": "cpp"
+>>>>>>> fb38a94 (feat: Odom thread running at 100 hz)
   }
 }
