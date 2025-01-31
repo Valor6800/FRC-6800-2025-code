@@ -16,12 +16,12 @@
     },
     {
       "anchor": {
-        "x": 5.463168041087962,
-        "y": 2.7678862847222216
+        "x": 5.55030737704918,
+        "y": 2.84421106557377
       },
       "prevControl": {
-        "x": 5.808192997685185,
-        "y": 1.4730381944444435
+        "x": 5.895332333646404,
+        "y": 1.5493629752959919
       },
       "nextControl": null,
       "isLocked": false,
@@ -42,13 +42,13 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 119.22959886808808
+    "rotation": 119.99999999999999
   },
   "reversed": false,
   "folder": "HP to Reef",
   "idealStartingState": {
     "velocity": 0,
-    "rotation": -179.40859765768087
+    "rotation": 180.0
   },
   "useDefaultConstraints": true
 }

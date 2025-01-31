@@ -3,13 +3,13 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 5.463168041087962,
-        "y": 2.7678862847222216
+        "x": 5.55030737704918,
+        "y": 2.84421106557377
       },
       "prevControl": null,
       "nextControl": {
-        "x": 4.928830656828702,
-        "y": 2.1156872106481477
+        "x": 5.015969992789921,
+        "y": 2.192011991499696
       },
       "isLocked": false,
       "linkedName": "C"
@@ -47,13 +47,13 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": -179.40859765768087
+    "rotation": 180.0
   },
   "reversed": false,
   "folder": "Reef to HP",
   "idealStartingState": {
     "velocity": 0,
-    "rotation": 119.22959886808808
+    "rotation": 119.99999999999999
   },
   "useDefaultConstraints": true
 }
