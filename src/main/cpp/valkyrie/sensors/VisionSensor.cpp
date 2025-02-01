@@ -1,11 +1,13 @@
 #include "valkyrie/sensors/VisionSensor.h"
 #include "networktables/NetworkTableInstance.h"
 #include "units/angle.h"
+#include "units/temperature.h"
 #include "units/time.h"
 #include "valkyrie/sensors/BaseSensor.h"
 #include "wpi/array.h"
 #include "wpi/sendable/SendableBuilder.h"
 #include <array>
+#include <cstddef>
 #include <span>
 #include <vector>
 
@@ -80,6 +82,16 @@ void VisionSensor::calculate(){
     tx = limeTable->GetNumber("tx", 0.0);
     ty = limeTable->GetNumber("ty", 0.0);
     pipe = limeTable->GetNumber("pipeline", 0);
+
+    std::vector<double> hw = limeTable->GetNumberArray(
+        "hw",
+        std::array<double, 4>()
+    );
+
+    fps = hw[0];
+    cpuTemp = units::celsius_t{hw[1]};
+    ramUsage = hw[2];
+    temp = units::celsius_t{hw[3]};
     
     currState = getSensor();
     
@@ -91,8 +103,8 @@ void VisionSensor::InitSendable(wpi::SendableBuilder& builder) {
     builder.AddDoubleProperty("totalLatency", [this] {return getTotalLatency().to<double>();}, nullptr);
     builder.AddBooleanProperty("hasTarget", [this]{ return hasTarget();}, nullptr);
     builder.AddBooleanProperty("limeTableExist", [this] {return limeTable != nullptr;}, nullptr);
-    builder.AddDoubleProperty("fps", [this] {return limeTable->GetNumber("fps", 0.0);}, nullptr);
-    builder.AddDoubleProperty("temp", [this] {return limeTable->GetNumber("temp", 0.0);}, nullptr);
-    builder.AddDoubleProperty("CPU Usage", [this] {return limeTable->GetNumber("cpu", 0.0);}, nullptr);
-    builder.AddDoubleProperty("RAM Usage", [this] {return limeTable->GetNumber("ram", 0.0);}, nullptr);
+    builder.AddDoubleProperty("fps", [this] {return fps;}, nullptr);
+    builder.AddDoubleProperty("CPU Temp", [this] {return cpuTemp.value();}, nullptr);
+    builder.AddDoubleProperty("RAM Usage", [this] {return ramUsage;}, nullptr);
+    builder.AddDoubleProperty("Temp", [this] {return temp.value();}, nullptr);
 }

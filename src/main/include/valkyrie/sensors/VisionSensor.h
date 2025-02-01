@@ -1,6 +1,7 @@
 #pragma once
 
 #include "networktables/NetworkTableInstance.h"
+#include "units/temperature.h"
 #include "units/time.h"
 #include "units/velocity.h"
 #include "valkyrie/sensors/BaseSensor.h"
@@ -51,8 +52,10 @@ class VisionSensor : public valor::BaseSensor<frc::Pose3d> {
         
 
     protected:
-        double tx, ty, tv;
+        double tx, ty, tv, fps, ramUsage;
         int pipe;
+        units::celsius_t cpuTemp, temp;
+        
 
         units::millisecond_t getTotalLatency();
         virtual frc::Pose3d getGlobalPose() = 0;
@@ -61,6 +64,7 @@ class VisionSensor : public valor::BaseSensor<frc::Pose3d> {
         std::shared_ptr<nt::NetworkTable> limeTable;
 
         void calculate() override;
+        
 };
 
 }
