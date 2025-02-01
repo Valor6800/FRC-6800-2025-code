@@ -8,6 +8,7 @@
 #include <frc/estimator/SwerveDrivePoseEstimator.h>
 #include <frc/controller/ProfiledPIDController.h>
 #include <frc/trajectory/TrapezoidProfile.h>
+#include <frc/Notifier.h>
 
 #include "Eigen/Core"
 #include "units/angle.h"
@@ -176,7 +177,7 @@ private:
     Eigen::Vector2d joystickVector, pidVector, powerVector;
     units::angle::degree_t rotAlignOffset;
 
-    std::thread odometryThread;
+    frc::Notifier odomThread;
 };
 
 }

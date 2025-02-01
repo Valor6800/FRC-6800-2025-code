@@ -40,7 +40,8 @@ Swerve<AzimuthMotor, DriveMotor>::Swerve(frc::TimedRobot *_robot,
     std::vector<std::pair<AzimuthMotor*, DriveMotor*>> modules,
     units::meter_t _module_radius,
     units::meter_t _wheelDiameter
-) : valor::BaseSubsystem(_robot, _name), lockingToTarget(false), useCarpetGrain(false)
+) : valor::BaseSubsystem(_robot, _name), lockingToTarget(false), useCarpetGrain(false),
+    odomThread{1, &Swerve::runOdometryThread, this}
 {
     frc2::CommandScheduler::GetInstance().RegisterSubsystem(this);
 
@@ -71,16 +72,8 @@ Swerve<AzimuthMotor, DriveMotor>::Swerve(frc::TimedRobot *_robot,
     rawEstimator = std::make_unique<frc::SwerveDrivePoseEstimator<MODULE_COUNT>>(*kinematics, getGyro(), getModuleStates(), frc::Pose2d{0_m, 0_m, 0_rad});
     calcEstimator = std::make_unique<frc::SwerveDrivePoseEstimator<MODULE_COUNT>>(*kinematics, getGyro(), getModuleStates(), frc::Pose2d{0_m, 0_m, 0_rad});
 
-    // Only start odometry thread after creating the pose estimators
-    odometryThread = std::thread{&Swerve::runOdometryThread, this};
-    sched_param param;
-    param.__sched_priority = 1; // 1 - 99, 1 is the lowest
-    // SCHED_FIFO > SCHED_RR > SCHED_OTHER (most processes fall here)
-    // This thread basically runs at a higher priority than most userspace threads but lower priority than kernel threads
-    // Ideally, the thread should have very low overhead (all it does is UpdateWithTime on two estimators) and sleeps for n milliseconds
-    pthread_setschedparam(odometryThread.native_handle(), SCHED_FIFO, &param);
-
     resetState();
+    odomThread.StartPeriodic(10_ms);
 }
 
 template<class AzimuthMotor, class DriveMotor>
@@ -263,7 +256,6 @@ void Swerve<AzimuthMotor, DriveMotor>::runOdometryThread() {
     // Maybe running every 8 ms?
     // WaitForAll -> Update estimators -> Sleep 6-7 ms (not 8) to make sure the new signals haven't been published yet -> Repeat
     // With this maybe no need for 250 hz publishing, maybe every 125 hz since the signals are being processed as soon as they are published
-
     auto gyro = getGyro();
     auto moduleStates = getModuleStates();
     auto timestamp = frc::Timer::GetFPGATimestamp();
@@ -272,8 +264,6 @@ void Swerve<AzimuthMotor, DriveMotor>::runOdometryThread() {
     rawEstimator->UpdateWithTime(timestamp, gyro, moduleStates);
     calcEstimator->UpdateWithTime(timestamp, gyro, moduleStates);
     odometryLock.unlock();
-
-    std::this_thread::sleep_for(std::chrono::milliseconds{10});
 }
 
 template<class AzimuthMotor, class DriveMotor>
