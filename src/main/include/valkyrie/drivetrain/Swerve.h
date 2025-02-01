@@ -11,6 +11,8 @@
 
 #include "Eigen/Core"
 #include "units/angle.h"
+#include "units/length.h"
+#include "units/time.h"
 #include "units/velocity.h"
 #include "valkyrie/BaseSubsystem.h"
 #include "valkyrie/drivetrain/SwerveModule.h"
@@ -172,6 +174,12 @@ private:
     units::angle::degree_t rotAlignOffset;
 
     units::meters_per_second_t yControllerInitialVelocity;
+    bool yControllerAligned, rotControllerAligned;
+    units::second_t rotAlignTime, yAlignTime;
+    units::radian_t rotControllerInitialDistance;
+    units::meter_t yControllerInitialDistance;
+    units::radian_t rotControllerTraveledDistance;
+    units::meter_t yControllerTraveledDistance;
 };
 
 }
