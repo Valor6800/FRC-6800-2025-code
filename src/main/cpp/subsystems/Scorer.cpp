@@ -193,79 +193,81 @@ Scorer::Scorer(frc::TimedRobot *_robot, Drivetrain *_drive) :
 
 }
 
-    void Scorer::resetState()
-    {
-        state.scoringState = SCORING_SPEED::HOLD;
-        state.elevState = ELEV_LVL::MANUAL;
-        state.gamePiece = CORAL;
+void Scorer::resetState()
+{
+    state.scoringState = SCORING_SPEED::HOLD;
+    state.elevState = ELEV_LVL::MANUAL;
+    state.gamePiece = CORAL;
+    state.scope = false;
+}
 
-    }
+bool Scorer::hallEffectSensorActive()
+{
+    return candi.GetS1Closed().GetValue();
+}
 
-    bool Scorer::hallEffectSensorActive(){
-        return candi.GetS1Closed().GetValue();
-    }
 
+void Scorer::init()
+{
+    state.hasZeroed = hallEffectSensorActive();
+    elevatorMotor->setGearRatios(ELEVATOR_MOTOR_TO_SENSOR, ELEVATOR_SENSOR_TO_MECH);
+    elevatorMotor->enableFOC(true);
+    scorerMotor->setGearRatios(1, SCORER_SENSOR_TO_MECH);
+    scorerMotor->enableFOC(true);
+    table->PutBoolean("Scope Button", false);
 
-    void Scorer::init()
-    {
-        state.hasZeroed = hallEffectSensorActive();
-        elevatorMotor->setGearRatios(ELEVATOR_MOTOR_TO_SENSOR, ELEVATOR_SENSOR_TO_MECH);
-        elevatorMotor->enableFOC(true);
-        scorerMotor->setGearRatios(1, SCORER_SENSOR_TO_MECH);
-        scorerMotor->enableFOC(true);
+    valor::PIDF elevatorPID;
+    elevatorPID.maxVelocity = elevatorMotor->getMaxMechSpeed();
+    elevatorPID.maxAcceleration = elevatorMotor->getMaxMechSpeed()/(1.0_s/5);
+    elevatorPID.P =ELEV_K_P ;
+    elevatorPID.error = ELEV_K_ERROR;
+    elevatorPID.aFF = ELEV_K_AFF;
+    elevatorPID.aFFType = valor::FeedForwardType::LINEAR;
 
-        valor::PIDF elevatorPID;
-        elevatorPID.maxVelocity = elevatorMotor->getMaxMechSpeed();
-        elevatorPID.maxAcceleration = elevatorMotor->getMaxMechSpeed()/(1.0_s/5);
-        elevatorPID.P =ELEV_K_P ;
-        elevatorPID.error = ELEV_K_ERROR;
-        elevatorPID.aFF = ELEV_K_AFF;
-        elevatorPID.aFFType = valor::FeedForwardType::LINEAR;
-
-        valor::PIDF scorerPID;
-        scorerPID.maxVelocity = scorerMotor->getMaxMechSpeed();
-        scorerPID.maxAcceleration = scorerMotor->getMaxMechSpeed()/(1.0_s/2);
-        scorerPID.P = SCORER_K_P;
+    valor::PIDF scorerPID;
+    scorerPID.maxVelocity = scorerMotor->getMaxMechSpeed();
+    scorerPID.maxAcceleration = scorerMotor->getMaxMechSpeed()/(1.0_s/2);
+    scorerPID.P = SCORER_K_P;
         
-        scorerMotor->setPIDF(scorerPID, 0);
-        scorerMotor->applyConfig();
+    scorerMotor->setPIDF(scorerPID, 0);
+    scorerMotor->applyConfig();
 
-        elevatorMotor->setPIDF(elevatorPID, 0);
-        scorerMotor->setPIDF(scorerPID, 0);
+    elevatorMotor->setPIDF(elevatorPID, 0);
+    scorerMotor->setPIDF(scorerPID, 0);
 
-        elevatorMotor->setForwardLimit(ELEVATOR_FORWARD_LIMIT);
-        elevatorMotor->setupReverseHardwareLimit(CANIDs::HALL_EFFECT, ctre::phoenix6::signals::ReverseLimitTypeValue::NormallyOpen);
-        elevatorMotor->applyConfig();
+    elevatorMotor->setForwardLimit(ELEVATOR_FORWARD_LIMIT);
+    elevatorMotor->setupReverseHardwareLimit(CANIDs::HALL_EFFECT, ctre::phoenix6::signals::ReverseLimitTypeValue::NormallyOpen);
+    elevatorMotor->applyConfig();
 
-        ctre::phoenix6::configs::CANdiConfiguration candiConfig;
-        candiConfig.DigitalInputs.S1CloseState = ctre::phoenix6::signals::S1CloseStateValue::CloseWhenLow;
-        candiConfig.DigitalInputs.S1FloatState = ctre::phoenix6::signals::S1FloatStateValue::FloatDetect;
-        // @todo LED flash if float detected - map to CANDle LED states like CANCoders
-        candi.GetConfigurator().Apply(candiConfig.DigitalInputs);
+    ctre::phoenix6::configs::CANdiConfiguration candiConfig;
+    candiConfig.DigitalInputs.S1CloseState = ctre::phoenix6::signals::S1CloseStateValue::CloseWhenLow;
+    candiConfig.DigitalInputs.S1FloatState = ctre::phoenix6::signals::S1FloatStateValue::FloatDetect;
+    // @todo LED flash if float detected - map to CANDle LED states like CANCoders
+    candi.GetConfigurator().Apply(candiConfig.DigitalInputs);
 
-        hallEffectDebounceSensor.setGetter([this] { return hallEffectSensorActive();});
-        hallEffectDebounceSensor.setRisingEdgeCallback([this] {
-            state.hasZeroed = true;
-            std::cout << "HALLEFFECT RESET FOR ELEVATOR" << std::endl;
-         });
+    hallEffectDebounceSensor.setGetter([this] { return hallEffectSensorActive();});
+    hallEffectDebounceSensor.setRisingEdgeCallback([this] {
+        state.hasZeroed = true;
+        std::cout << "HALLEFFECT RESET FOR ELEVATOR" << std::endl;
+    });
 
 
 
-        posMap[GAME_PIECE::CORAL][ELEV_LVL::STOWED] = units::meter_t(3_in);
-        posMap[GAME_PIECE::CORAL][ELEV_LVL::HP] = units::meter_t(8.425_in);
-        posMap[GAME_PIECE::CORAL][ELEV_LVL::ONE] = units::meter_t(13.57_in);
-        posMap[GAME_PIECE::CORAL][ELEV_LVL::TWO] = units::meter_t(17.0_in);
-        posMap[GAME_PIECE::CORAL][ELEV_LVL::THREE] = units::meter_t(25.05_in);
-        posMap[GAME_PIECE::CORAL][ELEV_LVL::FOUR] = units::meter_t(5_in);
+    posMap[GAME_PIECE::CORAL][ELEV_LVL::STOWED] = units::meter_t(3_in);
+    posMap[GAME_PIECE::CORAL][ELEV_LVL::HP] = units::meter_t(8.425_in);
+    posMap[GAME_PIECE::CORAL][ELEV_LVL::ONE] = units::meter_t(13.57_in);
+    posMap[GAME_PIECE::CORAL][ELEV_LVL::TWO] = units::meter_t(17.0_in);
+    posMap[GAME_PIECE::CORAL][ELEV_LVL::THREE] = units::meter_t(25.05_in);
+    posMap[GAME_PIECE::CORAL][ELEV_LVL::FOUR] = units::meter_t(5_in);
 
-        posMap[GAME_PIECE::ALGEE][ELEV_LVL::ONE] = units::meter_t(5_in);
-        posMap[GAME_PIECE::ALGEE][ELEV_LVL::TWO] = units::meter_t(5_in);
-        posMap[GAME_PIECE::ALGEE][ELEV_LVL::THREE] = units::meter_t(5_in);
-        posMap[GAME_PIECE::ALGEE][ELEV_LVL::FOUR] = units::meter_t(5_in);
+    posMap[GAME_PIECE::ALGEE][ELEV_LVL::ONE] = units::meter_t(5_in);
+    posMap[GAME_PIECE::ALGEE][ELEV_LVL::TWO] = units::meter_t(5_in);
+    posMap[GAME_PIECE::ALGEE][ELEV_LVL::THREE] = units::meter_t(5_in);
+    posMap[GAME_PIECE::ALGEE][ELEV_LVL::FOUR] = units::meter_t(5_in);
         
-        resetState();
+    resetState();
 
-    }
+}
 
 frc2::CommandPtr Scorer::createScoringSequence() {
     return frc2::SequentialCommandGroup(
@@ -304,7 +306,7 @@ frc2::CommandPtr Scorer::elevatorSequence() {
 }
 
 
-   void Scorer::assessInputs()
+void Scorer::assessInputs()
 {
     if (operatorGamepad == nullptr || !operatorGamepad->IsConnected())
         return;
@@ -350,112 +352,108 @@ frc2::CommandPtr Scorer::elevatorSequence() {
     }
 } 
 
+void Scorer::analyzeDashboard()
+{
+    state.scope = table->GetBoolean("Scope Button", false);
+}
 
-    void Scorer::analyzeDashboard()
-    {
+units::meter_t Scorer::convertToMechSpace(units::turn_t turns) 
+{
+    return units::meter_t{turns * units::meter_t {1.432_in * M_PI}/1_tr} + ELEVATOR_OFFSET;
+}
 
-    }
-
-    units::meter_t Scorer::convertToMechSpace(units::turn_t turns) 
-    {
-        return units::meter_t{turns * units::meter_t {1.432_in * M_PI}/1_tr} + ELEVATOR_OFFSET;
-    }
-
-    units::turn_t Scorer::convertToMotorSpace(units::meter_t meters)     
-    {
-        return (meters - ELEVATOR_OFFSET) / units::meter_t {1.432_in * M_PI} * 1_tr;
-    }
+units::turn_t Scorer::convertToMotorSpace(units::meter_t meters)     
+{
+    return (meters - ELEVATOR_OFFSET) / units::meter_t {1.432_in * M_PI} * 1_tr;
+}
 
 
-    void Scorer::assignOutputs()
-    {
-        if (state.hasZeroed) {
-            if (state.elevState == ELEV_LVL::MANUAL) {
-                elevatorMotor->setPower(state.manualSpeed);
-            } else {
-                if(state.scopedState == SCOPED){
-                    state.targetHeight = posMap[state.gamePiece][state.elevState];
-                } else{
-                    if(state.elevState == HP){
-                        state.targetHeight = posMap[CORAL][HP];
-                    }else{
-                        state.targetHeight = posMap[CORAL][STOWED];
-                    }
-                }
-                units::turn_t targetRotations = convertToMotorSpace(state.targetHeight);
-                elevatorMotor->setPosition(targetRotations);
-                
-            }
+void Scorer::assignOutputs()
+{
+    if (state.hasZeroed) {
+        if (state.elevState == ELEV_LVL::MANUAL) {
+            elevatorMotor->setPower(state.manualSpeed);
         } else {
-            elevatorMotor->setPower(-3.0_V);
+            if(state.scopedState == SCOPED || state.scope){
+                state.targetHeight = posMap[state.gamePiece][state.elevState];
+            } else{
+                if(state.elevState == HP){
+                    state.targetHeight = posMap[CORAL][HP];
+                }else{
+                    state.targetHeight = posMap[CORAL][STOWED];
+                }
+            }
+            units::turn_t targetRotations = convertToMotorSpace(state.targetHeight);
+            elevatorMotor->setPosition(targetRotations);                
         }
-
-        if (state.scoringState == SCORING_SPEED::INTAKING){
-            scorerMotor->setSpeed(INTAKE_SPEED);
-        }
-        else if(state.scoringState == SCORING_SPEED::SCORING){
-            scorerMotor->setSpeed(SCORE_SPEED);
-    
-        }else{
-            scorerMotor->setSpeed(0_tps);
-        }
+    } else {
+        elevatorMotor->setPower(-3.0_V);
     }
+
+    if (state.scoringState == SCORING_SPEED::INTAKING){
+        scorerMotor->setSpeed(INTAKE_SPEED);
+    } else if(state.scoringState == SCORING_SPEED::SCORING){
+        scorerMotor->setSpeed(SCORE_SPEED);
+    } else{
+        scorerMotor->setSpeed(0_tps);
+    }
+}
 
 
 void Scorer::InitSendable(wpi::SendableBuilder& builder)
-    {
+{
 
-        builder.SetSmartDashboardType("Subsystem");
-        builder.AddDoubleProperty(
-            "State Speed",
-            [this] { return state.scoringState; },
-            nullptr
-        );
-        builder.AddDoubleProperty(
-            "State elevator level",
-            [this] { return state.elevState; },
-            nullptr
-        );
-
-        builder.AddDoubleProperty(
-            "Target position",
-            [this] {return state.targetHeight.value();},
-            nullptr
-        );
-         builder.AddDoubleProperty(
-            "Current position (in)",
-            [this] { return units::inch_t{convertToMechSpace(elevatorMotor->getPosition())}.value();},
-            nullptr
-        );
-        builder.AddBooleanProperty(
-            "zeroed?",
-            [this] { return hallEffectSensorActive();},
-            nullptr
-        );
-
-         builder.AddIntegerProperty(
-            "Gamepiece state",
-            [this] { return state.gamePiece;},
-            nullptr
-        );
-         builder.AddIntegerProperty(
-            "Level state",
-            [this] { return state.elevState;},
-            nullptr
-        );
-
-        builder.AddBooleanProperty(
-            "Scoped state",
-            [this] { return state.scopedState;},
-            nullptr
-        );
-
-         builder.AddBooleanProperty(
-            "Zeroed state",
-            [this] { return hallEffectSensorActive();},
-            nullptr
-        );
-
-    }
+    builder.SetSmartDashboardType("Subsystem");
+    builder.AddDoubleProperty(
+        "State Speed",
+        [this] { return state.scoringState; },
+        nullptr
+    );
+    builder.AddDoubleProperty(
+        "State elevator level",
+        [this] { return state.elevState; },
+        nullptr
+    );
+    builder.AddDoubleProperty(
+        "Target position",
+        [this] {return state.targetHeight.value();},
+        nullptr
+    );
+    builder.AddDoubleProperty(
+        "Current position (in)",
+        [this] { return units::inch_t{convertToMechSpace(elevatorMotor->getPosition())}.value();},
+        nullptr
+    );
+    builder.AddBooleanProperty(
+        "zeroed?",
+        [this] { return hallEffectSensorActive();},
+        nullptr
+    );
+    builder.AddIntegerProperty(
+        "Gamepiece state",
+        [this] { return state.gamePiece;},
+        nullptr
+    );
+    builder.AddIntegerProperty(
+        "Level state",
+        [this] { return state.elevState;},
+        nullptr
+    );
+    builder.AddBooleanProperty(
+        "Scoped state",
+        [this] { return state.scopedState;},
+        nullptr
+    );
+    builder.AddBooleanProperty(
+        "Zeroed state",
+        [this] { return hallEffectSensorActive();},
+        nullptr
+    );
+    builder.AddBooleanProperty(
+        "Scope Button",
+        [this] { return state.scope;},
+        nullptr
+    );
+}
 
 
