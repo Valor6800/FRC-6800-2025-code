@@ -23,6 +23,8 @@
 #include "frc/geometry/Rotation3d.h"
 #include "units/angle.h"
 #include <ctre/phoenix6/TalonFX.hpp>
+#include <units/math.h>
+#include <frc/Alert.h>
 
 using namespace pathplanner;
 
@@ -436,6 +438,38 @@ frc2::FunctionalCommand* Drivetrain::getResetOdom() {
             return (frc::Timer::GetFPGATimestamp() - state.startTimestamp) > 1.0_s;
         },
         {}
+    );
+}
+
+frc2::CommandPtr Drivetrain::pitSequenceCommand(const frc::ChassisSpeeds& speeds) {
+    auto targetStates = getModuleStates(speeds);
+    return frc2::cmd::Sequence(
+        frc2::cmd::Deadline(
+            frc2::cmd::Wait(5_s),
+            frc2::cmd::RunOnce([this, targetStates] {
+                testModeDesiredStates = targetStates;
+            })
+        ),
+        frc2::cmd::RunOnce([this] {
+            for (int i = 0; i < MODULE_COUNT; i++)
+                testModeDesiredStates[i].speed = 0_mps;
+        }),
+        frc2::cmd::Wait(1_s)
+    );
+}
+
+frc2::CommandPtr Drivetrain::pitSequence() {
+    return frc2::cmd::Sequence(
+        pitSequenceCommand(frc::ChassisSpeeds{0_mps, 2_mps, 0_rad_per_s}),
+        pitSequenceCommand(frc::ChassisSpeeds{0_mps, -2_mps, 0_rad_per_s}),
+        pitSequenceCommand(frc::ChassisSpeeds(0_mps, 0_mps, 2_rad_per_s)),
+        pitSequenceCommand(frc::ChassisSpeeds{0_mps, 0_mps, -2_rad_per_s}),
+        pitSequenceCommand(frc::ChassisSpeeds{1_mps, 0_mps, 0_rad_per_s}),
+        pitSequenceCommand(frc::ChassisSpeeds{-1_mps, 0_mps, 0_rad_per_s}),
+        frc2::cmd::RunOnce([this] {
+            for (int i = 0; i < MODULE_COUNT; i++)
+                testModeDesiredStates[i].angle = 0_deg;
+        })
     );
 }
 

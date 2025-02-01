@@ -42,6 +42,7 @@ class Robot : public frc::TimedRobot {
         void TeleopPeriodic() override;
         void TestInit() override;
         void TestPeriodic() override;
+        void TestExit() override;
         
     private:
         valor::Gamepad gamepadOperator{OIConstants::GAMEPAD_OPERATOR_LOCATION};
@@ -59,13 +60,6 @@ class Robot : public frc::TimedRobot {
         valor::Auto valorAuto;
         valor::CharMode charMode;
 
-        frc::SendableChooser<frc2::Command*> pitSequenceChooser;
-
-
-        // Both an unordered_map and array would work here, but unordered_map will set up a lot more memory than we need
-        // We aren't actually using the map functionality because SendableChooser can directly store Command*
-
-        const std::array<std::pair<std::string_view, frc2::CommandPtr>, 1> PIT_SEQUENCES{{
-            std::make_pair("Elevator pit sequence", scorer.createElevatorSequence())
-        }};
+        frc::Alert subsystemGate{"Subsystem test complete, press A button on driver gamepad to continue", frc::Alert::AlertType::kInfo};
+        frc2::CommandPtr pitSequenceCommand = frc2::cmd::None();
 };

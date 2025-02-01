@@ -64,23 +64,23 @@ void Climber::init()
         "baseCAN"
     );
 
-    stabbyMotor = new valor::PhoenixController(
-        valor::PhoenixControllerType::KRAKEN_X44_FOC, 
-        CANIDs::CRABB, 
-        valor::NeutralMode::Coast, 
-        false, 
-        "baseCAN"     
-    );
+    // stabbyMotor = new valor::PhoenixController(
+    //     valor::PhoenixControllerType::KRAKEN_X44_FOC, 
+    //     CANIDs::CRABB, 
+    //     valor::NeutralMode::Coast, 
+    //     false, 
+    //     "baseCAN"     
+    // );
     
-    climbMotors->setupCANCoder(CANIDs::CLIMBER_CAN, 0.0_tr, true, "baseCAN", 1_tr); //0.5022
+    // climbMotors->setupCANCoder(CANIDs::CLIMBER_CAN, 0.0_tr, true, "baseCAN", 1_tr); //0.5022
 
     climbMotors->setGearRatios(CLIMB_GEAR_RATIO, 1.0);
-    stabbyMotor->setGearRatios(1.0, STABBY_ROTOR_TO_SENSOR);
-    stabbyPID.P = STABBY_K_P;
+    // stabbyMotor->setGearRatios(1.0, STABBY_ROTOR_TO_SENSOR);
+    // stabbyPID.P = STABBY_K_P;
 
-    stabbyMotor->setPIDF(stabbyPID, 0);
-    stabbyMotor->applyConfig();
-    stabbyMotor->enableFOC(true);
+    // stabbyMotor->setPIDF(stabbyPID, 0);
+    // stabbyMotor->applyConfig();
+    // stabbyMotor->enableFOC(true);
 
     climbPID.maxVelocity = climbMotors->getMaxMechSpeed() / 2.0;
     climbPID.maxAcceleration = climbMotors->getMaxMechSpeed() / Constants::Climber::maxVelocityRampTime();
@@ -146,9 +146,9 @@ void Climber::assignOutputs()
     }
 
      if (state.climbState == CLIMB_STATE::DEPLOYED || state.stabState == STABBY_STATE::CRABBING) {
-        stabbyMotor->setSpeed(STABBY_SPEED);
+        // stabbyMotor->setSpeed(STABBY_SPEED);
      } else{
-        stabbyMotor->setPower(0_V);
+        // stabbyMotor->setPower(0_V);
      }
 }
 
@@ -157,6 +157,34 @@ void Climber::setDegrees(units::degree_t deg)
     climbMotors->setPosition((deg / 360_deg) * 1_tr);
 }
 
+frc2::CommandPtr Climber::pitSequenceStage(CLIMB_STATE climbState) {
+    units::turn_t climbPos = STOW_POS;
+    if (climbState == RETRACTED) climbPos = RETRACTED_POS;
+    else if (climbState == DEPLOYED) climbPos = DEPLOYED_POS;
+    return frc2::cmd::Parallel(
+        frc2::cmd::Wait(5_s),
+        frc2::FunctionalCommand{
+            [this, climbState] {
+                climberPosSuccess.Set(false);
+                climberPosFail.Set(false);
+                state.climbState = climbState;
+            },
+            [this, climbPos] {
+            },
+            [](bool) {},
+            [] { return false; },
+            { this }
+        }.ToPtr()
+    );
+}
+
+frc2::CommandPtr Climber::pitSequence() {
+    return frc2::cmd::Sequence(
+        pitSequenceStage(STOW),
+        pitSequenceStage(DEPLOYED),
+        pitSequenceStage(RETRACTED)
+    );
+}
 
 void Climber::InitSendable(wpi::SendableBuilder& builder)
 {

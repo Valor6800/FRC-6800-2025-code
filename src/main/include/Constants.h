@@ -466,10 +466,10 @@ namespace Constants {
 
             static ScoringSpeedMap getScoringSpeedMap() { switch (robot) {
                 case Robot::Alpha: return {
-                    {ELEVATOR_STATE::ONE, 12_tps},
-                    {ELEVATOR_STATE::TWO, 15_tps},
+                    {ELEVATOR_STATE::ONE, 5_tps},
+                    {ELEVATOR_STATE::TWO, 10_tps},
                     {ELEVATOR_STATE::THREE, 15_tps},
-                    {ELEVATOR_STATE::FOUR, 15_tps}
+                    {ELEVATOR_STATE::FOUR, 20_tps}
                 };
                 default: return {
                     {ELEVATOR_STATE::ONE, 25_tps},
@@ -486,22 +486,22 @@ namespace Constants {
                             GAME_PIECE::CORAL,
                             {
                                 { ELEVATOR_STATE::STOWED, 5_in },
-                                { ELEVATOR_STATE::HP, 5_in },
-                                { ELEVATOR_STATE::ONE, 13.57_in },
-                                { ELEVATOR_STATE::TWO, 14_in },
-                                { ELEVATOR_STATE::THREE, 14_in },
-                                { ELEVATOR_STATE::FOUR, 5_in }
+                                { ELEVATOR_STATE::HP, 7.5_in },
+                                { ELEVATOR_STATE::ONE, 10_in },
+                                { ELEVATOR_STATE::TWO, 12.5_in },
+                                { ELEVATOR_STATE::THREE, 15_in },
+                                { ELEVATOR_STATE::FOUR, 17.5_in }
                             }
                         },
                         {
                             GAME_PIECE::ALGEE,
                             {
-                                { ELEVATOR_STATE::STOWED, 6_in },
+                                { ELEVATOR_STATE::STOWED, 7.5_in },
                                 { ELEVATOR_STATE::HP, 5_in },
                                 { ELEVATOR_STATE::ONE, 5_in },
                                 { ELEVATOR_STATE::TWO, 13.7_in },
                                 { ELEVATOR_STATE::THREE, 14.5_in },
-                                { ELEVATOR_STATE::FOUR, 5_in }
+                                { ELEVATOR_STATE::FOUR, 17.5_in }
                             }
                         }
                     };
@@ -558,7 +558,7 @@ namespace Constants {
             }}
 
             static double getScorerSensorToMech() { switch (robot) {
-                case Robot::Alpha: return 0.75;
+                case Robot::Alpha: return 2;
                 default: return 5 / 3;
             }}
 

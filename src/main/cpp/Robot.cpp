@@ -20,9 +20,6 @@ Robot::Robot() :
     scorer(this, &drivetrain, candle),
     climber(this, candle),
     valorAuto()
-
-
-    /* valorAuto(), */
 {
     frc::TimedRobot();
 
@@ -38,10 +35,6 @@ void Robot::RobotInit() {
     // We could use frc2::cmd::None() instead of nullptr but it means that we have to hardcode the index
     // of the command in PIT_SEQUENCES or store it elsewhere otherwise Command* will be dangling
     // Probably easier to use nullptr and check when scheduling
-    pitSequenceChooser.SetDefaultOption("None", nullptr);
-    frc::SmartDashboard::PutData("PIT Sequence", &pitSequenceChooser);
-    for (const auto& [key, value] : PIT_SEQUENCES)
-        pitSequenceChooser.AddOption(key, value.get());
 
     gamepadOperator.setDeadbandY(0.13);
     gamepadOperator.setDeadbandX(0.13);
@@ -120,16 +113,30 @@ void Robot::TeleopPeriodic() {
 }
 
 void Robot::TestInit() {
-    frc2::Command *selected = pitSequenceChooser.GetSelected();
-    if (!selected) return;
-
-    selected->Schedule();
+    auto subsystemGateCommand = [this] {
+        return frc2::FunctionalCommand{
+            [this] { subsystemGate.Set(true); },
+            [] {},
+            [this](bool) { subsystemGate.Set(false); },
+            [this] { return gamepadDriver.GetAButton(); }
+        }.ToPtr();
+    };
+    pitSequenceCommand = frc2::cmd::Sequence(
+        drivetrain.pitSequence(),
+        subsystemGateCommand(),
+        scorer.scorerPitSequence()
+    );
+    pitSequenceCommand.Schedule();
 }
 
 /**
  * This function is called periodically during test mode.
  */
 void Robot::TestPeriodic() {}
+
+void Robot::TestExit() {
+    pitSequenceCommand.Cancel();
+}
 
 #ifndef RUNNING_FRC_TESTS
 int main() { return frc::StartRobot<Robot>(); }

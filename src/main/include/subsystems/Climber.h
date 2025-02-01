@@ -12,7 +12,7 @@
 #include <frc/smartdashboard/SmartDashboard.h>
 
 #include "valkyrie/Gamepad.h"
-
+#include <frc/Alert.h>
 
 class Climber : public valor::BaseSubsystem
 {
@@ -27,6 +27,8 @@ public:
     void assessInputs();
     void analyzeDashboard();
     void assignOutputs();
+
+    frc2::CommandPtr pitSequence();
 
     void setDegrees(units::degree_t deg);
 
@@ -56,11 +58,18 @@ public:
         double cacheSize;
         units::volt_t manualSpeed;
 
-    }state;
+    } state;
 
 private:
+    frc2::CommandPtr pitSequenceStage(CLIMB_STATE);
+
     valor::PhoenixController<> *stabbyMotor;
     valor::PhoenixController<> *climbMotors;
     valor::CurrentSensor currentSensor;
+
+    frc::Alert climberPosSuccess{"Climber position is within tolerance", frc::Alert::AlertType::kInfo};
+    frc::Alert climberPosFail{"Climber position not within tolerance", frc::Alert::AlertType::kError};
+    frc::Alert stabbySpeedSuccess{"Stabby speed is within tolerance", frc::Alert::AlertType::kInfo};
+    frc::Alert stabbySpeedFail{"Stabby speed is not within tolerance", frc::Alert::AlertType::kError};
 };
 
