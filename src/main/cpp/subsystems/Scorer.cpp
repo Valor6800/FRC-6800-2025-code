@@ -18,6 +18,7 @@
 #define MOTOR_TO_MECH_IN 6000/ELEVATOR_SENSOR_TO_MECH*
 
 #define SCORER_K_P 0.5
+#define SCORER_K_S 0.45
 #define INTAKE_SPEED 5_tps
 #define SCORE_SPEED -11_tps
 
@@ -241,6 +242,7 @@ Scorer::Scorer(frc::TimedRobot *_robot, Drivetrain *_drive) :
         scorerPID.maxVelocity = scorerMotor->getMaxMechSpeed();
         scorerPID.maxAcceleration = scorerMotor->getMaxMechSpeed()/(1.0_s/2);
         scorerPID.P = SCORER_K_P;
+        scorerPID.S = SCORER_K_S;
         
         scorerMotor->setPIDF(scorerPID, 0);
         scorerMotor->applyConfig();
@@ -405,13 +407,18 @@ frc2::CommandPtr Scorer::elevatorSequence() {
             elevatorMotor->setPower(-3.0_V);
         }
 
-        if (state.scoringState == SCORING_SPEED::INTAKING){
+        if (state.scoringState == SCORING_SPEED::INTAKING) {
             scorerMotor->setSpeed(INTAKE_SPEED);
         }
-        else if(state.scoringState == SCORING_SPEED::SCORING){
-            scorerMotor->setSpeed(SCORE_SPEED);
-    
-        }else{
+        else if (state.scoringState == SCORING_SPEED::SCORING) {
+            auto it = scoringSpeedMap.find(state.elevState);
+            if (it != scoringSpeedMap.end()) {
+                scorerMotor->setSpeed(it->second);
+            } else {
+                // Fallback to the default SCORE_SPEED 
+                scorerMotor->setSpeed(SCORE_SPEED);
+            }
+        } else {
             scorerMotor->setSpeed(0_tps);
         }
     }
@@ -473,6 +480,11 @@ void Scorer::InitSendable(wpi::SendableBuilder& builder)
         builder.AddBooleanProperty(
             "Scope Button",
             [this] { return state.scope;},
+            nullptr
+        );
+        builder.AddDoubleProperty(
+            "Elevator speed",
+            [this] { return scoringSpeedMap.find(state.elevState)->second.to<double>();},
             nullptr
         );
 

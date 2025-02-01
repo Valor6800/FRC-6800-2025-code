@@ -98,6 +98,14 @@ public:
         {"ALGEE", GAME_PIECE::ALGEE}
     };
 
+    
+std::map<ELEV_LVL, units::turns_per_second_t> scoringSpeedMap = {
+    {ELEV_LVL::ONE, -2_tps},
+    {ELEV_LVL::TWO, -4_tps},
+    {ELEV_LVL::THREE, -6_tps},
+    {ELEV_LVL::FOUR, -8_tps}
+};
+
 private:
     
 
