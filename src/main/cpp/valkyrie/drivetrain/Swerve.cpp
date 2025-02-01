@@ -1,5 +1,6 @@
 #include "valkyrie/drivetrain/Swerve.h"
 #include "Eigen/Core"
+#include "frc/Timer.h"
 #include "frc/kinematics/ChassisSpeeds.h"
 #include "units/angle.h"
 #include "units/angular_velocity.h"
@@ -132,20 +133,31 @@ void Swerve<AzimuthMotor, DriveMotor>::analyzeDashboard()
     // Linear Speed calculations
     xSpeedMPS = units::meters_per_second_t{xSpeed * maxDriveSpeed};
     ySpeedMPS = units::meters_per_second_t{ySpeed * maxDriveSpeed};
+    if (rot_controller.AtGoal()){
+        rotAlignTime = frc::GetTime() - rotAlignTime;
+        rotControllerTraveledDistance = units::math::abs(rot_controller.GetGoal().position - rotControllerInitialDistance);
+    }
     if (frc::DriverStation::GetAlliance() == frc::DriverStation::kRed) {
         xSpeedMPS *= -1.0;
         ySpeedMPS *= -1.0;
     }
     // Rotational Speed calculations
     if (alignToTarget) {
-        rot_controller.SetGoal(units::radian_t{targetAngle - rotAlignOffset});
         units::radian_t robotRotation = getCalculatedPose().Rotation().Radians();
+        if (rotAlignTime == 0.0_s) {
+            rotAlignTime = frc::GetTime();
+            rotControllerInitialDistance = robotRotation;
+        }
+        rot_controller.SetGoal(units::radian_t{targetAngle - rotAlignOffset});
         rot_controller.Calculate(robotRotation);
         rotSpeedRPS = units::radians_per_second_t{rot_controller.Calculate(robotRotation)} + rot_controller.GetSetpoint().velocity;
     } 
     else {
         rotSpeedRPS = rotSpeed * maxRotationSpeed;
+        rotAlignTime = 0.0_s;
     }
+
+
     units::meters_per_second_t moduleSpeedsRotation = units::meters_per_second_t{rotSpeedRPS.to<double>() * Constants::driveBaseRadius().to<double>()};
     units::meters_per_second_t moduleSpeedsTranslation = units::meters_per_second_t{sqrtf(powf(xSpeedMPS.to<double>(), 2) + powf(ySpeedMPS.to<double>(), 2))};
     
@@ -174,16 +186,29 @@ void Swerve<AzimuthMotor, DriveMotor>::analyzeDashboard()
     yControllerInitialVelocity = units::meters_per_second_t{currVelocitiesFieldSpace.dot(MAKE_VECTOR(targetAngle - rotAlignOffset))};
 
     getSkiddingRatio();
+
+    if (y_controller.AtGoal()){
+        yAlignTime = frc::GetTime() - yAlignTime;
+        yControllerTraveledDistance = units::math::abs(y_controller.GetGoal().position - yControllerInitialDistance);
+    } 
     if (alignToTarget){
+        if (yAlignTime == 0.0_s) {
+            yAlignTime = frc::GetTime();
+            yControllerInitialDistance = yDistance;
+        } 
         y_controller.SetGoal(goalAlign);
         calculated_y_controller_val = y_controller.Calculate(yDistance, goalAlign);
         relativeToTagSpeed = units::meters_per_second_t{calculated_y_controller_val} + y_controller.GetSetpoint().velocity;
+
+        yControllerAligned = units::math::abs(y_controller.GetGoal().position - yDistance).value() <= y_controller.GetPositionTolerance();
 
         pidVector = MAKE_VECTOR(targetAngle - rotAlignOffset) * relativeToTagSpeed.value();
         powerVector = joystickVector + pidVector;
         // powerVector *= dotProduct / fabs(dotProduct);
         xSpeedMPS = units::meters_per_second_t{powerVector[0]};
         ySpeedMPS = units::meters_per_second_t{powerVector[1]};
+    } else {
+        yAlignTime = 0.0_s;
     }
 }
 
@@ -704,6 +729,56 @@ void Swerve<AzimuthMotor, DriveMotor>::InitSendable(wpi::SendableBuilder& builde
     builder.AddDoubleProperty(
         "Y Controller Initial Speed",
         [this] {return yControllerInitialVelocity.value();},
+        nullptr
+    );
+    builder.AddBooleanProperty(
+        "Rot Controller Aligned",
+        [this] {return rot_controller.AtGoal();},
+        nullptr
+    );
+    builder.AddBooleanProperty(
+        "Y Controller Aligned",
+        [this] {return y_controller.AtGoal();},
+        nullptr
+    );
+    builder.AddBooleanProperty(
+        "Rot Controller Position Error",
+        [this] {return rot_controller.GetPositionError().value();},
+        nullptr
+    );
+    builder.AddBooleanProperty(
+        "Y Controller Position Error",
+        [this] {return y_controller.GetPositionError().value();},
+        nullptr
+    );
+    builder.AddBooleanProperty(
+        "Rot Controller Velocity Error",
+        [this] {return rot_controller.GetVelocityError().value();},
+        nullptr
+    );
+    builder.AddBooleanProperty(
+        "Y Controller Velocity Error",
+        [this] {return y_controller.GetVelocityError().value();},
+        nullptr
+    );
+    builder.AddDoubleProperty(
+        "Time for Rot Controller to align over Distance Traveled",
+        [this] {return (rotAlignTime / rotControllerTraveledDistance).value();},
+        nullptr
+    );
+    builder.AddDoubleProperty(
+        "Time for Y Controller to align over Distance Traveled",
+        [this] {return (yAlignTime / yControllerTraveledDistance).value();},
+        nullptr
+    );
+    builder.AddDoubleProperty(
+        "Rot Controller Distance Traveled",
+        [this] {return rotControllerTraveledDistance.value();},
+        nullptr
+    );
+    builder.AddDoubleProperty(
+        "Y Controller Distance Traveled",
+        [this] {return yControllerTraveledDistance.value();},
         nullptr
     );
 }
