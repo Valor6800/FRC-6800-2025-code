@@ -558,7 +558,7 @@ namespace Constants {
             }}
 
             static double getScorerSensorToMech() { switch (robot) {
-                case Robot::Alpha: return 0.75;
+                case Robot::Alpha: return 2;
                 default: return 5 / 3;
             }}
 

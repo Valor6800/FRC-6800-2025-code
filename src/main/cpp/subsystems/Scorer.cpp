@@ -181,30 +181,49 @@ frc2::CommandPtr Scorer::createScoringSequence() {
     ).ToPtr();
 }
 
-frc2::CommandPtr Scorer::createElevatorSequence() {
-    return frc2::SequentialCommandGroup(
-        frc2::InstantCommand([this]() { 
+frc2::CommandPtr Scorer::elevatorPitSequenceStage(ELEVATOR_STATE elevState) {
+    units::turn_t targetPos = convertToMotorSpace(positionMap[state.gamePiece][elevState]);
+    return frc2::cmd::Race(
+        frc2::cmd::Wait(1_s),
+        frc2::FunctionalCommand{
+            [this, elevState] {
+                this->state.elevState = elevState;
+            },
+            [] {},
+            [](bool interrupted) {
+                if (interrupted) {
+                    // Set LEDs that elevator failed
+                    std::cout << "ELEVATOR FAILED\n";
+                } else {
+                    // Set LEDs that elevator succeeded
+                    std::cout << "ELEVATOR SUCCEEDED\n";
+                }
+            },
+            [this, targetPos] {
+                units::turn_t currentPos = elevatorMotor->getPosition();
+                return units::math::abs(targetPos - currentPos) < 0.5_tr;
+            },
+            { this }
+        }.ToPtr()
+    );
+}
+
+frc2::CommandPtr Scorer::elevatorPitSequence() {
+    return frc2::cmd::Sequence(
+        frc2::cmd::RunOnce([this] {
             state.scopedState = SCOPED_STATE::SCOPED;
             state.gamePiece = GAME_PIECE::CORAL;
         }),
-        frc2::InstantCommand([this]() { state.elevState = ELEVATOR_STATE::STOWED; }),
-        frc2::WaitCommand(1_s),
-        frc2::InstantCommand([this]() { state.elevState = ELEVATOR_STATE::ONE; }),
-        frc2::WaitCommand(1_s),
-        frc2::InstantCommand([this]() { state.elevState = ELEVATOR_STATE::STOWED; }),
-        frc2::WaitCommand(1_s),
-        frc2::InstantCommand([this]() { state.elevState = ELEVATOR_STATE::TWO; }),
-        frc2::WaitCommand(1_s),
-        frc2::InstantCommand([this]() { state.elevState = ELEVATOR_STATE::STOWED; }),
-        frc2::WaitCommand(1_s),
-        frc2::InstantCommand([this]() { state.elevState = ELEVATOR_STATE::THREE; }),
-        frc2::WaitCommand(1_s),
-        frc2::InstantCommand([this]() { state.elevState = ELEVATOR_STATE::STOWED; }),
-        frc2::WaitCommand(1_s),
-        frc2::InstantCommand([this]() { state.elevState = ELEVATOR_STATE::FOUR; }),
-        frc2::WaitCommand(1_s),
-        frc2::InstantCommand([this]() { state.elevState = ELEVATOR_STATE::STOWED; })        
-    ).ToPtr();
+        elevatorPitSequenceStage(ELEVATOR_STATE::STOWED),
+        elevatorPitSequenceStage(ELEVATOR_STATE::ONE),
+        elevatorPitSequenceStage(ELEVATOR_STATE::STOWED),
+        elevatorPitSequenceStage(ELEVATOR_STATE::TWO),
+        elevatorPitSequenceStage(ELEVATOR_STATE::STOWED),
+        elevatorPitSequenceStage(ELEVATOR_STATE::THREE),
+        elevatorPitSequenceStage(ELEVATOR_STATE::STOWED),
+        elevatorPitSequenceStage(ELEVATOR_STATE::FOUR),
+        elevatorPitSequenceStage(ELEVATOR_STATE::STOWED)
+    );
 }
 
 void Scorer::resetState()
@@ -295,7 +314,7 @@ void Scorer::init()
     currentSensor.setGetter([this]() {return scorerMotor->getCurrent().to<double>(); });
     currentSensor.setSpikeCallback([this]() {state.hasAlgae = true;});
     currentSensor.setCacheSize(ALGAE_CACHE_SIZE);
-    
+
     resetState();
 
     // Must be at the end of init() because the CANdi has to be setup before reading
@@ -389,7 +408,7 @@ void Scorer::assignOutputs()
     // Scorer State Machine
     if (state.scoringState == SCORE_STATE::SCORING) {
         if (state.gamePiece == GAME_PIECE::ALGEE) {
-            scorerMotor->setSpeed(ALGEE_SCORE_SPEED);  
+            // scorerMotor->setSpeed(ALGEE_SCORE_SPEED);  
         } else {
             auto it = scoringSpeedMap.find(state.elevState);
             if (it != scoringSpeedMap.end()) {

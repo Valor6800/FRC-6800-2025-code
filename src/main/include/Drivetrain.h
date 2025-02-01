@@ -138,6 +138,9 @@ public:
 
      frc2::FunctionalCommand* getResetOdom();
 
+     frc2::CommandPtr pitStateCommand(const frc::SwerveModuleState&);
+     frc2::CommandPtr pitSequence();
+
      units::meters_per_second_t getRobotSpeeds();
 
      // void setDriveMotorNeutralMode(valor::NeutralMode mode);

@@ -37,7 +37,8 @@ public:
     void InitSendable(wpi::SendableBuilder& builder);
 
     frc2::CommandPtr createScoringSequence();
-    frc2::CommandPtr createElevatorSequence();
+
+    frc2::CommandPtr elevatorPitSequence();
 
     enum SCORE_STATE
     {
@@ -69,6 +70,7 @@ public:
     } state;
 
 private:
+    frc2::CommandPtr elevatorPitSequenceStage(Constants::Scorer::ELEVATOR_STATE);
     
     units::meter_t convertToMechSpace(units::turn_t turns);
     units::turn_t convertToMotorSpace(units::meter_t meters);
