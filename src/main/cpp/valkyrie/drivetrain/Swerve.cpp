@@ -1,5 +1,6 @@
 #include "valkyrie/drivetrain/Swerve.h"
 #include "Eigen/Core"
+#include "frc/kinematics/ChassisSpeeds.h"
 #include "units/angle.h"
 #include "units/angular_velocity.h"
 #include "units/length.h"
@@ -274,8 +275,24 @@ void Swerve<AzimuthMotor, DriveMotor>::enableCarpetGrain(double _grainMultiplier
 
 template<class AzimuthMotor, class DriveMotor>
 void Swerve<AzimuthMotor, DriveMotor>::resetAlignControllers() {
-    rot_controller.Reset(getCalculatedPose().Rotation().Radians());
-    y_controller.Reset(yDistance);
+    rot_controller.Reset(
+        getCalculatedPose().Rotation().Radians(),
+        pigeon->GetAngularVelocityZWorld().GetValue()
+    );
+
+    frc::ChassisSpeeds fieldSpaceSpeeds = frc::ChassisSpeeds::FromRobotRelativeSpeeds(
+        getRobotRelativeSpeeds(),
+        getCalculatedPose().Rotation()
+    );
+
+    Eigen::Vector2d currVelocitiesFieldSpace{
+        fieldSpaceSpeeds.vx.value(),
+        fieldSpaceSpeeds.vy.value()
+    }; // meters_per_second_t
+    
+    units::meters_per_second_t yControllerInitialSpeed{ currVelocitiesFieldSpace.dot(MAKE_VECTOR(targetAngle + rotAlignOffset)) };
+
+    y_controller.Reset(yDistance, yControllerInitialSpeed);
 }
 
 template<class AzimuthMotor, class DriveMotor>
