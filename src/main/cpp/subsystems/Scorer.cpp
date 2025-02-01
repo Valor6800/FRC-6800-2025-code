@@ -267,28 +267,22 @@ Scorer::Scorer(frc::TimedRobot *_robot, Drivetrain *_drive) :
 
     }
 
-    frc2::SequentialCommandGroup Scorer::createScoringSequence() {
+frc2::CommandPtr Scorer::createScoringSequence() {
     return frc2::SequentialCommandGroup(
         frc2::InstantCommand([this]() { state.scoringState = Scorer::SCORING_SPEED::SCORING; }),
         frc2::WaitCommand(5_s),
         frc2::InstantCommand([this]() { state.scoringState = Scorer::SCORING_SPEED::INTAKING; }),
         frc2::WaitCommand(5_s),
         frc2::InstantCommand([this]() { state.scoringState = Scorer::SCORING_SPEED::HOLD; })
-    );
+    ).ToPtr();
 }
 
-frc2::SequentialCommandGroup Scorer::elevatorSequence() {
+frc2::CommandPtr Scorer::elevatorSequence() {
     return frc2::SequentialCommandGroup(
         frc2::InstantCommand([this]() { 
             state.scopedState = Scorer::SCOPED_STATE::SCOPED;
             state.gamePiece = Scorer::GAME_PIECE::CORAL;
         }),
-        frc2::InstantCommand([this]() { state.elevState = Scorer::ELEV_LVL::THREE; }),
-        frc2::WaitCommand(1_s),
-        frc2::InstantCommand([this]() { state.elevState = Scorer::ELEV_LVL::STOWED; }),
-        frc2::WaitCommand(1_s),
-        frc2::InstantCommand([this]() { state.elevState = Scorer::ELEV_LVL::ONE; }),
-        frc2::WaitCommand(1_s),
         frc2::InstantCommand([this]() { state.elevState = Scorer::ELEV_LVL::STOWED; }),
         frc2::WaitCommand(1_s),
         frc2::InstantCommand([this]() { state.elevState = Scorer::ELEV_LVL::ONE; }),
@@ -305,8 +299,8 @@ frc2::SequentialCommandGroup Scorer::elevatorSequence() {
         frc2::WaitCommand(1_s),
         frc2::InstantCommand([this]() { state.elevState = Scorer::ELEV_LVL::FOUR; }),
         frc2::WaitCommand(1_s),
-        frc2::InstantCommand([this]() { state.elevState = Scorer::ELEV_LVL::STOWED; })
-    );
+        frc2::InstantCommand([this]() { state.elevState = Scorer::ELEV_LVL::STOWED; })        
+    ).ToPtr();
 }
 
 

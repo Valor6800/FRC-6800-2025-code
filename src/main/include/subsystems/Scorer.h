@@ -35,6 +35,8 @@ public:
     void analyzeDashboard();
     void assignOutputs();
     void InitSendable(wpi::SendableBuilder& builder);
+    frc2::CommandPtr createScoringSequence();
+    frc2::CommandPtr  elevatorSequence();
 
     enum SCORING_SPEED
     {
@@ -95,8 +97,7 @@ public:
     };
 
 private:
-    frc2::SequentialCommandGroup createScoringSequence();
-    frc2::SequentialCommandGroup elevatorSequence();
+    
 
     Drivetrain *drivetrain;
     bool hallEffectSensorActive();

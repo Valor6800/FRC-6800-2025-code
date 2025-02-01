@@ -55,4 +55,11 @@ class Robot : public frc::TimedRobot {
         valor::CharMode charMode;
 
         frc::SendableChooser<frc2::Command*> pitSequenceChooser;
+
+        // Both an unordered_map and array would work here, but unordered_map will set up a lot more memory than we need
+        // We aren't actually using the map functionality because SendableChooser can directly store Command*
+
+        const std::array<std::pair<std::string_view, frc2::CommandPtr>, 1> PIT_SEQUENCES{{
+            std::make_pair("Elevator pit sequence", scorer.elevatorSequence())
+        }};
 };
