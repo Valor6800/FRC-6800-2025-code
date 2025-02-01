@@ -19,7 +19,7 @@
 
 #define SCORER_K_P 0.5
 #define SCORER_K_S 0.45
-#define INTAKE_SPEED 5_tps
+#define INTAKE_SPEED -5_tps
 #define SCORE_SPEED -11_tps
 
 #define ELEVATOR_FORWARD_LIMIT 5.75_tr
@@ -72,6 +72,7 @@ Scorer::Scorer(frc::TimedRobot *_robot) :
             )
         )
     ).ToPtr());
+    
     pathplanner::NamedCommands::registerCommand("Enable Scorer", std::move(
         frc2::SequentialCommandGroup(
             frc2::InstantCommand(
@@ -322,6 +323,16 @@ void Scorer::assessInputs()
     }
 } 
 
+    void Scorer::stageCoral(){
+        scorerMotor->setSpeed(-1_tps);
+        if(scorerMotor->getCurrent()>18_A){
+            scorerMotor->setPosition(units::angle::turn_t{-0.5} + scorerMotor->getPosition());
+            state.staged= STAGING_SEQ::DONE_STAGE;
+        }
+             
+    }
+
+
 void Scorer::analyzeDashboard()
 {
     state.tuning = table->GetBoolean("Scope Button", false);
@@ -337,45 +348,51 @@ units::turn_t Scorer::convertToMotorSpace(units::meter_t meters)
     return (meters - ELEVATOR_OFFSET) / units::meter_t {PULLEY_CIRCUMFERENCE * M_PI} * 1_tr;
 }
 
-void Scorer::assignOutputs()
-{
-    // Elevator State Machine
-    if (state.hasZeroed) {
-        if (state.elevState == ELEV_LVL::MANUAL) {
-            elevatorMotor->setPower(state.manualSpeed);
-        } else {
-            if(state.scopedState == SCOPED || state.tuning){
-                state.targetHeight = posMap[state.gamePiece][state.elevState];
-            } else{
-                if(state.elevState == HP){
-                    state.targetHeight = posMap[CORAL][HP];
-                }else{
-                    state.targetHeight = posMap[CORAL][STOWED];
+    void Scorer::assignOutputs()
+    {
+        if (state.hasZeroed) {
+            if (state.elevState == ELEV_LVL::MANUAL) {
+                elevatorMotor->setPower(state.manualSpeed);
+            } else {
+                if(state.scopedState == SCOPED || state.scope){
+                    state.targetHeight = posMap[state.gamePiece][state.elevState];
+                } else{
+                    if(state.elevState == HP){
+                        state.targetHeight = posMap[CORAL][HP];
+                    }else{
+                        state.targetHeight = posMap[CORAL][STOWED];
+                    }
                 }
+                units::turn_t targetRotations = convertToMotorSpace(state.targetHeight);
+                elevatorMotor->setPosition(targetRotations);
+                
             }
-            units::turn_t targetRotations = convertToMotorSpace(state.targetHeight);
-            elevatorMotor->setPosition(targetRotations);
-            
-        }
-    } else {
-        elevatorMotor->setPower(-3.0_V);
-    }
-
-    // Scorer State Machine
-    if (state.scoringState == SCORING_SPEED::INTAKING) {
-        scorerMotor->setSpeed(INTAKE_SPEED);
-    } else if (state.scoringState == SCORING_SPEED::SCORING) {
-        auto it = scoringSpeedMap.find(state.elevState);
-        if (it != scoringSpeedMap.end()) {
-            scorerMotor->setSpeed(it->second);
         } else {
-            // Fallback to the default SCORE_SPEED 
-            scorerMotor->setSpeed(SCORE_SPEED);
+            elevatorMotor->setPower(-3.0_V);
         }
-    } else {
-        scorerMotor->setSpeed(0_tps);
-    }
-}
+if (state.scoringState == SCORING_SPEED::INTAKING) {
+            scorerMotor->setSpeed(INTAKE_SPEED);
+        }
+        else if (state.scoringState == SCORING_SPEED::SCORING) {
+            auto it = scoringSpeedMap.find(state.elevState);
+            if (it != scoringSpeedMap.end()) {
+                scorerMotor->setSpeed(it->second);
+            } else {
+                // Fallback to the default SCORE_SPEED 
+                scorerMotor->setSpeed(SCORE_SPEED);
+            }
+        } 
+        else if(state.staged == STAGING_SEQ::STAGING){
+            std::cout << "Hello World\n\n\n";
+            stageCoral();
+        }
+        else if(state.staged == STAGING_SEQ::DONE_STAGE) {}
+
+        else {
+            scorerMotor->setSpeed(0_tps);
+            std::cout << "zero" << std::endl;
+        }
+    }   
 
 
 void Scorer::InitSendable(wpi::SendableBuilder& builder)
@@ -432,6 +449,11 @@ void Scorer::InitSendable(wpi::SendableBuilder& builder)
         [this] { return scorerStagingSensor.isDetected(); },
         nullptr
     );
+    builder.AddIntegerProperty(
+            "Staging Seq",
+            [this] {return state.staged;},
+            nullptr
+        );
 }
 
 

@@ -19,6 +19,7 @@
 #include <unordered_map>
 #include "valkyrie/Gamepad.h"
 #include <ctre/phoenix6/core/CoreCANdi.hpp>
+#include "valkyrie/sensors/CurrentSensor.h"
 
 
 class Scorer : public valor::BaseSubsystem
@@ -37,6 +38,14 @@ public:
 
     frc2::CommandPtr createScoringSequence();
     frc2::CommandPtr createElevatorSequence();
+    void stageCoral();
+
+    enum STAGING_SEQ
+    {
+        NOT_STAGE,
+        STAGING,
+        DONE_STAGE
+    };
 
     enum SCORING_SPEED
     {
@@ -80,15 +89,16 @@ public:
     
         bool hasZeroed;
         bool tuning;
+        STAGING_SEQ staged;
 
     } state;
 
     
     std::map<ELEV_LVL, units::turns_per_second_t> scoringSpeedMap = {
-        {ELEV_LVL::ONE, -2_tps},
-        {ELEV_LVL::TWO, -4_tps},
-        {ELEV_LVL::THREE, -6_tps},
-        {ELEV_LVL::FOUR, -8_tps}
+        {ELEV_LVL::ONE, -12_tps},
+        {ELEV_LVL::TWO, -15_tps},
+        {ELEV_LVL::THREE, -15_tps},
+        {ELEV_LVL::FOUR, -15_tps}
     };
 
 private:
@@ -110,4 +120,5 @@ private:
     valor::CANrangeSensor scorerStagingSensor;
 
     std::map<GAME_PIECE, std::map<ELEV_LVL, units::meter_t>> posMap;
+    valor::CurrentSensor currentSensor;
 };

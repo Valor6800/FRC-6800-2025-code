@@ -14,7 +14,7 @@ CANrangeSensor::CANrangeSensor(frc::TimedRobot *_robot, const char *name, int de
             if(!isFaulting()){
                 return measurement;
             }
-            return -1_mm;
+            return measurement;
         }
     );
 
