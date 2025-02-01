@@ -287,9 +287,19 @@ void Drivetrain::assessInputs()
                 // }
             }
         }
-        if (aprilLime->hasTarget() && aprilLime->getTagID() == state.reefTag){
-            Swerve::yDistance = aprilLime->get_botpose_targetspace().X();
-        }
+
+        // TODO: Make the aprilTag Map
+        
+        // frc::Transform2d fieldToRobot{
+        //     calcEstimator->GetEstimatedPosition().X(),
+        //     calcEstimator->GetEstimatedPosition().Y(),
+        //     0_deg
+        // };
+        // frc::Transform2d robotToTarget = fieldToRobot.Inverse()
+        
+        // if (aprilLime->hasTarget() && aprilLime->getTagID() == state.reefTag){
+        //     Swerve::yDistance = aprilLime->get_botpose_targetspace().X();
+        // }
 
     }
 
