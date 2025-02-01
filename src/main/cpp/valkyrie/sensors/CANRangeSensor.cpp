@@ -10,11 +10,11 @@ CANrangeSensor::CANrangeSensor(frc::TimedRobot *_robot, const char *name, int de
 
     LaserProximitySensor<units::millimeter_t>::setGetter(
         [this] () {
-            units::millimeter_t measurement = units::millimeter_t{device->GetDistance().GetValueAsDouble()};
+            units::millimeter_t measurement = device->GetDistance().GetValue();
             if(!isFaulting()){
-                return units::millimeter_t{measurement};
+                return measurement;
             }
-            return units::millimeter_t{-1};
+            return -1_mm;
         }
     );
 
