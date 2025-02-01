@@ -170,6 +170,8 @@ private:
 
     Eigen::Vector2d joystickVector, pidVector, powerVector;
     units::angle::degree_t rotAlignOffset;
+
+    units::meters_per_second_t yControllerInitialVelocity;
 };
 
 }

@@ -161,6 +161,18 @@ void Swerve<AzimuthMotor, DriveMotor>::analyzeDashboard()
     joystickVector *= maxDriveSpeed.value();
     // joystickVector = Eigen::Vector2d{joystickVector[0], joystickVector[1]};
 
+    frc::ChassisSpeeds fieldSpaceSpeeds = frc::ChassisSpeeds::FromRobotRelativeSpeeds(
+        getRobotRelativeSpeeds(),
+        getCalculatedPose().Rotation()
+    );
+
+    Eigen::Vector2d currVelocitiesFieldSpace{
+        fieldSpaceSpeeds.vx.value(),
+        fieldSpaceSpeeds.vy.value()
+    }; // meters_per_second_t
+    
+    yControllerInitialVelocity = units::meters_per_second_t{currVelocitiesFieldSpace.dot(MAKE_VECTOR(targetAngle - rotAlignOffset))};
+
     getSkiddingRatio();
     if (alignToTarget){
         y_controller.SetGoal(goalAlign);
@@ -280,19 +292,7 @@ void Swerve<AzimuthMotor, DriveMotor>::resetAlignControllers() {
         pigeon->GetAngularVelocityZWorld().GetValue()
     );
 
-    frc::ChassisSpeeds fieldSpaceSpeeds = frc::ChassisSpeeds::FromRobotRelativeSpeeds(
-        getRobotRelativeSpeeds(),
-        getCalculatedPose().Rotation()
-    );
-
-    Eigen::Vector2d currVelocitiesFieldSpace{
-        fieldSpaceSpeeds.vx.value(),
-        fieldSpaceSpeeds.vy.value()
-    }; // meters_per_second_t
-    
-    units::meters_per_second_t yControllerInitialSpeed{ currVelocitiesFieldSpace.dot(MAKE_VECTOR(targetAngle + rotAlignOffset)) };
-
-    y_controller.Reset(yDistance, yControllerInitialSpeed);
+    y_controller.Reset(yDistance, yControllerInitialVelocity);
 }
 
 template<class AzimuthMotor, class DriveMotor>
@@ -698,6 +698,12 @@ void Swerve<AzimuthMotor, DriveMotor>::InitSendable(wpi::SendableBuilder& builde
     builder.AddBooleanProperty(
         "Is Robot Skidding",
         [this] {return isRobotSkidding();},
+        nullptr
+    );
+
+    builder.AddDoubleProperty(
+        "Y Controller Initial Speed",
+        [this] {return yControllerInitialVelocity.value();},
         nullptr
     );
 }
