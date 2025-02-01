@@ -38,6 +38,7 @@ public:
     frc2::CommandPtr createScoringSequence();
     frc2::CommandPtr  elevatorSequence();
 
+
     enum SCORING_SPEED
     {
         HOLD,
@@ -108,4 +109,5 @@ private:
     valor::PhoenixController *scorerMotor;
     valor::GrappleSensor lidarSensor;
     std::map<GAME_PIECE, std::map<ELEV_LVL, units::meter_t>> posMap;
+    frc2::CommandPtr pitSequenceLevelCommand(Scorer::ELEV_LVL elevLevel);
 };

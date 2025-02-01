@@ -277,32 +277,52 @@ frc2::CommandPtr Scorer::createScoringSequence() {
     ).ToPtr();
 }
 
+
+frc2::CommandPtr Scorer::pitSequenceLevelCommand(Scorer::ELEV_LVL elevLevel) {
+    return frc2::cmd::Race(
+        frc2::cmd::Wait(1_s),
+        frc2::FunctionalCommand{
+            [this, elevLevel] () {
+                state.elevState = elevLevel;
+                state.targetHeight = posMap[state.gamePiece][elevLevel];
+            },
+            [] () {},
+            [this] (bool Interrupted) {
+                std::cout << "Elevator level changed!" << std::endl;
+            },
+            [this] () -> bool {
+                units::turn_t currentPosition = elevatorMotor->getPosition();
+                units::turn_t targetPosition = convertToMotorSpace(state.targetHeight);
+                return std::abs(currentPosition.value() - targetPosition.value()) <= ELEVATOR_TOLERANCE;
+            },
+            { this }
+        }.ToPtr()
+    );
+}
+
+
 frc2::CommandPtr Scorer::elevatorSequence() {
-    return frc2::SequentialCommandGroup(
+    return frc2::cmd::Sequence(
         frc2::InstantCommand([this]() { 
             state.scopedState = Scorer::SCOPED_STATE::SCOPED;
             state.gamePiece = Scorer::GAME_PIECE::CORAL;
-        }),
-        frc2::InstantCommand([this]() { state.elevState = Scorer::ELEV_LVL::STOWED; }),
-        frc2::WaitCommand(1_s),
-        frc2::InstantCommand([this]() { state.elevState = Scorer::ELEV_LVL::ONE; }),
-        frc2::WaitCommand(1_s),
-        frc2::InstantCommand([this]() { state.elevState = Scorer::ELEV_LVL::STOWED; }),
-        frc2::WaitCommand(1_s),
-        frc2::InstantCommand([this]() { state.elevState = Scorer::ELEV_LVL::TWO; }),
-        frc2::WaitCommand(1_s),
-        frc2::InstantCommand([this]() { state.elevState = Scorer::ELEV_LVL::STOWED; }),
-        frc2::WaitCommand(1_s),
-        frc2::InstantCommand([this]() { state.elevState = Scorer::ELEV_LVL::THREE; }),
-        frc2::WaitCommand(1_s),
-        frc2::InstantCommand([this]() { state.elevState = Scorer::ELEV_LVL::STOWED; }),
-        frc2::WaitCommand(1_s),
-        frc2::InstantCommand([this]() { state.elevState = Scorer::ELEV_LVL::FOUR; }),
-        frc2::WaitCommand(1_s),
-        frc2::InstantCommand([this]() { state.elevState = Scorer::ELEV_LVL::STOWED; })        
-    ).ToPtr();
+        }).ToPtr(),
+        pitSequenceLevelCommand(ELEV_LVL::STOWED),
+        pitSequenceLevelCommand(ELEV_LVL::ONE),
+        pitSequenceLevelCommand(ELEV_LVL::STOWED),
+        pitSequenceLevelCommand(ELEV_LVL::TWO),
+        pitSequenceLevelCommand(ELEV_LVL::STOWED),
+        pitSequenceLevelCommand(ELEV_LVL::THREE),
+        pitSequenceLevelCommand(ELEV_LVL::STOWED),
+        pitSequenceLevelCommand(ELEV_LVL::FOUR),
+        pitSequenceLevelCommand(ELEV_LVL::STOWED)
+    );
 }
 
+
+//units::turn_t currentPosition = elevatorMotor->getPosition();
+
+        //if ((currentPosition.value() - state.targetRotations) <= ELEVATOR_TOLERANCE) {
 
    void Scorer::assessInputs()
 {
