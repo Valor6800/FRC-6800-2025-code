@@ -37,7 +37,8 @@ public:
     void InitSendable(wpi::SendableBuilder& builder);
 
     frc2::CommandPtr createScoringSequence();
-    frc2::CommandPtr createElevatorSequence();
+    frc2::CommandPtr  elevatorSequence();
+
 
     enum SCORE_STATE
     {
@@ -90,4 +91,5 @@ private:
 
     Constants::Scorer::PositionMap positionMap;
     Constants::Scorer::ScoringSpeedMap scoringSpeedMap;
+    frc2::CommandPtr pitSequenceLevelCommand(ELEVATOR_STATE elevLevel);
 };
