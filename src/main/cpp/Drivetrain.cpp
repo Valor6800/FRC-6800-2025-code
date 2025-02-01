@@ -322,7 +322,6 @@ void Drivetrain::analyzeDashboard()
 
     // Swerve::goalAlign = units::meter_t{table->GetNumber("Pole Offset", Swerve::goalAlign.to<double>())};
     choosePoleDirection(state.dir);
-    std::cout << "\n\n" << (units::math::abs(Swerve::yDistance - Swerve::goalAlign).value()) << "\n\n";
     if (state.reefTag != -1){
         state.aligned = (units::math::abs(Swerve::yDistance - Swerve::goalAlign) <= yPosTolerance);
     } else {
