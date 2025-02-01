@@ -180,6 +180,8 @@ frc::Pose3d AprilTagsSensor::get_botpose_targetspace() {
 void AprilTagsSensor::InitSendable(wpi::SendableBuilder& builder) {
     builder.SetSmartDashboardType("Subsystem");
 
+    VisionSensor::InitSendable(builder);
+
     builder.AddDoubleArrayProperty(
         "globalPos",
         [this]
@@ -204,10 +206,6 @@ void AprilTagsSensor::InitSendable(wpi::SendableBuilder& builder) {
         },
         nullptr
     );
-    builder.AddDoubleProperty("tx", [this]{ return tx;}, nullptr);
-    builder.AddDoubleProperty("ty", [this]{ return ty;}, nullptr);
-    builder.AddBooleanProperty("hasTarget", [this]{ return hasTarget();}, nullptr);
-    builder.AddBooleanProperty("limeTableExist", [this] {return limeTable != nullptr;}, nullptr);
     builder.AddDoubleArrayProperty(
         "cameraPose",
         [this]
@@ -226,7 +224,6 @@ void AprilTagsSensor::InitSendable(wpi::SendableBuilder& builder) {
         },
         nullptr
     );
-    builder.AddDoubleProperty("totalLatency", [this] {return getTotalLatency().to<double>();}, nullptr);
     builder.AddDoubleProperty("distanceFromTarget", [this] {return distance.to<double>();}, nullptr);
     builder.AddDoubleProperty("Vision acceptance outlier", [this] {return normalVisionOutlier.to<double>();}, nullptr);
     builder.AddDoubleProperty("tid", [this] {return getTagID();}, nullptr);

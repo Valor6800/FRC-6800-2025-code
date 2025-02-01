@@ -4,6 +4,7 @@
 #include "units/time.h"
 #include "valkyrie/sensors/BaseSensor.h"
 #include "wpi/array.h"
+#include "wpi/sendable/SendableBuilder.h"
 #include <array>
 #include <span>
 #include <vector>
@@ -82,4 +83,16 @@ void VisionSensor::calculate(){
     
     currState = getSensor();
     
+}
+
+void VisionSensor::InitSendable(wpi::SendableBuilder& builder) {
+    builder.AddDoubleProperty("tx", [this]{ return tx;}, nullptr);
+    builder.AddDoubleProperty("ty", [this]{ return ty;}, nullptr);
+    builder.AddDoubleProperty("totalLatency", [this] {return getTotalLatency().to<double>();}, nullptr);
+    builder.AddBooleanProperty("hasTarget", [this]{ return hasTarget();}, nullptr);
+    builder.AddBooleanProperty("limeTableExist", [this] {return limeTable != nullptr;}, nullptr);
+    builder.AddDoubleProperty("fps", [this] {return limeTable->GetNumber("fps", 0.0);}, nullptr);
+    builder.AddDoubleProperty("temp", [this] {return limeTable->GetNumber("temp", 0.0);}, nullptr);
+    builder.AddDoubleProperty("CPU Usage", [this] {return limeTable->GetNumber("cpu", 0.0);}, nullptr);
+    builder.AddDoubleProperty("RAM Usage", [this] {return limeTable->GetNumber("ram", 0.0);}, nullptr);
 }
