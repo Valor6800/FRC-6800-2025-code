@@ -212,7 +212,7 @@ Scorer::Scorer(frc::TimedRobot *_robot, Drivetrain *_drive) :
         state.scoringState = SCORING_SPEED::HOLD;
         state.elevState = ELEV_LVL::MANUAL;
         state.gamePiece = CORAL;
-        state.scope = false;
+        state.tuning = false;
 
     }
 
@@ -370,7 +370,7 @@ frc2::CommandPtr Scorer::elevatorSequence() {
 
     void Scorer::analyzeDashboard()
     {
-        state.scope = table->GetBoolean("Scope Button", false);
+        state.tuning = table->GetBoolean("Scope Button", false);
     }
 
     units::meter_t Scorer::convertToMechSpace(units::turn_t turns) 
@@ -390,7 +390,7 @@ frc2::CommandPtr Scorer::elevatorSequence() {
             if (state.elevState == ELEV_LVL::MANUAL) {
                 elevatorMotor->setPower(state.manualSpeed);
             } else {
-                if(state.scopedState == SCOPED || state.scope){
+                if(state.scopedState == SCOPED || state.tuning){
                     state.targetHeight = posMap[state.gamePiece][state.elevState];
                 } else{
                     if(state.elevState == HP){
@@ -479,7 +479,7 @@ void Scorer::InitSendable(wpi::SendableBuilder& builder)
         );
         builder.AddBooleanProperty(
             "Scope Button",
-            [this] { return state.scope;},
+            [this] { return state.tuning;},
             nullptr
         );
         builder.AddDoubleProperty(

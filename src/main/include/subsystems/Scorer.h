@@ -79,7 +79,7 @@ public:
         bool hasZeroed;
         GAME_PIECE gamePiece;
         SCOPED_STATE scopedState;
-        bool scope;
+        bool tuning;
 
     } state;
 
