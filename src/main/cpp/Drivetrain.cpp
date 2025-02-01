@@ -239,6 +239,8 @@ void Drivetrain::init()
 {
     Swerve::init();
     state.reefTag = -1;
+    currentPosePathPlanner = nt::NetworkTableInstance::GetDefault().GetStructTopic<frc::Pose2d>("/PathPlanner/currentPose").Subscribe(frc::Pose2d{});
+    targetPosePathPlanner = nt::NetworkTableInstance::GetDefault().GetStructTopic<frc::Pose2d>("/PathPlanner/targetPose").Subscribe(frc::Pose2d{});
 }
 
 void Drivetrain::assessInputs()
@@ -305,7 +307,7 @@ void Drivetrain::assessInputs()
 
 void Drivetrain::analyzeDashboard()
 {
-
+    poseErrorPP = currentPosePathPlanner.Get() - targetPosePathPlanner.Get();
     Swerve::ROT_KP = table->GetNumber("Rot_KP", Swerve::ROT_KP);
     Swerve::ROT_KD = table->GetNumber("Rot_KD", Swerve::ROT_KD);
 
@@ -532,6 +534,39 @@ void Drivetrain::InitSendable(wpi::SendableBuilder& builder)
         builder.AddBooleanProperty(
             "Aligned",
             [this] {return state.aligned;},
+            nullptr
+        );
+        builder.AddDoubleArrayProperty(
+            "Current Pose PP",
+            [this] {
+                std::vector<double> pose;
+                pose.push_back(currentPosePathPlanner.Get().X().to<double>());
+                pose.push_back(currentPosePathPlanner.Get().Y().to<double>());
+                pose.push_back(currentPosePathPlanner.Get().Rotation().Radians().to<double>());
+                return pose;
+            },
+            nullptr
+        );
+        builder.AddDoubleArrayProperty(
+            "Target Pose PP",
+            [this] {
+                std::vector<double> pose;
+                pose.push_back(targetPosePathPlanner.Get().X().to<double>());
+                pose.push_back(targetPosePathPlanner.Get().Y().to<double>());
+                pose.push_back(targetPosePathPlanner.Get().Rotation().Radians().to<double>());
+                return pose;
+            },
+            nullptr
+        );
+        builder.AddDoubleArrayProperty(
+            "Pose Error PP",
+            [this] {
+                std::vector<double> pose;
+                pose.push_back(poseErrorPP.X().to<double>());
+                pose.push_back(poseErrorPP.Y().to<double>());
+                pose.push_back(poseErrorPP.Rotation().Radians().to<double>());
+                return pose;
+            },
             nullptr
         );
     }

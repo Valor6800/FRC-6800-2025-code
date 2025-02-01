@@ -116,6 +116,6 @@
     }
   },
   "resetOdom": true,
-  "folder": null,
+  "folder": "pit sequences",
   "choreoAuto": false
 }

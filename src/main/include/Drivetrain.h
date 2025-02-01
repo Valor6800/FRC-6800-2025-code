@@ -24,6 +24,7 @@
 #include <frc/geometry/Translation2d.h>
 #include <frc/geometry/Pose2d.h>
 #include <frc/geometry/Rotation2d.h>
+#include <frc/geometry/Transform2d.h>
 #include <frc/kinematics/DifferentialDriveWheelSpeeds.h>
 #include <frc/controller/SimpleMotorFeedforward.h>
 #include <frc/kinematics/DifferentialDriveKinematics.h>
@@ -40,6 +41,9 @@
 #include <frc2/command/WaitCommand.h>
 #include <frc/TimedRobot.h>
 #include <frc2/command/FunctionalCommand.h>
+#include <networktables/NetworkTable.h>
+#include <networktables/NetworkTableInstance.h>
+#include <networktables/StructTopic.h>
 
 #include <ctre/phoenix6/Pigeon2.hpp>
 
@@ -161,4 +165,7 @@ private:
      valor::GrappleSensor lidarSensor;
 
      units::meter_t visionAcceptanceRadius;
+     nt::StructSubscriber<frc::Pose2d> currentPosePathPlanner;
+     nt::StructSubscriber<frc::Pose2d> targetPosePathPlanner;
+     frc::Transform2d poseErrorPP;
 };

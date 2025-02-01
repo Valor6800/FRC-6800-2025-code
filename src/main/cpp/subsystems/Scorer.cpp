@@ -19,7 +19,7 @@
 
 #define SCORER_K_P 0.5
 #define INTAKE_SPEED 5_tps
-#define SCORE_SPEED -15_tps
+#define SCORE_SPEED -11_tps
 
 #define ELEVATOR_FORWARD_LIMIT 5.75_tr
 #define ELEVATOR_REVERSE_LIMIT 0.0_tr
@@ -43,6 +43,7 @@ Scorer::Scorer(frc::TimedRobot *_robot, Drivetrain *_drive) :
     elevatorMotor(new valor::PhoenixController(valor::PhoenixControllerType::KRAKEN_X60, CANIDs::ELEV_WHEEL, valor::NeutralMode::Brake, true, "baseCAN")),
     scorerMotor(new valor::PhoenixController(valor::PhoenixControllerType::FALCON_FOC, CANIDs::SCORER_WHEEL, valor::NeutralMode::Brake, false, "baseCAN")),
     lidarSensor(_robot, "Front Lidar Sensor", CANIDs::FRONT_LIDAR_SENSOR)
+    // canRangeSensor(_robot, "CAN Range Sensor", 47, "baseCAN")
     {
 
     frc2::CommandScheduler::GetInstance().RegisterSubsystem(this);
@@ -168,6 +169,18 @@ Scorer::Scorer(frc::TimedRobot *_robot, Drivetrain *_drive) :
         )
     ).ToPtr());
 
+        pathplanner::NamedCommands::registerCommand("HP", std::move(
+        frc2::SequentialCommandGroup(
+            frc2::InstantCommand(
+                [this]() {
+                    state.scopedState = Scorer::SCOPED_STATE::SCOPED;
+                    state.elevState = Scorer::ELEV_LVL::HP;
+                    state.gamePiece = Scorer::GAME_PIECE::CORAL;
+                }
+            )
+        )
+    ).ToPtr());
+
 
     pathplanner::NamedCommands::registerCommand("ZEROING PROCEDURE", std::move(
         frc2::FunctionalCommand(
@@ -198,6 +211,7 @@ Scorer::Scorer(frc::TimedRobot *_robot, Drivetrain *_drive) :
         state.scoringState = SCORING_SPEED::HOLD;
         state.elevState = ELEV_LVL::MANUAL;
         state.gamePiece = CORAL;
+        state.scope = false;
 
     }
 
@@ -213,6 +227,7 @@ Scorer::Scorer(frc::TimedRobot *_robot, Drivetrain *_drive) :
         elevatorMotor->enableFOC(true);
         scorerMotor->setGearRatios(1, SCORER_SENSOR_TO_MECH);
         scorerMotor->enableFOC(true);
+        table->PutBoolean("Scope Button", false);
 
         valor::PIDF elevatorPID;
         elevatorPID.maxVelocity = elevatorMotor->getMaxMechSpeed();
@@ -252,7 +267,7 @@ Scorer::Scorer(frc::TimedRobot *_robot, Drivetrain *_drive) :
 
 
         posMap[GAME_PIECE::CORAL][ELEV_LVL::STOWED] = units::meter_t(3_in);
-        posMap[GAME_PIECE::CORAL][ELEV_LVL::HP] = units::meter_t(8.425_in);
+        posMap[GAME_PIECE::CORAL][ELEV_LVL::HP] = units::meter_t(5.069_in);
         posMap[GAME_PIECE::CORAL][ELEV_LVL::ONE] = units::meter_t(13.57_in);
         posMap[GAME_PIECE::CORAL][ELEV_LVL::TWO] = units::meter_t(17.0_in);
         posMap[GAME_PIECE::CORAL][ELEV_LVL::THREE] = units::meter_t(25.05_in);
@@ -353,7 +368,7 @@ frc2::CommandPtr Scorer::elevatorSequence() {
 
     void Scorer::analyzeDashboard()
     {
-
+        state.scope = table->GetBoolean("Scope Button", false);
     }
 
     units::meter_t Scorer::convertToMechSpace(units::turn_t turns) 
@@ -373,7 +388,7 @@ frc2::CommandPtr Scorer::elevatorSequence() {
             if (state.elevState == ELEV_LVL::MANUAL) {
                 elevatorMotor->setPower(state.manualSpeed);
             } else {
-                if(state.scopedState == SCOPED){
+                if(state.scopedState == SCOPED || state.scope){
                     state.targetHeight = posMap[state.gamePiece][state.elevState];
                 } else{
                     if(state.elevState == HP){
@@ -453,6 +468,11 @@ void Scorer::InitSendable(wpi::SendableBuilder& builder)
          builder.AddBooleanProperty(
             "Zeroed state",
             [this] { return hallEffectSensorActive();},
+            nullptr
+        );
+        builder.AddBooleanProperty(
+            "Scope Button",
+            [this] { return state.scope;},
             nullptr
         );
 

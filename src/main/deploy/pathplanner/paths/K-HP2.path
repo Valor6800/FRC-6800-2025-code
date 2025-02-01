@@ -1,0 +1,88 @@
+{
+  "version": "2025.0",
+  "waypoints": [
+    {
+      "anchor": {
+        "x": 3.83175,
+        "y": 5.312
+      },
+      "prevControl": null,
+      "nextControl": {
+        "x": 3.4027499999999997,
+        "y": 5.789750000000001
+      },
+      "isLocked": false,
+      "linkedName": "K"
+    },
+    {
+      "anchor": {
+        "x": 1.3455000000000001,
+        "y": 6.9597500000000005
+      },
+      "prevControl": {
+        "x": 1.8817499999999998,
+        "y": 6.716
+      },
+      "nextControl": null,
+      "isLocked": false,
+      "linkedName": "HP2"
+    }
+  ],
+  "rotationTargets": [],
+  "constraintZones": [],
+  "pointTowardsZones": [],
+  "eventMarkers": [
+    {
+      "name": "DISABLE Scorer",
+      "waypointRelativePos": 0.05,
+      "endWaypointRelativePos": null,
+      "command": {
+        "type": "named",
+        "data": {
+          "name": "Disable Scorer"
+        }
+      }
+    },
+    {
+      "name": "HP Position",
+      "waypointRelativePos": 0.1,
+      "endWaypointRelativePos": null,
+      "command": {
+        "type": "named",
+        "data": {
+          "name": "HP"
+        }
+      }
+    },
+    {
+      "name": "Intaking",
+      "waypointRelativePos": 0.9,
+      "endWaypointRelativePos": null,
+      "command": {
+        "type": "named",
+        "data": {
+          "name": "Intaking"
+        }
+      }
+    }
+  ],
+  "globalConstraints": {
+    "maxVelocity": 3.5,
+    "maxAcceleration": 3.5,
+    "maxAngularVelocity": 540.0,
+    "maxAngularAcceleration": 720.0,
+    "nominalVoltage": 12.0,
+    "unlimited": false
+  },
+  "goalEndState": {
+    "velocity": 0,
+    "rotation": -145.0
+  },
+  "reversed": false,
+  "folder": null,
+  "idealStartingState": {
+    "velocity": 0,
+    "rotation": -150.0
+  },
+  "useDefaultConstraints": true
+}
