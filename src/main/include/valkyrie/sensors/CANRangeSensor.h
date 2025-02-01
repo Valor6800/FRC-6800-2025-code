@@ -13,6 +13,8 @@ class CANrangeSensor : public LaserProximitySensor<units::millimeter_t>
 public:
     CANrangeSensor(frc::TimedRobot *_robot, const char *name, int deviceId, std::string canbus);
 
+    bool isDetected();
+
 private:
     ctre::phoenix6::hardware::CANrange *device;
 

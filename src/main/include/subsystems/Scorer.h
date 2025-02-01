@@ -5,7 +5,7 @@
 #include "Constants.h"
 #include <vector>
 #include "valkyrie/sensors/GrappleSensor.h"
-// #include "valkyrie/sensors/CANRangeSensor.h"
+#include "valkyrie/sensors/CANRangeSensor.h"
 #include "valkyrie/controllers/PIDF.h"
 #include <frc/smartdashboard/SendableChooser.h>
 #include <frc/smartdashboard/SmartDashboard.h>
@@ -117,6 +117,6 @@ private:
     valor::PhoenixController *elevatorMotor;
     valor::PhoenixController *scorerMotor;
     valor::GrappleSensor lidarSensor;
-    // valor::CANrangeSensor canRangeSensor;
+    valor::CANrangeSensor canRangeSensor;
     std::map<GAME_PIECE, std::map<ELEV_LVL, units::meter_t>> posMap;
 };

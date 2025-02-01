@@ -27,3 +27,7 @@ bool CANrangeSensor::isFaulting(){
             device->GetFault_Undervoltage().GetValue() || 
             device->GetFault_UnlicensedFeatureInUse().GetValue());
 }
+
+bool CANrangeSensor::isDetected(){
+    return device->GetIsDetected().GetValue();
+}

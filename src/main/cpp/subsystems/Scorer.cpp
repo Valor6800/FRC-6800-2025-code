@@ -43,8 +43,8 @@ Scorer::Scorer(frc::TimedRobot *_robot, Drivetrain *_drive) :
     candi(CANIDs::HALL_EFFECT, "baseCAN"),
     elevatorMotor(new valor::PhoenixController(valor::PhoenixControllerType::KRAKEN_X60, CANIDs::ELEV_WHEEL, valor::NeutralMode::Brake, true, "baseCAN")),
     scorerMotor(new valor::PhoenixController(valor::PhoenixControllerType::FALCON_FOC, CANIDs::SCORER_WHEEL, valor::NeutralMode::Brake, false, "baseCAN")),
-    lidarSensor(_robot, "Front Lidar Sensor", CANIDs::FRONT_LIDAR_SENSOR)
-    // canRangeSensor(_robot, "CAN Range Sensor", 47, "baseCAN")
+    lidarSensor(_robot, "Front Lidar Sensor", CANIDs::FRONT_LIDAR_SENSOR),
+    canRangeSensor(_robot, "CAN Range Sensor", 47, "baseCAN")
     {
 
     frc2::CommandScheduler::GetInstance().RegisterSubsystem(this);
@@ -485,6 +485,11 @@ void Scorer::InitSendable(wpi::SendableBuilder& builder)
         builder.AddDoubleProperty(
             "Elevator speed",
             [this] { return scoringSpeedMap.find(state.elevState)->second.to<double>();},
+            nullptr
+        );
+        builder.AddBooleanProperty(
+            "isDetectingCANRANGE",
+            [this] {return canRangeSensor.isDetected();},
             nullptr
         );
 
