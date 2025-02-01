@@ -8,8 +8,8 @@
 #include <pathplanner/lib/auto/NamedCommands.h>
 #include <frc/DriverStation.h>
 
-#define FORWARD_LIMIT 0.25_tr
-#define REVERSE_LIMIT -0.20_tr
+#define FORWARD_LIMIT 0.15_tr
+#define REVERSE_LIMIT -0.18_tr
 
 #define CLIMB_MANUAL_SPEED units::angular_velocity::turns_per_second_t (0)
 #define CLIMB_K_P 100
@@ -40,6 +40,7 @@ using namespace valor;
 
 Climber::Climber(frc::TimedRobot *_robot) : valor::BaseSubsystem(_robot, "Climber"),
     climbMotors(nullptr),
+    crabMotor(nullptr),
     currentSensor(_robot, "Climber")
 {
     frc2::CommandScheduler::GetInstance().RegisterSubsystem(this);
@@ -92,7 +93,16 @@ void Climber::init()
     climbMotors->setContinuousWrap(true);
     climbMotors->enableFOC(true);
     climbMotors->applyConfig();
-    
+
+    crabMotor = new valor::PhoenixController(
+        valor::PhoenixControllerType::FALCON_FOC,
+        CANIDs::CRAB,
+        valor::NeutralMode::Brake,
+        false,
+        "baseCAN"
+    );
+    crabMotor->applyConfig();
+
     table->PutNumber("Spike Current", state.spikeCurrent);
     table->PutNumber("Cache Size", state.cacheSize);
 
@@ -106,6 +116,12 @@ void Climber::assessInputs()
     if (operatorGamepad->rightStickYActive()) {
         state.climbState = CLIMB_STATE::MANUAL;
         state.manualSpeed = operatorGamepad->rightStickY(2) * 12_V;
+    }
+
+    if(operatorGamepad->DPadLeft()){
+        state.crabState = CRAB_STATE::CRABBING;
+    } else{
+        state.crabState = CRAB_STATE::NO_CRAB;
     }
 
 }
@@ -127,15 +143,26 @@ void Climber::assignOutputs()
      } else{
          climbMotors->setPosition(STOW_POS);
      }
+
+     if(state.crabState == CRAB_STATE::CRABBING){
+        crabMotor->setPower(5_V);
+     } else{
+        crabMotor->setPower(0_V);
+     }
 }
 
 
 void Climber::InitSendable(wpi::SendableBuilder& builder)
 {
     builder.SetSmartDashboardType("Subsystem");
-    builder.AddBooleanProperty(
-        "Climbed?",
-        [this]{return state.climbed;},
+    builder.AddIntegerProperty(
+        "Climb State",
+        [this] {return state.climbState;},
+        nullptr
+    );
+    builder.AddIntegerProperty(
+        "Crab State",
+        [this] {return state.crabState;},
         nullptr
     );
     builder.AddDoubleProperty(

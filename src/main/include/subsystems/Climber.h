@@ -58,6 +58,7 @@ public:
 
 private:
     valor::PhoenixController *climbMotors;
+    valor::PhoenixController *crabMotor;
     valor::CurrentSensor currentSensor;
 };
 
