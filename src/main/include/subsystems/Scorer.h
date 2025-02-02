@@ -38,14 +38,14 @@ public:
     frc2::CommandPtr createScoringSequence();
     frc2::CommandPtr createElevatorSequence();
 
-    enum SCORING_SPEED
+    enum SCORE_STATE
     {
         HOLD,
         INTAKING,
         SCORING,
     };
 
-     enum ELEV_LVL
+     enum ELEVATOR_STATE
     {
         MANUAL,
         STOWED,
@@ -70,8 +70,8 @@ public:
 
     struct x
     {
-        SCORING_SPEED scoringState;
-        ELEV_LVL elevState;
+        SCORE_STATE scoringState;
+        ELEVATOR_STATE elevState;
         GAME_PIECE gamePiece;
         SCOPED_STATE scopedState;
 
@@ -84,11 +84,11 @@ public:
     } state;
 
     
-    std::map<ELEV_LVL, units::turns_per_second_t> scoringSpeedMap = {
-        {ELEV_LVL::ONE, -2_tps},
-        {ELEV_LVL::TWO, -4_tps},
-        {ELEV_LVL::THREE, -6_tps},
-        {ELEV_LVL::FOUR, -8_tps}
+    std::map<ELEVATOR_STATE, units::turns_per_second_t> scoringSpeedMap = {
+        {ELEVATOR_STATE::ONE, -12_tps},
+        {ELEVATOR_STATE::TWO, -15_tps},
+        {ELEVATOR_STATE::THREE, -15_tps},
+        {ELEVATOR_STATE::FOUR, -15_tps}
     };
 
 private:
@@ -98,7 +98,6 @@ private:
 
     bool hallEffectSensorActive();
 
-    valor::DebounceSensor scorerDebounceSensor;
     valor::DebounceSensor hallEffectDebounceSensor;
 
     ctre::phoenix6::hardware::core::CoreCANdi candi;
@@ -109,5 +108,5 @@ private:
     valor::GrappleSensor frontRangeSensor;
     valor::CANrangeSensor scorerStagingSensor;
 
-    std::map<GAME_PIECE, std::map<ELEV_LVL, units::meter_t>> posMap;
+    std::map<GAME_PIECE, std::map<ELEVATOR_STATE, units::meter_t>> posMap;
 };

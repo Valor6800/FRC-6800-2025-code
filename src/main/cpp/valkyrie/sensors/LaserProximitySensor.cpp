@@ -43,3 +43,8 @@ template <class T>
 T LaserProximitySensor<T>::getLidarData() {
     return LidarSensor<T>::getLatestSensorData();
 }
+
+template <class T>
+bool LaserProximitySensor<T>::isTriggered() {
+    return DebounceSensor::getLatestSensorData();
+}

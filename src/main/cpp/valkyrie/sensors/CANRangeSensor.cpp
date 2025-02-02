@@ -7,6 +7,15 @@ CANrangeSensor::CANrangeSensor(frc::TimedRobot *_robot, const char *name, int de
     device(new ctre::phoenix6::hardware::CANrange(deviceId, canbus))
 {
     device->ClearStickyFaults();
+    ctre::phoenix6::configs::CANrangeConfiguration config;
+    config.ToFParams.UpdateFrequency = 50_Hz;
+    config.ToFParams.UpdateMode = ctre::phoenix6::signals::UpdateModeValue::ShortRange100Hz;
+    config.ProximityParams.ProximityThreshold = 1_cm;
+    config.ProximityParams.ProximityHysteresis = 0.5_cm;
+    device->GetConfigurator().Apply(config);
+
+    setMaxDistance(units::inch_t{12});
+    setThresholdDistance(units::inch_t{5});
 
     LaserProximitySensor<units::millimeter_t>::setGetter(
         [this] () {
@@ -26,8 +35,4 @@ bool CANrangeSensor::isFaulting(){
             device->GetFault_Hardware().GetValue() || 
             device->GetFault_Undervoltage().GetValue() || 
             device->GetFault_UnlicensedFeatureInUse().GetValue());
-}
-
-bool CANrangeSensor::isDetected(){
-    return device->GetIsDetected().GetValue();
 }

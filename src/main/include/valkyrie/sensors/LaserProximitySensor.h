@@ -46,6 +46,8 @@ public:
      */
     T getLidarData();
 
+    bool isTriggered();
+
 private:
     T thresholdDistance;
 };

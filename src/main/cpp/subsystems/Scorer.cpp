@@ -31,7 +31,6 @@
 
 Scorer::Scorer(frc::TimedRobot *_robot) :
     valor::BaseSubsystem(_robot, "Scorer"),
-    scorerDebounceSensor(_robot, "ScorerDebounce"),
     hallEffectDebounceSensor(_robot, "HallEffectDebounce"),
     candi(CANIDs::HALL_EFFECT, "baseCAN"),
     elevatorMotor(new valor::PhoenixController(valor::PhoenixControllerType::KRAKEN_X60, CANIDs::ELEV_WHEEL, valor::NeutralMode::Brake, true, "baseCAN")),
@@ -45,19 +44,19 @@ Scorer::Scorer(frc::TimedRobot *_robot) :
         frc2::SequentialCommandGroup(
             frc2::InstantCommand(
                 [this]() {
-                    state.scoringState = Scorer::SCORING_SPEED::SCORING;
+                    state.scoringState = Scorer::SCORE_STATE::SCORING;
                 }
             ),
             frc2::WaitCommand(5_s),
             frc2::InstantCommand(
                 [this]() {
-                    state.scoringState = Scorer::SCORING_SPEED::INTAKING;
+                    state.scoringState = Scorer::SCORE_STATE::INTAKING;
                 }
             ),
             frc2::WaitCommand(5_s),
             frc2::InstantCommand(
                 [this]() {
-                    state.scoringState = Scorer::SCORING_SPEED::HOLD;
+                    state.scoringState = Scorer::SCORE_STATE::HOLD;
                 }
             )
         )
@@ -67,7 +66,7 @@ Scorer::Scorer(frc::TimedRobot *_robot) :
             frc2::InstantCommand(
                 [this]() {
                     
-                    state.scoringState = Scorer::SCORING_SPEED::INTAKING;
+                    state.scoringState = Scorer::SCORE_STATE::INTAKING;
                 }
             )
         )
@@ -77,7 +76,7 @@ Scorer::Scorer(frc::TimedRobot *_robot) :
             frc2::InstantCommand(
                 [this]() {
                     
-                    state.scoringState = Scorer::SCORING_SPEED::SCORING;
+                    state.scoringState = Scorer::SCORE_STATE::SCORING;
                 }
             )
         )
@@ -86,7 +85,7 @@ Scorer::Scorer(frc::TimedRobot *_robot) :
         frc2::SequentialCommandGroup(
             frc2::InstantCommand(
                 [this]() {
-                    state.scoringState = Scorer::SCORING_SPEED::HOLD;
+                    state.scoringState = Scorer::SCORE_STATE::HOLD;
                 }
             )
         )
@@ -96,7 +95,7 @@ Scorer::Scorer(frc::TimedRobot *_robot) :
             frc2::InstantCommand(
                 [this]() {
                     state.scopedState = Scorer::SCOPED_STATE::SCOPED;
-                    state.elevState = Scorer::ELEV_LVL::ONE;
+                    state.elevState = Scorer::ELEVATOR_STATE::ONE;
                     state.gamePiece = Scorer::GAME_PIECE::CORAL;
                 }
             )
@@ -107,7 +106,7 @@ Scorer::Scorer(frc::TimedRobot *_robot) :
             frc2::InstantCommand(
                 [this]() {
                     state.scopedState = Scorer::SCOPED_STATE::SCOPED;
-                    state.elevState = Scorer::ELEV_LVL::TWO;
+                    state.elevState = Scorer::ELEVATOR_STATE::TWO;
                     state.gamePiece = Scorer::GAME_PIECE::CORAL;
                 }
             )
@@ -118,7 +117,7 @@ Scorer::Scorer(frc::TimedRobot *_robot) :
             frc2::InstantCommand(
                 [this]() {
                     state.scopedState = Scorer::SCOPED_STATE::SCOPED;
-                    state.elevState = Scorer::ELEV_LVL::THREE;
+                    state.elevState = Scorer::ELEVATOR_STATE::THREE;
                     state.gamePiece = Scorer::GAME_PIECE::CORAL;
                 }
             )
@@ -129,7 +128,7 @@ Scorer::Scorer(frc::TimedRobot *_robot) :
             frc2::InstantCommand(
                 [this]() {
                     state.scopedState = Scorer::SCOPED_STATE::SCOPED;
-                    state.elevState = Scorer::ELEV_LVL::FOUR;
+                    state.elevState = Scorer::ELEVATOR_STATE::FOUR;
                     state.gamePiece = Scorer::GAME_PIECE::CORAL;
                 }
             )
@@ -140,7 +139,7 @@ Scorer::Scorer(frc::TimedRobot *_robot) :
             frc2::InstantCommand(
                 [this]() {
                     state.scopedState = Scorer::SCOPED_STATE::SCOPED;
-                    state.elevState = Scorer::ELEV_LVL::STOWED;
+                    state.elevState = Scorer::ELEVATOR_STATE::STOWED;
                     state.gamePiece = Scorer::GAME_PIECE::CORAL;
                 }
             )
@@ -151,7 +150,7 @@ Scorer::Scorer(frc::TimedRobot *_robot) :
             frc2::InstantCommand(
                 [this]() {
                     state.scopedState = Scorer::SCOPED_STATE::SCOPED;
-                    state.elevState = Scorer::ELEV_LVL::HP;
+                    state.elevState = Scorer::ELEVATOR_STATE::HP;
                     state.gamePiece = Scorer::GAME_PIECE::CORAL;
                 }
             )
@@ -163,11 +162,11 @@ Scorer::Scorer(frc::TimedRobot *_robot) :
 
 frc2::CommandPtr Scorer::createScoringSequence() {
     return frc2::SequentialCommandGroup(
-        frc2::InstantCommand([this]() { state.scoringState = Scorer::SCORING_SPEED::SCORING; }),
+        frc2::InstantCommand([this]() { state.scoringState = Scorer::SCORE_STATE::SCORING; }),
         frc2::WaitCommand(5_s),
-        frc2::InstantCommand([this]() { state.scoringState = Scorer::SCORING_SPEED::INTAKING; }),
+        frc2::InstantCommand([this]() { state.scoringState = Scorer::SCORE_STATE::INTAKING; }),
         frc2::WaitCommand(5_s),
-        frc2::InstantCommand([this]() { state.scoringState = Scorer::SCORING_SPEED::HOLD; })
+        frc2::InstantCommand([this]() { state.scoringState = Scorer::SCORE_STATE::HOLD; })
     ).ToPtr();
 }
 
@@ -177,30 +176,30 @@ frc2::CommandPtr Scorer::createElevatorSequence() {
             state.scopedState = Scorer::SCOPED_STATE::SCOPED;
             state.gamePiece = Scorer::GAME_PIECE::CORAL;
         }),
-        frc2::InstantCommand([this]() { state.elevState = Scorer::ELEV_LVL::STOWED; }),
+        frc2::InstantCommand([this]() { state.elevState = Scorer::ELEVATOR_STATE::STOWED; }),
         frc2::WaitCommand(1_s),
-        frc2::InstantCommand([this]() { state.elevState = Scorer::ELEV_LVL::ONE; }),
+        frc2::InstantCommand([this]() { state.elevState = Scorer::ELEVATOR_STATE::ONE; }),
         frc2::WaitCommand(1_s),
-        frc2::InstantCommand([this]() { state.elevState = Scorer::ELEV_LVL::STOWED; }),
+        frc2::InstantCommand([this]() { state.elevState = Scorer::ELEVATOR_STATE::STOWED; }),
         frc2::WaitCommand(1_s),
-        frc2::InstantCommand([this]() { state.elevState = Scorer::ELEV_LVL::TWO; }),
+        frc2::InstantCommand([this]() { state.elevState = Scorer::ELEVATOR_STATE::TWO; }),
         frc2::WaitCommand(1_s),
-        frc2::InstantCommand([this]() { state.elevState = Scorer::ELEV_LVL::STOWED; }),
+        frc2::InstantCommand([this]() { state.elevState = Scorer::ELEVATOR_STATE::STOWED; }),
         frc2::WaitCommand(1_s),
-        frc2::InstantCommand([this]() { state.elevState = Scorer::ELEV_LVL::THREE; }),
+        frc2::InstantCommand([this]() { state.elevState = Scorer::ELEVATOR_STATE::THREE; }),
         frc2::WaitCommand(1_s),
-        frc2::InstantCommand([this]() { state.elevState = Scorer::ELEV_LVL::STOWED; }),
+        frc2::InstantCommand([this]() { state.elevState = Scorer::ELEVATOR_STATE::STOWED; }),
         frc2::WaitCommand(1_s),
-        frc2::InstantCommand([this]() { state.elevState = Scorer::ELEV_LVL::FOUR; }),
+        frc2::InstantCommand([this]() { state.elevState = Scorer::ELEVATOR_STATE::FOUR; }),
         frc2::WaitCommand(1_s),
-        frc2::InstantCommand([this]() { state.elevState = Scorer::ELEV_LVL::STOWED; })        
+        frc2::InstantCommand([this]() { state.elevState = Scorer::ELEVATOR_STATE::STOWED; })        
     ).ToPtr();
 }
 
 void Scorer::resetState()
 {
-    state.scoringState = SCORING_SPEED::HOLD;
-    state.elevState = ELEV_LVL::MANUAL;
+    state.scoringState = HOLD;
+    state.elevState = ELEVATOR_STATE::MANUAL;
     state.gamePiece = CORAL;
     state.scopedState = UNSCOPED;
     state.tuning = false;
@@ -258,17 +257,24 @@ void Scorer::init()
         state.hasZeroed = true;
     });
 
-    posMap[GAME_PIECE::CORAL][ELEV_LVL::STOWED] = units::meter_t(3_in);
-    posMap[GAME_PIECE::CORAL][ELEV_LVL::HP] = units::meter_t(5.069_in);
-    posMap[GAME_PIECE::CORAL][ELEV_LVL::ONE] = units::meter_t(13.57_in);
-    posMap[GAME_PIECE::CORAL][ELEV_LVL::TWO] = units::meter_t(17.0_in);
-    posMap[GAME_PIECE::CORAL][ELEV_LVL::THREE] = units::meter_t(25.05_in);
-    posMap[GAME_PIECE::CORAL][ELEV_LVL::FOUR] = units::meter_t(5_in);
+    // Beambreak debounce sensor (on scoring mechanism)
+    scorerStagingSensor.setRisingEdgeCallback([this] {
+        state.scoringState = HOLD;
+        scorerMotor->setSpeed(0_tps);
+        scorerMotor->setEncoderPosition(0_tr);
+    });
 
-    posMap[GAME_PIECE::ALGEE][ELEV_LVL::ONE] = units::meter_t(5_in);
-    posMap[GAME_PIECE::ALGEE][ELEV_LVL::TWO] = units::meter_t(5_in);
-    posMap[GAME_PIECE::ALGEE][ELEV_LVL::THREE] = units::meter_t(5_in);
-    posMap[GAME_PIECE::ALGEE][ELEV_LVL::FOUR] = units::meter_t(5_in);
+    posMap[GAME_PIECE::CORAL][ELEVATOR_STATE::STOWED] = units::meter_t(3_in);
+    posMap[GAME_PIECE::CORAL][ELEVATOR_STATE::HP] = units::meter_t(5.069_in);
+    posMap[GAME_PIECE::CORAL][ELEVATOR_STATE::ONE] = units::meter_t(13.57_in);
+    posMap[GAME_PIECE::CORAL][ELEVATOR_STATE::TWO] = units::meter_t(18.5_in);
+    posMap[GAME_PIECE::CORAL][ELEVATOR_STATE::THREE] = units::meter_t(26.55_in);
+    posMap[GAME_PIECE::CORAL][ELEVATOR_STATE::FOUR] = units::meter_t(5_in);
+
+    posMap[GAME_PIECE::ALGEE][ELEVATOR_STATE::ONE] = units::meter_t(5_in);
+    posMap[GAME_PIECE::ALGEE][ELEVATOR_STATE::TWO] = units::meter_t(5_in);
+    posMap[GAME_PIECE::ALGEE][ELEVATOR_STATE::THREE] = units::meter_t(5_in);
+    posMap[GAME_PIECE::ALGEE][ELEVATOR_STATE::FOUR] = units::meter_t(5_in);
     
     resetState();
 
@@ -292,15 +298,15 @@ void Scorer::assessInputs()
         state.elevState = MANUAL;
         state.manualSpeed = operatorGamepad->leftStickY(2) * 12_V;
     } else if (operatorGamepad->GetYButton()) {
-         state.elevState = ELEV_LVL::FOUR;
+         state.elevState = ELEVATOR_STATE::FOUR;
     } else if (operatorGamepad->GetBButton()) {
-        state.elevState = ELEV_LVL::THREE;
+        state.elevState = ELEVATOR_STATE::THREE;
     } else if (operatorGamepad->GetAButton()) {
-        state.elevState = ELEV_LVL::TWO;
+        state.elevState = ELEVATOR_STATE::TWO;
     } else if (operatorGamepad->GetXButton()) {
-        state.elevState = ELEV_LVL::ONE;
+        state.elevState = ELEVATOR_STATE::ONE;
     } else if (operatorGamepad->DPadRight()) {
-        state.elevState = ELEV_LVL::HP;
+        state.elevState = ELEVATOR_STATE::HP;
     }
 
     // Driver controller section
@@ -313,12 +319,12 @@ void Scorer::assessInputs()
         state.scopedState = UNSCOPED;
     }
 
-    if (driverGamepad->GetRightBumperButton()) {
-        state.scoringState = SCORING_SPEED::INTAKING;
-    } else if (driverGamepad->rightTriggerActive()) {
-        state.scoringState = SCORING_SPEED::SCORING;
+    if (driverGamepad->rightTriggerActive()) {
+        state.scoringState = SCORE_STATE::SCORING;
+    } else if (driverGamepad->GetRightBumperButton()) {
+        state.scoringState = SCORE_STATE::INTAKING;
     } else {
-        state.scoringState = SCORING_SPEED::HOLD;
+        state.scoringState = SCORE_STATE::HOLD;
     }
 } 
 
@@ -339,32 +345,27 @@ units::turn_t Scorer::convertToMotorSpace(units::meter_t meters)
 
 void Scorer::assignOutputs()
 {
-    // Elevator State Machine
-    if (state.hasZeroed) {
-        if (state.elevState == ELEV_LVL::MANUAL) {
-            elevatorMotor->setPower(state.manualSpeed);
-        } else {
-            if(state.scopedState == SCOPED || state.tuning){
-                state.targetHeight = posMap[state.gamePiece][state.elevState];
-            } else{
-                if(state.elevState == HP){
-                    state.targetHeight = posMap[CORAL][HP];
-                }else{
-                    state.targetHeight = posMap[CORAL][STOWED];
-                }
-            }
-            units::turn_t targetRotations = convertToMotorSpace(state.targetHeight);
-            elevatorMotor->setPosition(targetRotations);
-            
-        }
-    } else {
+    // Gate to protect the elevator. No logic will be run until elevator is
+    if (!state.hasZeroed) {
         elevatorMotor->setPower(-3.0_V);
+        return;
+    }
+
+    // Elevator State Machine
+    if (state.elevState == ELEVATOR_STATE::MANUAL) {
+        elevatorMotor->setPower(state.manualSpeed + units::volt_t{ELEV_K_AFF});
+    } else {
+        if(state.scopedState == SCOPED || state.tuning){
+            state.targetHeight = posMap[state.gamePiece][state.elevState];
+        } else{
+            state.targetHeight = posMap[CORAL][HP];
+        }
+        units::turn_t targetRotations = convertToMotorSpace(state.targetHeight);
+        elevatorMotor->setPosition(targetRotations);
     }
 
     // Scorer State Machine
-    if (state.scoringState == SCORING_SPEED::INTAKING) {
-        scorerMotor->setSpeed(INTAKE_SPEED);
-    } else if (state.scoringState == SCORING_SPEED::SCORING) {
+    if (state.scoringState == SCORE_STATE::SCORING) {
         auto it = scoringSpeedMap.find(state.elevState);
         if (it != scoringSpeedMap.end()) {
             scorerMotor->setSpeed(it->second);
@@ -372,8 +373,12 @@ void Scorer::assignOutputs()
             // Fallback to the default SCORE_SPEED 
             scorerMotor->setSpeed(SCORE_SPEED);
         }
+    } else if (state.scoringState == SCORE_STATE::INTAKING || !scorerStagingSensor.isTriggered()) {
+        scorerMotor->setSpeed(INTAKE_SPEED);
     } else {
-        scorerMotor->setSpeed(0_tps);
+        // HOLD the coral at a specific position
+        // @todo check inversion
+        scorerMotor->setPosition(-1_tr);
     }
 }
 
@@ -425,11 +430,6 @@ void Scorer::InitSendable(wpi::SendableBuilder& builder)
     builder.AddDoubleProperty(
         "Desired Speed: Scorer",
         [this] { return scoringSpeedMap.find(state.elevState)->second.to<double>(); },
-        nullptr
-    );
-    builder.AddBooleanProperty(
-        "isDetectingCANRANGE",
-        [this] { return scorerStagingSensor.isDetected(); },
         nullptr
     );
 }
