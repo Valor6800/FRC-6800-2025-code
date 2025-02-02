@@ -354,7 +354,7 @@ units::turn_t Scorer::convertToMotorSpace(units::meter_t meters)
             if (state.elevState == ELEV_LVL::MANUAL) {
                 elevatorMotor->setPower(state.manualSpeed);
             } else {
-                if(state.scopedState == SCOPED || state.scope){
+                if(state.scopedState == SCOPED || state.tuning){
                     state.targetHeight = posMap[state.gamePiece][state.elevState];
                 } else{
                     if(state.elevState == HP){

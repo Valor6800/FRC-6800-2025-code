@@ -120,5 +120,4 @@ private:
     valor::CANrangeSensor scorerStagingSensor;
 
     std::map<GAME_PIECE, std::map<ELEV_LVL, units::meter_t>> posMap;
-    valor::CurrentSensor currentSensor;
 };
