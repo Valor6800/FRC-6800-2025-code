@@ -324,7 +324,7 @@ void Scorer::assessInputs()
 } 
 
     void Scorer::stageCoral(){
-        scorerMotor->setSpeed(-1_tps);
+        scorerMotor->setSpeed(-1_tps); 
         if(scorerMotor->getCurrent()>18_A){
             scorerMotor->setPosition(units::angle::turn_t{-0.5} + scorerMotor->getPosition());
             state.staged= STAGING_SEQ::DONE_STAGE;
@@ -370,29 +370,35 @@ units::turn_t Scorer::convertToMotorSpace(units::meter_t meters)
         } else {
             elevatorMotor->setPower(-3.0_V);
         }
-if (state.scoringState == SCORING_SPEED::INTAKING) {
-            scorerMotor->setSpeed(INTAKE_SPEED);
-        }
-        else if (state.scoringState == SCORING_SPEED::SCORING) {
-            auto it = scoringSpeedMap.find(state.elevState);
-            if (it != scoringSpeedMap.end()) {
-                scorerMotor->setSpeed(it->second);
-            } else {
-                // Fallback to the default SCORE_SPEED 
-                scorerMotor->setSpeed(SCORE_SPEED);
-            }
-        } 
-        else if(state.staged == STAGING_SEQ::STAGING){
-            std::cout << "Hello World\n\n\n";
-            stageCoral();
-        }
-        else if(state.staged == STAGING_SEQ::DONE_STAGE) {}
 
-        else {
-            scorerMotor->setSpeed(0_tps);
-            std::cout << "zero" << std::endl;
+
+      
+        if (state.scoringState == SCORING_SPEED::INTAKING) {
+    scorerMotor->setSpeed(INTAKE_SPEED);
+} 
+    else if (state.scoringState == SCORING_SPEED::SCORING) {
+        auto it = scoringSpeedMap.find(state.elevState);
+        if (it != scoringSpeedMap.end()) {
+            scorerMotor->setSpeed(it->second);
+        } else {
+            // Fallback to the default SCORE_SPEED
+            scorerMotor->setSpeed(SCORE_SPEED);
         }
-    }   
+    } 
+    else if (state.staged == STAGING_SEQ::STAGING) {
+        std::cout << "Hello World\n\n\n";
+        stageCoral();
+    } 
+    else if (state.staged == STAGING_SEQ::DONE_STAGE) {} 
+    else if (state.elevState == ELEV_LVL::HP) {
+        scorerMotor->setSpeed(INTAKE_SPEED);
+    } 
+    else {
+        scorerMotor->setSpeed(0_tps);
+        std::cout << "zero" << std::endl;
+    }
+
+    }                                                                                              
 
 
 void Scorer::InitSendable(wpi::SendableBuilder& builder)
