@@ -79,6 +79,7 @@ namespace CANIDs {
     constexpr static int CLIMBER_FOLLOW = 54;
     constexpr static int HALL_EFFECT = 46;
     constexpr static int CANDLE = 60;
+    constexpr static int STAGING_LIDAR_SENSOR = 47;
     constexpr static int FRONT_LIDAR_SENSOR = 49;
     constexpr static int CRABB = 56;
 }

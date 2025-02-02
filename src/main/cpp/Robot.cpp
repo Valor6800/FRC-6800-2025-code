@@ -20,7 +20,7 @@
 
 Robot::Robot() :
     drivetrain(this),
-    scorer(this, &drivetrain),
+    scorer(this),
     climber(this),
     valorAuto()
 {

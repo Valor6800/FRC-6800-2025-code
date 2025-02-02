@@ -25,19 +25,18 @@ class Scorer : public valor::BaseSubsystem
 {
 public:
 
-    Scorer(frc::TimedRobot *robot, Drivetrain *drivetrain);
+    Scorer(frc::TimedRobot *robot);
     
     void resetState();
      
     void init();
-    units::meter_t convertToMechSpace(units::turn_t turns);
-    units::turn_t convertToMotorSpace(units::meter_t meters);
     void assessInputs();
     void analyzeDashboard();
     void assignOutputs();
     void InitSendable(wpi::SendableBuilder& builder);
+
     frc2::CommandPtr createScoringSequence();
-    frc2::CommandPtr  elevatorSequence();
+    frc2::CommandPtr createElevatorSequence();
 
     enum SCORING_SPEED
     {
@@ -73,50 +72,42 @@ public:
     {
         SCORING_SPEED scoringState;
         ELEV_LVL elevState;
-        bool sensorTwoTripped;
-        units::meter_t targetHeight;
-        units::volt_t manualSpeed;
-        bool hasZeroed;
         GAME_PIECE gamePiece;
         SCOPED_STATE scopedState;
+
+        units::meter_t targetHeight;
+        units::volt_t manualSpeed;
+    
+        bool hasZeroed;
         bool tuning;
 
     } state;
 
-    std::unordered_map<std::string, ELEV_LVL> elevMap = {
-        {"MANUAL", ELEV_LVL::MANUAL},
-        {"STOW", ELEV_LVL::STOWED},
-        {"HP", ELEV_LVL::HP},      
-        {"ONE", ELEV_LVL::ONE},
-        {"TWO", ELEV_LVL::TWO},
-        {"THREE", ELEV_LVL::THREE},
-        {"FOUR", ELEV_LVL::FOUR}
-    };
- 
-    std::unordered_map<std::string, GAME_PIECE> gamePieceHMap = {
-        {"CORAL", GAME_PIECE::CORAL},
-        {"ALGEE", GAME_PIECE::ALGEE}
-    };
-
     
-std::map<ELEV_LVL, units::turns_per_second_t> scoringSpeedMap = {
-    {ELEV_LVL::ONE, -2_tps},
-    {ELEV_LVL::TWO, -4_tps},
-    {ELEV_LVL::THREE, -6_tps},
-    {ELEV_LVL::FOUR, -8_tps}
-};
+    std::map<ELEV_LVL, units::turns_per_second_t> scoringSpeedMap = {
+        {ELEV_LVL::ONE, -2_tps},
+        {ELEV_LVL::TWO, -4_tps},
+        {ELEV_LVL::THREE, -6_tps},
+        {ELEV_LVL::FOUR, -8_tps}
+    };
 
 private:
     
+    units::meter_t convertToMechSpace(units::turn_t turns);
+    units::turn_t convertToMotorSpace(units::meter_t meters);
 
-    Drivetrain *drivetrain;
     bool hallEffectSensorActive();
+
     valor::DebounceSensor scorerDebounceSensor;
     valor::DebounceSensor hallEffectDebounceSensor;
+
     ctre::phoenix6::hardware::core::CoreCANdi candi;
+
     valor::PhoenixController *elevatorMotor;
     valor::PhoenixController *scorerMotor;
-    valor::GrappleSensor lidarSensor;
-    valor::CANrangeSensor canRangeSensor;
+
+    valor::GrappleSensor frontRangeSensor;
+    valor::CANrangeSensor scorerStagingSensor;
+
     std::map<GAME_PIECE, std::map<ELEV_LVL, units::meter_t>> posMap;
 };

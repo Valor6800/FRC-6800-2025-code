@@ -88,8 +88,7 @@ Drivetrain::Drivetrain(frc::TimedRobot *_robot) :
         Constants::moduleDiff(),
         WHEEL_DIAMETER
     ),
-    teleopStart(999999999999),
-    lidarSensor(_robot, "Front Lidar Sensor", CANIDs::FRONT_LIDAR_SENSOR)
+    teleopStart(999999999999)
 {
     xPIDF.P = KPX;
     xPIDF.I = KIX;
@@ -266,25 +265,15 @@ void Drivetrain::assessInputs()
         state.dir = NONE;
     }
 
-    bool isRed = frc::DriverStation::GetAlliance() == frc::DriverStation::Alliance::kRed ? true : false;
-
     for(valor::AprilTagsSensor* aprilLime : aprilTagSensors) {
         if (state.getTag){
             if (aprilLime->hasTarget()) {
                 if(aprilLime->getTagID() >= 6 && aprilLime->getTagID() <= 11){ 
-                    state.reefTag = aprilLime->getTagID();                     // if (isRed) {
-                }                                                              //     if(aprilLime->getTagID() >= 6 && aprilLime->getTagID() <= 11){
-                //         state.reefTag = aprilLime->getTagID();
-                //     }
-                // }
+                    state.reefTag = aprilLime->getTagID();
+                }
                 if(aprilLime->getTagID()>=17 && aprilLime->getTagID() <= 22){
                     state.reefTag = aprilLime->getTagID();
                 }
-                // if (!isRed) {
-                //     if(aprilLime->getTagID()>=17 && aprilLime->getTagID() <= 22){
-                //         state.reefTag = aprilLime->getTagID();
-                //     }
-                // }
             }
         }
         if (aprilLime->hasTarget() && aprilLime->getTagID() == state.reefTag){
@@ -300,9 +289,6 @@ void Drivetrain::assessInputs()
     }
 
     Swerve::assessInputs();
-    /*for (valor::AprilTagsSensor *aprilCam : aprilTagSensors) {
-        if (aprilCam->hasTarget() && aprilCam->hasTarget());
-    }*/
 }
 
 void Drivetrain::analyzeDashboard()

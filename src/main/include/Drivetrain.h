@@ -162,7 +162,6 @@ private:
      valor::PIDF thetaPIDF;
      
      std::vector<valor::AprilTagsSensor*> aprilTagSensors;
-     valor::GrappleSensor lidarSensor;
 
      units::meter_t visionAcceptanceRadius;
      nt::StructSubscriber<frc::Pose2d> currentPosePathPlanner;
