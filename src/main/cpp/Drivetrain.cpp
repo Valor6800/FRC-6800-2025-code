@@ -12,6 +12,7 @@
 #include "frc2/command/FunctionalCommand.h"
 #include "frc2/command/SequentialCommandGroup.h"
 #include "units/acceleration.h"
+#include "units/base.h"
 #include "units/length.h"
 #include "units/math.h"
 #include "units/velocity.h"
@@ -258,27 +259,32 @@ void Drivetrain::assessInputs()
     state.getTag = false;
     if (driverGamepad->leftTriggerActive() && state.reefTag == -1) {
         state.getTag = true;
+        
     } else if (!driverGamepad->leftTriggerActive()) {
         state.reefTag = -1;
         hasReset = false;
+        potentialTagID.clear();
     }
 
     for(valor::AprilTagsSensor* aprilLime : aprilTagSensors) {
-        if (state.getTag){
-            if (aprilLime->hasTarget()) {
-                if(aprilLime->getTagID() >= 6 && aprilLime->getTagID() <= 11){ 
+        if (state.getTag && aprilLime->hasTarget()) {
+            if(
+                (frc::DriverStation::GetAlliance() == frc::DriverStation::kRed && 
+                aprilLime->getTagID() >= 6 &&
+                aprilLime->getTagID() <= 11) || 
+                (frc::DriverStation::GetAlliance() == frc::DriverStation::kBlue &&
+                aprilLime->getTagID() >= 17 &&
+                aprilLime->getTagID() <= 22)
+            ){ 
+                if (leastSkew.first > units::math::abs(aprilLime->getTargetToBotPose().Rotation().ToRotation2d().RotateBy(frc::Rotation2d(90_deg)).Radians())) {
                     state.reefTag = aprilLime->getTagID();
-                }
-                if(aprilLime->getTagID()>=17 && aprilLime->getTagID() <= 22){
-                    state.reefTag = aprilLime->getTagID();
+                    leastSkew = {aprilLime->getTargetToBotPose().Rotation().Y(), aprilLime->get_botpose_targetspace().X()};
                 }
             }
-        }
-        if (aprilLime->hasTarget() && aprilLime->getTagID() == state.reefTag){
-            Swerve::yDistance = aprilLime->get_botpose_targetspace().X();
-        }
-
+        } 
     }
+
+    Swerve::yDistance = leastSkew.second;
 
     Swerve::alignToTarget = driverGamepad->leftTriggerActive();
     if (driverGamepad->leftTriggerActive() && !hasReset) {

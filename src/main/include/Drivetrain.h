@@ -9,6 +9,7 @@
 #include "Constants.h"
 #include <map>
 #include <string>
+#include <unordered_map>
 #include <vector>
 
 #include "valkyrie/controllers/PhoenixController.h"
@@ -128,6 +129,7 @@ public:
           bool getTag;
           Direction dir;
           bool aligned;
+
      } state;
 
      frc2::FunctionalCommand* getResetOdom();
@@ -167,4 +169,6 @@ private:
      nt::StructSubscriber<frc::Pose2d> currentPosePathPlanner;
      nt::StructSubscriber<frc::Pose2d> targetPosePathPlanner;
      frc::Transform2d poseErrorPP;
+
+    std::unordered_map<int, frc::Translation2d> potentialTagID;
 };
