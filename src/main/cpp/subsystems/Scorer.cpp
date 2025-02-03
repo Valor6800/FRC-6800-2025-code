@@ -206,6 +206,7 @@ void Scorer::resetState()
     state.scopedState = UNSCOPED;
     state.tuning = false;
     state.manualSpeed = 0_V;
+    state.staged = STAGING_SEQ::NOT_STAGE;
 }
 
 bool Scorer::hallEffectSensorActive()
@@ -231,8 +232,8 @@ void Scorer::init()
     elevatorMotor->setupReverseHardwareLimit(CANIDs::HALL_EFFECT, ctre::phoenix6::signals::ReverseLimitTypeValue::NormallyOpen);
 
     valor::PIDF elevatorPID;
-    elevatorPID.maxVelocity = elevatorMotor->getMaxMechSpeed();
-    elevatorPID.maxAcceleration = elevatorMotor->getMaxMechSpeed()/(1.0_s/5);
+    elevatorPID.maxVelocity = 10_tps;
+    elevatorPID.maxAcceleration = 100_tr_per_s_sq;
     elevatorPID.P =ELEV_K_P ;
     elevatorPID.error = ELEV_K_ERROR;
     elevatorPID.aFF = ELEV_K_AFF;
@@ -258,6 +259,11 @@ void Scorer::init()
     hallEffectDebounceSensor.setRisingEdgeCallback([this] {
         state.hasZeroed = true;
     });
+
+    scorerStagingSensor.setMaxDistance(30000_mm);
+    scorerStagingSensor.setThresholdDistance(150_mm);
+    scorerStagingSensor.setRisingEdgeCallback([this] {state.staged = STAGING_SEQ::STAGING;});
+    scorerStagingSensor.setFallingEdgeCallback([this] {state.staged = STAGING_SEQ::NOT_STAGE;});    
 
     posMap[GAME_PIECE::CORAL][ELEV_LVL::STOWED] = units::meter_t(3_in);
     posMap[GAME_PIECE::CORAL][ELEV_LVL::HP] = units::meter_t(5.069_in);
@@ -325,8 +331,8 @@ void Scorer::assessInputs()
 
     void Scorer::stageCoral(){
         scorerMotor->setSpeed(-1_tps); 
-        if(scorerMotor->getCurrent()>18_A){
-            scorerMotor->setPosition(units::angle::turn_t{-0.5} + scorerMotor->getPosition());
+        if(scorerMotor->getCurrent()>14_A){
+            scorerMotor->setPosition(units::angle::turn_t{-1.0} + scorerMotor->getPosition());
             state.staged= STAGING_SEQ::DONE_STAGE;
         }
              
@@ -350,6 +356,7 @@ units::turn_t Scorer::convertToMotorSpace(units::meter_t meters)
 
     void Scorer::assignOutputs()
     {
+        
         if (state.hasZeroed) {
             if (state.elevState == ELEV_LVL::MANUAL) {
                 elevatorMotor->setPower(state.manualSpeed);
