@@ -20,7 +20,7 @@
 #define SCORER_K_P 0.5
 #define SCORER_K_S 0.45
 #define INTAKE_SPEED 5_tps
-#define SCORE_SPEED -11_tps
+#define SCORE_SPEED 11_tps
 
 #define ELEVATOR_FORWARD_LIMIT 5.75_tr
 #define ELEVATOR_OFFSET 3_in
@@ -34,7 +34,7 @@ Scorer::Scorer(frc::TimedRobot *_robot) :
     hallEffectDebounceSensor(_robot, "HallEffectDebounce"),
     candi(CANIDs::HALL_EFFECT, "baseCAN"),
     elevatorMotor(new valor::PhoenixController(valor::PhoenixControllerType::KRAKEN_X60, CANIDs::ELEV_WHEEL, valor::NeutralMode::Brake, true, "baseCAN")),
-    scorerMotor(new valor::PhoenixController(valor::PhoenixControllerType::FALCON_FOC, CANIDs::SCORER_WHEEL, valor::NeutralMode::Brake, false, "baseCAN")),
+    scorerMotor(new valor::PhoenixController(valor::PhoenixControllerType::FALCON_FOC, CANIDs::SCORER_WHEEL, valor::NeutralMode::Brake, true, "baseCAN")),
     frontRangeSensor(_robot, "Front Lidar Sensor", CANIDs::FRONT_LIDAR_SENSOR),
     scorerStagingSensor(_robot, "Scorer Staging Sensor", CANIDs::STAGING_LIDAR_SENSOR, "baseCAN")
 {
@@ -378,7 +378,7 @@ void Scorer::assignOutputs()
     } else {
         // HOLD the coral at a specific position
         // @todo check inversion
-        scorerMotor->setPosition(-1_tr);
+        scorerMotor->setPosition(1_tr);
     }
 }
 
