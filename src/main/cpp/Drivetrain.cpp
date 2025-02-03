@@ -263,6 +263,7 @@ void Drivetrain::assessInputs()
     } else if (!driverGamepad->leftTriggerActive()) {
         state.reefTag = -1;
         hasReset = false;
+        potentialTagID.clear();
     }
 
     units::radian_t leastSkew{90_rad};

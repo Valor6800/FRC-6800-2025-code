@@ -169,4 +169,6 @@ private:
      nt::StructSubscriber<frc::Pose2d> currentPosePathPlanner;
      nt::StructSubscriber<frc::Pose2d> targetPosePathPlanner;
      frc::Transform2d poseErrorPP;
+
+    std::unordered_map<int, frc::Translation2d> potentialTagID;
 };
