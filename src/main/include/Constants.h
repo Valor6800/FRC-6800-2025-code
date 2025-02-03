@@ -190,10 +190,10 @@ namespace Constants {
             case ALPHA_TEAM_NUMBER: return frc::Pose3d(
                 (6_in + 1.5625_in) - 14_in,
                 6.75_in,
-                1.25_in + 1.75_in + 1.5_in + 6_in,
+                1.25_in + 1.75_in + 1.5_in + 6_in + 2_in,
                 frc::Rotation3d(
-                    -2.1_deg,
-                    -1.6_deg,
+                    -3.3_deg,
+                    -1.7_deg,
                     90_deg
                 )
             );
