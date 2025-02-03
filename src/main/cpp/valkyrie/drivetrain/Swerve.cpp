@@ -133,6 +133,7 @@ void Swerve<AzimuthMotor, DriveMotor>::analyzeDashboard()
     // Linear Speed calculations
     xSpeedMPS = units::meters_per_second_t{xSpeed * maxDriveSpeed};
     ySpeedMPS = units::meters_per_second_t{ySpeed * maxDriveSpeed};
+
     if (rot_controller.AtGoal()){
         rotAlignTime = frc::GetTime() - rotAlignTime;
         rotControllerTraveledDistance = units::math::abs(rot_controller.GetGoal().position - rotControllerInitialDistance);
@@ -169,7 +170,7 @@ void Swerve<AzimuthMotor, DriveMotor>::analyzeDashboard()
 
     joystickVector = Eigen::Vector2d{xSpeed, ySpeed};
     double dotProduct = joystickVector.dot(MAKE_VECTOR(targetAngle));
-    joystickVector = dotProduct * MAKE_VECTOR(targetAngle);
+    joystickVector = dotProduct * MAKE_VECTOR(targetAngle + (frc::DriverStation::GetAlliance() == frc::DriverStation::kRed ? 180_deg : 0_deg));
     joystickVector *= maxDriveSpeed.value();
     // joystickVector = Eigen::Vector2d{joystickVector[0], joystickVector[1]};
 
@@ -191,6 +192,7 @@ void Swerve<AzimuthMotor, DriveMotor>::analyzeDashboard()
         yAlignTime = frc::GetTime() - yAlignTime;
         yControllerTraveledDistance = units::math::abs(y_controller.GetGoal().position - yControllerInitialDistance);
     } 
+
     if (alignToTarget){
         if (yAlignTime == 0.0_s) {
             yAlignTime = frc::GetTime();
@@ -741,22 +743,22 @@ void Swerve<AzimuthMotor, DriveMotor>::InitSendable(wpi::SendableBuilder& builde
         [this] {return y_controller.AtGoal();},
         nullptr
     );
-    builder.AddBooleanProperty(
+    builder.AddDoubleProperty(
         "Rot Controller Position Error",
         [this] {return rot_controller.GetPositionError().value();},
         nullptr
     );
-    builder.AddBooleanProperty(
+    builder.AddDoubleProperty(
         "Y Controller Position Error",
         [this] {return y_controller.GetPositionError().value();},
         nullptr
     );
-    builder.AddBooleanProperty(
+    builder.AddDoubleProperty(
         "Rot Controller Velocity Error",
         [this] {return rot_controller.GetVelocityError().value();},
         nullptr
     );
-    builder.AddBooleanProperty(
+    builder.AddDoubleProperty(
         "Y Controller Velocity Error",
         [this] {return y_controller.GetVelocityError().value();},
         nullptr
@@ -779,6 +781,16 @@ void Swerve<AzimuthMotor, DriveMotor>::InitSendable(wpi::SendableBuilder& builde
     builder.AddDoubleProperty(
         "Y Controller Distance Traveled",
         [this] {return yControllerTraveledDistance.value();},
+        nullptr
+    );
+    builder.AddDoubleProperty(
+        "Rot Controller Time",
+        [this] {return rotAlignTime.value();},
+        nullptr
+    );
+    builder.AddDoubleProperty(
+        "Y Controller Time",
+        [this] {return yAlignTime.value();},
         nullptr
     );
 }
