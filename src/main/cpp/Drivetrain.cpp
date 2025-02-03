@@ -247,10 +247,12 @@ void Drivetrain::assessInputs()
     if (!driverGamepad || !driverGamepad->IsConnected() || !operatorGamepad || !operatorGamepad->IsConnected())
         return;
 
-    if(operatorGamepad->GetLeftBumperButton()){
-        state.dir = LEFT;
-    } else if(operatorGamepad->GetRightBumperButton()){
+    if(operatorGamepad->GetRightBumperButton()){
         state.dir = RIGHT;
+    } else if(operatorGamepad->GetLeftBumperButton()){
+        state.dir = LEFT;
+    } else if(operatorGamepad->leftTriggerActive()){
+        state.dir = NONE;
     }
     // state.lockingToReef = driverGamepad->GetAButtonPressed();
     state.getTag = false;
