@@ -3,29 +3,29 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 1.3455000000000001,
-        "y": 6.9597500000000005
+        "x": 1.1895,
+        "y": 1.0902499999999997
       },
       "prevControl": null,
       "nextControl": {
-        "x": 2.3497500000000002,
-        "y": 6.31625
+        "x": 2.34,
+        "y": 1.3925
       },
       "isLocked": false,
-      "linkedName": "HP2"
+      "linkedName": "HP1"
     },
     {
       "anchor": {
-        "x": 3.549,
-        "y": 5.0195
+        "x": 3.6855,
+        "y": 2.9232499999999995
       },
       "prevControl": {
-        "x": 2.457,
-        "y": 5.6240000000000006
+        "x": 3.2955,
+        "y": 2.31875
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "L"
+      "linkedName": "C"
     }
   ],
   "rotationTargets": [],
@@ -33,30 +33,24 @@
   "pointTowardsZones": [],
   "eventMarkers": [
     {
-      "name": "Enable Scorer",
-      "waypointRelativePos": 0,
-      "endWaypointRelativePos": null,
-      "command": null
-    },
-    {
-      "name": "Disable Scorer",
-      "waypointRelativePos": 0.05,
-      "endWaypointRelativePos": null,
-      "command": {
-        "type": "named",
-        "data": {
-          "name": "DISABLE Scorer"
-        }
-      }
-    },
-    {
       "name": "TROUGH POSITION",
-      "waypointRelativePos": 0.7,
+      "waypointRelativePos": 0.65,
       "endWaypointRelativePos": null,
       "command": {
         "type": "named",
         "data": {
           "name": "TROUGH POSITION"
+        }
+      }
+    },
+    {
+      "name": "Enable Scorer",
+      "waypointRelativePos": 0.95,
+      "endWaypointRelativePos": null,
+      "command": {
+        "type": "named",
+        "data": {
+          "name": "Enable Scorer"
         }
       }
     }
@@ -71,13 +65,13 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": -145.0
+    "rotation": 150.0
   },
   "reversed": false,
-  "folder": "C1-4T",
+  "folder": "C6-4T",
   "idealStartingState": {
     "velocity": 0,
-    "rotation": -145.0
+    "rotation": 145.0
   },
   "useDefaultConstraints": true
 }

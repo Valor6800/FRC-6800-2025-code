@@ -3,41 +3,35 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 1.3455000000000001,
-        "y": 6.9597500000000005
+        "x": 3.6855,
+        "y": 2.9232499999999995
       },
       "prevControl": null,
       "nextControl": {
-        "x": 2.3497500000000002,
-        "y": 6.31625
+        "x": 3.12975,
+        "y": 2.114
       },
       "isLocked": false,
-      "linkedName": "HP2"
+      "linkedName": "C"
     },
     {
       "anchor": {
-        "x": 3.549,
-        "y": 5.0195
+        "x": 1.1895,
+        "y": 1.0902499999999997
       },
       "prevControl": {
-        "x": 2.457,
-        "y": 5.6240000000000006
+        "x": 2.09625,
+        "y": 1.353499999999999
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "L"
+      "linkedName": "HP1"
     }
   ],
   "rotationTargets": [],
   "constraintZones": [],
   "pointTowardsZones": [],
   "eventMarkers": [
-    {
-      "name": "Enable Scorer",
-      "waypointRelativePos": 0,
-      "endWaypointRelativePos": null,
-      "command": null
-    },
     {
       "name": "Disable Scorer",
       "waypointRelativePos": 0.05,
@@ -50,15 +44,10 @@
       }
     },
     {
-      "name": "TROUGH POSITION",
-      "waypointRelativePos": 0.7,
+      "name": "HP Position",
+      "waypointRelativePos": 0.65,
       "endWaypointRelativePos": null,
-      "command": {
-        "type": "named",
-        "data": {
-          "name": "TROUGH POSITION"
-        }
-      }
+      "command": null
     }
   ],
   "globalConstraints": {
@@ -71,13 +60,13 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": -145.0
+    "rotation": 145.0
   },
   "reversed": false,
-  "folder": "C1-4T",
+  "folder": "C6-4T",
   "idealStartingState": {
     "velocity": 0,
-    "rotation": -145.0
+    "rotation": 150.0
   },
   "useDefaultConstraints": true
 }

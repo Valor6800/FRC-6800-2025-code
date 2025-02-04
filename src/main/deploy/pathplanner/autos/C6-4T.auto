@@ -1,0 +1,55 @@
+{
+  "version": "2025.0",
+  "command": {
+    "type": "sequential",
+    "data": {
+      "commands": [
+        {
+          "type": "path",
+          "data": {
+            "pathName": "C6-E"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "E-HP"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "HP-D"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "D-HP"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "HP-C"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "C-HP"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "HP-B"
+          }
+        }
+      ]
+    }
+  },
+  "resetOdom": true,
+  "folder": null,
+  "choreoAuto": false
+}
