@@ -204,6 +204,7 @@ void Scorer::resetState()
     state.scopedState = UNSCOPED;
     state.tuning = false;
     state.manualSpeed = 0_V;
+    state.hasPiece = false;
 }
 
 bool Scorer::hallEffectSensorActive()
@@ -260,8 +261,16 @@ void Scorer::init()
     // Beambreak debounce sensor (on scoring mechanism)
     scorerStagingSensor.setRisingEdgeCallback([this] {
         state.scoringState = HOLD;
+        state.hasPiece = true;
         scorerMotor->setSpeed(0_tps);
         scorerMotor->setEncoderPosition(0_tr);
+    });
+
+    scorerStagingSensor.setFallingEdgeCallback([this] {
+        if(state.hasPiece){
+            state.ignoreRisingEdge = true;
+            scorerMotor->setEncoderPosition(0_tr);
+        }        
     });
 
     posMap[GAME_PIECE::CORAL][ELEVATOR_STATE::STOWED] = units::meter_t(3_in);
@@ -321,6 +330,7 @@ void Scorer::assessInputs()
 
     if (driverGamepad->rightTriggerActive()) {
         state.scoringState = SCORE_STATE::SCORING;
+        state.hasPiece = false;
     } else if (driverGamepad->GetRightBumperButton()) {
         state.scoringState = SCORE_STATE::INTAKING;
     } else {
@@ -373,13 +383,25 @@ void Scorer::assignOutputs()
             // Fallback to the default SCORE_SPEED 
             scorerMotor->setSpeed(SCORE_SPEED);
         }
-    } else if (state.scoringState == SCORE_STATE::INTAKING || !scorerStagingSensor.isTriggered()) {
+    } else if (state.scoringState == SCORE_STATE::INTAKING || (!scorerStagingSensor.isTriggered() && !state.ignoreRisingEdge) ) {
         scorerMotor->setSpeed(INTAKE_SPEED);
-    } else {
-        // HOLD the coral at a specific position
-        // @todo check inversion
+    } else if (state.ignoreRisingEdge){
+        scorerMotor->setPosition(-0.5_tr);
+    }else {
         scorerMotor->setPosition(1_tr);
     }
+
+
+//     } else if ((state.scoringState == SCORE_STATE::INTAKING || !scorerStagingSensor.isTriggered()) && !ignoreRisingEdge) {
+//     scorerMotor->setSpeed(INTAKE_SPEED);
+// } else if (ignoreRisingEdge) {
+//     // Move back 1 turn when ignoring rising edge
+//     scorerMotor->setPosition(scorerMotor->getPosition() - 1_tr);
+// } else {
+//     // HOLD the coral at a specific position
+//     scorerMotor->setPosition(1_tr);
+// }
+
 }
 
 

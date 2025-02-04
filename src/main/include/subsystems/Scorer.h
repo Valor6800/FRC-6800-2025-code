@@ -80,7 +80,8 @@ public:
     
         bool hasZeroed;
         bool tuning;
-
+        bool hasPiece;
+        bool ignoreRisingEdge;
     } state;
 
     
