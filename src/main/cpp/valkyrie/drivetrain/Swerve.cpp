@@ -706,4 +706,22 @@ void Swerve<AzimuthMotor, DriveMotor>::InitSendable(wpi::SendableBuilder& builde
         [this] {return yControllerInitialVelocity.value();},
         nullptr
     );
+
+    builder.AddDoubleProperty(
+        "Pigeon Accelerometer X",
+        [this] {return pigeon->GetAccelerationX().GetValueAsDouble();},
+        nullptr
+    );
+
+    builder.AddDoubleProperty(
+        "Pigeon Accelerometer Y",
+        [this] {return pigeon->GetAccelerationY().GetValueAsDouble();},
+        nullptr
+    );
+
+    builder.AddDoubleProperty(
+        "Pigeon Accelerometer Z",
+        [this] {return pigeon->GetAccelerationZ().GetValueAsDouble();},
+        nullptr
+    );
 }
