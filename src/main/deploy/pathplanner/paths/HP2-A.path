@@ -8,8 +8,8 @@
       },
       "prevControl": null,
       "nextControl": {
-        "x": 1.6087499999999997,
-        "y": 4.73675
+        "x": 2.9835000000000003,
+        "y": 6.013999999999999
       },
       "isLocked": false,
       "linkedName": "HP2"
@@ -79,7 +79,7 @@
     "rotation": -90.0
   },
   "reversed": false,
-  "folder": "C1-4T",
+  "folder": "H-R",
   "idealStartingState": {
     "velocity": 0,
     "rotation": -145.0

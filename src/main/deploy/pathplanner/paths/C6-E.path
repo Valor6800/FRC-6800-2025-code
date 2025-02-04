@@ -65,10 +65,10 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": -150.15406805031262
+    "rotation": -150.0
   },
   "reversed": false,
-  "folder": "C6-4T",
+  "folder": "C-R",
   "idealStartingState": {
     "velocity": 0,
     "rotation": 180.0

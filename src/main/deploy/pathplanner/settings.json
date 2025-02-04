@@ -4,10 +4,10 @@
   "holonomicMode": true,
   "pathFolders": [
     "C1-4T",
-    "Cage to Reef",
-    "HP to Reef",
     "C6-4T",
-    "Reef to HP",
+    "C-R",
+    "H-R",
+    "R-H",
     "tests"
   ],
   "autoFolders": [

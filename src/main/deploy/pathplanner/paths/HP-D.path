@@ -21,7 +21,7 @@
       },
       "prevControl": {
         "x": 3.16875,
-        "y": 1.6362499999999998
+        "y": 1.6362499999999995
       },
       "nextControl": null,
       "isLocked": false,
@@ -68,7 +68,7 @@
     "rotation": 150.0
   },
   "reversed": false,
-  "folder": "C6-4T",
+  "folder": "H-R",
   "idealStartingState": {
     "velocity": 0,
     "rotation": 145.0

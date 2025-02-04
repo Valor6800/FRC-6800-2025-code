@@ -79,7 +79,7 @@
     "rotation": 150.0
   },
   "reversed": false,
-  "folder": "C1-4T",
+  "folder": "C-R",
   "idealStartingState": {
     "velocity": 0,
     "rotation": 180.0
