@@ -263,12 +263,12 @@ void Drivetrain::assessInputs()
     } else if (!driverGamepad->leftTriggerActive()) {
         state.reefTag = -1;
         hasReset = false;
-        potentialTagID.clear();
     }
 
-    std::pair<units::radian_t, units::meter_t> leastSkew{90_rad, 0_m};
+    units::radian_t leastSkew{90_rad};
+    Swerve::yDistance = 0_m;
     for(valor::AprilTagsSensor* aprilLime : aprilTagSensors) {
-        if (state.getTag && aprilLime->hasTarget()) {
+        if (aprilLime->hasTarget()) {
             if(
                 (frc::DriverStation::GetAlliance() == frc::DriverStation::kRed && 
                 aprilLime->getTagID() >= 6 &&
@@ -277,15 +277,24 @@ void Drivetrain::assessInputs()
                 aprilLime->getTagID() >= 17 &&
                 aprilLime->getTagID() <= 22)
             ){ 
-                if (leastSkew.first > units::math::abs(aprilLime->getTargetToBotPose().Rotation().ToRotation2d().RotateBy(frc::Rotation2d(90_deg)).Radians())) {
+
+                units::radian_t currSkew = aprilLime->getTargetToBotPose().Rotation().ToRotation2d().RotateBy(frc::Rotation2d(90_deg)).Radians();
+                if (state.getTag) {
+                    std::cout << aprilLime->getName() << " : " << aprilLime->getTagID() << " : " << currSkew.convert<units::degrees>().value() << "\n";
+                }
+                if (state.getTag && leastSkew > currSkew) {
                     state.reefTag = aprilLime->getTagID();
-                    leastSkew = {aprilLime->getTargetToBotPose().Rotation().Y(), aprilLime->get_botpose_targetspace().X()};
+                    leastSkew = aprilLime->getTargetToBotPose().Rotation().Y();
+                }
+                if (state.reefTag == aprilLime->getTagID()) {
+                    Swerve::yDistance = aprilLime->get_botpose_targetspace().X();
                 }
             }
         } 
     }
 
-    Swerve::yDistance = leastSkew.second;
+    if (state.getTag) std::cout << "\n\n";
+
 
     Swerve::alignToTarget = driverGamepad->leftTriggerActive();
     if (driverGamepad->leftTriggerActive() && !hasReset) {
