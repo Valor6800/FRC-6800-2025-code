@@ -263,10 +263,10 @@ void Drivetrain::assessInputs()
     } else if (!driverGamepad->leftTriggerActive()) {
         state.reefTag = -1;
         hasReset = false;
-        potentialTagID.clear();
     }
 
     units::radian_t leastSkew{90_rad};
+    Swerve::yDistance = 0_m;
     for(valor::AprilTagsSensor* aprilLime : aprilTagSensors) {
         if (aprilLime->hasTarget()) {
             if(
@@ -289,6 +289,7 @@ void Drivetrain::assessInputs()
             }
         } 
     }
+
 
     Swerve::alignToTarget = driverGamepad->leftTriggerActive();
     if (driverGamepad->leftTriggerActive() && !hasReset) {
