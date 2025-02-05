@@ -263,10 +263,6 @@ void Drivetrain::assessInputs()
         hasReset = false;
     }
 
-    if(!driverGamepad->leftTriggerActive() && state.aligned) {
-        state.dir = NONE;
-    }
-
     for(valor::AprilTagsSensor* aprilLime : aprilTagSensors) {
         if (state.getTag){
             if (aprilLime->hasTarget()) {
