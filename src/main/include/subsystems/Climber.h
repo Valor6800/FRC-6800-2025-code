@@ -27,6 +27,8 @@ public:
     void analyzeDashboard();
     void assignOutputs();
 
+    units::degree_t toDegrees();
+
     void InitSendable(wpi::SendableBuilder& builder);
 
     enum CLIMB_STATE

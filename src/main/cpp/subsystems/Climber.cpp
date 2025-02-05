@@ -127,6 +127,11 @@ void Climber::assignOutputs()
      }
 }
 
+units::degree_t Climber::toDegrees()
+{
+    return {climbMotors->getPosition()};
+}
+
 
 void Climber::InitSendable(wpi::SendableBuilder& builder)
 {
@@ -140,6 +145,11 @@ void Climber::InitSendable(wpi::SendableBuilder& builder)
     builder.AddDoubleProperty(
         "Cache Size",
         [this] {return state.cacheSize;},
+        nullptr
+    );
+    builder.AddDoubleProperty(
+        "Pos in Degrees",
+        [this] {return toDegrees().to<double>();},
         nullptr
     );
 }
