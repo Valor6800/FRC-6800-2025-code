@@ -278,13 +278,10 @@ void Drivetrain::assessInputs()
                 aprilLime->getTagID() <= 22)
             ){ 
 
-                units::radian_t currSkew = aprilLime->getTargetToBotPose().Rotation().ToRotation2d().RotateBy(frc::Rotation2d(90_deg)).Radians();
-                if (state.getTag) {
-                    std::cout << aprilLime->getName() << " : " << aprilLime->getTagID() << " : " << currSkew.convert<units::degrees>().value() << "\n";
-                }
-                if (state.getTag && leastSkew > currSkew) {
+                units::degree_t currentSkew = aprilLime->getTargetToBotPose().Rotation().Y() + 90_deg;
+                if (state.getTag && leastSkew > units::math::abs(currentSkew)) {
                     state.reefTag = aprilLime->getTagID();
-                    leastSkew = aprilLime->getTargetToBotPose().Rotation().Y();
+                    leastSkew = currentSkew;
                 }
                 if (state.reefTag == aprilLime->getTagID()) {
                     Swerve::yDistance = aprilLime->get_botpose_targetspace().X();
@@ -292,9 +289,6 @@ void Drivetrain::assessInputs()
             }
         } 
     }
-
-    if (state.getTag) std::cout << "\n\n";
-
 
     Swerve::alignToTarget = driverGamepad->leftTriggerActive();
     if (driverGamepad->leftTriggerActive() && !hasReset) {
