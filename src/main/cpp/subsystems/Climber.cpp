@@ -8,8 +8,8 @@
 #include <pathplanner/lib/auto/NamedCommands.h>
 #include <frc/DriverStation.h>
 
-#define FORWARD_LIMIT 0.25_tr
-#define REVERSE_LIMIT -0.20_tr
+#define FORWARD_LIMIT 0.15_tr
+#define REVERSE_LIMIT -0.18_tr
 
 #define CLIMB_MANUAL_SPEED units::angular_velocity::turns_per_second_t (0)
 #define CLIMB_K_P 100
