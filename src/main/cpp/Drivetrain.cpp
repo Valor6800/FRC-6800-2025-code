@@ -290,7 +290,6 @@ void Drivetrain::assessInputs()
         } 
     }
 
-
     Swerve::alignToTarget = driverGamepad->leftTriggerActive();
     if (driverGamepad->leftTriggerActive() && !hasReset) {
         Swerve::resetAlignControllers();
