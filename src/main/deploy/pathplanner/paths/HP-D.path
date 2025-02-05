@@ -33,13 +33,13 @@
   "pointTowardsZones": [],
   "eventMarkers": [
     {
-      "name": "HP Position",
+      "name": "LEVEL TWO POSITION",
       "waypointRelativePos": 0.6,
       "endWaypointRelativePos": null,
       "command": {
         "type": "named",
         "data": {
-          "name": "HP"
+          "name": "LEVEL TWO POSITION"
         }
       }
     },
@@ -71,7 +71,7 @@
   "folder": "H-R",
   "idealStartingState": {
     "velocity": 0,
-    "rotation": -35.0
+    "rotation": 55.0
   },
   "useDefaultConstraints": true
 }

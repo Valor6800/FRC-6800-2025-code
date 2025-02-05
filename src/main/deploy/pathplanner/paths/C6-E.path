@@ -33,13 +33,13 @@
   "pointTowardsZones": [],
   "eventMarkers": [
     {
-      "name": "TROUGH POSITION",
+      "name": "LEVEL TWO POSITION",
       "waypointRelativePos": 0.6,
       "endWaypointRelativePos": null,
       "command": {
         "type": "named",
         "data": {
-          "name": "TROUGH POSITION"
+          "name": "LEVEL TWO POSITION"
         }
       }
     },
