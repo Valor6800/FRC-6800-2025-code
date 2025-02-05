@@ -49,7 +49,6 @@ public:
         CLIMB_STATE climbState;
         CRAB_STATE crabState;
 
-        bool climbed;
         double spikeCurrent;
         double cacheSize;
         units::volt_t manualSpeed;

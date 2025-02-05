@@ -43,7 +43,6 @@ Climber::Climber(frc::TimedRobot *_robot) : valor::BaseSubsystem(_robot, "Climbe
     currentSensor(_robot, "Climber")
 {
     frc2::CommandScheduler::GetInstance().RegisterSubsystem(this);
-    table->PutBoolean("Climbed?", state.climbed);
     init();
 }
 
@@ -56,7 +55,6 @@ void Climber::resetState()
 {
     state.climbState = CLIMB_STATE::MANUAL;
     state.crabState = CRAB_STATE::NO_CRAB;
-    state.climbed = false;
     currentSensor.reset();
 }
 
@@ -133,11 +131,7 @@ void Climber::assignOutputs()
 void Climber::InitSendable(wpi::SendableBuilder& builder)
 {
     builder.SetSmartDashboardType("Subsystem");
-    builder.AddBooleanProperty(
-        "Climbed?",
-        [this]{return state.climbed;},
-        nullptr
-    );
+
     builder.AddDoubleProperty(
         "Spike Current",
         [this] {return state.spikeCurrent;},
