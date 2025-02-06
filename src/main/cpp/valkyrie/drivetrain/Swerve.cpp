@@ -134,10 +134,6 @@ void Swerve<AzimuthMotor, DriveMotor>::analyzeDashboard()
     xSpeedMPS = units::meters_per_second_t{xSpeed * maxDriveSpeed};
     ySpeedMPS = units::meters_per_second_t{ySpeed * maxDriveSpeed};
 
-    if (rot_controller.AtGoal()){
-        rotAlignTime = frc::GetTime() - rotAlignTime;
-        rotControllerTraveledDistance = units::math::abs(rot_controller.GetGoal().position - rotControllerInitialDistance);
-    }
     if (frc::DriverStation::GetAlliance() == frc::DriverStation::kRed) {
         xSpeedMPS *= -1.0;
         ySpeedMPS *= -1.0;
@@ -145,17 +141,12 @@ void Swerve<AzimuthMotor, DriveMotor>::analyzeDashboard()
     // Rotational Speed calculations
     if (alignToTarget) {
         units::radian_t robotRotation = getCalculatedPose().Rotation().Radians();
-        if (rotAlignTime == 0.0_s) {
-            rotAlignTime = frc::GetTime();
-            rotControllerInitialDistance = robotRotation;
-        }
         rot_controller.SetGoal(units::radian_t{targetAngle - rotAlignOffset});
         rot_controller.Calculate(robotRotation);
         rotSpeedRPS = units::radians_per_second_t{rot_controller.Calculate(robotRotation)} + rot_controller.GetSetpoint().velocity;
     } 
     else {
         rotSpeedRPS = rotSpeed * maxRotationSpeed;
-        rotAlignTime = 0.0_s;
     }
 
 
@@ -188,29 +179,16 @@ void Swerve<AzimuthMotor, DriveMotor>::analyzeDashboard()
 
     getSkiddingRatio();
 
-    if (y_controller.AtGoal()){
-        yAlignTime = frc::GetTime() - yAlignTime;
-        yControllerTraveledDistance = units::math::abs(y_controller.GetGoal().position - yControllerInitialDistance);
-    } 
-
     if (alignToTarget){
-        if (yAlignTime == 0.0_s) {
-            yAlignTime = frc::GetTime();
-            yControllerInitialDistance = yDistance;
-        } 
         y_controller.SetGoal(goalAlign);
         calculated_y_controller_val = y_controller.Calculate(yDistance, goalAlign);
         relativeToTagSpeed = units::meters_per_second_t{calculated_y_controller_val} + y_controller.GetSetpoint().velocity;
-
-        yControllerAligned = units::math::abs(y_controller.GetGoal().position - yDistance).value() <= y_controller.GetPositionTolerance();
 
         pidVector = MAKE_VECTOR(targetAngle - rotAlignOffset) * relativeToTagSpeed.value();
         powerVector = joystickVector + pidVector;
         // powerVector *= dotProduct / fabs(dotProduct);
         xSpeedMPS = units::meters_per_second_t{powerVector[0]};
         ySpeedMPS = units::meters_per_second_t{powerVector[1]};
-    } else {
-        yAlignTime = 0.0_s;
     }
 }
 
@@ -761,36 +739,6 @@ void Swerve<AzimuthMotor, DriveMotor>::InitSendable(wpi::SendableBuilder& builde
     builder.AddDoubleProperty(
         "Y Controller Velocity Error",
         [this] {return y_controller.GetVelocityError().value();},
-        nullptr
-    );
-    builder.AddDoubleProperty(
-        "Time for Rot Controller to align over Distance Traveled",
-        [this] {return (rotAlignTime / rotControllerTraveledDistance).value();},
-        nullptr
-    );
-    builder.AddDoubleProperty(
-        "Time for Y Controller to align over Distance Traveled",
-        [this] {return (yAlignTime / yControllerTraveledDistance).value();},
-        nullptr
-    );
-    builder.AddDoubleProperty(
-        "Rot Controller Distance Traveled",
-        [this] {return rotControllerTraveledDistance.value();},
-        nullptr
-    );
-    builder.AddDoubleProperty(
-        "Y Controller Distance Traveled",
-        [this] {return yControllerTraveledDistance.value();},
-        nullptr
-    );
-    builder.AddDoubleProperty(
-        "Rot Controller Time",
-        [this] {return rotAlignTime.value();},
-        nullptr
-    );
-    builder.AddDoubleProperty(
-        "Y Controller Time",
-        [this] {return yAlignTime.value();},
         nullptr
     );
 }

@@ -174,12 +174,6 @@ private:
     units::angle::degree_t rotAlignOffset;
 
     units::meters_per_second_t yControllerInitialVelocity;
-    bool yControllerAligned, rotControllerAligned;
-    units::second_t rotAlignTime, yAlignTime;
-    units::radian_t rotControllerInitialDistance;
-    units::meter_t yControllerInitialDistance;
-    units::radian_t rotControllerTraveledDistance;
-    units::meter_t yControllerTraveledDistance;
 };
 
 }
