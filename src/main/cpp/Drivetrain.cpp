@@ -343,23 +343,24 @@ void Drivetrain::analyzeDashboard()
 
     visionAcceptanceRadius = (units::meter_t) table->GetNumber("Vision Acceptance", VISION_ACCEPTANCE.to<double>());
 
-    for (int i = 0; i < 4; i++) {
+    auto azimuthHealthValues = getAzimuthMagnetHealth();
+    for (int i = 0; i < MODULE_COUNT; i++) {
         int color = 0xAC41FF;
-        switch (getAzimuthMagnetHealth(i).value) {
-            case 1: 
-                color = 0xFF0000;
+        switch (azimuthHealthValues[i]) {
+            case valor::PhoenixController::MagnetHealth::GREEN: 
+                color = valor::CANdleSensor::GREEN;
                 break;
-            case 2:
-                color = 0xFF8C00;
+            case valor::PhoenixController::MagnetHealth::ORANGE:
+                color = valor::CANdleSensor::ORANGE;
                 break;
-            case 3:
-                color = 0x00FF00;
+            case valor::PhoenixController::MagnetHealth::RED:
+                color = valor::CANdleSensor::RED;
                 break;
         }
         leds->setLED(i, color);
     }
     for (int i = 5; i < 8; i++)
-        leds->setLED(i, 0x000000);
+        leds->setLED(i, valor::CANdleSensor::WHITE);
 
     for (valor::AprilTagsSensor* aprilLime : aprilTagSensors) {
         aprilLime->applyVisionMeasurement(
@@ -369,25 +370,6 @@ void Drivetrain::analyzeDashboard()
             doubtX,
             doubtY
         );
-
-        for (int i = 0; i < 4; i++) {
-        int color = 0xAC41FF;
-        switch (azimuthControllers[i]->getMagnetHealth().value) {
-            case 1: 
-                color = 0xFF0000;
-                break;
-            case 2:
-                color = 0xFF8C00;
-                break;
-            case 3:
-                color = 0x00FF00;
-                break;
-        }
-        leds->setLED(i, color);
-        }
-        for (int i = 5; i < 8; i++)
-            leds->setLED(i, 0x000000);
-
     }
 
     if (!driverGamepad || !driverGamepad->IsConnected() || !operatorGamepad || !operatorGamepad->IsConnected())

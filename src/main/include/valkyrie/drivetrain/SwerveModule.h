@@ -8,6 +8,7 @@
 #include <frc/DutyCycleEncoder.h>
 #include <units/voltage.h>
 #include <ctre/phoenix6/CANcoder.hpp>
+#include "valkyrie/controllers/PhoenixController.h"
 
 #include <wpi/sendable/Sendable.h>
 #include <wpi/sendable/SendableBuilder.h>
@@ -39,8 +40,8 @@ public:
     );
 
     frc::Rotation2d getAzimuthPosition();
-
-    ctre::phoenix6::signals::MagnetHealthValue getAzimuthMagnetHealth();
+    
+    PhoenixController::MagnetHealth getAzimuthMagnetHealth();
 
     units::meter_t getDrivePosition();
 

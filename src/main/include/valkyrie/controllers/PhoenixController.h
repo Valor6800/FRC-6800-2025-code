@@ -93,8 +93,22 @@ public:
     units::turn_t getCANCoder() override;
 
     float getBusUtil(const char* canBusName);
-    ctre::phoenix6::signals::MagnetHealthValue getMagnetHealth();
+
+    enum MagnetHealth
+    {
+        RED,
+        ORANGE,
+        GREEN
+    };
+
+    struct x
+    {
+        MagnetHealth magnetHealth;
+
+    } state;
     
+    MagnetHealth getMagnetHealth();
+
     void setOpenLoopRamp(units::second_t time, bool saveImmediately = false) override;
 
     units::frequency::hertz_t getPositionUpdateFrequency();

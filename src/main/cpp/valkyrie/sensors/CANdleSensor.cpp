@@ -86,7 +86,7 @@ void CANdleSensor::setLED(uint led, int color) {
 void CANdleSensor::setColor(int segment, RGBColor rgb)
 {
     segment++;
-    if (segment >= segmentMap.size()) return;
+    if (segment >= static_cast<int>(segmentMap.size())) return;
     segmentMap[segment].recentlyChanged = true;
     segmentMap[segment].currentColor = rgb;
 }
@@ -110,7 +110,7 @@ void CANdleSensor::setAnimation(AnimationType animation, RGBColor color, double 
 void CANdleSensor::setAnimation(int segment, AnimationType animation,RGBColor color, double speed)
 {
     segment++;
-    if (segment >= segmentMap.size()) return;
+    if (segment >=  static_cast<int>(segmentMap.size())) return;
     clearAnimation(segment);
     setAnimation(&segmentMap[segment], animation, color, speed);
 }
@@ -220,7 +220,7 @@ void CANdleSensor::setAnimation(CANdleSensor::SegmentSettings *segment, Animatio
 void CANdleSensor::clearAnimation(int segment)
 {
     segment++;
-    if (segment >= segmentMap.size()) return;
+    if (segment >=  static_cast<int>(segmentMap.size())) return;
     if (segmentMap[segment].activeAnimation != nullptr) {
         candle.ClearAnimation(0);
         delete segmentMap[segment].activeAnimation;
@@ -235,13 +235,13 @@ void CANdleSensor::clearAnimation()
 
 CANdleSensor::AnimationType CANdleSensor::getActiveAnimationType(int segment) {
     segment++;
-    if (segment >= segmentMap.size()) segment = 0;
+    if (segment >= static_cast<int>(segmentMap.size())) segment = 0;
     return segmentMap[segment].activeAnimationType;
 }
 
 CANdleSensor::RGBColor CANdleSensor::getColor(int segment) {
     segment++;
-    if (segment >= segmentMap.size()) segment = 0;
+    if (segment >= static_cast<int>(segmentMap.size())) segment = 0;
     return segmentMap[segment].currentColor;
 }
 
