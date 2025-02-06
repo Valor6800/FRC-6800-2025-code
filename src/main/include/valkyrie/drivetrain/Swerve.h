@@ -54,7 +54,7 @@ public:
     frc::Pose2d getRawPose();
     frc::Pose2d getCalculatedPose();
 
-    ctre::phoenix6::signals::MagnetHealthValue getAzimuthMagnetHealth(int index);
+    wpi::array<valor::PhoenixController::MagnetHealth, MODULE_COUNT> getAzimuthMagnetHealth();
 
     void setupGyro(int, const char*, units::degree_t, units::degree_t, units::degree_t);
     void resetGyro();

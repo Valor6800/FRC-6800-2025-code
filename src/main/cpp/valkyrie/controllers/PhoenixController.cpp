@@ -355,9 +355,20 @@ float PhoenixController::getBusUtil(const char* canBusName)
     return 0;
 }
 
-ctre::phoenix6::signals::MagnetHealthValue PhoenixController::getMagnetHealth()
+PhoenixController::MagnetHealth PhoenixController::getMagnetHealth()
 {
-    return cancoder->GetMagnetHealth().GetValue();
+    switch (cancoder->GetMagnetHealth().GetValue().value) {
+        case 1:
+            state.magnetHealth = valor::PhoenixController::MagnetHealth::RED;
+            break;
+        case 2:
+            state.magnetHealth = valor::PhoenixController::MagnetHealth::ORANGE;
+            break;
+        case 3:
+            state.magnetHealth = valor::PhoenixController::MagnetHealth::GREEN;
+            break;
+    };
+    return state.magnetHealth;
 }
 
 void PhoenixController::InitSendable(wpi::SendableBuilder& builder)

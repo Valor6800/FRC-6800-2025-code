@@ -160,7 +160,7 @@ public:
 private:
      bool aprilTagOnReef(int id);
 
-      bool hasReset;
+     bool hasReset;
 
      std::vector<std::pair<SwerveAzimuthMotor*, SwerveDriveMotor*>> generateModules();
      std::vector<SwerveAzimuthMotor *> azimuthControllers;
