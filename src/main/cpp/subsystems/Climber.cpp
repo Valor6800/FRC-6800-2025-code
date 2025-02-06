@@ -43,56 +43,7 @@ Climber::Climber(frc::TimedRobot *_robot) : valor::BaseSubsystem(_robot, "Climbe
 {
     frc2::CommandScheduler::GetInstance().RegisterSubsystem(this);
     init();
-    pathplanner::NamedCommands::registerCommand("Stow climber", std::move(
-        frc2::SequentialCommandGroup(
-            frc2::InstantCommand(
-                [this]() {
-                    
-                    state.climbState = CLIMB_STATE::STOW;
-                }
-            )
-        )
-    ).ToPtr());
-    pathplanner::NamedCommands::registerCommand("Deploy climber", std::move(
-        frc2::SequentialCommandGroup(
-            frc2::InstantCommand(
-                [this]() {
-                    
-                    state.climbState = CLIMB_STATE::DEPLOYED;
-                }
-            )
-        )
-    ).ToPtr());
-    pathplanner::NamedCommands::registerCommand("Retract climber", std::move(
-        frc2::SequentialCommandGroup(
-            frc2::InstantCommand(
-                [this]() {
-                    
-                    state.climbState = CLIMB_STATE::RETRACTED;
-                }
-            )
-        )
-    ).ToPtr());
-    pathplanner::NamedCommands::registerCommand("Enable crab", std::move(
-        frc2::SequentialCommandGroup(
-            frc2::InstantCommand(
-                [this]() {
-                    
-                    state.crabState = CRAB_STATE::CRABBING;
-                }
-            )
-        )
-    ).ToPtr());
-    pathplanner::NamedCommands::registerCommand("Disable crab", std::move(
-        frc2::SequentialCommandGroup(
-            frc2::InstantCommand(
-                [this]() {
-                    
-                    state.crabState = CRAB_STATE::NO_CRAB;
-                }
-            )
-        )
-    ).ToPtr());
+    
 }
 
 Climber::~Climber()
