@@ -8,9 +8,12 @@
 #include <string>
 #include "Constants.h"
 #include "Eigen/Core"
+#include "frc/geometry/Pose2d.h"
 #include "frc2/command/Commands.h"
 #include "frc2/command/FunctionalCommand.h"
 #include "frc2/command/SequentialCommandGroup.h"
+#include "networktables/NetworkTableInstance.h"
+#include "networktables/StructTopic.h"
 #include "units/acceleration.h"
 #include "units/base.h"
 #include "units/length.h"
@@ -279,10 +282,12 @@ void Drivetrain::assessInputs()
             ){ 
 
                 units::degree_t currentSkew = aprilLime->getTargetToBotPose().Rotation().Y() + 90_deg;
+
                 if (state.getTag && leastSkew > units::math::abs(currentSkew)) {
                     state.reefTag = aprilLime->getTagID();
                     leastSkew = currentSkew;
                 }
+
                 if (state.reefTag == aprilLime->getTagID()) {
                     Swerve::yDistance = aprilLime->get_botpose_targetspace().X();
                 }
@@ -471,7 +476,7 @@ void Drivetrain::choosePoleDirection(Drivetrain::Direction dir){
             Swerve::goalAlign = -units::math::abs(POLE_OFFSET);
             break;
         case RIGHT:
-            Swerve::goalAlign = units::math::abs(POLE_OFFSET);
+            Swerve::goalAlign = units::math::abs(POLE_OFFSET) + 1.125_in;
             break;
         default:
             Swerve::goalAlign = 0_m;
@@ -551,6 +556,7 @@ void Drivetrain::InitSendable(wpi::SendableBuilder& builder)
             },
             nullptr
         );
+    
         builder.AddDoubleArrayProperty(
             "Pose Error PP",
             [this] {

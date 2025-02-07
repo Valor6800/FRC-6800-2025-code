@@ -378,7 +378,7 @@ void Scorer::assignOutputs()
     } else {
         // HOLD the coral at a specific position
         // @todo check inversion
-        scorerMotor->setPosition(1_tr);
+        scorerMotor->setPosition(1.37_tr);
     }
 }
 

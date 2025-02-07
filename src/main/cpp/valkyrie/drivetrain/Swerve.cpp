@@ -133,30 +133,13 @@ void Swerve<AzimuthMotor, DriveMotor>::analyzeDashboard()
     // Linear Speed calculations
     xSpeedMPS = units::meters_per_second_t{xSpeed * maxDriveSpeed};
     ySpeedMPS = units::meters_per_second_t{ySpeed * maxDriveSpeed};
+    
+    // Rotational Speed calculations
+    rotSpeedRPS = rotSpeed * maxRotationSpeed;
 
     if (frc::DriverStation::GetAlliance() == frc::DriverStation::kRed) {
         xSpeedMPS *= -1.0;
         ySpeedMPS *= -1.0;
-    }
-    // Rotational Speed calculations
-    if (alignToTarget) {
-        units::radian_t robotRotation = getCalculatedPose().Rotation().Radians();
-        rot_controller.SetGoal(units::radian_t{targetAngle - rotAlignOffset});
-        rot_controller.Calculate(robotRotation);
-        rotSpeedRPS = units::radians_per_second_t{rot_controller.Calculate(robotRotation)} + rot_controller.GetSetpoint().velocity;
-    } 
-    else {
-        rotSpeedRPS = rotSpeed * maxRotationSpeed;
-    }
-
-
-    units::meters_per_second_t moduleSpeedsRotation = units::meters_per_second_t{rotSpeedRPS.to<double>() * Constants::driveBaseRadius().to<double>()};
-    units::meters_per_second_t moduleSpeedsTranslation = units::meters_per_second_t{sqrtf(powf(xSpeedMPS.to<double>(), 2) + powf(ySpeedMPS.to<double>(), 2))};
-    
-    if (moduleSpeedsTranslation + moduleSpeedsRotation > maxDriveSpeed) {
-        units::meters_per_second_t adjustedModuleSpeedsTranslation = std::max(maxDriveSpeed - moduleSpeedsRotation, 0_mps);
-        xSpeedMPS *= adjustedModuleSpeedsTranslation / moduleSpeedsTranslation;
-        ySpeedMPS *= adjustedModuleSpeedsTranslation / moduleSpeedsTranslation;
     }
 
     joystickVector = Eigen::Vector2d{xSpeed, ySpeed};
@@ -177,9 +160,13 @@ void Swerve<AzimuthMotor, DriveMotor>::analyzeDashboard()
     
     yControllerInitialVelocity = units::meters_per_second_t{currVelocitiesFieldSpace.dot(MAKE_VECTOR(targetAngle - rotAlignOffset))};
 
-    getSkiddingRatio();
-
     if (alignToTarget){
+        units::radian_t robotRotation = getCalculatedPose().Rotation().Radians();
+
+        rot_controller.SetGoal(targetAngle - rotAlignOffset);
+        rot_controller.Calculate(robotRotation);
+        rotSpeedRPS = units::radians_per_second_t{rot_controller.Calculate(robotRotation)} + rot_controller.GetSetpoint().velocity;
+
         y_controller.SetGoal(goalAlign);
         calculated_y_controller_val = y_controller.Calculate(yDistance, goalAlign);
         relativeToTagSpeed = units::meters_per_second_t{calculated_y_controller_val} + y_controller.GetSetpoint().velocity;
@@ -190,6 +177,18 @@ void Swerve<AzimuthMotor, DriveMotor>::analyzeDashboard()
         xSpeedMPS = units::meters_per_second_t{powerVector[0]};
         ySpeedMPS = units::meters_per_second_t{powerVector[1]};
     }
+
+    units::meters_per_second_t moduleSpeedsRotation = units::meters_per_second_t{rotSpeedRPS.to<double>() * Constants::driveBaseRadius().to<double>()};
+    units::meters_per_second_t moduleSpeedsTranslation = units::meters_per_second_t{sqrtf(powf(xSpeedMPS.to<double>(), 2) + powf(ySpeedMPS.to<double>(), 2))};
+    
+    if (moduleSpeedsTranslation + moduleSpeedsRotation > maxDriveSpeed) {
+        units::meters_per_second_t adjustedModuleSpeedsTranslation = std::max(maxDriveSpeed - moduleSpeedsRotation, 0_mps);
+        xSpeedMPS *= adjustedModuleSpeedsTranslation / moduleSpeedsTranslation;
+        ySpeedMPS *= adjustedModuleSpeedsTranslation / moduleSpeedsTranslation;
+    }
+
+
+    getSkiddingRatio();
 }
 
 template<class AzimuthMotor, class DriveMotor>
