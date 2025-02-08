@@ -3,25 +3,25 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 3.6855,
-        "y": 2.9232499999999995
+        "x": 3.752151639344262,
+        "y": 3.083965163934426
       },
       "prevControl": null,
       "nextControl": {
-        "x": 3.12975,
-        "y": 2.114
+        "x": 3.196401639344262,
+        "y": 2.2747151639344265
       },
       "isLocked": false,
       "linkedName": "C"
     },
     {
       "anchor": {
-        "x": 1.1895,
-        "y": 1.0902499999999997
+        "x": 1.1867827868852459,
+        "y": 0.7943135245901636
       },
       "prevControl": {
-        "x": 2.09625,
-        "y": 1.353499999999999
+        "x": 2.0935327868852456,
+        "y": 1.057563524590163
       },
       "nextControl": null,
       "isLocked": false,
@@ -47,7 +47,12 @@
       "name": "HP Position",
       "waypointRelativePos": 0.65,
       "endWaypointRelativePos": null,
-      "command": null
+      "command": {
+        "type": "named",
+        "data": {
+          "name": "HP"
+        }
+      }
     }
   ],
   "globalConstraints": {
@@ -60,7 +65,7 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 55.0
+    "rotation": -35.0
   },
   "reversed": false,
   "folder": "R-H",

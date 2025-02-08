@@ -3,25 +3,25 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 4.9725,
-        "y": 2.80625
+        "x": 4.938934426229508,
+        "y": 2.916137295081967
       },
       "prevControl": null,
       "nextControl": {
-        "x": 3.6660000000000004,
-        "y": 2.075
+        "x": 3.6324344262295085,
+        "y": 2.184887295081967
       },
       "isLocked": false,
       "linkedName": "E"
     },
     {
       "anchor": {
-        "x": 1.1895,
-        "y": 1.0902499999999997
+        "x": 1.1867827868852459,
+        "y": 0.7943135245901636
       },
       "prevControl": {
-        "x": 2.09625,
-        "y": 1.694749999999999
+        "x": 2.0935327868852456,
+        "y": 1.398813524590163
       },
       "nextControl": null,
       "isLocked": false,
@@ -34,7 +34,7 @@
   "eventMarkers": [
     {
       "name": "DISABLE Scorer",
-      "waypointRelativePos": 0.05,
+      "waypointRelativePos": 0.2,
       "endWaypointRelativePos": null,
       "command": {
         "type": "named",
@@ -65,7 +65,7 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 55.0
+    "rotation": -35.0
   },
   "reversed": false,
   "folder": "R-H",

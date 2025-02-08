@@ -16,12 +16,12 @@
     },
     {
       "anchor": {
-        "x": 4.9725,
-        "y": 2.80625
+        "x": 4.938934426229508,
+        "y": 2.916137295081967
       },
       "prevControl": {
-        "x": 5.31375,
-        "y": 1.2462499999999999
+        "x": 5.280184426229508,
+        "y": 1.3561372950819668
       },
       "nextControl": null,
       "isLocked": false,
@@ -45,7 +45,7 @@
     },
     {
       "name": "Enable Scorer",
-      "waypointRelativePos": 0.95,
+      "waypointRelativePos": 0.97,
       "endWaypointRelativePos": null,
       "command": {
         "type": "named",
