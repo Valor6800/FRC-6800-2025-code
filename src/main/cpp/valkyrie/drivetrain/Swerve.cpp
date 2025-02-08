@@ -363,6 +363,8 @@ template<class AzimuthMotor, class DriveMotor>
 void Swerve<AzimuthMotor, DriveMotor>::resetState()
 {
     resetOdometry(frc::Pose2d{0_m, 0_m, 0_rad});
+    meritCamera = 1.0;
+    meritEncoder = 1.0;
     rotTest = false;
     strLineTest = false;
 }
@@ -372,6 +374,9 @@ void Swerve<AzimuthMotor, DriveMotor>::resetOdometry(frc::Pose2d pose)
 {
     rawEstimator->ResetPosition(getGyro(), getModuleStates(), pose);
     calcEstimator->ResetPosition(getGyro(), getModuleStates(), pose);
+    encoderPose = pose;
+    cameraPose = pose;
+    mergedPose = pose;
 }
 
 template<class AzimuthMotor, class DriveMotor>
@@ -404,26 +409,41 @@ void Swerve<AzimuthMotor, DriveMotor>::resetAlignControllers() {
 template<class AzimuthMotor, class DriveMotor>
 void  Swerve<AzimuthMotor, DriveMotor>::calculateCarpetPose()
 {
-    static frc::Pose2d previousPose;
-    frc::Pose2d newPose = calcEstimator->GetEstimatedPosition();
-    units::meter_t deltaX = newPose.X() - previousPose.X();
+    static frc::Pose2d previousPoseCalc;
+    static frc::Pose2d previousPoseRaw;
+    frc::Pose2d newPoseCalc = calcEstimator->GetEstimatedPosition();
+    frc::Pose2d newPoseRaw = rawEstimator->GetEstimatedPosition();
+    units::meter_t deltaXCalc = newPoseCalc.X() - previousPoseCalc.X();
+    units::meter_t deltaXRaw = newPoseRaw.X() - previousPoseRaw.X();
     double factor = 1.0;
     if (roughTowardsRed) {
-        factor = deltaX < 0_m ? carpetGrainMultiplier : 1;
+        factor = deltaXCalc < 0_m ? carpetGrainMultiplier : 1;
+        factor = deltaXRaw < 0_m ? carpetGrainMultiplier : 1;
     } else {
-        factor = deltaX > 0_m ? carpetGrainMultiplier : 1;
+        factor = deltaXCalc > 0_m ? carpetGrainMultiplier : 1;
+        factor = deltaXRaw > 0_m ? carpetGrainMultiplier : 1;
     }
     
     calcEstimator->AddVisionMeasurement(
         frc::Pose2d{
-            factor * deltaX + previousPose.X(),
-            newPose.Y(),
-            newPose.Rotation()
+            factor * deltaXCalc + previousPoseCalc.X(),
+            newPoseCalc.Y(),
+            newPoseCalc.Rotation()
         },
         frc::Timer::GetFPGATimestamp(),
         {0.1, 0.1, 0.1}
     );
-    previousPose = calcEstimator->GetEstimatedPosition();
+    rawEstimator->AddVisionMeasurement(
+        frc::Pose2d{
+            factor * deltaXRaw + previousPoseRaw.X(),
+            newPoseRaw.Y(),
+            newPoseRaw.Rotation()
+        },
+        frc::Timer::GetFPGATimestamp(),
+        {0.1, 0.1, 0.1}
+    );
+    previousPoseCalc = calcEstimator->GetEstimatedPosition();
+    previousPoseRaw = rawEstimator->GetEstimatedPosition();
 }
 
 template<class AzimuthMotor, class DriveMotor>

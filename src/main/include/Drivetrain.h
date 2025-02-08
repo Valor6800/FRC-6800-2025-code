@@ -146,6 +146,10 @@ public:
 
      units::meters_per_second_t getRobotSpeeds();
 
+     frc::Pose2d getPoseFromCameras();
+
+     void determineEncoderMerit();
+
      // void setDriveMotorNeutralMode(valor::NeutralMode mode);
 
      // alings the robot using tags
