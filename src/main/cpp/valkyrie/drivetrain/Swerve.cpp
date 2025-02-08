@@ -241,6 +241,35 @@ void Swerve<AzimuthMotor, DriveMotor>::driveRobotRelative(frc::ChassisSpeeds spe
 }
 
 template<class AzimuthMotor, class DriveMotor>
+void Swerve<AzimuthMotor, DriveMotor>::updateAngularAcceleration() {
+    if (!pigeon) return;
+
+    // Get current angular velocity (yaw rate)
+    units::angular_velocity::radians_per_second_t currentYawRate = pigeon->GetAngularVelocityZWorld().GetValue();
+
+    // Compute angular acceleration (Δw/Δt)
+    angularAcceleration = (currentYawRate - lastYawRate) / LOOP_TIME;
+    lastYawRate = currentYawRate;
+
+    // Store in rolling buffer
+    yawRateBuffer.push_back(angularAcceleration);
+    if (yawRateBuffer.size() > ACCEL_BUFFER_SIZE) {
+        yawRateBuffer.pop_front();
+    } 
+}
+
+template<class AzimuthMotor, class DriveMotor>
+units::angular_acceleration::radians_per_second_squared_t Swerve<AzimuthMotor, DriveMotor>::getSmoothedAngularAcceleration() {
+    if (yawRateBuffer.empty()) return 0_rad_per_s_sq;
+
+    units::angular_acceleration::radians_per_second_squared_t sum = 0_rad_per_s_sq;
+    for (const auto &accel : yawRateBuffer) {
+        sum += accel;
+    }
+    return sum / yawRateBuffer.size();
+}
+
+template<class AzimuthMotor, class DriveMotor>
 frc::ChassisSpeeds Swerve<AzimuthMotor, DriveMotor>::getRobotRelativeSpeeds(){
     wpi::array<frc::SwerveModuleState, 4> moduleStates = {
         swerveModules[0]->getState(),
@@ -742,6 +771,11 @@ void Swerve<AzimuthMotor, DriveMotor>::InitSendable(wpi::SendableBuilder& builde
         [this] {return y_controller.GetVelocityError().value();},
         nullptr
     );
+    builder.AddDoubleProperty(
+    "Smoothed Angular Acceleration (rad/s^2)",
+    [this] { return getSmoothedAngularAcceleration().value(); },
+    nullptr
+);
     builder.AddDoubleProperty(
         "Y Controller Error",
         [this] {return y_controller.GetPositionError().to<double>();},
