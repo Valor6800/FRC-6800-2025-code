@@ -272,8 +272,8 @@ void Scorer::init()
     posMap[GAME_PIECE::CORAL][ELEVATOR_STATE::FOUR] = units::meter_t(5_in);
 
     posMap[GAME_PIECE::ALGEE][ELEVATOR_STATE::ONE] = units::meter_t(5_in);
-    posMap[GAME_PIECE::ALGEE][ELEVATOR_STATE::TWO] = units::meter_t(5_in);
-    posMap[GAME_PIECE::ALGEE][ELEVATOR_STATE::THREE] = units::meter_t(5_in);
+    posMap[GAME_PIECE::ALGEE][ELEVATOR_STATE::TWO] = units::meter_t(13.2_in);
+    posMap[GAME_PIECE::ALGEE][ELEVATOR_STATE::THREE] = units::meter_t(23.31_in);
     posMap[GAME_PIECE::ALGEE][ELEVATOR_STATE::FOUR] = units::meter_t(5_in);
     
     resetState();
