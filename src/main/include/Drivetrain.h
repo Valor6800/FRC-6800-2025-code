@@ -5,6 +5,7 @@
 #include "frc/geometry/Pose3d.h" 
 #include "units/acceleration.h"
 #include "units/angular_velocity.h"
+#include "units/angle.h"
 #include "units/length.h"
 #include "units/time.h"
 #include "valkyrie/sensors/AprilTagsSensor.h"
@@ -140,6 +141,7 @@ public:
           bool right;
           bool left;
           bool alignToTarget, climberAlign;
+          bool alignControllersReset;
 
           Constants::Scorer::GAME_PIECE gamePiece;
           Constants::Scorer::ELEVATOR_STATE elevState;
@@ -184,6 +186,7 @@ public:
      units::degrees_per_second_t getYawVelocity();
 
      std::bitset<5> getAutoDunkAcceptance();
+     void worldFrameAlignment(frc::Pose2d reefTagPose);
 
 private:
 
@@ -204,7 +207,8 @@ private:
      units::meter_t visionAcceptanceRadius;
      nt::StructSubscriber<frc::Pose2d> currentPosePathPlanner;
      nt::StructSubscriber<frc::Pose2d> targetPosePathPlanner;
-     nt::StructPublisher<frc::Transform2d> robotPublisher;
+     nt::StructPublisher<frc::Pose2d> reefPublisher;
+     nt::StructPublisher<frc::Pose2d> robotPublisher;
      nt::StructPublisher<frc::Transform2d> robotInTagSpacePublisher;
      frc::Transform2d poseErrorPP;
      frc::LinearFilter<double> filter = frc::LinearFilter<double>::MovingAverage(10);

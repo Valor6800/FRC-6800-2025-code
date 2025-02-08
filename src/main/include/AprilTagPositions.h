@@ -3,9 +3,11 @@
 #include "frc/geometry/Pose2d.h"
 #include "frc/geometry/Pose3d.h"
 #include "frc/geometry/Transform3d.h"
+#include "frc/geometry/Translation3d.h"
+#include "gcem_incl/abs.hpp"
+#include <algorithm>
 #include <unordered_map>
 
-// aprilTagPositions is the tag position expressed in world space
 #include "frc/geometry/Translation3d.h"
 #include "gcem_incl/abs.hpp"
 #include <algorithm>

@@ -12,6 +12,7 @@
 #include "networktables/NetworkTableInstance.h"
 #include "networktables/NetworkTableEntry.h"
 #include "networktables/NetworkTableInstance.h"
+#include "Constants.h"
 
 namespace valor
 {
@@ -32,7 +33,8 @@ namespace valor
             units::meter_t normalVisionOutlier = 2.2_m;
             void applyVisionMeasurement(
                 frc::SwerveDrivePoseEstimator<4> *estimator,
-                bool accept = true
+                units::velocity::meters_per_second_t speed,
+                double doubtX = 1, double doubtY = 1, double doubtRot = 1
             );
 
             void applyVisionMeasurement(

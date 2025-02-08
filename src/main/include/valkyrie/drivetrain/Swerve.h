@@ -111,8 +111,6 @@ public:
     bool xAlign = false;
     bool dumbAutoAlign = false;
 
-    bool xAlign = false;
-
     void InitSendable(wpi::SendableBuilder& builder) override;
 
     units::meters_per_second_t yControllerInitialVelocity;

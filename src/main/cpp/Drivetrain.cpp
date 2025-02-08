@@ -9,6 +9,7 @@
 #include <pathplanner/lib/auto/AutoBuilder.h>
 #include <string>
 #include "Constants.h"
+#include "frc/geometry/Pose2d.h"
 #include "frc2/command/FunctionalCommand.h"
 #include "units/acceleration.h"
 #include "units/angular_velocity.h"
@@ -95,7 +96,8 @@ const units::meter_t WHEEL_DIAMETER(0.0973_m);
 #define RED_REEF_11_ANGLE -120_deg + 180_deg
 
 #define POLE_OFFSET 6.758_in
-#define SCORER_TO_ROBOT 0.5_in
+#define RIGHT_TO_ROBOT 0.5_in
+#define LEFT_TO_ROBOT -1.0_in
 
 #define AA_LEFT_OFFSET 0.0_in // 0.5_in
 #define AA_RIGHT_OFFSET 0.0_in // 1.5_in
@@ -151,6 +153,9 @@ Drivetrain::Drivetrain(frc::TimedRobot *_robot, valor::CANdleSensor* _leds) :
     leftDistanceSensor.setMaxDistance(2_m);
     rightdistanceSensor.setMaxDistance(2_m);
 
+    table->PutNumber("LEFT ALIGN OFFSET (in)", LEFT_TO_ROBOT.value());
+    table->PutNumber("RIGHT ALIGN OFFSET (in)", RIGHT_TO_ROBOT.value());
+
     Swerve::Y_KP = Y_ALIGN_KP;
     Swerve::Y_KI = Y_ALIGN_KI;
     Swerve::Y_KD = Y_ALIGN_KD;
@@ -176,6 +181,8 @@ Drivetrain::Drivetrain(frc::TimedRobot *_robot, valor::CANdleSensor* _leds) :
     table->PutNumber("Vision Acceptance", VISION_ACCEPTANCE.to<double>() );
     table->PutNumber("KPLIMELIGHT", KP_LIMELIGHT);
     table->PutBoolean("Accepting Vision Measurements", true);
+    table->PutBoolean("USE AUTO-ALIGN", true);
+    table->PutBoolean("Use World Align", false);
 
     table->PutBoolean("Align Right", false);
     table->PutBoolean("Align Left", false);
@@ -238,6 +245,7 @@ Drivetrain::Drivetrain(frc::TimedRobot *_robot, valor::CANdleSensor* _leds) :
     reefPublisher = nt::NetworkTableInstance::GetDefault().GetStructTopic<frc::Pose2d>("Reef Pose").Publish();
 
     doubtRot = 1;
+    robotPublisher = nt::NetworkTableInstance::GetDefault().GetStructTopic<frc::Pose2d>("Robot Pose").Publish();
     robotInTagSpacePublisher = nt::NetworkTableInstance::GetDefault().GetStructTopic<frc::Transform2d>("Robot In Tag Space Transform").Publish();
 
     resetState();
@@ -323,7 +331,7 @@ void Drivetrain::assessInputs()
     } else if(driverGamepad->leftTriggerActive()){
         state.dir = LEFT;
     }
-    // state.lockingToReef = driverGamepad->GetAButtonPressed();
+
     state.getTag = false;
     if ((driverGamepad->leftTriggerActive() || driverGamepad->rightTriggerActive()) && state.reefTag == -1 && !state.intaking) {
         state.getTag = true;
@@ -356,38 +364,6 @@ void Drivetrain::analyzeDashboard()
         }
     }
 
-
-    poseErrorPP = currentPosePathPlanner.Get() - targetPosePathPlanner.Get();
-
-
-
-    Swerve::yDistance = units::length::meter_t (state.yEstimate); //units::length::meter_t {filter.Calculate(unfilteredYDistance)};
-    Swerve::xDistance = units::length::meter_t (state.xEstimate);
-
-    if (true){ //TODO: CHANGE THIS TO BE ELASTIC VALUE
-
-        Swerve::yDistance = 0_m;
-
-        if (state.reefTag != -1) {
-            frc::Transform2d reefTagTransform{
-                valor::aprilTagPositions.at(state.reefTag).Translation().ToTranslation2d(),
-                valor::aprilTagPositions.at(state.reefTag).Rotation().ToRotation2d()
-            };
-
-            reefPublisher.Set(reefTagTransform);
-
-            frc::Transform2d robotTransform{
-                getCalculatedPose().Translation(),
-                getCalculatedPose().Rotation()
-            };
-
-            frc::Transform2d robotInTagSpaceTransform = reefTagTransform.Inverse() + robotTransform;
-
-            robotInTagSpacePublisher.Set(robotInTagSpaceTransform);
-
-            Swerve::yDistance = robotInTagSpaceTransform.Y();
-        }
-    }
 
     poseErrorPP = currentPosePathPlanner.Get() - targetPosePathPlanner.Get();
 
@@ -490,21 +466,28 @@ void Drivetrain::analyzeDashboard()
     if (state.alignToTarget && state.reefTag == -1) {
         state.reefTag = temp.first;
     }
-    reefPublisher.Set(
-        frc::Pose2d(
-            temp.second.ToPose2d().Translation() + frc::Translation2d(FIELD_LENGTH / 2.0, FIELD_WIDTH / 2.0),
-            temp.second.ToPose2d().Rotation()
-        )
-    );
+    
+    frc::Pose2d reefTagPose {
+        temp.second.ToPose2d().Translation() + frc::Translation2d(FIELD_LENGTH / 2.0, FIELD_WIDTH / 2.0),
+        temp.second.ToPose2d().Rotation()
+    };
+
+    reefPublisher.Set(reefTagPose);
 
     alignAngleTags(); 
     transformControllerSpeeds();
 
-    state.yEstimate += Swerve::yControllerInitialVelocity.value() * LOOP_TIME;
-    unfilteredYDistance = Swerve::goalAlign.to<double>();
-    for(valor::AprilTagsSensor* aprilLime : aprilTagSensors) {
-        if (aprilLime->hasTarget() && valor::isReefTag(aprilLime->getTagID())) {
-            if (state.reefTag == aprilLime->getTagID()) {
+    if (!table->GetBoolean("Use World Align", false)){
+
+        state.yEstimate += Swerve::yControllerInitialVelocity.value() * LOOP_TIME;
+        unfilteredYDistance = Swerve::goalAlign.to<double>();
+
+        for(valor::AprilTagsSensor* aprilLime : aprilTagSensors) {
+            if (
+                aprilLime->hasTarget() &&
+                valor::isReefTag(aprilLime->getTagID()) &&
+                state.reefTag == aprilLime->getTagID()
+            ) {
                 if (Swerve::yAlign && Swerve::xAlign && !hasXReset) {
                     state.xEstimate = -aprilLime->get_botpose_targetspace().Z().to<double>();
                     Swerve::xDistance = units::length::meter_t (state.xEstimate);
@@ -521,6 +504,11 @@ void Drivetrain::analyzeDashboard()
                 state.yEstimate = Y_FILTER_CONST * state.yEstimate + ((1 - Y_FILTER_CONST) * aprilLime->get_botpose_targetspace().X().to<double>());
                 state.xEstimate = -aprilLime->get_botpose_targetspace().Z().to<double>();
             }
+        }
+
+    } else {
+        if (state.alignToTarget) {
+            worldFrameAlignment(reefTagPose);
         }
     }
 
@@ -547,12 +535,12 @@ void Drivetrain::analyzeDashboard()
         }
         
 
-        aprilLime->applyVisionMeasurement(
-            alignEstimator.get(),
-            true,
-            Constants::cameraStandardDeviationLBF(aprilLime->get_botpose_targetspace().Y()),
-            Constants::cameraStandardDeviationLBF(aprilLime->get_botpose_targetspace().Y())
-        );
+        // aprilLime->applyVisionMeasurement(
+        //     alignEstimator.get(),
+        //     true,
+        //     Constants::cameraStandardDeviationLBF(aprilLime->get_botpose_targetspace().Y()),
+        //     Constants::cameraStandardDeviationLBF(aprilLime->get_botpose_targetspace().Y())
+        // );
     }
 
     if (!driverGamepad || !driverGamepad->IsConnected() || !operatorGamepad || !operatorGamepad->IsConnected())
@@ -574,6 +562,25 @@ void Drivetrain::assignOutputs()
         pigeon->GetAccelerationY().GetValue(),
         pigeon->GetAccelerationZ().GetValue()
     };
+}
+
+void Drivetrain::worldFrameAlignment(frc::Pose2d reefTagPose) {
+            frc::Transform2d reefTagTransform{
+                reefTagPose.Translation(),
+                reefTagPose.Rotation()
+            };
+
+            frc::Transform2d robotTransform{
+                getCalculatedPose().Translation(),
+                getCalculatedPose().Rotation()
+            };
+
+            frc::Transform2d robotInTagSpaceTransform = reefTagTransform.Inverse() + robotTransform;
+
+            robotInTagSpacePublisher.Set(robotInTagSpaceTransform);
+
+            Swerve::yDistance = robotInTagSpaceTransform.Y();
+            Swerve::xDistance = robotInTagSpaceTransform.X();
 }
 
 units::meters_per_second_t Drivetrain::getRobotSpeeds(){
