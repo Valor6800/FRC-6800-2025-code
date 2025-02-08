@@ -97,7 +97,7 @@ void SwerveModule<AzimuthMotor, DriveMotor>::setDesiredState(frc::SwerveModuleSt
 }
 
 template<class AzimuthMotor, class DriveMotor>
-frc::SwerveModuleState SwerveModule<AzimuthMotor, DriveMotor>::getRealModuleVelocity(frc::ChassisSpeeds speeds, frc::Translation2d moduleLocation)
+frc::SwerveModuleState SwerveModule<AzimuthMotor, DriveMotor>::getRealModuleVelocity(frc::ChassisSpeeds speeds)
 {
     Eigen::MatrixXd inputMatrix(3, 1);
     Eigen::MatrixXd firstOrderMatrix(2, 3);
@@ -110,9 +110,9 @@ frc::SwerveModuleState SwerveModule<AzimuthMotor, DriveMotor>::getRealModuleVelo
     firstOrderMatrix(0, 0) = 0; firstOrderMatrix(0, 1) = 0; firstOrderMatrix(0, 2) = 1;
     firstOrderMatrix(1, 0) = 1; firstOrderMatrix(1, 1) = 1; firstOrderMatrix(1, 2) = 1;
 
-    frc::Rotation2d moduleAngle = frc::Rotation2d(units::radian_t{atan2(moduleLocation.Y().value(), moduleLocation.X().value())});
-    double moduleX = moduleLocation.Norm().value() * cos(moduleAngle.Radians().value());
-    double moduleY = moduleLocation.Norm().value() * sin(moduleAngle.Radians().value());
+    frc::Rotation2d moduleAngle = frc::Rotation2d(units::radian_t{atan2(wheelLocation.Y().value(), wheelLocation.X().value())});
+    double moduleX = wheelLocation.Norm().value() * cos(moduleAngle.Radians().value());
+    double moduleY = wheelLocation.Norm().value() * sin(moduleAngle.Radians().value());
 
     firstOrderMatrix(0, 2) = -moduleY;
     firstOrderMatrix(1, 2) = +moduleX;
@@ -128,7 +128,7 @@ frc::SwerveModuleState SwerveModule<AzimuthMotor, DriveMotor>::getRealModuleVelo
 template<class AzimuthMotor, class DriveMotor>
 units::meters_per_second_t SwerveModule<AzimuthMotor, DriveMotor>::getParallelVelocity(frc::SwerveModuleState state, frc::ChassisSpeeds speeds)
 {
-    frc::SwerveModuleState inertialState = getRealModuleVelocity(speeds, wheelLocation);
+    frc::SwerveModuleState inertialState = getRealModuleVelocity(speeds);
 
     Eigen::Vector2d interialVelocity = {inertialState.speed.value() * cos(inertialState.angle.Radians().value()),
         inertialState.speed.value() * sin(inertialState.angle.Radians().value())};

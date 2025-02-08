@@ -90,7 +90,7 @@ public:
      */
     bool loadAndSetAzimuthZeroReference(std::vector<units::turn_t> offsets);
 
-    frc::SwerveModuleState getRealModuleVelocity(frc::ChassisSpeeds, frc::Translation2d);
+    frc::SwerveModuleState getRealModuleVelocity(frc::ChassisSpeeds);
     units::meters_per_second_t getParallelVelocity(frc::SwerveModuleState, frc::ChassisSpeeds);
 
     void setAzimuthPosition(frc::Rotation2d angle);

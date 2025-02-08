@@ -101,6 +101,9 @@ public:
     void updateAngularAcceleration();
     units::angular_acceleration::radians_per_second_squared_t getSmoothedAngularAcceleration();
     double rotationLerping(double);
+    units::meters_per_second_t getInertialVelocityX();
+    units::meters_per_second_t getInertialVelocityY();
+    units::meters_per_second_t getInertialVelocityRotate();
 
     void InitSendable(wpi::SendableBuilder& builder) override;
 
