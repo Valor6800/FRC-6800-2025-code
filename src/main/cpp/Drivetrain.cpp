@@ -215,6 +215,7 @@ Drivetrain::Drivetrain(frc::TimedRobot *_robot, valor::CANdleSensor* _leds) :
 
     poseErrorPPTopic = nt::NetworkTableInstance::GetDefault().GetStructTopic<frc::Transform2d>("LiveWindow/BaseSubsystem/SwerveDrive/Pose Error PP").Publish();
     table->PutNumber("Y Controller Activation Degree Threshold", Y_ACTIVATION_THRESHOLD.value());
+    reefPublisher = nt::NetworkTableInstance::GetDefault().GetStructTopic<frc::Pose2d>("Reef Pose").Publish();
 
     doubtRot = 1;
 
@@ -373,7 +374,7 @@ void Drivetrain::analyzeDashboard()
 
     Swerve::yDistance = units::length::meter_t (state.yEstimate); //units::length::meter_t {filter.Calculate(unfilteredYDistance)};
     Swerve::xDistance = units::length::meter_t (state.xEstimate);
-    //
+
     poseErrorPPTopic.Set(poseErrorPP);
     //
     Swerve::ROT_KP = table->GetNumber("Rot_KP", Swerve::ROT_KP);

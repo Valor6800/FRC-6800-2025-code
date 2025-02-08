@@ -197,6 +197,7 @@ private:
      units::meter_t visionAcceptanceRadius;
      nt::StructSubscriber<frc::Pose2d> currentPosePathPlanner;
      nt::StructSubscriber<frc::Pose2d> targetPosePathPlanner;
+     nt::StructPublisher<frc::Pose2d> reefPublisher;
      frc::Transform2d poseErrorPP;
      frc::LinearFilter<double> filter = frc::LinearFilter<double>::MovingAverage(10);
      double unfilteredYDistance;
