@@ -9,11 +9,13 @@
 #include <frc/controller/ProfiledPIDController.h>
 #include <frc/trajectory/TrapezoidProfile.h>
 
+#include <deque>
 #include "Eigen/Core"
 #include "units/angle.h"
 #include "units/length.h"
 #include "units/time.h"
 #include "units/velocity.h"
+#include "units/acceleration.h"
 #include "valkyrie/BaseSubsystem.h"
 #include "valkyrie/drivetrain/SwerveModule.h"
 #include "valkyrie/CharMode.h"
@@ -83,7 +85,10 @@ public:
 
     double getSkiddingRatio();
     bool isRobotSkidding();
+    
     wpi::array<frc::SwerveModuleState, MODULE_COUNT> getAllModuleStates();
+    void updateAngularAcceleration();
+    units::angular_acceleration::radians_per_second_squared_t getSmoothedAngularAcceleration();
 
     void InitSendable(wpi::SendableBuilder& builder) override;
 
@@ -141,6 +146,12 @@ private:
     const units::radians_per_second_squared_t MAX_ROTATION_ACCEL = 12_rad_per_s_sq;
     const units::meters_per_second_t MAX_Y_VEL = 5.5_mps;
     const units::meters_per_second_squared_t MAX_Y_ACCEL = 3_mps_sq;
+
+    std::deque<units::angular_acceleration::radians_per_second_squared_t> yawRateBuffer;
+
+    static constexpr size_t ACCEL_BUFFER_SIZE = 100; //need to adjust
+    units::angular_velocity::radians_per_second_t lastYawRate = 0_rad_per_s;
+    units::angular_acceleration::radians_per_second_squared_t angularAcceleration = 0_rad_per_s_sq;
 
     std::vector<valor::SwerveModule<AzimuthMotor, DriveMotor> *> swerveModules;
 
