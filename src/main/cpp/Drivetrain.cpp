@@ -312,7 +312,7 @@ void Drivetrain::assessInputs()
 
     if (state.reefTag != -1) {
         frc::Transform2d reefTagTransform{
-            valor::aprilTagPositions.at(state.reefTag).Translation().ToTranslation2d(),
+            valor::aprilTagPositions.at(state.reefTag).Translation().ToTranslation2d() + frc::Translation2d(17.5482504_m / 2.0, 8.0519016_m / 2.0),
             valor::aprilTagPositions.at(state.reefTag).Rotation().ToRotation2d()
         };
 
