@@ -6,6 +6,7 @@
 #include "units/time.h"
 #include "units/mass.h"
 #include "units/constants.h"
+#include "units/frequency.h"
 
 namespace valor {
 
