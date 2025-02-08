@@ -1,8 +1,9 @@
 #include "Eigen/Core"
 #include "frc/geometry/Transform3d.h"
+#include "frc/geometry/Translation3d.h"
 #include <unordered_map>
 
-// aprilTagPositions is the tag position expressed in world space
+// aprilTagPositions is the tag position expressed in center space
 namespace valor {
 static const std::unordered_map<int, frc::Transform3d> aprilTagPositions{
     {1, frc::Transform3d(Eigen::Matrix4d{
