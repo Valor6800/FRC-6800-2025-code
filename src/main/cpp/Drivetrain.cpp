@@ -86,6 +86,7 @@ const units::meter_t WHEEL_DIAMETER(0.0973_m);
 
 #define POLE_OFFSET 6.758_in
 #define SCORER_TO_ROBOT 0.5_in
+#define MAX 1e9
 
 Drivetrain::Drivetrain(frc::TimedRobot *_robot, valor::CANdleSensor *_leds) : 
     valor::Swerve<SwerveAzimuthMotor, SwerveDriveMotor>(
@@ -373,6 +374,12 @@ void Drivetrain::analyzeDashboard()
         );
     }
 
+    Swerve::cameraPose = getPoseFromCameras();
+    Swerve::encoderPose = getRawPose();
+    Swerve::mergedPose = frc::Pose2d{(((1 / std::pow(Swerve::meritEncoder, 2)) * Swerve::encoderPose.ToMatrix()) + 
+                                    ((1 / std::pow(Swerve::meritCamera, 2)) * Swerve::cameraPose.ToMatrix())) / 
+                                    (1/std::pow(Swerve::meritEncoder, 2) + 1/std::pow(Swerve::meritCamera, 2))};
+
     if (!driverGamepad || !driverGamepad->IsConnected() || !operatorGamepad || !operatorGamepad->IsConnected())
         return;
 
@@ -423,6 +430,29 @@ frc2::FunctionalCommand* Drivetrain::getResetOdom() {
         },
         {}
     );
+}
+
+frc::Pose2d Drivetrain::getPoseFromCameras()
+{
+    std::vector<frc::Pose2d> poses;
+    frc::Pose2d pose = frc::Pose2d{0_m, 0_m, 0_rad};
+    for (valor::AprilTagsSensor* aprilLime : aprilTagSensors) {
+        if (aprilLime->hasTarget()) {
+            pose = aprilLime->getPoseFromAprilTag().ToPose2d();
+            poses.push_back(pose);
+        }
+    }
+    if(poses.size() == 0){Swerve::meritCamera = MAX; return pose;}
+    Eigen::Matrix3d avgPose = Eigen::Matrix3d::Zero();
+    for (frc::Pose2d pose : poses) {
+        avgPose += pose.ToMatrix();
+    }
+    avgPose /= poses.size();
+    return frc::Pose2d{avgPose};
+}
+
+void Drivetrain::determineEncoderMerit(){
+    
 }
 
 void Drivetrain::alignAngleTags()
