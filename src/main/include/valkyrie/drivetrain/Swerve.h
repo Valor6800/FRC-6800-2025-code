@@ -66,6 +66,7 @@ public:
     void resetEncoders();
 
     wpi::array<frc::SwerveModulePosition, MODULE_COUNT> getModuleStates();
+    void updateAngularPosition();
 
     /**
      * Drive the robot with given x, y and rotational velocities using open loop velocity control
@@ -137,7 +138,7 @@ protected:
 
     units::millimeter_t yPosTolerance = 0_mm;  //20_mm;
     units::meters_per_second_t yVelTolerance = 0.0_mps; //0.01_mps;
-
+    units::radian_t angularPosition = 0_rad;
     units::meter_t goalAlign = 0.0_m;
 
     units::meters_per_second_t yControllerInitialVelocity;

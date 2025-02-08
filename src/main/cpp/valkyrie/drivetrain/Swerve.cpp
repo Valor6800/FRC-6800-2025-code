@@ -99,6 +99,7 @@ Swerve<AzimuthMotor, DriveMotor>::~Swerve()
 template<class AzimuthMotor, class DriveMotor>
 void Swerve<AzimuthMotor, DriveMotor>::init()
 {
+    angularPosition = getCalculatedPose().Rotation().Radians();
     rot_controller.EnableContinuousInput(units::radian_t{-M_PI}, units::radian_t{M_PI});
     for(size_t i = 0; i < MODULE_COUNT; i++){
         swerveModules[i]->setUpdateFrequency(250_Hz);
@@ -135,6 +136,7 @@ void Swerve<AzimuthMotor, DriveMotor>::analyzeDashboard()
 
     rawEstimator->UpdateWithTime(frc::Timer::GetFPGATimestamp(), getGyro(), getModuleStates());
     calcEstimator->UpdateWithTime(frc::Timer::GetFPGATimestamp(), getGyro(), getModuleStates());
+    updateAngularPosition();
 
     updateAngularAcceleration();
 
@@ -295,6 +297,26 @@ frc::ChassisSpeeds Swerve<AzimuthMotor, DriveMotor>::getRobotRelativeSpeeds(){
         swerveModules[3]->getState()
     };
     return kinematics->ToChassisSpeeds(moduleStates);
+}
+
+template<class AzimuthMotor, class DriveMotor>
+void Swerve<AzimuthMotor, DriveMotor>::updateAngularPosition() {
+    static units::second_t lastTime = frc::Timer::GetFPGATimestamp();
+    units::second_t currentTime = frc::Timer::GetFPGATimestamp();
+    units::second_t deltaTime = currentTime - lastTime;
+    lastTime = currentTime;
+    units::angular_velocity::radians_per_second_t angularVelocity = pigeon->GetAngularVelocityZWorld().GetValue();
+    angularPosition += angularVelocity * deltaTime;
+    calcEstimator->AddVisionMeasurement(
+        frc::Pose2d(0_m, 0_m, angularPosition),
+        0_s,
+        {
+            std::numeric_limits<double>::max(),
+            std::numeric_limits<double>::max(),
+            1
+        }
+    );
+
 }
 
 template<class AzimuthMotor, class DriveMotor>
@@ -808,6 +830,13 @@ void Swerve<AzimuthMotor, DriveMotor>::InitSendable(wpi::SendableBuilder& builde
         [this] {return y_controller.GetVelocityError().value();},
         nullptr
     );
+
+    builder.AddDoubleProperty(
+    "Pigeon Estimated Rotational Position",
+    [this] { return angularPosition.value(); },
+    nullptr
+);
+
     builder.AddDoubleProperty(
     "Smoothed Angular Acceleration (rad/s^2)",
     [this] { return getSmoothedAngularAcceleration().value(); },
