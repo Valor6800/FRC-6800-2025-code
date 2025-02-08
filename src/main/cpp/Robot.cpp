@@ -34,6 +34,7 @@ Robot::Robot() :
 }
 
 void Robot::RobotInit() {
+    frc::SmartDashboard::PutString("Robot Serial Number", Constants::serialNumber);
     // We could use frc2::cmd::None() instead of nullptr but it means that we have to hardcode the index
     // of the command in PIT_SEQUENCES or store it elsewhere otherwise Command* will be dangling
     // Probably easier to use nullptr and check when scheduling

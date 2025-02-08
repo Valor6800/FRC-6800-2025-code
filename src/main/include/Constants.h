@@ -113,14 +113,12 @@ namespace Constants {
             std::ifstream{"/sys/firmware/devicetree/base/serial-number"}.read(buffer, 8);
             return std::string{buffer, 8};
         }
-
+        static std::string serialNumber = getSerialNumber();
         static Robot getRobot() {
-            std::string serialNumber = getSerialNumber();
             if (serialNumber == ALPHA_SERIAL_NUMBER) return Robot::Alpha;
             else if (serialNumber == GOLD_SERIAL_NUMBER) return Robot::Gold;
             else return Robot::Black;
         }
-
         static Robot robot = getRobot();
 
         static bool roughTowardsRedAllianceWall = true;
