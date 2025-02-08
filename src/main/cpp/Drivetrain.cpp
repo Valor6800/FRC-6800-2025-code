@@ -238,6 +238,8 @@ void Drivetrain::resetState()
 void Drivetrain::init()
 {
     Swerve::init();
+
+    state.leastSkewTag = -1;
     state.reefTag = -1;
     currentPosePathPlanner = nt::NetworkTableInstance::GetDefault().GetStructTopic<frc::Pose2d>("/PathPlanner/currentPose").Subscribe(frc::Pose2d{});
     targetPosePathPlanner = nt::NetworkTableInstance::GetDefault().GetStructTopic<frc::Pose2d>("/PathPlanner/targetPose").Subscribe(frc::Pose2d{});
@@ -259,35 +261,13 @@ void Drivetrain::assessInputs()
     state.getTag = false;
     if (driverGamepad->leftTriggerActive() && state.reefTag == -1) {
         state.getTag = true;
+        state.leastSkewTag = -1;
         
     } else if (!driverGamepad->leftTriggerActive()) {
         state.reefTag = -1;
         hasReset = false;
     }
 
-    units::radian_t leastSkew{90_rad};
-    for(valor::AprilTagsSensor* aprilLime : aprilTagSensors) {
-        if (aprilLime->hasTarget()) {
-            if(
-                (frc::DriverStation::GetAlliance() == frc::DriverStation::kRed && 
-                aprilLime->getTagID() >= 6 &&
-                aprilLime->getTagID() <= 11) || 
-                (frc::DriverStation::GetAlliance() == frc::DriverStation::kBlue &&
-                aprilLime->getTagID() >= 17 &&
-                aprilLime->getTagID() <= 22)
-            ){ 
-
-                units::degree_t currentSkew = aprilLime->getTargetToBotPose().Rotation().Y() + 90_deg;
-                if (state.getTag && leastSkew > units::math::abs(currentSkew)) {
-                    state.reefTag = aprilLime->getTagID();
-                    leastSkew = currentSkew;
-                }
-                if (state.reefTag == aprilLime->getTagID()) {
-                    Swerve::yDistance = aprilLime->get_botpose_targetspace().X();
-                }
-            }
-        } 
-    }
 
     Swerve::alignToTarget = driverGamepad->leftTriggerActive();
     if (driverGamepad->leftTriggerActive() && !hasReset) {
@@ -312,6 +292,36 @@ void Drivetrain::analyzeDashboard()
 
     Swerve::yPosTolerance = table->GetNumber("Y_Pos_Tol", Swerve::yPosTolerance.to<double>()) * 1_mm;
     Swerve::yVelTolerance = table->GetNumber("Y_Vel_Tol", Swerve::yVelTolerance.to<double>()) * 1_mps;
+
+    units::radian_t leastSkew{90_rad};
+    Swerve::yDistance = Swerve::goalAlign;
+    for(valor::AprilTagsSensor* aprilLime : aprilTagSensors) {
+        if (aprilLime->hasTarget()) {
+            if(
+                (frc::DriverStation::GetAlliance() == frc::DriverStation::kRed && 
+                aprilLime->getTagID() >= 6 &&
+                aprilLime->getTagID() <= 11) || 
+                (frc::DriverStation::GetAlliance() == frc::DriverStation::kBlue &&
+                aprilLime->getTagID() >= 17 &&
+                aprilLime->getTagID() <= 22)
+            ){ 
+                units::degree_t currentSkew = aprilLime->getTargetToBotPose().Rotation().Y() + 90_deg;
+
+                if (leastSkew > units::math::abs(currentSkew)){
+                    leastSkew = currentSkew;
+                    state.leastSkewTag = aprilLime->getTagID();
+                }
+                if (state.getTag && state.leastSkewTag != -1) {
+                    state.reefTag = state.leastSkewTag;
+                }
+
+                if (state.leastSkewTag == aprilLime->getTagID()){
+                    Swerve::yDistance = aprilLime->get_botpose_targetspace().X();
+                }
+
+            }
+        } 
+    }
 
     // Swerve::goalAlign = units::meter_t{table->GetNumber("Pole Offset", Swerve::goalAlign.to<double>())};
     choosePoleDirection(state.dir);
@@ -514,6 +524,11 @@ void Drivetrain::InitSendable(wpi::SendableBuilder& builder)
         builder.AddDoubleProperty(
             "Locking Tag ID",
             [this] {return state.reefTag;},
+            nullptr
+        );
+        builder.AddDoubleProperty(
+            "Tag with least Skew",
+            [this] {return state.leastSkewTag;},
             nullptr
         );
 

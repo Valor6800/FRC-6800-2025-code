@@ -126,6 +126,7 @@ public:
           bool lockingToReef;
 
           int reefTag;
+          int leastSkewTag;
           bool getTag;
           Direction dir;
           bool aligned;
