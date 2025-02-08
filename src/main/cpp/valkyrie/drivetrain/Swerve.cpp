@@ -307,13 +307,18 @@ void Swerve<AzimuthMotor, DriveMotor>::updateAngularPosition() {
     lastTime = currentTime;
     units::angular_velocity::radians_per_second_t angularVelocity = pigeon->GetAngularVelocityZWorld().GetValue();
     angularPosition += angularVelocity * deltaTime;
+    angularPosition = units::math::fmod(angularPosition + units::radian_t(M_PI), units::radian_t{2.0 * M_PI});
+    if (angularPosition.value() <0){
+        angularPosition += units::radian_t(2.0 * M_PI);
+    }
+    angularPosition -= units::radian_t{M_PI};
     calcEstimator->AddVisionMeasurement(
         frc::Pose2d(0_m, 0_m, angularPosition),
         0_s,
         {
             std::numeric_limits<double>::max(),
             std::numeric_limits<double>::max(),
-            1
+            1.0
         }
     );
 
@@ -421,6 +426,8 @@ void Swerve<AzimuthMotor, DriveMotor>::resetGyro(){
     frc::Pose2d initialPose = getRawPose();
     frc::Pose2d desiredPose = frc::Pose2d(initialPose.X(), initialPose.Y(), frc::Rotation2d(0_deg));
     resetOdometry(desiredPose);
+    angularPosition = desiredPose.Rotation().Radians();
+
 }
 
 template<class AzimuthMotor, class DriveMotor>
