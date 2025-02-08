@@ -27,9 +27,9 @@ TractionController::TractionController(units::dimensionless::dimensionless_t sta
     _staticCOF(staticCOF),
     _dynamicCOF(dynamicCOF),
     _maxAcceleration(_staticCOF * 9.81),
-    _slippingDebouncer(MIN_SLIPPING_TIME, frc::Debouncer::kRising),
     _maxPredictedSlipRatio((_maxAcceleration * 50 ) / (_staticCOF * _mass * 9.81)),
     _isSlipping(false),
+    _slippingDebouncer(MIN_SLIPPING_TIME, frc::Debouncer::kRising),
     _staticForceAccelerationDebouncer(STATIC_FORCE_ACCELERATE_TRIGGER_TIME, frc::Debouncer::kRising),
     _dyamicForceAccelerationDebouncer(DYNAMIC_FORCE_ACCELERATE_TRIGGER_TIME, frc::Debouncer::kRising),
     _state(TractionController::State::DISABLE)
@@ -57,11 +57,21 @@ units::meters_per_second_t TractionController::calculate(units::meters_per_secon
 
     _isSlipping = _slippingDebouncer.Calculate(currentSlipRatio > _optimalSlipRatio && std::abs(wheelSpeed.value()) > _maxLinearVelocity * _optimalSlipRatio && isEnabled());
     
-    units::meters_per_second_squared_t desiredAcceleration = units::meters_per_second_squared_t{(velocityRequest.value() - (inertialVelocity.value() * oppositeDirection ? -1 : 1)) / 0.02};
+    units::meters_per_second_squared_t desiredAcceleration = units::meters_per_second_squared_t{(velocityRequest.value() - (inertialVelocity.value() * (oppositeDirection ? -1 : 1))) / 0.02};
 
     double sigmoid = 1 / (1 + std::exp(-SIGMOID_K * std::clamp(2 * (currentSlipRatio - _optimalSlipRatio) - 1, -1.0, 1.0)));
 
     double effectiveCOF = _isSlipping ? _staticCOF * (1 - sigmoid) + _dynamicCOF * sigmoid : _staticCOF;
+
+    double predictedSlipRatio = std::abs(desiredAcceleration.value() / (inertialVelocity.value() * 9.81 + effectiveCOF * _mass * 9.81)) / _maxPredictedSlipRatio;
+
+    units::meters_per_second_t velocityCorrection = velocityOutput * (_optimalSlipRatio - predictedSlipRatio) * (int) _state;
+
+    if (forceAcceleration) velocityCorrection = velocityCorrection * (FORCE_ACCELERATION_MULTIPLIER);
+
+    velocityOutput = units::meters_per_second_t{std::clamp((velocityOutput + velocityCorrection).value(), -_maxLinearVelocity, _maxLinearVelocity)};
+
+    return velocityOutput;
 }
 
 bool TractionController::isModuleSlipping(){
