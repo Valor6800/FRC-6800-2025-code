@@ -335,12 +335,10 @@ void Drivetrain::analyzeDashboard()
     Swerve::yDistance = units::length::meter_t (state.yEstimate); //units::length::meter_t {filter.Calculate(unfilteredYDistance)};
 
     if (true){ //TODO: CHANGE THIS TO BE ELASTIC VALUE
-
         Swerve::yDistance = 0_m;
-
         if (state.reefTag != -1) {
             frc::Transform2d reefTagTransform{
-                valor::aprilTagPositions.at(state.reefTag).Translation().ToTranslation2d(),
+                valor::aprilTagPositions.at(state.reefTag).Translation().ToTranslation2d() + frc::Translation2d(17.5482504_m / 2.0, 8.0519016_m / 2.0),
                 valor::aprilTagPositions.at(state.reefTag).Rotation().ToRotation2d()
             };
 
