@@ -144,18 +144,18 @@ namespace Constants {
 
         static std::vector<units::turn_t> swerveZeros(){ switch (robot){
             case Robot::Alpha: return {0.4240722_tr, 0.85498046875_tr, 0.471924_tr, 0.081299_tr};
-            case Robot::Gold: return {0.4240722_tr, 0.85498046875_tr, 0.471924_tr, 0.081299_tr};
+            case Robot::Gold: return {0.661133_tr, 0.093018_tr, 0.345703_tr, 0.38208_tr};
             default: return {0.4240722_tr, 0.85498046875_tr, 0.471924_tr, 0.081299_tr};
         }};
         static double driveGearRatio(){ switch (robot){
             case Robot::Alpha: return 5.51f;
-            case Robot::Gold: return 5.51f;
-            default: return 5.51f;
+            case Robot::Gold: return 6.48;
+            default: return 6.48f;
         }};
         static double azimuthGearRatio(){ switch (robot){
             case Robot::Alpha: return 13.37f;
-            case Robot::Gold: return 13.37f;
-            default: return 13.37f;
+            case Robot::Gold: return 12.1f;
+            default: return 12.1f;
         }};
         static units::meter_t moduleDiff(){ switch (robot){
             case Robot::Alpha: return 0.295_m;
@@ -164,14 +164,14 @@ namespace Constants {
         }};
         static units::meter_t driveBaseRadius(){ switch (robot){
             case Robot::Alpha: return 0.4175_m; 
-            case Robot::Gold: return 0.4175_m; 
-            default: return 0.4175_m;
+            case Robot::Gold: return 0.413_m; 
+            default: return 0.413_m;
         }};
 
         static std::vector<bool> swerveDrivesReversals(){ switch (robot){
             case Robot::Alpha: return {true, false, true, false};
-            case Robot::Gold: return {false, false, false, false};
-            default: return {false, false, false, false};
+            case Robot::Gold: return {true, true, true, true};
+            default: return {true, true, true, true};
         }};
         static std::vector<bool> swerveAzimuthsReversals(){ switch (robot){
             case Robot::Alpha: return {true, false, true, false};
@@ -186,8 +186,8 @@ namespace Constants {
         }};
         static units::turns_per_second_t azimuthKVel(){ switch (robot) {
             case Robot::Alpha: return 7.9_tps;
-            case Robot::Gold: return 7.9_tps;
-            default: return 7.9_tps;
+            case Robot::Gold: return 8.26_tps;
+            default: return 8.26_tps;
         }};
         static units::turns_per_second_squared_t azimuthKAcc() { switch (robot) {
             case Robot::Alpha: return 1000_tr_per_s_sq;
@@ -202,8 +202,8 @@ namespace Constants {
         }};
         static units::meters_per_second_t driveKVel(){ switch (robot) {
             case Robot::Alpha: return 5.36_mps;
-            case Robot::Gold: return 5.36_mps;
-            default: return 5.36_mps;
+            case Robot::Gold: return 4.717_mps;
+            default: return 4.717_mps;
         }};
         static units::meters_per_second_squared_t driveKAcc(){ switch (robot) {
             case Robot::Alpha: return 100_mps_sq;
