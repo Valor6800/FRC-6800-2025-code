@@ -148,7 +148,7 @@ private:
 
     std::deque<units::angular_acceleration::radians_per_second_squared_t> yawRateBuffer;
 
-    static constexpr size_t ACCEL_BUFFER_SIZE = 100; //need to adjust
+    static constexpr size_t ACCEL_BUFFER_SIZE = 10; //need to adjust
     units::angular_velocity::radians_per_second_t lastYawRate = 0_rad_per_s;
     units::angular_acceleration::radians_per_second_squared_t angularAcceleration = 0_rad_per_s_sq;
 

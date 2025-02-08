@@ -127,6 +127,8 @@ void Swerve<AzimuthMotor, DriveMotor>::analyzeDashboard()
     rawEstimator->UpdateWithTime(frc::Timer::GetFPGATimestamp(), getGyro(), getModuleStates());
     calcEstimator->UpdateWithTime(frc::Timer::GetFPGATimestamp(), getGyro(), getModuleStates());
 
+    updateAngularAcceleration();
+
     if (useCarpetGrain)
         calculateCarpetPose();
 
@@ -781,4 +783,18 @@ void Swerve<AzimuthMotor, DriveMotor>::InitSendable(wpi::SendableBuilder& builde
         [this] {return y_controller.GetPositionError().to<double>();},
         nullptr
     );
+
+builder.AddDoubleProperty(
+    "Angular Velocity",
+    [this] { return pigeon->GetAngularVelocityZWorld().GetValue().value(); },  
+    nullptr
+);
+
+builder.AddDoubleProperty(
+    "Angular Acceleration (NOT AVERAGED)",
+    [this] { return angularAcceleration.value();},  
+    nullptr
+);
+
+    
 }
