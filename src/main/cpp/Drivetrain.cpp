@@ -27,6 +27,7 @@
 #include <ctre/phoenix6/TalonFX.hpp>
 #include <units/math.h>
 #include <frc/Alert.h>
+#include "AprilTagPositions.h"
 
 using namespace pathplanner;
 
@@ -196,6 +197,8 @@ Drivetrain::Drivetrain(frc::TimedRobot *_robot, CANdle& leds) :
 
     poseErrorPPTopic = nt::NetworkTableInstance::GetDefault().GetStructTopic<frc::Transform2d>("LiveWindow/BaseSubsystem/SwerveDrive/Pose Error PP").Publish();
     table->PutNumber("Y Controller Activation Degree Threshold", Y_ACTIVATION_THRESHOLD.value());
+    reefPublisher = nt::NetworkTableInstance::GetDefault().GetStructTopic<frc::Transform2d>("Reef Transform").Publish();
+    robotInTagSpacePublisher = nt::NetworkTableInstance::GetDefault().GetStructTopic<frc::Transform2d>("Robot In Tag Space Transform").Publish();
 
     resetState();
     init();
@@ -302,19 +305,6 @@ void Drivetrain::assessInputs()
 
 void Drivetrain::analyzeDashboard()
 {
-    if(robot->IsDisabled()){
-        state.right = table->GetBoolean("Align Right", false);
-        state.left = table->GetBoolean("Align Left", false);
-        if (state.right) {
-            state.dir = RIGHT;
-        } else if(state.left) {
-            state.dir = LEFT;
-        } else{
-            state.dir = NONE;
-        }
-    }
-    poseErrorPP = currentPosePathPlanner.Get() - targetPosePathPlanner.Get();
-
     state.yEstimate += Swerve::yControllerInitialVelocity.value() * LOOP_TIME;
     units::radian_t leastSkew{90_rad};
     unfilteredYDistance = Swerve::goalAlign.to<double>();
@@ -343,7 +333,34 @@ void Drivetrain::analyzeDashboard()
     }
 
     Swerve::yDistance = units::length::meter_t (state.yEstimate); //units::length::meter_t {filter.Calculate(unfilteredYDistance)};
-    //
+
+    if (true){ //TODO: CHANGE THIS TO BE ELASTIC VALUE
+
+        Swerve::yDistance = 0_m;
+
+        if (state.reefTag != -1) {
+            frc::Transform2d reefTagTransform{
+                valor::aprilTagPositions.at(state.reefTag).Translation().ToTranslation2d(),
+                valor::aprilTagPositions.at(state.reefTag).Rotation().ToRotation2d()
+            };
+
+            reefPublisher.Set(reefTagTransform);
+
+            frc::Transform2d robotTransform{
+                getCalculatedPose().Translation(),
+                getCalculatedPose().Rotation()
+            };
+
+            frc::Transform2d robotInTagSpaceTransform = reefTagTransform.Inverse() + robotTransform;
+
+            robotInTagSpacePublisher.Set(robotInTagSpaceTransform);
+
+            Swerve::yDistance = robotInTagSpaceTransform.Y();
+        }
+    }
+
+    poseErrorPP = currentPosePathPlanner.Get() - targetPosePathPlanner.Get();
+
     poseErrorPPTopic.Set(poseErrorPP);
     //
     Swerve::ROT_KP = table->GetNumber("Rot_KP", Swerve::ROT_KP);
