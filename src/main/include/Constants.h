@@ -9,6 +9,7 @@
 #include "frc/RobotController.h"
 #include <cmath>
 #include <iostream> 
+#include <fstream>
 #include <frc/RobotController.h>
 #include <frc/geometry/Rotation3d.h>
 #include <units/angle.h>
@@ -26,7 +27,9 @@
 
 
 #define ALPHA_TEAM_NUMBER 6800
+#define ALPHA_SERIAL_NUMBER "03260AF3"
 #define GOLD_TEAM_NUMBER 6808
+#define GOLD_SERIAL_NUMBER ""
 // When trying to compile against other targets for simulation, cmath doesn't include M_PI
 //   Therefore if not defined, define M_PI for use on other targets
 #ifndef M_PI
@@ -89,105 +92,127 @@ namespace CANIDs {
 #pragma GCC diagnostic ignored "-Wunused-variable"
 
 // Constants that stay the same across bots should not go here
-namespace Constants { 
+namespace Constants {
     // public:
         /*
         To use a global Constants:: instead of using an object, the function/variable used must be "static".
         The reason that can't happen here is that for functions/variables to be static, the values they use must also be static.
         Because GetTeamNumber isn't static, team number can't be static, and therefore none of the getters can be static either. 
         */
-        static int teamNumber = frc::RobotController::GetTeamNumber();;
+
+        enum Robot {
+            Alpha,
+            Gold,
+            Black
+        };
+
+        static std::string getSerialNumber() {
+            std::string env = std::getenv("serialnum");
+            if (!env.empty()) return env;
+            char buffer[8];
+            std::ifstream{"/sys/firmware/devicetree/base/serial-number"}.read(buffer, 8);
+            return std::string{buffer, 8};
+        }
+
+        static Robot getRobot() {
+            std::string serialNumber = getSerialNumber();
+            if (serialNumber == ALPHA_SERIAL_NUMBER) return Robot::Alpha;
+            else if (serialNumber == GOLD_SERIAL_NUMBER) return Robot::Gold;
+            else return Robot::Black;
+        }
+
+        static Robot robot = getRobot();
 
         static bool roughTowardsRedAllianceWall = true;
         static double carpetGrainMultipler = 1.05;
 
-        static units::degree_t pigeonMountPitch(){ switch (teamNumber){ 
-            case ALPHA_TEAM_NUMBER: return 0.037622284_deg; 
-            case GOLD_TEAM_NUMBER: return 0.037622284_deg;  
+        static units::degree_t pigeonMountPitch(){ switch (robot){ 
+            case Robot::Alpha: return 0.037622284_deg; 
+            case Robot::Gold: return 0.037622284_deg;  
             default: return 0.037622284_deg;
         }};
-        static units::degree_t pigeonMountRoll(){ switch (teamNumber){ 
-            case ALPHA_TEAM_NUMBER: return -0.784180343_deg;
-            case GOLD_TEAM_NUMBER: return -0.784180343_deg;
+        static units::degree_t pigeonMountRoll(){ switch (robot){ 
+            case Robot::Alpha: return -0.784180343_deg;
+            case Robot::Gold: return -0.784180343_deg;
             default: return -0.784180343_deg;
         }};
-        static units::degree_t pigeonMountYaw(){ switch (teamNumber){ 
-            case ALPHA_TEAM_NUMBER: return -90.230049133_deg; 
-            case GOLD_TEAM_NUMBER: return -90.230049133_deg;
+        static units::degree_t pigeonMountYaw(){ switch (robot){ 
+            case Robot::Alpha: return -90.230049133_deg; 
+            case Robot::Gold: return -90.230049133_deg;
             default: return -90.230049133_deg; 
         }};
 
-        static std::vector<units::turn_t> swerveZeros(){ switch (teamNumber){
-            case ALPHA_TEAM_NUMBER: return {0.4240722_tr, 0.85498046875_tr, 0.471924_tr, 0.081299_tr};
-            case GOLD_TEAM_NUMBER: return {0.4240722_tr, 0.85498046875_tr, 0.471924_tr, 0.081299_tr};
+        static std::vector<units::turn_t> swerveZeros(){ switch (robot){
+            case Robot::Alpha: return {0.4240722_tr, 0.85498046875_tr, 0.471924_tr, 0.081299_tr};
+            case Robot::Gold: return {0.4240722_tr, 0.85498046875_tr, 0.471924_tr, 0.081299_tr};
             default: return {0.4240722_tr, 0.85498046875_tr, 0.471924_tr, 0.081299_tr};
         }};
-        static double driveGearRatio(){ switch (teamNumber){
-            case ALPHA_TEAM_NUMBER: return 5.51f;
-            case GOLD_TEAM_NUMBER: return 5.51f;
+        static double driveGearRatio(){ switch (robot){
+            case Robot::Alpha: return 5.51f;
+            case Robot::Gold: return 5.51f;
             default: return 5.51f;
         }};
-        static double azimuthGearRatio(){ switch (teamNumber){
-            case ALPHA_TEAM_NUMBER: return 13.37f;
-            case GOLD_TEAM_NUMBER: return 13.37f;
+        static double azimuthGearRatio(){ switch (robot){
+            case Robot::Alpha: return 13.37f;
+            case Robot::Gold: return 13.37f;
             default: return 13.37f;
         }};
-        static units::meter_t moduleDiff(){ switch (teamNumber){
-            case ALPHA_TEAM_NUMBER: return 0.295_m;
-            case GOLD_TEAM_NUMBER: return 0.295_m;
+        static units::meter_t moduleDiff(){ switch (robot){
+            case Robot::Alpha: return 0.295_m;
+            case Robot::Gold: return 0.295_m;
             default: return 0.295_m;
         }};
-        static units::meter_t driveBaseRadius(){ switch (teamNumber){
-            case ALPHA_TEAM_NUMBER: return 0.4175_m; 
-            case GOLD_TEAM_NUMBER: return 0.4175_m; 
+        static units::meter_t driveBaseRadius(){ switch (robot){
+            case Robot::Alpha: return 0.4175_m; 
+            case Robot::Gold: return 0.4175_m; 
             default: return 0.4175_m;
         }};
 
-        static std::vector<bool> swerveDrivesReversals(){ switch (teamNumber){
-            case ALPHA_TEAM_NUMBER: return {true, false, true, false};
-            case GOLD_TEAM_NUMBER: return {false, false, false, false};
+        static std::vector<bool> swerveDrivesReversals(){ switch (robot){
+            case Robot::Alpha: return {true, false, true, false};
+            case Robot::Gold: return {false, false, false, false};
             default: return {false, false, false, false};
         }};
-        static std::vector<bool> swerveAzimuthsReversals(){ switch (teamNumber){
-            case ALPHA_TEAM_NUMBER: return {true, false, true, false};
-            case GOLD_TEAM_NUMBER: return {false, false, false, false};
+        static std::vector<bool> swerveAzimuthsReversals(){ switch (robot){
+            case Robot::Alpha: return {true, false, true, false};
+            case Robot::Gold: return {false, false, false, false};
             default: return {false, false, false, false};
         }};
 
-        static double azimuthKP(){ switch (teamNumber) {
-            case ALPHA_TEAM_NUMBER: return 100.0;
-            case GOLD_TEAM_NUMBER: return 100.0;
+        static double azimuthKP(){ switch (robot) {
+            case Robot::Alpha: return 100.0;
+            case Robot::Gold: return 100.0;
             default: return 100.0;
         }};
-        static units::turns_per_second_t azimuthKVel(){ switch (teamNumber) {
-            case ALPHA_TEAM_NUMBER: return 7.9_tps;
-            case GOLD_TEAM_NUMBER: return 7.9_tps;
+        static units::turns_per_second_t azimuthKVel(){ switch (robot) {
+            case Robot::Alpha: return 7.9_tps;
+            case Robot::Gold: return 7.9_tps;
             default: return 7.9_tps;
         }};
-        static units::turns_per_second_squared_t azimuthKAcc() { switch (teamNumber) {
-            case ALPHA_TEAM_NUMBER: return 1000_tr_per_s_sq;
-            case GOLD_TEAM_NUMBER: return 1000_tr_per_s_sq;
+        static units::turns_per_second_squared_t azimuthKAcc() { switch (robot) {
+            case Robot::Alpha: return 1000_tr_per_s_sq;
+            case Robot::Gold: return 1000_tr_per_s_sq;
             default: return 1000_tr_per_s_sq;
         }};
 
-        static double driveKP(){ switch (teamNumber) {
-            case ALPHA_TEAM_NUMBER: return 5.0;
-            case GOLD_TEAM_NUMBER: return 5.0;
+        static double driveKP(){ switch (robot) {
+            case Robot::Alpha: return 5.0;
+            case Robot::Gold: return 5.0;
             default: return 5.0;
         }};
-        static units::meters_per_second_t driveKVel(){ switch (teamNumber) {
-            case ALPHA_TEAM_NUMBER: return 5.36_mps;
-            case GOLD_TEAM_NUMBER: return 5.36_mps;
+        static units::meters_per_second_t driveKVel(){ switch (robot) {
+            case Robot::Alpha: return 5.36_mps;
+            case Robot::Gold: return 5.36_mps;
             default: return 5.36_mps;
         }};
-        static units::meters_per_second_squared_t driveKAcc(){ switch (teamNumber) {
-            case ALPHA_TEAM_NUMBER: return 100_mps_sq;
-            case GOLD_TEAM_NUMBER: return 100_mps_sq;
+        static units::meters_per_second_squared_t driveKAcc(){ switch (robot) {
+            case Robot::Alpha: return 100_mps_sq;
+            case Robot::Gold: return 100_mps_sq;
             default: return 100_mps_sq;
         }};
 
-        static frc::Pose3d mintCameraPosition(){ switch (teamNumber) {
-            case ALPHA_TEAM_NUMBER: return frc::Pose3d(
+        static frc::Pose3d mintCameraPosition(){ switch (robot) {
+            case Robot::Alpha: return frc::Pose3d(
                 (6_in + 1.5625_in) - 14_in,
                 6.75_in,
                 1.25_in + 1.75_in + 1.5_in + 6_in + 2_in,
@@ -197,30 +222,30 @@ namespace Constants {
                     90_deg
                 )
             );
-            case GOLD_TEAM_NUMBER: return frc::Pose3d();
+            case Robot::Gold: return frc::Pose3d();
             default: return frc::Pose3d();
         }};
 
-        static frc::Pose3d vanillaCameraPosition(){ switch (teamNumber) {
-            case ALPHA_TEAM_NUMBER: return frc::Pose3d();
-            case GOLD_TEAM_NUMBER: return frc::Pose3d();
+        static frc::Pose3d vanillaCameraPosition(){ switch (robot) {
+            case Robot::Alpha: return frc::Pose3d();
+            case Robot::Gold: return frc::Pose3d();
             default: return frc::Pose3d();
         }};
 
-        static frc::Pose3d chocolateCameraPosition(){ switch (teamNumber) {
-            case ALPHA_TEAM_NUMBER: return frc::Pose3d();
-            case GOLD_TEAM_NUMBER: return frc::Pose3d();
+        static frc::Pose3d chocolateCameraPosition(){ switch (robot) {
+            case Robot::Alpha: return frc::Pose3d();
+            case Robot::Gold: return frc::Pose3d();
             default: return frc::Pose3d();
         }};
 
-        static frc::Pose3d lemonCameraPosition(){ switch (teamNumber){
-            case ALPHA_TEAM_NUMBER: return frc::Pose3d();
-            case GOLD_TEAM_NUMBER: return frc::Pose3d();
+        static frc::Pose3d lemonCameraPosition(){ switch (robot){
+            case Robot::Alpha: return frc::Pose3d();
+            case Robot::Gold: return frc::Pose3d();
             default: return frc::Pose3d();
         }};
 
-        static frc::Pose3d mangoCameraPosition(){ switch (teamNumber){
-            case ALPHA_TEAM_NUMBER: return frc::Pose3d(
+        static frc::Pose3d mangoCameraPosition(){ switch (robot){
+            case Robot::Alpha: return frc::Pose3d(
                 14_in - (1.5625_in + 5.875_in),
                 8.5_in,
                 10.625_in,
@@ -230,13 +255,13 @@ namespace Constants {
                     90_deg
                 )
             );
-            case GOLD_TEAM_NUMBER: return frc::Pose3d();
+            case Robot::Gold: return frc::Pose3d();
             default: return frc::Pose3d();
         }};
 
-        static frc::Pose3d berryCameraPosition(){ switch (teamNumber){
-            case ALPHA_TEAM_NUMBER: return frc::Pose3d();
-            case GOLD_TEAM_NUMBER: return frc::Pose3d();
+        static frc::Pose3d berryCameraPosition(){ switch (robot){
+            case Robot::Alpha: return frc::Pose3d();
+            case Robot::Gold: return frc::Pose3d();
             default: return frc::Pose3d();
         }};
 
