@@ -197,7 +197,8 @@ private:
      units::meter_t visionAcceptanceRadius;
      nt::StructSubscriber<frc::Pose2d> currentPosePathPlanner;
      nt::StructSubscriber<frc::Pose2d> targetPosePathPlanner;
-     nt::StructPublisher<frc::Transform2d> robotPublisher;
+     nt::StructPublisher<frc::Pose2d> reefPublisher;
+     nt::StructPublisher<frc::Pose2d> robotPublisher;
      nt::StructPublisher<frc::Transform2d> robotInTagSpacePublisher;
      frc::Transform2d poseErrorPP;
      frc::LinearFilter<double> filter = frc::LinearFilter<double>::MovingAverage(10);
