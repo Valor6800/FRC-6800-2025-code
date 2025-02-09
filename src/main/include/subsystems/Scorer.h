@@ -45,23 +45,6 @@ public:
         SCORING,
     };
 
-     enum ELEVATOR_STATE
-    {
-        MANUAL,
-        STOWED,
-        HP,
-        ONE,
-        TWO,
-        THREE,
-        FOUR,
-    };
-
-     enum GAME_PIECE
-    {
-        CORAL,
-        ALGEE,
-    };
-
     enum SCOPED_STATE
     {
         UNSCOPED,
@@ -71,8 +54,8 @@ public:
     struct x
     {
         SCORE_STATE scoringState;
-        ELEVATOR_STATE elevState;
-        GAME_PIECE gamePiece;
+        Constants::Scorer::ELEVATOR_STATE elevState;
+        Constants::Scorer::GAME_PIECE gamePiece;
         SCOPED_STATE scopedState;
 
         units::meter_t targetHeight;
@@ -84,12 +67,12 @@ public:
     } state;
 
     
-    std::map<ELEVATOR_STATE, units::turns_per_second_t> scoringSpeedMap = {
-        {ELEVATOR_STATE::ONE, 25_tps},
-        {ELEVATOR_STATE::TWO, 35_tps},
-        {ELEVATOR_STATE::THREE, 35_tps},
-        {ELEVATOR_STATE::FOUR, 35_tps}
-    };
+    // std::map<ELEVATOR_STATE, units::turns_per_second_t> scoringSpeedMap = {
+    //     {ELEVATOR_STATE::ONE, 12_tps},
+    //     {ELEVATOR_STATE::TWO, 15_tps},
+    //     {ELEVATOR_STATE::THREE, 15_tps},
+    //     {ELEVATOR_STATE::FOUR, 15_tps}
+    // };
 
 private:
     
@@ -107,6 +90,4 @@ private:
 
     valor::GrappleSensor frontRangeSensor;
     valor::CANrangeSensor scorerStagingSensor;
-
-    std::map<GAME_PIECE, std::map<ELEVATOR_STATE, units::meter_t>> posMap;
 };

@@ -269,5 +269,100 @@ namespace Constants {
                     std::pair("limelight-vanilla", vanillaCameraPosition()),
                     std::pair("limelight-berry", berryCameraPosition())
         };
+
+        namespace Scorer {
+            enum ELEVATOR_STATE
+            {
+                MANUAL,
+                STOWED,
+                HP,
+                ONE,
+                TWO,
+                THREE,
+                FOUR,
+            };
+
+            enum GAME_PIECE
+            {
+                CORAL,
+                ALGEE,
+            };
+
+            static std::unordered_map<ELEVATOR_STATE, units::turns_per_second_t> scoringSpeedMap() { switch (robot) {
+                case Robot::Alpha: return {
+                    {ELEVATOR_STATE::ONE, 12_tps},
+                    {ELEVATOR_STATE::TWO, 15_tps},
+                    {ELEVATOR_STATE::THREE, 15_tps},
+                    {ELEVATOR_STATE::FOUR, 15_tps}
+                };
+                default: return {
+                    {ELEVATOR_STATE::ONE, 25_tps},
+                    {ELEVATOR_STATE::TWO, 35_tps},
+                    {ELEVATOR_STATE::THREE, 35_tps},
+                    {ELEVATOR_STATE::FOUR, 35_tps}
+                };
+            }}
+
+            static std::unordered_map<GAME_PIECE, std::unordered_map<ELEVATOR_STATE, units::meter_t>> positionMap() { switch (robot) {
+                case Robot::Alpha: 
+                    return {
+                        {
+                            GAME_PIECE::CORAL,
+                            {
+                                { ELEVATOR_STATE::STOWED, 5_in },
+                                { ELEVATOR_STATE::HP, 5_in },
+                                { ELEVATOR_STATE::ONE, 13.57_in },
+                                { ELEVATOR_STATE::TWO, 14_in },
+                                { ELEVATOR_STATE::THREE, 14_in },
+                                { ELEVATOR_STATE::FOUR, 5_in }
+                            }
+                        },
+                        {
+                            GAME_PIECE::ALGEE,
+                            {
+                                { ELEVATOR_STATE::ONE, 5_in },
+                                { ELEVATOR_STATE::TWO, 13.2_in },
+                                { ELEVATOR_STATE::THREE, 14_in },
+                                { ELEVATOR_STATE::FOUR, 5_in }
+                            }
+                        }
+                    };
+                default:
+                    return {
+                        {
+                            GAME_PIECE::CORAL,
+                            {
+                                { ELEVATOR_STATE::STOWED, 3.5_in },
+                                { ELEVATOR_STATE::HP, 3.5_in },
+                                { ELEVATOR_STATE::ONE, 12.9_in },
+                                { ELEVATOR_STATE::TWO, 14.72_in },
+                                { ELEVATOR_STATE::THREE, 20.44_in },
+                                { ELEVATOR_STATE::FOUR, 27.4_in }
+                            }
+                        },
+                        {
+                            GAME_PIECE::ALGEE,
+                            {
+                                { ELEVATOR_STATE::ONE, 5_in },
+                                { ELEVATOR_STATE::TWO, 10.71_in },
+                                { ELEVATOR_STATE::THREE, 16.22_in },
+                                { ELEVATOR_STATE::FOUR, 30.5_in }
+                            }
+                        }
+                    };
+            }}
+
+            static bool elevatorMotorInverted() { switch (robot) {
+                case Robot::Alpha: return true;
+                case Robot::Gold: return false;
+                default: return false;
+            }}
+
+            static bool scorerMotorInverted() { switch (robot) {
+                case Robot::Alpha: return true;
+                case Robot::Gold: return false;
+                default: return false;
+            }}
+        }
 }
 #pragma GCC diagnostic pop

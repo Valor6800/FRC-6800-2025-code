@@ -32,12 +32,14 @@
 #define SCORER_SENSOR_TO_MECH 0.75f
 #define PULLEY_CIRCUMFERENCE 1.432_in
 
+using namespace Constants::Scorer;
+
 Scorer::Scorer(frc::TimedRobot *_robot) :
     valor::BaseSubsystem(_robot, "Scorer"),
     hallEffectDebounceSensor(_robot, "HallEffectDebounce"),
     candi(CANIDs::HALL_EFFECT, "baseCAN"),
-    elevatorMotor(new valor::PhoenixController(valor::PhoenixControllerType::KRAKEN_X60, CANIDs::ELEV_WHEEL, valor::NeutralMode::Brake, false, "baseCAN")),
-    scorerMotor(new valor::PhoenixController(valor::PhoenixControllerType::FALCON_FOC, CANIDs::SCORER_WHEEL, valor::NeutralMode::Brake, false, "baseCAN")),
+    elevatorMotor(new valor::PhoenixController(valor::PhoenixControllerType::KRAKEN_X60, CANIDs::ELEV_WHEEL, valor::NeutralMode::Brake, elevatorMotorInverted(), "baseCAN")),
+    scorerMotor(new valor::PhoenixController(valor::PhoenixControllerType::FALCON_FOC, CANIDs::SCORER_WHEEL, valor::NeutralMode::Brake, scorerMotorInverted(), "baseCAN")),
     frontRangeSensor(_robot, "Front Lidar Sensor", CANIDs::FRONT_LIDAR_SENSOR),
     scorerStagingSensor(_robot, "Scorer Staging Sensor", CANIDs::STAGING_LIDAR_SENSOR, "baseCAN")
 {
@@ -97,9 +99,9 @@ Scorer::Scorer(frc::TimedRobot *_robot) :
         frc2::SequentialCommandGroup(
             frc2::InstantCommand(
                 [this]() {
-                    state.scopedState = Scorer::SCOPED_STATE::SCOPED;
-                    state.elevState = Scorer::ELEVATOR_STATE::ONE;
-                    state.gamePiece = Scorer::GAME_PIECE::CORAL;
+                    state.scopedState = SCOPED_STATE::SCOPED;
+                    state.elevState = ELEVATOR_STATE::ONE;
+                    state.gamePiece = GAME_PIECE::CORAL;
                 }
             )
         )
@@ -108,9 +110,9 @@ Scorer::Scorer(frc::TimedRobot *_robot) :
         frc2::SequentialCommandGroup(
             frc2::InstantCommand(
                 [this]() {
-                    state.scopedState = Scorer::SCOPED_STATE::SCOPED;
-                    state.elevState = Scorer::ELEVATOR_STATE::TWO;
-                    state.gamePiece = Scorer::GAME_PIECE::CORAL;
+                    state.scopedState = SCOPED_STATE::SCOPED;
+                    state.elevState = ELEVATOR_STATE::TWO;
+                    state.gamePiece = GAME_PIECE::CORAL;
                 }
             )
         )
@@ -119,9 +121,9 @@ Scorer::Scorer(frc::TimedRobot *_robot) :
         frc2::SequentialCommandGroup(
             frc2::InstantCommand(
                 [this]() {
-                    state.scopedState = Scorer::SCOPED_STATE::SCOPED;
-                    state.elevState = Scorer::ELEVATOR_STATE::THREE;
-                    state.gamePiece = Scorer::GAME_PIECE::CORAL;
+                    state.scopedState = SCOPED_STATE::SCOPED;
+                    state.elevState = ELEVATOR_STATE::THREE;
+                    state.gamePiece = GAME_PIECE::CORAL;
                 }
             )
         )
@@ -130,9 +132,9 @@ Scorer::Scorer(frc::TimedRobot *_robot) :
         frc2::SequentialCommandGroup(
             frc2::InstantCommand(
                 [this]() {
-                    state.scopedState = Scorer::SCOPED_STATE::SCOPED;
-                    state.elevState = Scorer::ELEVATOR_STATE::FOUR;
-                    state.gamePiece = Scorer::GAME_PIECE::CORAL;
+                    state.scopedState = SCOPED_STATE::SCOPED;
+                    state.elevState = ELEVATOR_STATE::FOUR;
+                    state.gamePiece = GAME_PIECE::CORAL;
                 }
             )
         )
@@ -141,9 +143,9 @@ Scorer::Scorer(frc::TimedRobot *_robot) :
         frc2::SequentialCommandGroup(
             frc2::InstantCommand(
                 [this]() {
-                    state.scopedState = Scorer::SCOPED_STATE::SCOPED;
-                    state.elevState = Scorer::ELEVATOR_STATE::STOWED;
-                    state.gamePiece = Scorer::GAME_PIECE::CORAL;
+                    state.scopedState = SCOPED_STATE::SCOPED;
+                    state.elevState = ELEVATOR_STATE::STOWED;
+                    state.gamePiece = GAME_PIECE::CORAL;
                 }
             )
         )
@@ -152,9 +154,9 @@ Scorer::Scorer(frc::TimedRobot *_robot) :
         frc2::SequentialCommandGroup(
             frc2::InstantCommand(
                 [this]() {
-                    state.scopedState = Scorer::SCOPED_STATE::SCOPED;
-                    state.elevState = Scorer::ELEVATOR_STATE::HP;
-                    state.gamePiece = Scorer::GAME_PIECE::CORAL;
+                    state.scopedState = SCOPED_STATE::SCOPED;
+                    state.elevState = ELEVATOR_STATE::HP;
+                    state.gamePiece = GAME_PIECE::CORAL;
                 }
             )
         )
@@ -176,26 +178,26 @@ frc2::CommandPtr Scorer::createScoringSequence() {
 frc2::CommandPtr Scorer::createElevatorSequence() {
     return frc2::SequentialCommandGroup(
         frc2::InstantCommand([this]() { 
-            state.scopedState = Scorer::SCOPED_STATE::SCOPED;
-            state.gamePiece = Scorer::GAME_PIECE::CORAL;
+            state.scopedState = SCOPED_STATE::SCOPED;
+            state.gamePiece = GAME_PIECE::CORAL;
         }),
-        frc2::InstantCommand([this]() { state.elevState = Scorer::ELEVATOR_STATE::STOWED; }),
+        frc2::InstantCommand([this]() { state.elevState = ELEVATOR_STATE::STOWED; }),
         frc2::WaitCommand(1_s),
-        frc2::InstantCommand([this]() { state.elevState = Scorer::ELEVATOR_STATE::ONE; }),
+        frc2::InstantCommand([this]() { state.elevState = ELEVATOR_STATE::ONE; }),
         frc2::WaitCommand(1_s),
-        frc2::InstantCommand([this]() { state.elevState = Scorer::ELEVATOR_STATE::STOWED; }),
+        frc2::InstantCommand([this]() { state.elevState = ELEVATOR_STATE::STOWED; }),
         frc2::WaitCommand(1_s),
-        frc2::InstantCommand([this]() { state.elevState = Scorer::ELEVATOR_STATE::TWO; }),
+        frc2::InstantCommand([this]() { state.elevState = ELEVATOR_STATE::TWO; }),
         frc2::WaitCommand(1_s),
-        frc2::InstantCommand([this]() { state.elevState = Scorer::ELEVATOR_STATE::STOWED; }),
+        frc2::InstantCommand([this]() { state.elevState = ELEVATOR_STATE::STOWED; }),
         frc2::WaitCommand(1_s),
-        frc2::InstantCommand([this]() { state.elevState = Scorer::ELEVATOR_STATE::THREE; }),
+        frc2::InstantCommand([this]() { state.elevState = ELEVATOR_STATE::THREE; }),
         frc2::WaitCommand(1_s),
-        frc2::InstantCommand([this]() { state.elevState = Scorer::ELEVATOR_STATE::STOWED; }),
+        frc2::InstantCommand([this]() { state.elevState = ELEVATOR_STATE::STOWED; }),
         frc2::WaitCommand(1_s),
-        frc2::InstantCommand([this]() { state.elevState = Scorer::ELEVATOR_STATE::FOUR; }),
+        frc2::InstantCommand([this]() { state.elevState = ELEVATOR_STATE::FOUR; }),
         frc2::WaitCommand(1_s),
-        frc2::InstantCommand([this]() { state.elevState = Scorer::ELEVATOR_STATE::STOWED; })        
+        frc2::InstantCommand([this]() { state.elevState = ELEVATOR_STATE::STOWED; })        
     ).ToPtr();
 }
 
@@ -271,19 +273,19 @@ void Scorer::init()
         scorerMotor->setEncoderPosition(0_tr);
     });
 
-    posMap[GAME_PIECE::CORAL][ELEVATOR_STATE::STOWED] = units::meter_t(3.5_in);
-    posMap[GAME_PIECE::CORAL][ELEVATOR_STATE::HP] = units::meter_t(3.5_in);
-    //posMap[GAME_PIECE::CORAL][ELEVATOR_STATE::ONE] = units::meter_t(13.57_in);
-    posMap[GAME_PIECE::CORAL][ELEVATOR_STATE::ONE] = units::meter_t(12.9_in);
+    // posMap[GAME_PIECE::CORAL][ELEVATOR_STATE::STOWED] = units::meter_t(3.5_in);
+    // posMap[GAME_PIECE::CORAL][ELEVATOR_STATE::HP] = units::meter_t(3.5_in);
+    // //posMap[GAME_PIECE::CORAL][ELEVATOR_STATE::ONE] = units::meter_t(13.57_in);
+    // posMap[GAME_PIECE::CORAL][ELEVATOR_STATE::ONE] = units::meter_t(12.9_in);
 
-    posMap[GAME_PIECE::CORAL][ELEVATOR_STATE::TWO] = units::meter_t(14.72_in);
-    posMap[GAME_PIECE::CORAL][ELEVATOR_STATE::THREE] = units::meter_t(20.44_in);
-    posMap[GAME_PIECE::CORAL][ELEVATOR_STATE::FOUR] = units::meter_t(27.4_in);
+    // posMap[GAME_PIECE::CORAL][ELEVATOR_STATE::TWO] = units::meter_t(14.72_in);
+    // posMap[GAME_PIECE::CORAL][ELEVATOR_STATE::THREE] = units::meter_t(20.44_in);
+    // posMap[GAME_PIECE::CORAL][ELEVATOR_STATE::FOUR] = units::meter_t(27.4_in);
 
-    posMap[GAME_PIECE::ALGEE][ELEVATOR_STATE::ONE] = units::meter_t(5_in);
-    posMap[GAME_PIECE::ALGEE][ELEVATOR_STATE::TWO] = units::meter_t(10.71_in);
-    posMap[GAME_PIECE::ALGEE][ELEVATOR_STATE::THREE] = units::meter_t(16.22_in);
-    posMap[GAME_PIECE::ALGEE][ELEVATOR_STATE::FOUR] = units::meter_t(30.5_in);
+    // posMap[GAME_PIECE::ALGEE][ELEVATOR_STATE::ONE] = units::meter_t(5_in);
+    // posMap[GAME_PIECE::ALGEE][ELEVATOR_STATE::TWO] = units::meter_t(10.71_in);
+    // posMap[GAME_PIECE::ALGEE][ELEVATOR_STATE::THREE] = units::meter_t(16.22_in);
+    // posMap[GAME_PIECE::ALGEE][ELEVATOR_STATE::FOUR] = units::meter_t(30.5_in);
     
     resetState();
 
@@ -364,9 +366,9 @@ void Scorer::assignOutputs()
         elevatorMotor->setPower(state.manualSpeed + units::volt_t{ELEV_K_AFF});
     } else {
         if(state.scopedState == SCOPED || state.tuning){
-            state.targetHeight = posMap[state.gamePiece][state.elevState];
+            state.targetHeight = Constants::Scorer::positionMap().at(state.gamePiece).at(state.elevState);
         } else{
-            state.targetHeight = posMap[CORAL][HP];
+            state.targetHeight = Constants::Scorer::positionMap().at(CORAL).at(HP);
         }
         units::turn_t targetRotations = convertToMotorSpace(state.targetHeight);
         elevatorMotor->setPosition(targetRotations);
@@ -377,6 +379,7 @@ void Scorer::assignOutputs()
         if (state.gamePiece == GAME_PIECE::ALGEE) {
             scorerMotor->setSpeed(ALGEE_SCORE_SPEED);  
         } else {
+            auto scoringSpeedMap = Constants::Scorer::scoringSpeedMap();
             auto it = scoringSpeedMap.find(state.elevState);
             if (it != scoringSpeedMap.end()) {
                 scorerMotor->setSpeed(it->second);
@@ -446,7 +449,7 @@ void Scorer::InitSendable(wpi::SendableBuilder& builder)
     );
     builder.AddDoubleProperty(
         "Desired Speed: Scorer",
-        [this] { return scoringSpeedMap.find(state.elevState)->second.to<double>(); },
+        [this] { return Constants::Scorer::scoringSpeedMap().find(state.elevState)->second.to<double>(); },
         nullptr
     );
 
