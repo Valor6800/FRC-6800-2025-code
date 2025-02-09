@@ -12,9 +12,9 @@
 
 #include <frc/DriverStation.h>
 
-#define ELEV_K_P 10
+#define ELEV_K_P 0
 #define ELEV_K_ERROR units::angle::turn_t (0)
-#define ELEV_K_AFF 0.5
+#define ELEV_K_AFF 0.72
 #define ELEVATOR_SENSOR_TO_MECH 8.02f
 
 #define SCORER_K_P 0.5
@@ -26,15 +26,15 @@
 #define ELEVATOR_OFFSET 3_in
 
 #define ELEVATOR_MOTOR_TO_SENSOR 1.0f
-#define SCORER_SENSOR_TO_MECH 1.66666f
+#define SCORER_SENSOR_TO_MECH 0.75f
 #define PULLEY_CIRCUMFERENCE 1.432_in
 
 Scorer::Scorer(frc::TimedRobot *_robot) :
     valor::BaseSubsystem(_robot, "Scorer"),
     hallEffectDebounceSensor(_robot, "HallEffectDebounce"),
     candi(CANIDs::HALL_EFFECT, "baseCAN"),
-    elevatorMotor(new valor::PhoenixController(valor::PhoenixControllerType::KRAKEN_X60, CANIDs::ELEV_WHEEL, valor::NeutralMode::Brake, true, "baseCAN")),
-    scorerMotor(new valor::PhoenixController(valor::PhoenixControllerType::FALCON_FOC, CANIDs::SCORER_WHEEL, valor::NeutralMode::Brake, true, "baseCAN")),
+    elevatorMotor(new valor::PhoenixController(valor::PhoenixControllerType::KRAKEN_X60, CANIDs::ELEV_WHEEL, valor::NeutralMode::Brake, false, "baseCAN")),
+    scorerMotor(new valor::PhoenixController(valor::PhoenixControllerType::FALCON_FOC, CANIDs::SCORER_WHEEL, valor::NeutralMode::Brake, false, "baseCAN")),
     frontRangeSensor(_robot, "Front Lidar Sensor", CANIDs::FRONT_LIDAR_SENSOR),
     scorerStagingSensor(_robot, "Scorer Staging Sensor", CANIDs::STAGING_LIDAR_SENSOR, "baseCAN")
 {
@@ -264,16 +264,16 @@ void Scorer::init()
         scorerMotor->setEncoderPosition(0_tr);
     });
 
-    posMap[GAME_PIECE::CORAL][ELEVATOR_STATE::STOWED] = units::meter_t(3_in);
-    posMap[GAME_PIECE::CORAL][ELEVATOR_STATE::HP] = units::meter_t(3.25_in);
+    posMap[GAME_PIECE::CORAL][ELEVATOR_STATE::STOWED] = units::meter_t(5_in);
+    posMap[GAME_PIECE::CORAL][ELEVATOR_STATE::HP] = units::meter_t(5_in);
     posMap[GAME_PIECE::CORAL][ELEVATOR_STATE::ONE] = units::meter_t(13.57_in);
-    posMap[GAME_PIECE::CORAL][ELEVATOR_STATE::TWO] = units::meter_t(18.5_in);
-    posMap[GAME_PIECE::CORAL][ELEVATOR_STATE::THREE] = units::meter_t(26.55_in);
+    posMap[GAME_PIECE::CORAL][ELEVATOR_STATE::TWO] = units::meter_t(14_in);
+    posMap[GAME_PIECE::CORAL][ELEVATOR_STATE::THREE] = units::meter_t(14_in);
     posMap[GAME_PIECE::CORAL][ELEVATOR_STATE::FOUR] = units::meter_t(5_in);
 
     posMap[GAME_PIECE::ALGEE][ELEVATOR_STATE::ONE] = units::meter_t(5_in);
     posMap[GAME_PIECE::ALGEE][ELEVATOR_STATE::TWO] = units::meter_t(13.2_in);
-    posMap[GAME_PIECE::ALGEE][ELEVATOR_STATE::THREE] = units::meter_t(23.31_in);
+    posMap[GAME_PIECE::ALGEE][ELEVATOR_STATE::THREE] = units::meter_t(14_in);
     posMap[GAME_PIECE::ALGEE][ELEVATOR_STATE::FOUR] = units::meter_t(5_in);
     
     resetState();

@@ -74,7 +74,7 @@ namespace CANIDs {
     constexpr static int AZIMUTH_CANS[4] = {1, 3, 5, 7};
     constexpr static int CANCODER_CANS[4] = {20, 21, 22, 23};
     constexpr static int PIGEON_CAN = 61;
-    constexpr static int SCORER_WHEEL = 51;
+    constexpr static int SCORER_WHEEL = 11;
     constexpr static int ELEV_WHEEL = 30;
     constexpr static int CLIMBER_LEAD = 53;
     constexpr static int CLIMBER_FOLLOW = 54;
