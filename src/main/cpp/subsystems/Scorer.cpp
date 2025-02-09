@@ -265,7 +265,7 @@ void Scorer::init()
     });
 
     posMap[GAME_PIECE::CORAL][ELEVATOR_STATE::STOWED] = units::meter_t(3_in);
-    posMap[GAME_PIECE::CORAL][ELEVATOR_STATE::HP] = units::meter_t(5.069_in);
+    posMap[GAME_PIECE::CORAL][ELEVATOR_STATE::HP] = units::meter_t(3_in);
     posMap[GAME_PIECE::CORAL][ELEVATOR_STATE::ONE] = units::meter_t(13.57_in);
     posMap[GAME_PIECE::CORAL][ELEVATOR_STATE::TWO] = units::meter_t(18.5_in);
     posMap[GAME_PIECE::CORAL][ELEVATOR_STATE::THREE] = units::meter_t(26.55_in);
