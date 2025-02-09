@@ -197,7 +197,8 @@ Drivetrain::Drivetrain(frc::TimedRobot *_robot, CANdle& leds) :
 
     poseErrorPPTopic = nt::NetworkTableInstance::GetDefault().GetStructTopic<frc::Transform2d>("LiveWindow/BaseSubsystem/SwerveDrive/Pose Error PP").Publish();
     table->PutNumber("Y Controller Activation Degree Threshold", Y_ACTIVATION_THRESHOLD.value());
-    reefPublisher = nt::NetworkTableInstance::GetDefault().GetStructTopic<frc::Transform2d>("Reef Transform").Publish();
+    reefPublisher = nt::NetworkTableInstance::GetDefault().GetStructTopic<frc::Pose2d>("Reef Pose").Publish();
+    robotPublisher = nt::NetworkTableInstance::GetDefault().GetStructTopic<frc::Pose2d>("Robot Pose").Publish();
     robotInTagSpacePublisher = nt::NetworkTableInstance::GetDefault().GetStructTopic<frc::Transform2d>("Robot In Tag Space Transform").Publish();
 
     resetState();
@@ -336,13 +337,30 @@ void Drivetrain::analyzeDashboard()
 
     if (true){ //TODO: CHANGE THIS TO BE ELASTIC VALUE
         Swerve::yDistance = 0_m;
-        if (state.reefTag != -1) {
-            frc::Transform2d reefTagTransform{
-                valor::aprilTagPositions.at(state.reefTag).Translation().ToTranslation2d() + frc::Translation2d(17.5482504_m / 2.0, 8.0519016_m / 2.0),
-                valor::aprilTagPositions.at(state.reefTag).Rotation().ToRotation2d()
+        if (state.alignToTarget) {
+            frc::Pose2d robotToCenter{
+                getCalculatedPose().Translation() + frc::Translation2d(-17.5482504_m / 2.0, -8.0519016_m / 2.0),
+                getCalculatedPose().Rotation()
+            };
+            std::pair<int, frc::Pose3d> temp = valor::getNearestTag(robotToCenter);
+            std::pair<int, frc::Pose2d> reefTagPose{ temp.first, temp.second.ToPose2d()};
+
+            reefTagPose = std::pair<int, frc::Pose2d>{
+                reefTagPose.first,
+                frc::Pose2d{
+                    reefTagPose.second.Translation() + frc::Translation2d(17.5482504_m / 2.0, 8.0519016_m / 2.0),
+                    reefTagPose.second.Rotation()
+                }
             };
 
-            reefPublisher.Set(reefTagTransform);
+            state.reefTag = reefTagPose.first;
+
+            reefPublisher.Set(reefTagPose.second);
+
+            frc::Transform2d reefTagTransform{
+                reefTagPose.second.Translation(),
+                reefTagPose.second.Rotation()
+            };
 
             frc::Transform2d robotTransform{
                 getCalculatedPose().Translation(),
