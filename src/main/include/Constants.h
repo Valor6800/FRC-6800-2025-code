@@ -26,10 +26,8 @@
 #include "valkyrie/controllers/PhoenixController.h"
 
 
-#define ALPHA_TEAM_NUMBER 6800
 #define ALPHA_SERIAL_NUMBER "03260AF3"
-#define GOLD_TEAM_NUMBER 6808
-#define GOLD_SERIAL_NUMBER ""
+#define GOLD_SERIAL_NUMBER "033E1BEA"
 // When trying to compile against other targets for simulation, cmath doesn't include M_PI
 //   Therefore if not defined, define M_PI for use on other targets
 #ifndef M_PI
