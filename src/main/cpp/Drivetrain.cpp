@@ -120,6 +120,7 @@ Drivetrain::Drivetrain(frc::TimedRobot *_robot) :
     table->PutNumber("Vision Acceptance", VISION_ACCEPTANCE.to<double>() );
     table->PutNumber("KPLIMELIGHT", KP_LIMELIGHT);
     table->PutBoolean("Accepting Vision Measurements", true);
+    table->PutBoolean("USE AUTO-ALIGN", true);
 
     setRotAlignOffset(90_deg);
 
@@ -289,7 +290,7 @@ void Drivetrain::assessInputs()
         } 
     }
     
-    // Swerve::alignToTarget = driverGamepad->leftTriggerActive();
+    Swerve::alignToTarget = driverGamepad->leftTriggerActive() && table->GetBoolean("USE AUTO-ALIGN", true);;
     if (driverGamepad->leftTriggerActive() && !hasReset) {
         Swerve::resetAlignControllers();
         hasReset = true;
