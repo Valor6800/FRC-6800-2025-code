@@ -24,6 +24,9 @@
 #define LOOP_TIME 0.05_s
 #define EPS 1e-9
 
+#define Y_KFF 0.6
+#define I_ZONE 0.05
+
 const units::hertz_t KP_ROTATE(-90);
 const units::hertz_t KD_ROTATE(-30);
 
@@ -116,6 +119,7 @@ template<class AzimuthMotor, class DriveMotor>
 void Swerve<AzimuthMotor, DriveMotor>::analyzeDashboard()
 {
     y_controller.SetP(Y_KP);
+    y_controller.SetI(Y_KI);
     y_controller.SetD(Y_KD);
 
     rot_controller.SetP(ROT_KP);
@@ -143,7 +147,6 @@ void Swerve<AzimuthMotor, DriveMotor>::analyzeDashboard()
     rot_controller.SetGoal(units::radian_t{targetAngle - rotAlignOffset});
     rot_controller.Calculate(robotRotation);
     if (alignToTarget) {
-        
         rotSpeedRPS = units::radians_per_second_t{rot_controller.Calculate(robotRotation)} + rot_controller.GetSetpoint().velocity;
     } 
     else {
@@ -180,10 +183,17 @@ void Swerve<AzimuthMotor, DriveMotor>::analyzeDashboard()
 
     getSkiddingRatio();
 
+    if(units::math::fabs(yDistance - goalAlign).value() < I_ZONE) {
+        y_controller.SetIZone(I_ZONE);
+    } else{
+        y_controller.SetIZone(0);
+    }
+    
     y_controller.SetGoal(goalAlign);
     calculated_y_controller_val = y_controller.Calculate(yDistance, goalAlign);
     if (alignToTarget){
-        relativeToTagSpeed = units::meters_per_second_t{calculated_y_controller_val} + y_controller.GetSetpoint().velocity;
+        
+        relativeToTagSpeed = units::meters_per_second_t{calculated_y_controller_val} + (Y_KFF * y_controller.GetSetpoint().velocity);
 
         pidVector = MAKE_VECTOR(targetAngle - rotAlignOffset) * relativeToTagSpeed.value();
         powerVector = joystickVector + pidVector;

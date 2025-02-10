@@ -120,16 +120,17 @@ protected:
     frc::ChassisSpeeds getRobotRelativeSpeeds();
     void setSwerveDesiredState(wpi::array<frc::SwerveModuleState, MODULE_COUNT> desiredStates, bool isDriveOpenLoop);
 
-    double ROT_KP = 3;
+    double ROT_KP = 6;
     double ROT_KD = 0.5;
     double Y_KP = 0.0;
+    double Y_KI = 0.0;
     double Y_KD = 0;
 
-    units::degree_t rotPosTolerance = 2.0_deg;
-    units::degrees_per_second_t rotVelTolerance = 1_deg_per_s;
+    units::degree_t rotPosTolerance = 0.0_deg; //1.0_deg;
+    units::degrees_per_second_t rotVelTolerance = 0_deg_per_s; //1_deg_per_s;
 
-    units::millimeter_t yPosTolerance = 60_mm;
-    units::meters_per_second_t yVelTolerance = 0.01_mps;
+    units::millimeter_t yPosTolerance = 0_mm;  //20_mm;
+    units::meters_per_second_t yVelTolerance = 0.0_mps; //0.01_mps;
 
     units::meter_t goalAlign = 0.0_m;
 

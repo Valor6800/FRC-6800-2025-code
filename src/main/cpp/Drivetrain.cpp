@@ -62,9 +62,11 @@ const units::meter_t WHEEL_DIAMETER(0.0973_m);
 
 #define MT2_POSE true
 
-#define Y_ALIGN_KP 1
-#define Y_ALIGN_KD 0.025
 #define Y_FILTER_CONST 0.99
+#define Y_ALIGN_KP 6 
+#define Y_ALIGN_KI 10
+#define Y_ALIGN_KD 0.2
+
 
 // fix these
 #define BLUE_REEF_17_ANGLE 120_deg
@@ -82,7 +84,8 @@ const units::meter_t WHEEL_DIAMETER(0.0973_m);
 #define RED_REEF_10_ANGLE 180_deg - 180_deg
 #define RED_REEF_11_ANGLE -120_deg + 180_deg
 
-#define POLE_OFFSET 6.5_in
+#define POLE_OFFSET 6.758_in
+#define SCORER_TO_ROBOT 0.5_in
 
 Drivetrain::Drivetrain(frc::TimedRobot *_robot) : 
     valor::Swerve<SwerveAzimuthMotor, SwerveDriveMotor>(
@@ -102,16 +105,18 @@ Drivetrain::Drivetrain(frc::TimedRobot *_robot) :
     thetaPIDF.I = KIT;
     thetaPIDF.D = KDT;
 
-    table->PutNumber("Rot_Pos_Tol", Swerve::rotPosTolerance.to<double>());
-    table->PutNumber("Rot_Vel_Tol", Swerve::rotVelTolerance.to<double>());
+    // table->PutNumber("Rot_Pos_Tol", Swerve::rotPosTolerance.to<double>());
+    // table->PutNumber("Rot_Vel_Tol", Swerve::rotVelTolerance.to<double>());
 
-    table->PutNumber("Y_Pos_Tol", Swerve::yPosTolerance.to<double>());
-    table->PutNumber("Y_Vel_Tol", Swerve::yVelTolerance.to<double>());
+    // table->PutNumber("Y_Pos_Tol", Swerve::yPosTolerance.to<double>());
+    // table->PutNumber("Y_Vel_Tol", Swerve::yVelTolerance.to<double>());
 
     Swerve::Y_KP = Y_ALIGN_KP;
+    Swerve::Y_KI = Y_ALIGN_KI;
     Swerve::Y_KD = Y_ALIGN_KD;
 
     table->PutNumber("Y_KP", Swerve::Y_KP);
+    table->PutNumber("Y_KI", Swerve::Y_KI);
     table->PutNumber("Y_KD", Swerve::Y_KD);
 
     table->PutNumber("Rot_KP", Swerve::ROT_KP);
@@ -313,13 +318,14 @@ void Drivetrain::analyzeDashboard()
     Swerve::ROT_KD = table->GetNumber("Rot_KD", Swerve::ROT_KD);
 
     Swerve::Y_KP = table->GetNumber("Y_KP", Swerve::Y_KP);
+    Swerve::Y_KI = table->GetNumber("Y_KI", Swerve::Y_KI);
     Swerve::Y_KD = table->GetNumber("Y_KD", Swerve::Y_KD);
 
-    Swerve::rotPosTolerance = table->GetNumber("Rot_Pos_Tol", Swerve::rotPosTolerance.to<double>()) * 1_deg;
-    Swerve::rotVelTolerance = table->GetNumber("Rot_Vel_Tol", Swerve::rotVelTolerance.to<double>()) * 1_deg_per_s;
+    // Swerve::rotPosTolerance = table->GetNumber("Rot_Pos_Tol", Swerve::rotPosTolerance.to<double>()) * 1_deg;
+    // Swerve::rotVelTolerance = table->GetNumber("Rot_Vel_Tol", Swerve::rotVelTolerance.to<double>()) * 1_deg_per_s;
 
-    Swerve::yPosTolerance = table->GetNumber("Y_Pos_Tol", Swerve::yPosTolerance.to<double>()) * 1_mm;
-    Swerve::yVelTolerance = table->GetNumber("Y_Vel_Tol", Swerve::yVelTolerance.to<double>()) * 1_mps;
+    // Swerve::yPosTolerance = table->GetNumber("Y_Pos_Tol", Swerve::yPosTolerance.to<double>()) * 1_mm;
+    // Swerve::yVelTolerance = table->GetNumber("Y_Vel_Tol", Swerve::yVelTolerance.to<double>()) * 1_mps;
 
     // Swerve::goalAlign = units::meter_t{table->GetNumber("Pole Offset", Swerve::goalAlign.to<double>())};
     choosePoleDirection(state.dir);
@@ -478,7 +484,7 @@ void Drivetrain::choosePoleDirection(Drivetrain::Direction dir){
             Swerve::goalAlign = -units::math::abs(POLE_OFFSET);
             break;
         case RIGHT:
-            Swerve::goalAlign = units::math::abs(POLE_OFFSET);
+            Swerve::goalAlign = units::math::abs(POLE_OFFSET); // + SCORER_TO_ROBOT
             break;
         default:
             Swerve::goalAlign = 0_m;
