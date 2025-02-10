@@ -407,7 +407,9 @@ void Drivetrain::analyzeDashboard()
 
     Swerve::cameraPose = getPoseFromCameras();
     Swerve::encoderPose = getRawPose();
-    Swerve::mergedPose = frc::Pose2d{(((1 / std::pow(Swerve::meritEncoder, 2)) * Swerve::encoderPose.ToMatrix()) + 
+    if(Swerve::meritCamera == MAX) Swerve::mergedPose = encoderPose;
+    else if(Swerve::meritEncoder == MAX) Swerve::mergedPose = cameraPose;
+    else Swerve::mergedPose = frc::Pose2d{(((1 / std::pow(Swerve::meritEncoder, 2)) * Swerve::encoderPose.ToMatrix()) + 
                                     ((1 / std::pow(Swerve::meritCamera, 2)) * Swerve::cameraPose.ToMatrix())) / 
                                     (1/std::pow(Swerve::meritEncoder, 2) + 1/std::pow(Swerve::meritCamera, 2))};
 
