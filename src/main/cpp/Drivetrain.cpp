@@ -276,7 +276,7 @@ void Drivetrain::assessInputs()
                 aprilLime->getTagID() >= 17 &&
                 aprilLime->getTagID() <= 22)
             ){ 
-
+    
                 units::degree_t currentSkew = aprilLime->getTargetToBotPose().Rotation().Y() + 90_deg;
                 if (state.getTag && leastSkew > units::math::abs(currentSkew)) {
                     state.reefTag = aprilLime->getTagID();
@@ -288,8 +288,8 @@ void Drivetrain::assessInputs()
             }
         } 
     }
-
-    Swerve::alignToTarget = driverGamepad->leftTriggerActive();
+    
+    // Swerve::alignToTarget = driverGamepad->leftTriggerActive();
     if (driverGamepad->leftTriggerActive() && !hasReset) {
         Swerve::resetAlignControllers();
         hasReset = true;
