@@ -184,6 +184,8 @@ Drivetrain::Drivetrain(frc::TimedRobot *_robot, valor::CANdleSensor *_leds) :
         this // Reference to this subsystem to set requirements
     );
 
+    poseErrorPPTopic = nt::NetworkTableInstance::GetDefault().GetStructTopic<frc::Transform2d>("LiveWindow/BaseSubsystem/SwerveDrive/Pose Error PP").Publish();
+
     resetState();
     init();
 }
@@ -564,42 +566,5 @@ void Drivetrain::InitSendable(wpi::SendableBuilder& builder)
             [this] {return state.aligned;},
             nullptr
         );
-        builder.AddDoubleArrayProperty(
-            "Current Pose PP",
-            [this] {
-                std::vector<double> pose;
-                pose.push_back(currentPosePathPlanner.Get().X().to<double>());
-                pose.push_back(currentPosePathPlanner.Get().Y().to<double>());
-                pose.push_back(currentPosePathPlanner.Get().Rotation().Radians().to<double>());
-                return pose;
-            },
-            nullptr
-        );
-        builder.AddDoubleArrayProperty(
-            "Target Pose PP",
-            [this] {
-                std::vector<double> pose;
-                pose.push_back(targetPosePathPlanner.Get().X().to<double>());
-                pose.push_back(targetPosePathPlanner.Get().Y().to<double>());
-                pose.push_back(targetPosePathPlanner.Get().Rotation().Radians().to<double>());
-                return pose;
-            },
-            nullptr
-        );
-        builder.AddDoubleArrayProperty(
-            "Pose Error PP",
-            [this] {
-                std::vector<double> pose;
-                pose.push_back(poseErrorPP.X().to<double>());
-                pose.push_back(poseErrorPP.Y().to<double>());
-                pose.push_back(poseErrorPP.Rotation().Radians().to<double>());
-                return pose;
-            },
-            nullptr
-        );
-        builder.AddDoubleProperty(
-            "Unfiltered Y Distance",
-            [this] {return unfilteredYDistance;},
-            nullptr
-        );
+        poseErrorPPTopic.Set(poseErrorPP); // WARN: Proof of concept
     }

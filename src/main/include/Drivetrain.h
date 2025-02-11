@@ -178,6 +178,6 @@ private:
      double unfilteredYDistance;
 
      valor::CANdleSensor *leds;
-
      
+     nt::StructPublisher<frc::Transform2d> poseErrorPPTopic;
 };

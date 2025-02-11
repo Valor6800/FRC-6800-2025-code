@@ -12,6 +12,8 @@
 
 #include <deque>
 #include "Eigen/Core"
+#include "frc/EigenCore.h"
+#include "networktables/StructTopic.h"
 #include "units/angle.h"
 #include "units/length.h"
 #include "units/time.h"
@@ -193,6 +195,9 @@ private:
 
     Eigen::Vector2d joystickVector, pidVector, powerVector;
     units::angle::degree_t rotAlignOffset;
+
+    nt::StructPublisher<frc::Pose2d> rawPosePublisher, calculatedPosePublisher;
+    nt::StructPublisher<frc::ChassisSpeeds> robotVelocitiesPublisher;
 };
 
 }
