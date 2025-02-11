@@ -2,6 +2,7 @@
 #include "Eigen/Core"
 #include "frc/Timer.h"
 #include "frc/kinematics/ChassisSpeeds.h"
+#include "networktables/NetworkTableInstance.h"
 #include "units/angle.h"
 #include "units/angular_velocity.h"
 #include "units/length.h"
@@ -73,6 +74,10 @@ Swerve<AzimuthMotor, DriveMotor>::Swerve(frc::TimedRobot *_robot,
     rawEstimator = std::make_unique<frc::SwerveDrivePoseEstimator<MODULE_COUNT>>(*kinematics, getGyro(), getModuleStates(), frc::Pose2d{0_m, 0_m, 0_rad});
     calcEstimator = std::make_unique<frc::SwerveDrivePoseEstimator<MODULE_COUNT>>(*kinematics, getGyro(), getModuleStates(), frc::Pose2d{0_m, 0_m, 0_rad});
 
+    rawPosePublisher = nt::NetworkTableInstance::GetDefault().GetStructTopic<frc::Pose2d>("LiveWindow/BaseSubsystem/SwerveDrive/Actual Raw Pose").Publish();
+    calculatedPosePublisher = nt::NetworkTableInstance::GetDefault().GetStructTopic<frc::Pose2d>("LiveWindow/BaseSubsystem/SwerveDrive/Actual Calculated Pose").Publish();
+    robotVelocitiesPublisher = nt::NetworkTableInstance::GetDefault().GetStructTopic<frc::ChassisSpeeds>("LiveWindow/BaseSubsystem/SwerveDrive/Robot Velocities").Publish();
+
     resetState();
 }
 
@@ -115,6 +120,10 @@ void Swerve<AzimuthMotor, DriveMotor>::assessInputs()
 template<class AzimuthMotor, class DriveMotor>
 void Swerve<AzimuthMotor, DriveMotor>::analyzeDashboard()
 {
+    rawPosePublisher.Set(rawEstimator->GetEstimatedPosition());
+    calculatedPosePublisher.Set(getCalculatedPose());
+    robotVelocitiesPublisher.Set(getRobotRelativeSpeeds());
+
     y_controller.SetP(Y_KP);
     y_controller.SetD(Y_KD);
 
@@ -501,60 +510,6 @@ void Swerve<AzimuthMotor, DriveMotor>::InitSendable(wpi::SendableBuilder& builde
         nullptr
     );
     builder.AddDoubleProperty(
-        "Actual Raw Pose X",
-        [this] { return getRawPose().X().template to<double>(); },
-        nullptr
-    );
-    builder.AddDoubleProperty(
-        "Actual Raw Pose Y",
-        [this] { return getRawPose().Y().template to<double>(); },
-        nullptr
-    );
-    builder.AddDoubleProperty(
-        "Actual Raw Pose Theta",
-        [this] { return getRawPose().Rotation().Degrees().template to<double>(); },
-        nullptr
-    );
-    builder.AddDoubleArrayProperty(
-        "Actual Raw Pose",
-        [this] 
-        { 
-            std::vector<double> pose;
-            pose.push_back(getRawPose().X().template to<double>());
-            pose.push_back(getRawPose().Y().template to<double>());
-            pose.push_back(getRawPose().Rotation().Radians().template to<double>());
-            return pose;
-        },
-        nullptr
-    );
-    builder.AddDoubleProperty(
-        "Actual Calculated Pose X",
-        [this] { return getCalculatedPose().X().template to<double>(); },
-        nullptr
-    );
-    builder.AddDoubleProperty(
-        "Actual Calculated Pose Y",
-        [this] { return getCalculatedPose().Y().template to<double>(); },
-        nullptr
-    );
-    builder.AddDoubleProperty(
-        "Actual Calculated Pose Theta",
-        [this] { return getCalculatedPose().Rotation().Degrees().template to<double>(); },
-        nullptr
-    );
-    builder.AddDoubleArrayProperty(
-        "Actual Calculated Pose",
-        [this] 
-        { 
-            std::vector<double> pose;
-            pose.push_back(getCalculatedPose().X().template to<double>());
-            pose.push_back(getCalculatedPose().Y().template to<double>());
-            pose.push_back(getCalculatedPose().Rotation().Radians().template to<double>());
-            return pose;
-        },
-        nullptr
-    );
-    builder.AddDoubleProperty(
         "Gyro Pitch",
         [this]
         {
@@ -601,17 +556,6 @@ void Swerve<AzimuthMotor, DriveMotor>::InitSendable(wpi::SendableBuilder& builde
             states.push_back(swerveModules[2]->getState().speed.template to<double>());
             states.push_back(swerveModules[3]->getState().angle.Degrees().template to<double>());
             states.push_back(swerveModules[3]->getState().speed.template to<double>());
-            return states;
-        },
-        nullptr
-    );
-    builder.AddDoubleArrayProperty(
-        "Robot Velocities",
-        [this]
-        {
-            std::vector<double> states;
-            states.push_back(getRobotRelativeSpeeds().vx.template to<double>());
-            states.push_back(getRobotRelativeSpeeds().vy.template to<double>());
             return states;
         },
         nullptr
@@ -741,4 +685,6 @@ void Swerve<AzimuthMotor, DriveMotor>::InitSendable(wpi::SendableBuilder& builde
         [this] {return y_controller.GetVelocityError().value();},
         nullptr
     );
+
+    
 }

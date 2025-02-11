@@ -10,6 +10,8 @@
 #include <frc/trajectory/TrapezoidProfile.h>
 
 #include "Eigen/Core"
+#include "frc/EigenCore.h"
+#include "networktables/StructTopic.h"
 #include "units/angle.h"
 #include "units/length.h"
 #include "units/time.h"
@@ -174,6 +176,9 @@ private:
     units::angle::degree_t rotAlignOffset;
 
     units::meters_per_second_t yControllerInitialVelocity;
+
+    nt::StructPublisher<frc::Pose2d> rawPosePublisher, calculatedPosePublisher;
+    nt::StructPublisher<frc::ChassisSpeeds> robotVelocitiesPublisher;
 };
 
 }

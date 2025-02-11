@@ -169,4 +169,5 @@ private:
      nt::StructSubscriber<frc::Pose2d> currentPosePathPlanner;
      nt::StructSubscriber<frc::Pose2d> targetPosePathPlanner;
      frc::Transform2d poseErrorPP;
+     nt::StructPublisher<frc::Transform2d> poseErrorPPTopic;
 };
