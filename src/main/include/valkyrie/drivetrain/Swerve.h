@@ -89,6 +89,7 @@ public:
     wpi::array<frc::SwerveModuleState, MODULE_COUNT> getAllModuleStates();
     void updateAngularAcceleration();
     units::angular_acceleration::radians_per_second_squared_t getSmoothedAngularAcceleration();
+    double rotationLerping(double);
 
     void InitSendable(wpi::SendableBuilder& builder) override;
 

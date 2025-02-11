@@ -30,6 +30,11 @@
 const units::hertz_t KP_ROTATE(-90);
 const units::hertz_t KD_ROTATE(-30);
 
+const std::pair<double, double> P1{0.0, 0.0};
+const std::pair<double, double> P2{0.6, 0.05};
+const std::pair<double, double> P3{0.8, 0.1};
+const std::pair<double, double> P4{0.95, 0.2};
+const std::pair<double, double> P5{1.0, 1.0};
 
 #define MAKE_VECTOR(angle) Eigen::Vector2d{units::math::cos(angle).value(), units::math::sin(angle).value()}
 
@@ -112,7 +117,7 @@ void Swerve<AzimuthMotor, DriveMotor>::assessInputs()
 
     xSpeed = driverGamepad->leftStickY(2);
     ySpeed = driverGamepad->leftStickX(2);
-    rotSpeed = driverGamepad->rightStickX(3);
+    rotSpeed = rotationLerping(driverGamepad->rightStickX(1));
 }
 
 template<class AzimuthMotor, class DriveMotor>
@@ -506,6 +511,25 @@ frc::Twist2d Swerve<AzimuthMotor, DriveMotor>::log(frc::Pose2d transform){
 
     frc::Translation2d translation_part = transform.Translation().RotateBy(frc::Rotation2d(halftheta_by_tan_of_halfdtheta, -half_dtheta));//*sqrt(pow(halftheta_by_tan_of_halfdtheta, 2) + pow(half_dtheta, 2));
     return frc::Twist2d{translation_part.X(), translation_part.Y(), units::radian_t{dtheta}};
+}
+
+template<class AzimuthMotor, class DriveMotor>
+double Swerve<AzimuthMotor, DriveMotor>::rotationLerping(double input){
+    double rot = 0.0;
+    double abs = std::abs(input);
+    if(abs > P4.first){
+        rot = copysign((((P5.second - P4.second)/(P5.first - P4.first))*(input - P4.first)) + P4.second, input);
+    }
+    else if(abs > P3.first){
+        rot = copysign((((P4.second - P3.second)/(P4.first - P3.first))*(input - P3.first)) + P3.second, input);
+    }
+    else if(abs > P2.first){
+        rot = copysign((((P3.second - P2.second)/(P3.first - P2.first))*(input - P2.first)) + P2.second, input);
+    }
+    else{
+        rot = copysign((((P2.second - P1.second)/(P2.first - P1.first))*(input - P1.first)) + P1.second, input);
+    }
+    return rot;
 }
 
 template<class AzimuthMotor, class DriveMotor>
