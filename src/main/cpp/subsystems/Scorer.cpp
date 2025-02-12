@@ -12,19 +12,19 @@
 
 #include <frc/DriverStation.h>
 
-#define ELEV_K_P 0
+#define ELEV_K_P 10
 #define ELEV_K_ERROR units::angle::turn_t (0)
 #define ELEV_K_AFF 0.72
 #define ELEVATOR_SENSOR_TO_MECH 1.0f
 
 #define SCORER_K_P 0.5
 #define SCORER_K_S 0.45
-#define INTAKE_SPEED 5_tps
+#define INTAKE_SPEED 10_tps //5
 #define SCORE_SPEED 11_tps
 
 #define ELEVATOR_FORWARD_LIMIT 5.75_tr
 #define ELEVATOR_OFFSET 3_in
-#define ELEVATOR_MAGNET_OFFSET -0.072_tr
+#define ELEVATOR_MAGNET_OFFSET 0.321_tr
 
 #define ELEVATOR_MOTOR_TO_SENSOR 8.02f
 #define SCORER_SENSOR_TO_MECH 0.75f
@@ -231,13 +231,13 @@ void Scorer::init()
 
     valor::PIDF elevatorPID;
     elevatorPID.maxVelocity = elevatorMotor->getMaxMechSpeed();
-    elevatorPID.maxAcceleration = elevatorMotor->getMaxMechSpeed()/(1.0_s/5);
+    elevatorPID.maxAcceleration = elevatorMotor->getMaxMechSpeed()/(1.0_s/0.5);
     elevatorPID.P =ELEV_K_P ;
     elevatorPID.error = ELEV_K_ERROR;
     elevatorPID.aFF = ELEV_K_AFF;
     elevatorPID.aFFType = valor::FeedForwardType::LINEAR;
     elevatorMotor->setPIDF(elevatorPID, 0);
-    elevatorMotor->setupCANCoder(CANIDs::ELEVATOR_CAN, ELEVATOR_MAGNET_OFFSET, true, "baseCAN", 0.75_tr); 
+    elevatorMotor->setupCANCoder(CANIDs::ELEVATOR_CAN, ELEVATOR_MAGNET_OFFSET, true, "baseCAN", 1_tr); 
     elevatorMotor->applyConfig();
 
     // Scorer init sequence
@@ -269,17 +269,19 @@ void Scorer::init()
         scorerMotor->setEncoderPosition(0_tr);
     });
 
-    posMap[GAME_PIECE::CORAL][ELEVATOR_STATE::STOWED] = units::meter_t(5_in);
-    posMap[GAME_PIECE::CORAL][ELEVATOR_STATE::HP] = units::meter_t(5_in);
-    posMap[GAME_PIECE::CORAL][ELEVATOR_STATE::ONE] = units::meter_t(13.57_in);
-    posMap[GAME_PIECE::CORAL][ELEVATOR_STATE::TWO] = units::meter_t(14_in);
-    posMap[GAME_PIECE::CORAL][ELEVATOR_STATE::THREE] = units::meter_t(14_in);
-    posMap[GAME_PIECE::CORAL][ELEVATOR_STATE::FOUR] = units::meter_t(5_in);
+    posMap[GAME_PIECE::CORAL][ELEVATOR_STATE::STOWED] = units::meter_t(3.5_in);
+    posMap[GAME_PIECE::CORAL][ELEVATOR_STATE::HP] = units::meter_t(3.5_in);
+    //posMap[GAME_PIECE::CORAL][ELEVATOR_STATE::ONE] = units::meter_t(13.57_in);
+    posMap[GAME_PIECE::CORAL][ELEVATOR_STATE::ONE] = units::meter_t(10_in);
+
+    posMap[GAME_PIECE::CORAL][ELEVATOR_STATE::TWO] = units::meter_t(13_in);
+    posMap[GAME_PIECE::CORAL][ELEVATOR_STATE::THREE] = units::meter_t(16_in);
+    posMap[GAME_PIECE::CORAL][ELEVATOR_STATE::FOUR] = units::meter_t(20_in);
 
     posMap[GAME_PIECE::ALGEE][ELEVATOR_STATE::ONE] = units::meter_t(5_in);
     posMap[GAME_PIECE::ALGEE][ELEVATOR_STATE::TWO] = units::meter_t(13.2_in);
     posMap[GAME_PIECE::ALGEE][ELEVATOR_STATE::THREE] = units::meter_t(14_in);
-    posMap[GAME_PIECE::ALGEE][ELEVATOR_STATE::FOUR] = units::meter_t(5_in);
+    posMap[GAME_PIECE::ALGEE][ELEVATOR_STATE::FOUR] = units::meter_t(14_in);
     
     resetState();
 
@@ -350,24 +352,23 @@ units::turn_t Scorer::convertToMotorSpace(units::meter_t meters)
 
 void Scorer::assignOutputs()
 {
-    // Gate to protect the elevator. No logic will be run until elevator is
     // if (!state.hasZeroed) {
     //     elevatorMotor->setPower(-3.0_V);
     //     return;
     // }
 
-    // Elevator State Machine
-    // if (state.elevState == ELEVATOR_STATE::MANUAL) {
+    //Elevator State Machine
+    if (state.elevState == ELEVATOR_STATE::MANUAL) {
         elevatorMotor->setPower(state.manualSpeed + units::volt_t{ELEV_K_AFF});
-    // } else {
-    //     if(state.scopedState == SCOPED || state.tuning){
-    //         state.targetHeight = posMap[state.gamePiece][state.elevState];
-    //     } else{
-    //         state.targetHeight = posMap[CORAL][HP];
-    //     }
-    //     units::turn_t targetRotations = convertToMotorSpace(state.targetHeight);
-    //     elevatorMotor->setPosition(targetRotations);
-    // }
+    } else {
+        if(state.scopedState == SCOPED || state.tuning){
+            state.targetHeight = posMap[state.gamePiece][state.elevState];
+        } else{
+            state.targetHeight = posMap[CORAL][HP];
+        }
+        units::turn_t targetRotations = convertToMotorSpace(state.targetHeight);
+        elevatorMotor->setPosition(targetRotations);
+    }
 
     // Scorer State Machine
     if (state.scoringState == SCORE_STATE::SCORING) {
