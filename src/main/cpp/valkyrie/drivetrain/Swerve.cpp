@@ -42,7 +42,7 @@ using namespace valor;
 
 // Explicit template instantiation
 // This is needed for linking
-template class valor::Swerve<valor::PhoenixController, valor::PhoenixController>;
+template class valor::Swerve<valor::PhoenixController<>, valor::PhoenixController<>>;
 
 template<class AzimuthMotor, class DriveMotor>
 Swerve<AzimuthMotor, DriveMotor>::Swerve(frc::TimedRobot *_robot,
