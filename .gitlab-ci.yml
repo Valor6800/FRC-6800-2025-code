@@ -14,6 +14,7 @@ build:
       - build/
     reports:
       junit: '**/TEST-*.xml'
+    expire_in: 1 week
 
 doxygen:
   stage: build
@@ -24,6 +25,7 @@ doxygen:
   artifacts:
     paths:
       - public
+    expire_in: 1 week
 
 pages:
   stage: deploy
