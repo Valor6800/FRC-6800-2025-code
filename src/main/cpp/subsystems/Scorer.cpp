@@ -15,7 +15,7 @@
 #define ELEV_K_P 0
 #define ELEV_K_ERROR units::angle::turn_t (0)
 #define ELEV_K_AFF 0.72
-#define ELEVATOR_SENSOR_TO_MECH 8.02f
+#define ELEVATOR_SENSOR_TO_MECH 1.0f
 
 #define SCORER_K_P 0.5
 #define SCORER_K_S 0.45
@@ -24,8 +24,9 @@
 
 #define ELEVATOR_FORWARD_LIMIT 5.75_tr
 #define ELEVATOR_OFFSET 3_in
+#define ELEVATOR_MAGNET_OFFSET -0.072_tr
 
-#define ELEVATOR_MOTOR_TO_SENSOR 1.0f
+#define ELEVATOR_MOTOR_TO_SENSOR 8.02f
 #define SCORER_SENSOR_TO_MECH 0.75f
 #define PULLEY_CIRCUMFERENCE 1.432_in
 
@@ -236,6 +237,7 @@ void Scorer::init()
     elevatorPID.aFF = ELEV_K_AFF;
     elevatorPID.aFFType = valor::FeedForwardType::LINEAR;
     elevatorMotor->setPIDF(elevatorPID, 0);
+    elevatorMotor->setupCANCoder(CANIDs::ELEVATOR_CAN, ELEVATOR_MAGNET_OFFSET, true, "baseCAN", 0.75_tr); 
     elevatorMotor->applyConfig();
 
     // Scorer init sequence
@@ -249,7 +251,10 @@ void Scorer::init()
     scorerPID.S = SCORER_K_S;
     
     scorerMotor->setPIDF(scorerPID, 0);
+
     scorerMotor->applyConfig();
+
+
 
     // Zeroing debounce sensor (utilizes CANdi configured hall effect sensor)
     hallEffectDebounceSensor.setGetter([this] { return hallEffectSensorActive();});
@@ -346,23 +351,23 @@ units::turn_t Scorer::convertToMotorSpace(units::meter_t meters)
 void Scorer::assignOutputs()
 {
     // Gate to protect the elevator. No logic will be run until elevator is
-    if (!state.hasZeroed) {
-        elevatorMotor->setPower(-3.0_V);
-        return;
-    }
+    // if (!state.hasZeroed) {
+    //     elevatorMotor->setPower(-3.0_V);
+    //     return;
+    // }
 
     // Elevator State Machine
-    if (state.elevState == ELEVATOR_STATE::MANUAL) {
+    // if (state.elevState == ELEVATOR_STATE::MANUAL) {
         elevatorMotor->setPower(state.manualSpeed + units::volt_t{ELEV_K_AFF});
-    } else {
-        if(state.scopedState == SCOPED || state.tuning){
-            state.targetHeight = posMap[state.gamePiece][state.elevState];
-        } else{
-            state.targetHeight = posMap[CORAL][HP];
-        }
-        units::turn_t targetRotations = convertToMotorSpace(state.targetHeight);
-        elevatorMotor->setPosition(targetRotations);
-    }
+    // } else {
+    //     if(state.scopedState == SCOPED || state.tuning){
+    //         state.targetHeight = posMap[state.gamePiece][state.elevState];
+    //     } else{
+    //         state.targetHeight = posMap[CORAL][HP];
+    //     }
+    //     units::turn_t targetRotations = convertToMotorSpace(state.targetHeight);
+    //     elevatorMotor->setPosition(targetRotations);
+    // }
 
     // Scorer State Machine
     if (state.scoringState == SCORE_STATE::SCORING) {
@@ -430,6 +435,12 @@ void Scorer::InitSendable(wpi::SendableBuilder& builder)
     builder.AddDoubleProperty(
         "Desired Speed: Scorer",
         [this] { return scoringSpeedMap.find(state.elevState)->second.to<double>(); },
+        nullptr
+    );
+
+    builder.AddDoubleProperty(
+        "MANUAL SPEED ELEVATOR",
+        [this] { return state.manualSpeed.to<double>(); },
         nullptr
     );
 }

@@ -129,7 +129,7 @@ void PhoenixController::setupReverseHardwareLimit(int canID, ctre::phoenix6::sig
     config.HardwareLimitSwitch.ReverseLimitEnable = true;
     config.HardwareLimitSwitch.ReverseLimitRemoteSensorID = canID;
     config.HardwareLimitSwitch.ReverseLimitAutosetPositionValue = autosetPosition;
-    config.HardwareLimitSwitch.ReverseLimitAutosetPositionEnable = true;
+    config.HardwareLimitSwitch.ReverseLimitAutosetPositionEnable = false;
     config.HardwareLimitSwitch.ReverseLimitSource = ctre::phoenix6::signals::ReverseLimitSourceValue::RemoteCANdiS1;
 
     if (saveImmediately) {
