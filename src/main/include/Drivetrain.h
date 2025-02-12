@@ -61,7 +61,7 @@
  * * valor::PhoenixController
  * * valor::NeoController
  */
-typedef valor::PhoenixController SwerveDriveMotor;
+typedef valor::PhoenixController<> SwerveDriveMotor;
 
 /**
  * @brief Quick way to select the azimuth motor controller
@@ -69,7 +69,7 @@ typedef valor::PhoenixController SwerveDriveMotor;
  * * valor::PhoenixController
  * * valor::NeoController
  */
-typedef valor::PhoenixController SwerveAzimuthMotor;
+typedef valor::PhoenixController<> SwerveAzimuthMotor;
 
 /**
  * @brief Subsystem - Drivetrain

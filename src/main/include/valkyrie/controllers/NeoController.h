@@ -49,7 +49,7 @@ public:
     
     void setPosition(units::turn_t) override;
     void setSpeed(units::turns_per_second_t) override;
-    void setPower(units::volt_t) override;
+    void setPower(units::volt_t);
 
     void setupFollower(int, bool = false) override;
     

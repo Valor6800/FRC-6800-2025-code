@@ -24,9 +24,16 @@ enum PhoenixControllerType {
     FALCON
 }; 
 
+template <class RawOutput = ctre::phoenix6::controls::VoltageOut, class VelocityOutput = ctre::phoenix6::controls::VelocityVoltage, class PositionOutput = ctre::phoenix6::controls::PositionVoltage>
 class PhoenixController : public BaseController<ctre::phoenix6::hardware::TalonFX>
 {
+    static_assert(std::is_base_of_v<ctre::phoenix6::controls::ControlRequest, RawOutput>);
+    static_assert(std::is_base_of_v<ctre::phoenix6::controls::ControlRequest, VelocityOutput>);
+    static_assert(std::is_base_of_v<ctre::phoenix6::controls::ControlRequest, PositionOutput>);
+
 public:
+    typedef decltype(RawOutput::Output) RawOutputUnit;
+
     PhoenixController(valor::PhoenixControllerType, int _canID, valor::NeutralMode _mode, bool _inverted, std::string _canbus = "");
 
     static units::revolutions_per_minute_t getPhoenixControllerMotorSpeed(PhoenixControllerType controllerType)
@@ -71,7 +78,7 @@ public:
     
     void setPosition(units::turn_t) override;
     void setSpeed(units::turns_per_second_t) override;
-    void setPower(units::volt_t) override;
+    void setPower(RawOutputUnit);
 
     void setupFollower(int, bool = false) override;
     
@@ -120,9 +127,9 @@ private:
     valor::PIDF pidf;
     int currentProfile;
 
-    ctre::phoenix6::controls::MotionMagicVoltage req_position;
-    ctre::phoenix6::controls::VelocityVoltage req_velocity;
-    ctre::phoenix6::controls::VoltageOut req_voltage;
+    RawOutput req_raw_out;
+    VelocityOutput req_vel_out;
+    PositionOutput req_pos_out;
 
     ctre::phoenix6::hardware::CANcoder *cancoder;
 
