@@ -19,10 +19,12 @@
 
 #define SCORER_K_P 0.5
 #define SCORER_K_S 0.45
-#define INTAKE_SPEED 15_tps //5
+#define CORAL_INTAKE_SPEED 20_tps //5
+#define ALGEE_INTAKE_SPEED 15_tps
 #define SCORE_SPEED 20_tps
+#define ALGEE_SCORE_SPEED -40_tps
 
-#define ELEVATOR_FORWARD_LIMIT 5.5_tr
+#define ELEVATOR_FORWARD_LIMIT 6_tr
 #define ELEVATOR_OFFSET 3_in
 #define ELEVATOR_MAGNET_OFFSET 0.321_tr
 
@@ -279,9 +281,9 @@ void Scorer::init()
     posMap[GAME_PIECE::CORAL][ELEVATOR_STATE::FOUR] = units::meter_t(27.4_in);
 
     posMap[GAME_PIECE::ALGEE][ELEVATOR_STATE::ONE] = units::meter_t(5_in);
-    posMap[GAME_PIECE::ALGEE][ELEVATOR_STATE::TWO] = units::meter_t(13.2_in);
-    posMap[GAME_PIECE::ALGEE][ELEVATOR_STATE::THREE] = units::meter_t(14_in);
-    posMap[GAME_PIECE::ALGEE][ELEVATOR_STATE::FOUR] = units::meter_t(14_in);
+    posMap[GAME_PIECE::ALGEE][ELEVATOR_STATE::TWO] = units::meter_t(10.71_in);
+    posMap[GAME_PIECE::ALGEE][ELEVATOR_STATE::THREE] = units::meter_t(16.22_in);
+    posMap[GAME_PIECE::ALGEE][ELEVATOR_STATE::FOUR] = units::meter_t(30.5_in);
     
     resetState();
 
@@ -372,15 +374,24 @@ void Scorer::assignOutputs()
 
     // Scorer State Machine
     if (state.scoringState == SCORE_STATE::SCORING) {
-        auto it = scoringSpeedMap.find(state.elevState);
-        if (it != scoringSpeedMap.end()) {
-            scorerMotor->setSpeed(it->second);
+        if (state.gamePiece == GAME_PIECE::ALGEE) {
+            scorerMotor->setSpeed(ALGEE_SCORE_SPEED);  
         } else {
-            // Fallback to the default SCORE_SPEED 
-            scorerMotor->setSpeed(SCORE_SPEED);
+            auto it = scoringSpeedMap.find(state.elevState);
+            if (it != scoringSpeedMap.end()) {
+                scorerMotor->setSpeed(it->second);
+            } else {
+                // Fallback to the default SCORE_SPEED 
+                scorerMotor->setSpeed(SCORE_SPEED);
+            }
         }
     } else if (state.scoringState == SCORE_STATE::INTAKING || !scorerStagingSensor.isTriggered()) {
-        scorerMotor->setSpeed(INTAKE_SPEED);
+        if(state.gamePiece == GAME_PIECE::ALGEE){
+            scorerMotor->setSpeed(ALGEE_INTAKE_SPEED);
+        } else{
+            scorerMotor->setSpeed(CORAL_INTAKE_SPEED);
+        }
+    
     } else {
         // HOLD the coral at a specific position
         // @todo check inversion
