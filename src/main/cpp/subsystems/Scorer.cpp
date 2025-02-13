@@ -41,8 +41,11 @@ Scorer::Scorer(frc::TimedRobot *_robot) :
     elevatorMotor(new valor::PhoenixController(valor::PhoenixControllerType::KRAKEN_X60, CANIDs::ELEV_WHEEL, valor::NeutralMode::Brake, elevatorMotorInverted(), "baseCAN")),
     scorerMotor(new valor::PhoenixController(valor::PhoenixControllerType::FALCON_FOC, CANIDs::SCORER_WHEEL, valor::NeutralMode::Brake, scorerMotorInverted(), "baseCAN")),
     frontRangeSensor(_robot, "Front Lidar Sensor", CANIDs::FRONT_LIDAR_SENSOR),
-    scorerStagingSensor(_robot, "Scorer Staging Sensor", CANIDs::STAGING_LIDAR_SENSOR, "baseCAN")
+    scorerStagingSensor(_robot, "Scorer Staging Sensor", CANIDs::STAGING_LIDAR_SENSOR, "baseCAN"),
+    positionMap{std::move(getPositionMap())},
+    scoringSpeedMap{std::move(getScoringSpeedMap())}
 {
+
     frc2::CommandScheduler::GetInstance().RegisterSubsystem(this);
 
     pathplanner::NamedCommands::registerCommand("OUTTAKE, INTAKE, HOLD", std::move(
@@ -273,20 +276,6 @@ void Scorer::init()
         scorerMotor->setEncoderPosition(0_tr);
     });
 
-    // posMap[GAME_PIECE::CORAL][ELEVATOR_STATE::STOWED] = units::meter_t(3.5_in);
-    // posMap[GAME_PIECE::CORAL][ELEVATOR_STATE::HP] = units::meter_t(3.5_in);
-    // //posMap[GAME_PIECE::CORAL][ELEVATOR_STATE::ONE] = units::meter_t(13.57_in);
-    // posMap[GAME_PIECE::CORAL][ELEVATOR_STATE::ONE] = units::meter_t(12.9_in);
-
-    // posMap[GAME_PIECE::CORAL][ELEVATOR_STATE::TWO] = units::meter_t(14.72_in);
-    // posMap[GAME_PIECE::CORAL][ELEVATOR_STATE::THREE] = units::meter_t(20.44_in);
-    // posMap[GAME_PIECE::CORAL][ELEVATOR_STATE::FOUR] = units::meter_t(27.4_in);
-
-    // posMap[GAME_PIECE::ALGEE][ELEVATOR_STATE::ONE] = units::meter_t(5_in);
-    // posMap[GAME_PIECE::ALGEE][ELEVATOR_STATE::TWO] = units::meter_t(10.71_in);
-    // posMap[GAME_PIECE::ALGEE][ELEVATOR_STATE::THREE] = units::meter_t(16.22_in);
-    // posMap[GAME_PIECE::ALGEE][ELEVATOR_STATE::FOUR] = units::meter_t(30.5_in);
-    
     resetState();
 
     // Must be at the end of init() because the CANdi has to be setup before reading
@@ -366,9 +355,9 @@ void Scorer::assignOutputs()
         elevatorMotor->setPower(state.manualSpeed + units::volt_t{ELEV_K_AFF});
     } else {
         if(state.scopedState == SCOPED || state.tuning){
-            state.targetHeight = Constants::Scorer::positionMap().at(state.gamePiece).at(state.elevState);
+            state.targetHeight = positionMap.at(state.gamePiece).at(state.elevState);
         } else{
-            state.targetHeight = Constants::Scorer::positionMap().at(CORAL).at(HP);
+            state.targetHeight = positionMap.at(CORAL).at(HP);
         }
         units::turn_t targetRotations = convertToMotorSpace(state.targetHeight);
         elevatorMotor->setPosition(targetRotations);
@@ -379,7 +368,6 @@ void Scorer::assignOutputs()
         if (state.gamePiece == GAME_PIECE::ALGEE) {
             scorerMotor->setSpeed(ALGEE_SCORE_SPEED);  
         } else {
-            auto scoringSpeedMap = Constants::Scorer::scoringSpeedMap();
             auto it = scoringSpeedMap.find(state.elevState);
             if (it != scoringSpeedMap.end()) {
                 scorerMotor->setSpeed(it->second);
@@ -449,7 +437,11 @@ void Scorer::InitSendable(wpi::SendableBuilder& builder)
     );
     builder.AddDoubleProperty(
         "Desired Speed: Scorer",
-        [this] { return Constants::Scorer::scoringSpeedMap().find(state.elevState)->second.to<double>(); },
+        [this] {
+            auto speed = scoringSpeedMap.find(state.elevState);
+            if (speed == scoringSpeedMap.end()) return 0.0;
+            return speed->second.to<double>();
+        },
         nullptr
     );
 

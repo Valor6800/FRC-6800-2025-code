@@ -288,7 +288,10 @@ namespace Constants {
                 ALGEE,
             };
 
-            static std::unordered_map<ELEVATOR_STATE, units::turns_per_second_t> scoringSpeedMap() { switch (robot) {
+            typedef std::unordered_map<ELEVATOR_STATE, units::turns_per_second_t> ScoringSpeedMap;
+            typedef std::unordered_map<GAME_PIECE, std::unordered_map<ELEVATOR_STATE, units::meter_t>> PositionMap;
+
+            static ScoringSpeedMap getScoringSpeedMap() { switch (robot) {
                 case Robot::Alpha: return {
                     {ELEVATOR_STATE::ONE, 12_tps},
                     {ELEVATOR_STATE::TWO, 15_tps},
@@ -303,7 +306,7 @@ namespace Constants {
                 };
             }}
 
-            static std::unordered_map<GAME_PIECE, std::unordered_map<ELEVATOR_STATE, units::meter_t>> positionMap() { switch (robot) {
+            static PositionMap getPositionMap() { switch (robot) {
                 case Robot::Alpha: 
                     return {
                         {
