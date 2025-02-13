@@ -31,6 +31,8 @@
 
 using namespace pathplanner;
 
+#define LOOP_TIME 0.02
+
 #define TXRANGE  30.0f
 #define KPIGEON 2.0f
 #define KLIMELIGHT -29.8f
@@ -62,6 +64,7 @@ const units::meter_t WHEEL_DIAMETER(0.0973_m);
 
 #define Y_ALIGN_KP 1
 #define Y_ALIGN_KD 0.025
+#define Y_FILTER_CONST 0.99
 
 // fix these
 #define BLUE_REEF_17_ANGLE 120_deg
@@ -173,6 +176,7 @@ Drivetrain::Drivetrain(frc::TimedRobot *_robot) :
         },
         this // Reference to this subsystem to set requirements
     );
+
     resetState();
     init();
 }
@@ -260,13 +264,13 @@ void Drivetrain::assessInputs()
     state.getTag = false;
     if (driverGamepad->leftTriggerActive() && state.reefTag == -1) {
         state.getTag = true;
-        
     } else if (!driverGamepad->leftTriggerActive()) {
         state.reefTag = -1;
         hasReset = false;
     }
-
+    state.yEstimate += Swerve::yControllerInitialVelocity.value() * LOOP_TIME;
     units::radian_t leastSkew{90_rad};
+    unfilteredYDistance = Swerve::goalAlign.to<double>();
     for(valor::AprilTagsSensor* aprilLime : aprilTagSensors) {
         if (aprilLime->hasTarget()) {
             if(
@@ -277,19 +281,22 @@ void Drivetrain::assessInputs()
                 aprilLime->getTagID() >= 17 &&
                 aprilLime->getTagID() <= 22)
             ){ 
-    
                 units::degree_t currentSkew = aprilLime->getTargetToBotPose().Rotation().Y() + 90_deg;
                 if (state.getTag && leastSkew > units::math::abs(currentSkew)) {
                     state.reefTag = aprilLime->getTagID();
                     leastSkew = currentSkew;
+                    state.yEstimate = aprilLime->get_botpose_targetspace().X().to<double>();
                 }
                 if (state.reefTag == aprilLime->getTagID()) {
-                    Swerve::yDistance = aprilLime->get_botpose_targetspace().X();
+                    //unfilteredYDistance = aprilLime->get_botpose_targetspace().X().to<double>();
+                    state.yEstimate = Y_FILTER_CONST * state.yEstimate + ((1 - Y_FILTER_CONST) * aprilLime->get_botpose_targetspace().X().to<double>());
                 }
             }
         } 
     }
-    
+
+    Swerve::yDistance = units::length::meter_t (state.yEstimate); //units::length::meter_t {filter.Calculate(unfilteredYDistance)};
+
     Swerve::alignToTarget = driverGamepad->leftTriggerActive() && table->GetBoolean("USE AUTO-ALIGN", true);;
     if (driverGamepad->leftTriggerActive() && !hasReset) {
         Swerve::resetAlignControllers();
@@ -560,6 +567,11 @@ void Drivetrain::InitSendable(wpi::SendableBuilder& builder)
                 pose.push_back(poseErrorPP.Rotation().Radians().to<double>());
                 return pose;
             },
+            nullptr
+        );
+        builder.AddDoubleProperty(
+            "Unfiltered Y Distance",
+            [this] {return unfilteredYDistance;},
             nullptr
         );
     }

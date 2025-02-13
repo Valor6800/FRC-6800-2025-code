@@ -139,10 +139,11 @@ void Swerve<AzimuthMotor, DriveMotor>::analyzeDashboard()
         ySpeedMPS *= -1.0;
     }
     // Rotational Speed calculations
+    units::radian_t robotRotation = getCalculatedPose().Rotation().Radians();
+    rot_controller.SetGoal(units::radian_t{targetAngle - rotAlignOffset});
+    rot_controller.Calculate(robotRotation);
     if (alignToTarget) {
-        units::radian_t robotRotation = getCalculatedPose().Rotation().Radians();
-        rot_controller.SetGoal(units::radian_t{targetAngle - rotAlignOffset});
-        rot_controller.Calculate(robotRotation);
+        
         rotSpeedRPS = units::radians_per_second_t{rot_controller.Calculate(robotRotation)} + rot_controller.GetSetpoint().velocity;
     } 
     else {
@@ -179,9 +180,9 @@ void Swerve<AzimuthMotor, DriveMotor>::analyzeDashboard()
 
     getSkiddingRatio();
 
+    y_controller.SetGoal(goalAlign);
+    calculated_y_controller_val = y_controller.Calculate(yDistance, goalAlign);
     if (alignToTarget){
-        y_controller.SetGoal(goalAlign);
-        calculated_y_controller_val = y_controller.Calculate(yDistance, goalAlign);
         relativeToTagSpeed = units::meters_per_second_t{calculated_y_controller_val} + y_controller.GetSetpoint().velocity;
 
         pidVector = MAKE_VECTOR(targetAngle - rotAlignOffset) * relativeToTagSpeed.value();
@@ -739,6 +740,11 @@ void Swerve<AzimuthMotor, DriveMotor>::InitSendable(wpi::SendableBuilder& builde
     builder.AddDoubleProperty(
         "Y Controller Velocity Error",
         [this] {return y_controller.GetVelocityError().value();},
+        nullptr
+    );
+    builder.AddDoubleProperty(
+        "Y Controller Error",
+        [this] {return y_controller.GetPositionError().to<double>();},
         nullptr
     );
 }

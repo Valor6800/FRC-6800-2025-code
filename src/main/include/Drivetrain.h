@@ -46,6 +46,8 @@
 #include <networktables/NetworkTableInstance.h>
 #include <networktables/StructTopic.h>
 
+#include <frc/filter/LinearFilter.h>
+
 #include <ctre/phoenix6/Pigeon2.hpp>
 
 #define SWERVE_COUNT 4
@@ -129,6 +131,7 @@ public:
           bool getTag;
           Direction dir;
           bool aligned;
+          double yEstimate;
 
      } state;
 
@@ -169,4 +172,6 @@ private:
      nt::StructSubscriber<frc::Pose2d> currentPosePathPlanner;
      nt::StructSubscriber<frc::Pose2d> targetPosePathPlanner;
      frc::Transform2d poseErrorPP;
+     frc::LinearFilter<double> filter = frc::LinearFilter<double>::MovingAverage(10);
+     double unfilteredYDistance;
 };
