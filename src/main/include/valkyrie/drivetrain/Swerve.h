@@ -133,6 +133,8 @@ protected:
 
     units::meter_t goalAlign = 0.0_m;
 
+    units::meters_per_second_t yControllerInitialVelocity;
+
 private:
     const units::radians_per_second_t MAX_ROTATION_VEL = 16_rad_per_s;
     const units::radians_per_second_squared_t MAX_ROTATION_ACCEL = 12_rad_per_s_sq;
@@ -172,8 +174,6 @@ private:
 
     Eigen::Vector2d joystickVector, pidVector, powerVector;
     units::angle::degree_t rotAlignOffset;
-
-    units::meters_per_second_t yControllerInitialVelocity;
 };
 
 }
