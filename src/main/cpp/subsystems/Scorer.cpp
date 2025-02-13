@@ -19,6 +19,7 @@
 #define ALGEE_INTAKE_SPEED 15_tps
 #define SCORE_SPEED 20_tps
 #define ALGEE_SCORE_SPEED -40_tps
+#define ALGEE_HOLD_SPD 0.2_tps
 
 #define ELEVATOR_FORWARD_LIMIT 6_tr
 #define ELEVATOR_OFFSET 3_in
@@ -209,6 +210,7 @@ void Scorer::resetState()
     state.scopedState = UNSCOPED;
     state.tuning = false;
     state.manualSpeed = 0_V;
+    state.algaeSpikeCurrent = 60;
     currentSensor.reset();
 }
 
@@ -276,8 +278,8 @@ void Scorer::init()
     });
 
     currentSensor.setSpikeSetpoint(state.algaeSpikeCurrent);
-    currentSensor.setGetter([this]() { return scorerMotor->getCurrent().to<double>(); });
-    currentSensor.setSpikeCallback([this]() { state.hasAlgae = true;});
+    currentSensor.setGetter([this]() {return scorerMotor->getCurrent().to<double>(); });
+    currentSensor.setSpikeCallback([this]() {state.hasAlgae = true;});
     currentSensor.setCacheSize(ALGAE_CACHE_SIZE);
     
     resetState();
@@ -373,12 +375,16 @@ void Scorer::assignOutputs()
         if (state.gamePiece == GAME_PIECE::ALGEE) {
             scorerMotor->setSpeed(ALGEE_SCORE_SPEED);  
         } else {
-            auto it = scoringSpeedMap.find(state.elevState);
-            if (it != scoringSpeedMap.end()) {
-                scorerMotor->setSpeed(it->second);
-            } else {
-                // Fallback to the default SCORE_SPEED 
-                scorerMotor->setSpeed(SCORE_SPEED);
+            if (state.hasAlgae) {
+                scorerMotor->setSpeed(ALGEE_HOLD_SPD);
+            } else{
+                auto it = scoringSpeedMap.find(state.elevState);
+                if (it != scoringSpeedMap.end()) {
+                    scorerMotor->setSpeed(it->second);
+                } else {
+                    // Fallback to the default SCORE_SPEED 
+                    scorerMotor->setSpeed(SCORE_SPEED);
+                }
             }
         }
     } else if (state.scoringState == SCORE_STATE::INTAKING || !scorerStagingSensor.isTriggered()) {
