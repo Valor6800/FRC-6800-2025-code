@@ -6,6 +6,7 @@
 #include <vector>
 #include "valkyrie/sensors/GrappleSensor.h"
 #include "valkyrie/sensors/CANRangeSensor.h"
+#include "valkyrie/sensors/CurrentSensor.h"
 #include "valkyrie/controllers/PIDF.h"
 #include <frc/smartdashboard/SendableChooser.h>
 #include <frc/smartdashboard/SmartDashboard.h>
@@ -42,7 +43,7 @@ public:
     {
         HOLD,
         INTAKING,
-        SCORING,
+        SCORING
     };
 
     enum SCOPED_STATE
@@ -60,7 +61,10 @@ public:
 
         units::meter_t targetHeight;
         units::volt_t manualSpeed;
-    
+
+        bool hasAlgae;
+        double algaeSpikeCurrent;
+
         bool hasZeroed;
         bool tuning;
 
@@ -82,6 +86,7 @@ private:
 
     valor::GrappleSensor frontRangeSensor;
     valor::CANrangeSensor scorerStagingSensor;
+    valor::CurrentSensor currentSensor;
 
     Constants::Scorer::PositionMap positionMap;
     Constants::Scorer::ScoringSpeedMap scoringSpeedMap;
