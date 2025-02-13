@@ -849,7 +849,19 @@ void Swerve<AzimuthMotor, DriveMotor>::InitSendable(wpi::SendableBuilder& builde
     
     builder.AddDoubleProperty(
         "Angular Acceleration (NOT AVERAGED)",
-        [this] { return angularAcceleration.value();},  
+        [this] { return angularAcceleration.value();},
+        nullptr
+    );  
+    builder.AddDoubleArrayProperty(
+        "Merged Pose",
+        [this]
+        {
+            std::vector<double> pose;
+            pose.push_back(mergedPose.X().to<double>());
+            pose.push_back(mergedPose.Y().to<double>());
+            pose.push_back(mergedPose.Rotation().Radians().to<double>());
+            return pose;
+        },
         nullptr
     );
 }
