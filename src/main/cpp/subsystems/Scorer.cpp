@@ -32,6 +32,8 @@
 #define SCORER_SENSOR_TO_MECH 0.75f
 #define PULLEY_CIRCUMFERENCE 1.432_in
 
+#define ALGAE_CACHE_SIZE 0
+
 using namespace Constants::Scorer;
 
 Scorer::Scorer(frc::TimedRobot *_robot) :
@@ -42,6 +44,7 @@ Scorer::Scorer(frc::TimedRobot *_robot) :
     scorerMotor(new valor::PhoenixController(Constants::getScorerMotorType(), CANIDs::SCORER_WHEEL, valor::NeutralMode::Brake, scorerMotorInverted(), "baseCAN")),
     frontRangeSensor(_robot, "Front Lidar Sensor", CANIDs::FRONT_LIDAR_SENSOR),
     scorerStagingSensor(_robot, "Scorer Staging Sensor", CANIDs::STAGING_LIDAR_SENSOR, "baseCAN"),
+    currentSensor(_robot, "Algae Current Sensor"),
     positionMap{std::move(getPositionMap())},
     scoringSpeedMap{std::move(getScoringSpeedMap())}
 {
@@ -212,6 +215,7 @@ void Scorer::resetState()
     state.scopedState = UNSCOPED;
     state.tuning = false;
     state.manualSpeed = 0_V;
+    currentSensor.reset();
 }
 
 bool Scorer::hallEffectSensorActive()
@@ -276,6 +280,11 @@ void Scorer::init()
         scorerMotor->setEncoderPosition(0_tr);
     });
 
+    currentSensor.setSpikeSetpoint(state.algaeSpikeCurrent);
+    currentSensor.setGetter([this]() { return scorerMotor->getCurrent().to<double>(); });
+    currentSensor.setSpikeCallback([this]() { state.hasAlgae = true;});
+    currentSensor.setCacheSize(ALGAE_CACHE_SIZE);
+    
     resetState();
 
     // Must be at the end of init() because the CANdi has to be setup before reading
@@ -321,6 +330,7 @@ void Scorer::assessInputs()
 
     if (driverGamepad->rightTriggerActive()) {
         state.scoringState = SCORE_STATE::SCORING;
+        state.hasAlgae = false;
     } else if (driverGamepad->GetRightBumperButton()) {
         state.scoringState = SCORE_STATE::INTAKING;
     } else {
