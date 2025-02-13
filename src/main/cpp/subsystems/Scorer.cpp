@@ -19,10 +19,10 @@
 
 #define SCORER_K_P 0.5
 #define SCORER_K_S 0.45
-#define INTAKE_SPEED 10_tps //5
-#define SCORE_SPEED 11_tps
+#define INTAKE_SPEED 15_tps //5
+#define SCORE_SPEED 20_tps
 
-#define ELEVATOR_FORWARD_LIMIT 5.75_tr
+#define ELEVATOR_FORWARD_LIMIT 5.5_tr
 #define ELEVATOR_OFFSET 3_in
 #define ELEVATOR_MAGNET_OFFSET 0.321_tr
 
@@ -272,11 +272,11 @@ void Scorer::init()
     posMap[GAME_PIECE::CORAL][ELEVATOR_STATE::STOWED] = units::meter_t(3.5_in);
     posMap[GAME_PIECE::CORAL][ELEVATOR_STATE::HP] = units::meter_t(3.5_in);
     //posMap[GAME_PIECE::CORAL][ELEVATOR_STATE::ONE] = units::meter_t(13.57_in);
-    posMap[GAME_PIECE::CORAL][ELEVATOR_STATE::ONE] = units::meter_t(10_in);
+    posMap[GAME_PIECE::CORAL][ELEVATOR_STATE::ONE] = units::meter_t(12.9_in);
 
-    posMap[GAME_PIECE::CORAL][ELEVATOR_STATE::TWO] = units::meter_t(13_in);
-    posMap[GAME_PIECE::CORAL][ELEVATOR_STATE::THREE] = units::meter_t(16_in);
-    posMap[GAME_PIECE::CORAL][ELEVATOR_STATE::FOUR] = units::meter_t(20_in);
+    posMap[GAME_PIECE::CORAL][ELEVATOR_STATE::TWO] = units::meter_t(14.72_in);
+    posMap[GAME_PIECE::CORAL][ELEVATOR_STATE::THREE] = units::meter_t(20.44_in);
+    posMap[GAME_PIECE::CORAL][ELEVATOR_STATE::FOUR] = units::meter_t(27.4_in);
 
     posMap[GAME_PIECE::ALGEE][ELEVATOR_STATE::ONE] = units::meter_t(5_in);
     posMap[GAME_PIECE::ALGEE][ELEVATOR_STATE::TWO] = units::meter_t(13.2_in);

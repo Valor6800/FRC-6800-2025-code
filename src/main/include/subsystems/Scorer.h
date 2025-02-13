@@ -85,10 +85,10 @@ public:
 
     
     std::map<ELEVATOR_STATE, units::turns_per_second_t> scoringSpeedMap = {
-        {ELEVATOR_STATE::ONE, 12_tps},
-        {ELEVATOR_STATE::TWO, 15_tps},
-        {ELEVATOR_STATE::THREE, 15_tps},
-        {ELEVATOR_STATE::FOUR, 15_tps}
+        {ELEVATOR_STATE::ONE, 25_tps},
+        {ELEVATOR_STATE::TWO, 35_tps},
+        {ELEVATOR_STATE::THREE, 35_tps},
+        {ELEVATOR_STATE::FOUR, 35_tps}
     };
 
 private:
