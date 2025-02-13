@@ -1,5 +1,7 @@
 #include "Constants.h"
 #include "subsystems/Scorer.h"
+#include "units/length.h"
+#include "units/math.h"
 #include "valkyrie/controllers/NeutralMode.h"
 #include "valkyrie/controllers/PIDF.h"
 #include <iostream>
@@ -35,6 +37,9 @@
 #define PULLEY_CIRCUMFERENCE 1.432_in
 
 using namespace Constants::Scorer;
+
+#define VIABLE_DUNK_DISTANCE 0.3548_m
+#define VIABLE_ELEVATOR_THRESHOLD 0.02_m
 
 Scorer::Scorer(frc::TimedRobot *_robot) :
     valor::BaseSubsystem(_robot, "Scorer"),
@@ -167,6 +172,7 @@ Scorer::Scorer(frc::TimedRobot *_robot) :
         )
     ).ToPtr());
 
+    frontRangeSensor.setMaxDistance(units::millimeter_t{600});
     init();
 }
 
@@ -224,7 +230,8 @@ bool Scorer::hallEffectSensorActive()
 void Scorer::init()
 {
     table->PutBoolean("Scope Button", false);
-    
+    table->PutNumber("Viable Dunk Distance (m)", VIABLE_DUNK_DISTANCE.value());
+    table->PutNumber("Elevator Threshold (m)", VIABLE_ELEVATOR_THRESHOLD.value());
     // CANdi init sequence (for reverse hard limit sensor of elevator)
     ctre::phoenix6::configs::CANdiConfiguration candiConfig;
     candiConfig.DigitalInputs.S1CloseState = ctre::phoenix6::signals::S1CloseStateValue::CloseWhenLow;
@@ -342,6 +349,15 @@ void Scorer::assessInputs()
 
 void Scorer::analyzeDashboard()
 {
+    state.scoringState = SCORE_STATE::HOLD;
+
+    bool withinRange = frontRangeSensor.getLidarData().convert<units::meter>().value() < table->GetNumber("Viable Dunk Distance (m)", VIABLE_DUNK_DISTANCE.value()) && frontRangeSensor.getLidarData().value() != 0;
+    units::meter_t elevatorError = units::math::fabs(convertToMechSpace(elevatorMotor->getPosition()) - posMap[state.gamePiece][state.elevState]);
+    bool elevatorWithinThreshold = elevatorError.value() < table->GetNumber("Elevator Threshold (m)", VIABLE_ELEVATOR_THRESHOLD.value());
+
+    if (withinRange && state.scopedState == SCOPED_STATE::SCOPED && elevatorWithinThreshold) {
+        state.scoringState = SCORE_STATE::SCORING;
+    }
     state.tuning = table->GetBoolean("Scope Button", false);
 }
 
@@ -463,6 +479,11 @@ void Scorer::InitSendable(wpi::SendableBuilder& builder)
         nullptr
     );
     
+    builder.AddDoubleProperty(
+        "Forward Sensor",
+        [this] {return frontRangeSensor.getLidarData().value();},
+        nullptr
+    );
 }
 
 

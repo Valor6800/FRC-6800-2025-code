@@ -305,6 +305,7 @@ void Drivetrain::assessInputs()
     Swerve::yDistance = units::length::meter_t (state.yEstimate); //units::length::meter_t {filter.Calculate(unfilteredYDistance)};
 
     Swerve::alignToTarget = driverGamepad->leftTriggerActive() && table->GetBoolean("USE AUTO-ALIGN", true);;
+
     if (driverGamepad->leftTriggerActive() && !hasReset) {
         Swerve::resetAlignControllers();
         hasReset = true;
