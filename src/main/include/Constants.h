@@ -284,6 +284,36 @@ namespace Constants {
             default: return frc::Pose3d();
         }};
 
+        static frc::Pose3d phishCameraPosition(){ switch (robot){
+            case Robot::Alpha: return frc::Pose3d();
+            case Robot::Gold: return frc::Pose3d();
+            default: return frc::Pose3d(
+                6.5_in,
+                10_in,
+                8.62_in, // change Z
+                frc::Rotation3d(
+                    0_deg,
+                    18_deg,
+                    90_deg
+                )
+            );
+        }};
+
+        static frc::Pose3d coffeeCameraPosition(){ switch (robot){
+            case Robot::Alpha: return frc::Pose3d();
+            case Robot::Gold: return frc::Pose3d();
+            default: return frc::Pose3d(
+                -6.5_in,
+                10_in,
+                8.62_in, // change Z
+                frc::Rotation3d(
+                    0_deg,
+                    18_deg,
+                    90_deg
+                )
+            );
+        }};
+
         static frc::Pose3d mangoCameraPosition(){ switch (robot){
             case Robot::Alpha: return frc::Pose3d(
                 14_in - (1.5625_in + 5.875_in),
@@ -310,7 +340,9 @@ namespace Constants {
                     std::pair("limelight-choco", chocolateCameraPosition()),
                     std::pair("limelight-mango", mangoCameraPosition()),
                     std::pair("limelight-vanilla", vanillaCameraPosition()),
-                    std::pair("limelight-berry", berryCameraPosition())
+                    std::pair("limelight-berry", berryCameraPosition()),
+                    std::pair("limelight-phish", phishCameraPosition()),
+                    std::pair("limelight-coffee", coffeeCameraPosition())
         };
 
         namespace Scorer {
