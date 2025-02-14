@@ -3,6 +3,7 @@
 #include <valkyrie/sensors/CANRangeSensor.h>
 #include "frc/geometry/Pose3d.h" 
 #include "units/acceleration.h"
+#include "units/angle.h"
 #include "units/length.h"
 #include "units/time.h"
 #include "valkyrie/sensors/AprilTagsSensor.h"
@@ -177,6 +178,8 @@ public:
      bool withinYRange();
      bool isSpeedBelowThreshold();
      bool isSpeedStopped();
+
+     void worldFrameAlignment(frc::Pose2d reefTagPose);
 
 private:
 

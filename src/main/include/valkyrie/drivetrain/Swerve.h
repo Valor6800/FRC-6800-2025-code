@@ -107,8 +107,6 @@ public:
     bool xAlign = false;
     bool dumbAutoAlign = false;
 
-    bool xAlign = false;
-
     void InitSendable(wpi::SendableBuilder& builder) override;
 
 protected:
