@@ -32,8 +32,8 @@ const units::hertz_t KD_ROTATE(-30);
 
 const std::pair<double, double> P1{0.0, 0.0};
 const std::pair<double, double> P2{0.6, 0.05};
-const std::pair<double, double> P3{0.8, 0.1};
-const std::pair<double, double> P4{0.95, 0.2};
+const std::pair<double, double> P3{0.8, 0.2};
+const std::pair<double, double> P4{0.9, 0.3};
 const std::pair<double, double> P5{1.0, 1.0};
 
 #define MAKE_VECTOR(angle) Eigen::Vector2d{units::math::cos(angle).value(), units::math::sin(angle).value()}
