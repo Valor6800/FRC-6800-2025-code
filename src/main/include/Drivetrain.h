@@ -3,6 +3,7 @@
 #include <valkyrie/sensors/CANRangeSensor.h>
 #include "frc/geometry/Pose3d.h" 
 #include "units/acceleration.h"
+#include "units/angle.h"
 #include "units/length.h"
 #include "units/time.h"
 #include "valkyrie/sensors/AprilTagsSensor.h"
@@ -174,6 +175,10 @@ public:
      bool hasReset;
 
      bool withinXRange(units::meter_t), withinYRange(), isSpeedBelowThreshold();
+
+     void worldFrameAlignment();
+     void tagFrameAlignment();
+     void getLeastSkewTagDistance(valor::AprilTagsSensor* aprilSensor, units::radian_t leastSkew);
 
 private:
 
