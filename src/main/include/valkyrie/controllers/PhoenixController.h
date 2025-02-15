@@ -19,7 +19,7 @@ enum PhoenixControllerType {
     FALCON
 }; 
 
-template <class RawOutput = ctre::phoenix6::controls::VoltageOut, class VelocityOutput = ctre::phoenix6::controls::VelocityVoltage, class PositionOutput = ctre::phoenix6::controls::PositionVoltage>
+template <class RawOutput = ctre::phoenix6::controls::VoltageOut, class VelocityOutput = ctre::phoenix6::controls::VelocityVoltage, class PositionOutput = ctre::phoenix6::controls::MotionMagicVoltage>
 class PhoenixController : public BaseController<ctre::phoenix6::hardware::TalonFX>
 {
     static_assert(std::is_base_of_v<ctre::phoenix6::controls::ControlRequest, RawOutput>);
@@ -159,12 +159,12 @@ public:
         if (saveImmediately) getMotor()->GetConfigurator().Apply(config.ClosedLoopGeneral);
     }
     
-    void setPosition(units::turn_t position) override {
-        getMotor()->SetControl(req_pos_out.WithPosition(position));
+    void setPosition(units::turn_t position, int slot = 0) override {
+        getMotor()->SetControl(req_pos_out.WithSlot(slot).WithPosition(position));
     }
 
-    void setSpeed(units::turns_per_second_t velocity) override {
-        getMotor()->SetControl(req_vel_out.WithVelocity(velocity));
+    void setSpeed(units::turns_per_second_t velocity, int slot = 0) override {
+        getMotor()->SetControl(req_vel_out.WithSlot(slot).WithVelocity(velocity));
     }
 
     void setPower(RawOutputUnit out) {
@@ -180,38 +180,19 @@ public:
         followerMotor->SetControl(ctre::phoenix6::controls::StrictFollower(getMotor()->GetDeviceID()));
     }
     
-    void setPIDF(valor::PIDF _pidf, int slot, bool saveImmediately = false) override {
+    void setPIDF(valor::PIDF _pidf, int slot = 0, bool saveImmediately = false) override {
         pidf = _pidf;
-
-        // Generic PIDF configurations
-        // Numerator for closed loop controls will be in volts
-        config.Slot0.kP = pidf.P;
-        config.Slot0.kI = pidf.I;
-        config.Slot0.kD = pidf.D;
-        if (pidf.kV < 0) {
-            config.Slot0.kV = (voltageCompenstation / getMaxMechSpeed()).value();
-        } else{
-            config.Slot0.kV = pidf.kV;
-        }
-        config.Slot0.kS = pidf.S;
-
-        // Feedforward gain configuration
-        if (pidf.aFF != 0) {
-            config.Slot0.GravityType = pidf.aFFType == valor::FeedForwardType::LINEAR ?
-                ctre::phoenix6::signals::GravityTypeValue::Elevator_Static :
-                ctre::phoenix6::signals::GravityTypeValue::Arm_Cosine;
-            config.Slot0.kG = pidf.aFF;
-        }
 
         // Motion magic configuration
         config.MotionMagic.MotionMagicCruiseVelocity = pidf.maxVelocity;
         config.MotionMagic.MotionMagicAcceleration = pidf.maxAcceleration;
         config.MotionMagic.MotionMagicJerk = pidf.maxJerk;
 
-        if (saveImmediately) {
-            getMotor()->GetConfigurator().Apply(config.Slot0);
-            getMotor()->GetConfigurator().Apply(config.MotionMagic);
-        }
+        if (slot == 1) setPIDFSlot(config.Slot1, saveImmediately);
+        else if (slot == 2) setPIDFSlot(config.Slot2, saveImmediately);
+        else setPIDFSlot(config.Slot0, saveImmediately); // Default case
+
+        if (saveImmediately) getMotor()->GetConfigurator().Apply(config.MotionMagic);
     }
 
     void setupReverseHardwareLimit(int canID, ctre::phoenix6::signals::ReverseLimitTypeValue type, units::turn_t autosetPosition = 0_tr, bool saveImmediately = false) {
@@ -259,11 +240,6 @@ public:
 
         if (saveImmediately)
             getMotor()->GetConfigurator().Apply(config.Feedback);
-    }
-
-    void setProfile(int profile) override {
-        // TODO: Actually implement, currentProfile is never used
-        currentProfile = profile;
     }
 
     enum MagnetHealth
@@ -440,6 +416,38 @@ private:
     static constexpr units::revolutions_per_minute_t FREE_SPD_FALCON = 6380_rpm;
     static constexpr units::revolutions_per_minute_t FREE_SPD_FALCON_FOC = 6080_rpm;
 
+    template <class S>
+    void setPIDFSlot(S& slot, bool saveImmediately) {
+        // Generic PIDF configurations
+        // Numerator for closed loop controls will be in volts
+        slot.kP = pidf.P;
+        slot.kI = pidf.I;
+        slot.kD = pidf.D;
+        slot.kS = pidf.S;
+        slot.kV = 0;
+        if constexpr (std::is_same_v<RawOutputUnit, units::volt_t>) {
+            if (pidf.kV < 0)
+                slot.kV = (voltageCompenstation / getMaxMechSpeed()).value();
+            else
+                slot.kV = pidf.kV;
+        } else if constexpr (std::is_same_v<RawOutputUnit, units::ampere_t>) {
+            if (pidf.kV < 0)
+                slot.kV = 0;
+            else
+                slot.kV = pidf.kV;
+        }
+
+        // Feedforward gain configuration
+        if (pidf.aFF != 0) {
+            slot.GravityType = pidf.aFFType == valor::FeedForwardType::LINEAR ?
+                ctre::phoenix6::signals::GravityTypeValue::Elevator_Static :
+                ctre::phoenix6::signals::GravityTypeValue::Arm_Cosine;
+            slot.kG = pidf.aFF;
+        }
+
+        if (saveImmediately) getMotor()->GetConfigurator().Apply(slot);
+    }
+
     // Helper function for enableFOC that only enables if the template has the field "EnableFOC"
     template <typename T>
     static inline void tryEnableFOC(T& request, bool enableFOC) {
@@ -450,7 +458,6 @@ private:
     }
 
     valor::PIDF pidf;
-    int currentProfile;
 
     RawOutput req_raw_out;
     VelocityOutput req_vel_out;
