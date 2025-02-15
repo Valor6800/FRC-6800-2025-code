@@ -214,6 +214,36 @@ namespace Constants {
             default: return valor::PhoenixControllerType::KRAKEN_X44;
         }};
 
+        static units::angle::turn_t getElevatorMagnetOffset() { switch (robot) {
+            case Robot::Alpha: return 0.10327_tr; 
+            case Robot::Gold: return 0.321_tr; 
+            default: return 0.321_tr;
+        }};
+
+    static bool isElevatorClockwise() { switch (robot) {
+            case Robot::Alpha: return false;
+            case Robot::Gold: return true;
+            default: return true;
+        }};
+
+    static units::angle::turn_t getElevatorAbsoluteRange() { switch (robot) {
+            case Robot::Alpha: return .75_tr;
+            case Robot::Gold: return 1_tr;
+            default: return 1_tr;
+        }};
+
+    static double getElevKAFF() { switch (robot) {
+            case Robot::Alpha: return 0.5;
+            case Robot::Gold: return 0.72;
+            default: return 0.72;
+        }};
+
+    static double getElevKP() { switch (robot) {
+            case Robot::Alpha: return 10;
+            case Robot::Gold: return 10;
+            default: return 10;
+        }};
+
         static frc::Pose3d mintCameraPosition(){ switch (robot) {
             case Robot::Alpha: return frc::Pose3d(
                 (6_in + 1.5625_in) - 14_in,

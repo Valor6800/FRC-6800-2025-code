@@ -12,9 +12,7 @@
 
 #include <frc/DriverStation.h>
 
-#define ELEV_K_P 10
 #define ELEV_K_ERROR units::angle::turn_t (0)
-#define ELEV_K_AFF 0.72
 #define ELEVATOR_SENSOR_TO_MECH 1.0f
 
 #define SCORER_K_P 0.5
@@ -239,12 +237,19 @@ void Scorer::init()
     valor::PIDF elevatorPID;
     elevatorPID.maxVelocity = elevatorMotor->getMaxMechSpeed();
     elevatorPID.maxAcceleration = elevatorMotor->getMaxMechSpeed()/(1.0_s/0.5);
-    elevatorPID.P =ELEV_K_P ;
+    elevatorPID.P = Constants::getElevKP() ;
     elevatorPID.error = ELEV_K_ERROR;
-    elevatorPID.aFF = ELEV_K_AFF;
+    elevatorPID.aFF = Constants::getElevKAFF();
     elevatorPID.aFFType = valor::FeedForwardType::LINEAR;
     elevatorMotor->setPIDF(elevatorPID, 0);
-    elevatorMotor->setupCANCoder(CANIDs::ELEVATOR_CAN, ELEVATOR_MAGNET_OFFSET, true, "baseCAN", 1_tr); 
+   //elevatorMotor->setupCANCoder(CANIDs::ELEVATOR_CAN, ELEVATOR_MAGNET_OFFSET, true, "baseCAN", 1_tr); 
+    elevatorMotor->setupCANCoder(
+        CANIDs::ELEVATOR_CAN,
+        Constants::getElevatorMagnetOffset(), 
+        Constants::isElevatorClockwise(),
+        "baseCAN",
+        Constants::getElevatorAbsoluteRange()
+    );
     elevatorMotor->applyConfig();
 
     // Scorer init sequence
@@ -352,7 +357,7 @@ void Scorer::assignOutputs()
 
     //Elevator State Machine
     if (state.elevState == ELEVATOR_STATE::MANUAL) {
-        elevatorMotor->setPower(state.manualSpeed + units::volt_t{ELEV_K_AFF});
+        elevatorMotor->setPower(state.manualSpeed + units::volt_t{Constants::getElevKAFF()});
     } else {
         if(state.scopedState == SCOPED || state.tuning){
             state.targetHeight = positionMap.at(state.gamePiece).at(state.elevState);
