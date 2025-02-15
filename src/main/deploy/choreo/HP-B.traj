@@ -79,6 +79,5 @@
   "splits":[0]
  },
  "events":[
-   {"name":"LEVEL TWO POSITION", "from":{"target":0, "targetTimestamp":0.0, "offset":{"exp":"1.3 s", "val":1.3}}, "event":{"type":"named", "data":{"name":"LEVEL TWO POSITION"}}},
    {"name":"Enable Scorer", "from":{"target":1, "targetTimestamp":1.69784, "offset":{"exp":"-0.05 s", "val":-0.05}}, "event":{"type":"named", "data":{"name":"Enable Scorer"}}}]
 }

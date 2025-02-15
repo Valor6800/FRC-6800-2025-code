@@ -79,6 +79,5 @@
   "splits":[0]
  },
  "events":[
-   {"name":"DISABLE Scorer", "from":{"target":0, "targetTimestamp":0.0, "offset":{"exp":"0.1 s", "val":0.1}}, "event":{"type":"named", "data":{"name":"DISABLE Scorer"}}},
-   {"name":"LEVEL TWO POSITION", "from":{"target":0, "targetTimestamp":0.0, "offset":{"exp":"0.15 s", "val":0.15}}, "event":{"type":"named", "data":{"name":"LEVEL TWO POSITION"}}}]
+   {"name":"DISABLE Scorer", "from":{"target":0, "targetTimestamp":0.0, "offset":{"exp":"0.1 s", "val":0.1}}, "event":{"type":"named", "data":{"name":"DISABLE Scorer"}}}]
 }
