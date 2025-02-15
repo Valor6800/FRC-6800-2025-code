@@ -208,6 +208,12 @@ namespace Constants {
             default: return 100_mps_sq;
         }};
 
+        static valor::PhoenixControllerType getScorerMotorType() { switch (robot) {
+            case Robot::Alpha: return valor::PhoenixControllerType::FALCON_FOC;
+            case Robot::Gold: return valor::PhoenixControllerType::KRAKEN_X44;
+            default: return valor::PhoenixControllerType::KRAKEN_X44;
+        }};
+
         static frc::Pose3d mintCameraPosition(){ switch (robot) {
             case Robot::Alpha: return frc::Pose3d(
                 (6_in + 1.5625_in) - 14_in,
