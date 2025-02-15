@@ -74,7 +74,7 @@ frc::SwerveModuleState SwerveModule<AzimuthMotor, DriveMotor>::getState()
 }
 
 template<class AzimuthMotor, class DriveMotor>
-PhoenixController::MagnetHealth SwerveModule<AzimuthMotor, DriveMotor>::getAzimuthMagnetHealth() 
+AzimuthMotor::MagnetHealth SwerveModule<AzimuthMotor, DriveMotor>::getAzimuthMagnetHealth() 
 {
     return azimuthMotor->getMagnetHealth();
 }

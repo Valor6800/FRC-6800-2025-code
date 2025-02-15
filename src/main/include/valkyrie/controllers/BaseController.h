@@ -184,16 +184,6 @@ public:
     virtual void setSpeed(units::turns_per_second_t speed) = 0;
 
     /**
-     * @brief Set the motor power
-     * 
-     * To be defined by the implemented BaseController class
-     * 
-     * @param power The power to set the motor to
-     * 
-     */
-    virtual void setPower(units::volt_t power) = 0;
-
-    /**
      * @brief If a motor is paired with another motor, setup that other motor as a follower
      * 
      * The follower motor will need a CAN ID, and then it will mimic and assume

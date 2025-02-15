@@ -347,13 +347,13 @@ void Drivetrain::analyzeDashboard()
     for (int i = 0; i < MODULE_COUNT; i++) {
         int color = 0xAC41FF;
         switch (azimuthHealthValues[i]) {
-            case valor::PhoenixController::MagnetHealth::GREEN: 
+            case SwerveAzimuthMotor::MagnetHealth::GREEN: 
                 color = valor::CANdleSensor::GREEN;
                 break;
-            case valor::PhoenixController::MagnetHealth::ORANGE:
+            case SwerveAzimuthMotor::MagnetHealth::ORANGE:
                 color = valor::CANdleSensor::ORANGE;
                 break;
-            case valor::PhoenixController::MagnetHealth::RED:
+            case SwerveAzimuthMotor::MagnetHealth::RED:
                 color = valor::CANdleSensor::RED;
                 break;
         }

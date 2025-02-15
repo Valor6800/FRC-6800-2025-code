@@ -41,7 +41,7 @@ public:
 
     frc::Rotation2d getAzimuthPosition();
     
-    PhoenixController::MagnetHealth getAzimuthMagnetHealth();
+    AzimuthMotor::MagnetHealth getAzimuthMagnetHealth();
 
     units::meter_t getDrivePosition();
 
