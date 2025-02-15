@@ -121,21 +121,16 @@ units::turns_per_second_t NeoController::getSpeed()
 /**
  * Set a position in mechanism rotations
 */
-void NeoController::setPosition(units::turn_t position)
+void NeoController::setPosition(units::turn_t position, int slot)
 {
 }
 
-void NeoController::setSpeed(units::turns_per_second_t speed)
+void NeoController::setSpeed(units::turns_per_second_t speed, int slot)
 {
 }
 
 void NeoController::setPower(units::volt_t voltage)
 {
-}
-
-void NeoController::setProfile(int profile)
-{
-    currentProfile = profile;
 }
 
 void NeoController::setNeutralMode(valor::NeutralMode mode, bool saveImmediately)

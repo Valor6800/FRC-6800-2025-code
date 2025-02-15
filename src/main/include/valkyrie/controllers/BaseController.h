@@ -169,7 +169,7 @@ public:
      * 
      * @param position The position to send the motor to
      */
-    virtual void setPosition(units::turn_t position) = 0;
+    virtual void setPosition(units::turn_t position, int slot = 0) = 0;
 
     /**
      * @brief Send the motor to a specific speed
@@ -181,7 +181,7 @@ public:
      * 
      * @param speed The speed to set the motor to
      */
-    virtual void setSpeed(units::turns_per_second_t speed) = 0;
+    virtual void setSpeed(units::turns_per_second_t speed, int slot = 0) = 0;
 
     /**
      * @brief If a motor is paired with another motor, setup that other motor as a follower
@@ -265,17 +265,6 @@ public:
      * @param supplyTimeThreshold The amount of time before re-allowing current to pass through
      */
     virtual void setCurrentLimits(units::ampere_t statorCurrentLimit, units::ampere_t supplyCurrentLimit, units::ampere_t supplyCurrentThreshold, units::second_t supplyTimeThreshold, bool saveImmediately = false) = 0;
-
-    /**
-     * @brief Set which profile to use
-     * 
-     * Multiple motor profiles can be setup. This method chooses which motor profile is active
-     * 
-     * To be defined by the implemented BaseController class
-     * 
-     * @param slot Which profile to turn active
-     */
-    virtual void setProfile(int slot) = 0;
 
     virtual void setNeutralMode(valor::NeutralMode mode, bool saveImmediately = false) = 0;
 

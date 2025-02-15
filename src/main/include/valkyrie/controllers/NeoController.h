@@ -47,8 +47,8 @@ public:
 
     void setEncoderPosition(units::turn_t position) override;
     
-    void setPosition(units::turn_t) override;
-    void setSpeed(units::turns_per_second_t) override;
+    void setPosition(units::turn_t, int) override;
+    void setSpeed(units::turns_per_second_t, int) override;
     void setPower(units::volt_t);
 
     void setupFollower(int, bool = false) override;
@@ -59,8 +59,6 @@ public:
     void setReverseLimit(units::turn_t reverse, bool saveImmediately = false) override;
     
     void setGearRatios(double, double, bool saveImmediately = false) override;
-
-    void setProfile(int slot) override;
 
     void setupCANCoder(int deviceId, units::turn_t offset, bool clockwise, std::string canbus = "", units::turn_t absoluteRange=1_tr, bool saveImmediately = false) override;
     units::turn_t getCANCoder() override;
