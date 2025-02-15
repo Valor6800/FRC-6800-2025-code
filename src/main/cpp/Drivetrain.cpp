@@ -290,11 +290,15 @@ void Drivetrain::assessInputs()
 
     robotPublisher.Set(getCalculatedPose());
 
+
+    state.yEstimate += Swerve::yControllerInitialVelocity.value() * LOOP_TIME;
+    unfilteredYDistance = Swerve::goalAlign.to<double>();
     if (Swerve::alignToTarget) {
         if (table->GetBoolean("Use World Align", false)) {
             worldFrameAlignment();
         } else {
             tagFrameAlignment();
+            Swerve::yDistance = units::meter_t{state.yEstimate};
         }
     }
 
@@ -383,30 +387,21 @@ void Drivetrain::assignOutputs()
 }
 
 void Drivetrain::getLeastSkewTagDistance(valor::AprilTagsSensor* aprilSensor, units::radian_t leastSkew) {
-    if(
-        (frc::DriverStation::GetAlliance() == frc::DriverStation::kRed && 
-        aprilSensor->getTagID() >= 6 &&
-        aprilSensor->getTagID() <= 11) || 
-        (frc::DriverStation::GetAlliance() == frc::DriverStation::kBlue &&
-        aprilSensor->getTagID() >= 17 &&
-        aprilSensor->getTagID() <= 22)
-    ){ 
+    if(valor::isReefTag(aprilSensor->getTagID())){ 
         units::degree_t currentSkew = aprilSensor->getTargetToBotPose().Rotation().Y() + 90_deg;
         if (state.getTag && leastSkew > units::math::abs(currentSkew)) {
             state.reefTag = aprilSensor->getTagID();
             leastSkew = currentSkew;
         }
         if (state.reefTag == aprilSensor->getTagID()) {
-            //unfilteredYDistance = aprilLime->get_botpose_targetspace().X().to<double>();
+            //unfilteredYDistance = aprilSensor->get_botpose_targetspace().X().to<double>();
             state.yEstimate = Y_FILTER_CONST * state.yEstimate + ((1 - Y_FILTER_CONST) * aprilSensor->get_botpose_targetspace().X().to<double>());
         }
     }
 }
 
 void Drivetrain::tagFrameAlignment() {
-    state.yEstimate += Swerve::yControllerInitialVelocity.value() * LOOP_TIME;
     units::radian_t leastSkew{90_rad};
-    unfilteredYDistance = Swerve::goalAlign.to<double>();
     for(valor::AprilTagsSensor* aprilLime : aprilTagSensors) {
         if (aprilLime->hasTarget()) {
             getLeastSkewTagDistance(aprilLime, leastSkew);
@@ -419,7 +414,11 @@ void Drivetrain::worldFrameAlignment() {
         getCalculatedPose().Translation() + frc::Translation2d(-17.5482504_m / 2.0, -8.0519016_m / 2.0),
         getCalculatedPose().Rotation()
     };
-    std::pair<int, frc::Pose3d> temp = valor::getNearestTag(robotToCenter);
+
+    std::pair<int, frc::Pose3d> temp = valor::getNearestTag(
+        robotToCenter,
+        frc::DriverStation::kRed == frc::DriverStation::GetAlliance() ? valor::redReefAprilTagPoses : valor::blueReefAprilTagPoses
+    );
     std::pair<int, frc::Pose2d> reefTagPose{ temp.first, temp.second.ToPose2d()};
     
     reefTagPose = std::pair<int, frc::Pose2d>{
