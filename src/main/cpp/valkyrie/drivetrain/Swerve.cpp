@@ -188,7 +188,6 @@ void Swerve<AzimuthMotor, DriveMotor>::analyzeDashboard()
     // Rotational Speed calculations
     units::radian_t robotRotation = getCalculatedPose().Rotation().Radians();
     rot_controller.SetGoal(units::radian_t{targetAngle - rotAlignOffset});
-    rot_controller.Calculate(robotRotation);
     if (rotAlign) {
         rotSpeedRPS = units::radians_per_second_t{rot_controller.Calculate(robotRotation)} + rot_controller.GetSetpoint().velocity;
     }
@@ -421,12 +420,18 @@ void Swerve<AzimuthMotor, DriveMotor>::enableCarpetGrain(double _grainMultiplier
 }
 
 template<class AzimuthMotor, class DriveMotor>
-void Swerve<AzimuthMotor, DriveMotor>::resetAlignControllers() {
+void Swerve<AzimuthMotor, DriveMotor>::resetRotationAlignControllers() {
     rot_controller.Reset(
         getCalculatedPose().Rotation().Radians(),
         pigeon->GetAngularVelocityZWorld().GetValue()
     );
 
+    y_controller.Reset(yDistance, yControllerInitialVelocity);
+    x_controller.Reset(xDistance, -xControllerInitialVelocity);
+}
+
+template<class AzimuthMotor, class DriveMotor>
+void Swerve<AzimuthMotor, DriveMotor>::resetLinearAlignControllers() {
     y_controller.Reset(yDistance, yControllerInitialVelocity);
     x_controller.Reset(xDistance, -xControllerInitialVelocity);
 }
