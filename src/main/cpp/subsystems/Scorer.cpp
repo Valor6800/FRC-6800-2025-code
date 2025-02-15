@@ -347,14 +347,19 @@ void Scorer::analyzeDashboard()
     state.algaeSpikeCurrent = table->GetNumber("Algae Spike Setpoint", 30);
 }
 
-units::meter_t Scorer::convertToMechSpace(units::turn_t turns) 
+// units::meter_t Scorer::convertToMechSpace(units::turn_t turns) 
+// {
+//     return units::meter_t{turns * units::meter_t {PULLEY_CIRCUMFERENCE * M_PI}/1_tr} + ELEVATOR_OFFSET;
+// }
+
+units::meter_t Scorer::convertToMechSpace(units::turn_t turns)
 {
-    return units::meter_t{turns * units::meter_t {PULLEY_CIRCUMFERENCE * M_PI}/1_tr} + ELEVATOR_OFFSET;
+    return units::meter_t{turns * Constants::NUM_STAGES() * units::meter_t{PITCH_DIAMETER * M_PI} / 1_tr} + ELEVATOR_OFFSET;
 }
 
-units::turn_t Scorer::convertToMotorSpace(units::meter_t meters)     
+units::turn_t Scorer::convertToMotorSpace(units::meter_t meters)
 {
-    return (meters - ELEVATOR_OFFSET) / units::meter_t {PULLEY_CIRCUMFERENCE * M_PI} * 1_tr;
+    return (meters - ELEVATOR_OFFSET) / Constants::NUM_STAGES() / units::meter_t {PITCH_DIAMETER * M_PI} * 1_tr;
 }
 
 void Scorer::assignOutputs()
