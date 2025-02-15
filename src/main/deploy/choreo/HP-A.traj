@@ -80,6 +80,5 @@
   "splits":[0]
  },
  "events":[
-   {"name":"Enable Scorer", "from":{"target":1, "targetTimestamp":1.77781, "offset":{"exp":"-0.05 s", "val":-0.05}}, "event":{"type":"named", "data":{"name":"Enable Scorer"}}},
-   {"name":"LEVEL TWO POSITION", "from":{"target":1, "targetTimestamp":1.77781, "offset":{"exp":"-0.15 s", "val":-0.15}}, "event":{"type":"named", "data":{"name":"LEVEL TWO POSITION"}}}]
+   {"name":"Enable Scorer", "from":{"target":1, "targetTimestamp":1.77781, "offset":{"exp":"-0.05 s", "val":-0.05}}, "event":{"type":"named", "data":{"name":"Enable Scorer"}}}]
 }
