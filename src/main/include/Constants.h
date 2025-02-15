@@ -74,15 +74,15 @@ namespace CANIDs {
     constexpr static int AZIMUTH_CANS[4] = {1, 3, 5, 7};
     constexpr static int CANCODER_CANS[4] = {20, 21, 22, 23};
     constexpr static int PIGEON_CAN = 61;
-    constexpr static int SCORER_WHEEL = 51;
+    constexpr static int SCORER_WHEEL = 11;
     constexpr static int ELEV_WHEEL = 30;
-    constexpr static int CLIMBER_LEAD = 53;
-    constexpr static int CLIMBER_FOLLOW = 54;
+    constexpr static int CLIMBER_LEAD = 31;
+    constexpr static int CLIMBER_FOLLOW = 32;
     constexpr static int HALL_EFFECT = 46;
     constexpr static int CANDLE = 60;
     constexpr static int STAGING_LIDAR_SENSOR = 47;
     constexpr static int FRONT_LIDAR_SENSOR = 49;
-    constexpr static int CRABB = 56;
+    constexpr static int CRABB = 33;
 }
 
 #pragma GCC diagnostic push
