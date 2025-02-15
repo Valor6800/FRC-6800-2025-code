@@ -33,6 +33,17 @@
   "pointTowardsZones": [],
   "eventMarkers": [
     {
+      "name": "HP Position",
+      "waypointRelativePos": 0.15,
+      "endWaypointRelativePos": null,
+      "command": {
+        "type": "named",
+        "data": {
+          "name": "HP"
+        }
+      }
+    },
+    {
       "name": "DISABLE Scorer",
       "waypointRelativePos": 0.2,
       "endWaypointRelativePos": null,
@@ -40,17 +51,6 @@
         "type": "named",
         "data": {
           "name": "DISABLE Scorer"
-        }
-      }
-    },
-    {
-      "name": "HP Position",
-      "waypointRelativePos": 0.6,
-      "endWaypointRelativePos": null,
-      "command": {
-        "type": "named",
-        "data": {
-          "name": "HP"
         }
       }
     }

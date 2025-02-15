@@ -45,7 +45,7 @@
     },
     {
       "name": "HP Position",
-      "waypointRelativePos": 0.65,
+      "waypointRelativePos": 0.15,
       "endWaypointRelativePos": null,
       "command": {
         "type": "named",
