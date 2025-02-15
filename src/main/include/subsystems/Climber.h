@@ -57,6 +57,7 @@ public:
     }state;
 
 private:
+    valor::PhoenixController<> *stabbyMotor;
     valor::PhoenixController<> *climbMotors;
     valor::CurrentSensor currentSensor;
 };

@@ -16,7 +16,8 @@
 #define ELEVATOR_SENSOR_TO_MECH 1.0f
 
 #define SCORER_K_P 0.5
-#define SCORER_K_S 0.45
+#define SCORER_K_S 0.58 //45
+#define SCORER_K_V 0.11
 #define CORAL_INTAKE_SPEED 20_tps //5
 #define ALGEE_INTAKE_SPEED 15_tps
 #define SCORE_SPEED 20_tps
@@ -25,9 +26,12 @@
 #define ELEVATOR_FORWARD_LIMIT 6_tr
 #define ELEVATOR_OFFSET 3_in
 #define ELEVATOR_MAGNET_OFFSET 0.321_tr
+#define ELEVATOR_JERK 40_tr_per_s_cu
+
+
 
 #define ELEVATOR_MOTOR_TO_SENSOR 8.02f
-#define SCORER_SENSOR_TO_MECH 0.75f
+#define SCORER_SENSOR_TO_MECH 1.66666667f //.75
 #define PULLEY_CIRCUMFERENCE 1.432_in
 
 using namespace Constants::Scorer;
@@ -205,7 +209,7 @@ frc2::CommandPtr Scorer::createElevatorSequence() {
 void Scorer::resetState()
 {
     state.scoringState = HOLD;
-    state.elevState = ELEVATOR_STATE::MANUAL;
+    state.elevState = ELEVATOR_STATE::STOWED;
     state.gamePiece = CORAL;
     state.scopedState = UNSCOPED;
     state.tuning = false;
@@ -236,13 +240,13 @@ void Scorer::init()
 
     valor::PIDF elevatorPID;
     elevatorPID.maxVelocity = elevatorMotor->getMaxMechSpeed();
-    elevatorPID.maxAcceleration = elevatorMotor->getMaxMechSpeed()/(1.0_s/0.5);
+    elevatorPID.maxAcceleration = elevatorMotor->getMaxMechSpeed()/(1.0_s/0.83333);
+    elevatorPID.maxJerk = ELEVATOR_JERK;
     elevatorPID.P = Constants::getElevKP() ;
     elevatorPID.error = ELEV_K_ERROR;
     elevatorPID.aFF = Constants::getElevKAFF();
     elevatorPID.aFFType = valor::FeedForwardType::LINEAR;
     elevatorMotor->setPIDF(elevatorPID, 0);
-   //elevatorMotor->setupCANCoder(CANIDs::ELEVATOR_CAN, ELEVATOR_MAGNET_OFFSET, true, "baseCAN", 1_tr); 
     elevatorMotor->setupCANCoder(
         CANIDs::ELEVATOR_CAN,
         Constants::getElevatorMagnetOffset(), 
@@ -258,9 +262,12 @@ void Scorer::init()
 
     valor::PIDF scorerPID;
     scorerPID.maxVelocity = scorerMotor->getMaxMechSpeed();
+
+
     scorerPID.maxAcceleration = scorerMotor->getMaxMechSpeed()/(1.0_s/2);
     scorerPID.P = SCORER_K_P;
     scorerPID.S = SCORER_K_S;
+    scorerPID.kV = SCORER_K_V;
     
     scorerMotor->setPIDF(scorerPID, 0);
 
@@ -391,7 +398,7 @@ void Scorer::assignOutputs()
     } else {
         // HOLD the coral at a specific position
         // @todo check inversion
-        scorerMotor->setPosition(1.37_tr);
+        scorerMotor->setPosition(Constants::getTurns());
     }
 }
 
@@ -455,6 +462,7 @@ void Scorer::InitSendable(wpi::SendableBuilder& builder)
         [this] { return state.manualSpeed.to<double>(); },
         nullptr
     );
+    
 }
 
 

@@ -8,11 +8,11 @@
 #include <pathplanner/lib/auto/NamedCommands.h>
 #include <frc/DriverStation.h>
 
-#define FORWARD_LIMIT 0.25_tr
-#define REVERSE_LIMIT -0.20_tr
+#define FORWARD_LIMIT 0.75_tr
+#define REVERSE_LIMIT 0.38671875_tr //-.25
 
 #define CLIMB_MANUAL_SPEED units::angular_velocity::turns_per_second_t (0)
-#define CLIMB_K_P 100
+#define CLIMB_K_P 0 //100
 #define CLIMB_K_D 0
 #define CLIMB_K_ERROR units::angle::turn_t (0)
 #define CLIMB_K_JERK units::angular_jerk::turns_per_second_cubed_t (0)
@@ -24,8 +24,11 @@
 #define CRAB_K_P 0
 #define CRAB_K_ERROR units::angle::turn_t (0)
 #define CRAB_K_AFF 0
+#define CRABB_ROTOR_TO_SENSOR 1.6
+#define STABBY_K_P 0.6
+#define STABBY_K_S 0.5
 
-#define CLIMB_GEAR_RATIO 227.12
+#define CLIMB_GEAR_RATIO 145.36
 #define CRAB_GEAR_RATIO 0
 
 #define DEPLOYED_POS units::angle::turn_t (0.1)
@@ -64,16 +67,33 @@ void Climber::init()
 {
 
     valor::PIDF climbPID;
+    valor::PIDF stabbyPID;
 
     climbMotors = new valor::PhoenixController(
         valor::PhoenixControllerType::FALCON_FOC,
         CANIDs::CLIMBER_LEAD,
         valor::NeutralMode::Brake,
-        false,
+        true,
         "baseCAN"
     );
 
-    climbMotors->setGearRatios(1.0, CLIMB_GEAR_RATIO);
+    stabbyMotor = new valor::PhoenixController(
+        valor::PhoenixControllerType::KRAKEN_X44_FOC, 
+        CANIDs::CRABB, 
+        valor::NeutralMode::Coast, 
+        false, 
+        "baseCAN"     
+    );
+    
+    climbMotors->setupCANCoder(CANIDs::CLIMBER_CAN, 0.0_tr, true, "baseCAN", 1_tr); //0.5022
+
+    climbMotors->setGearRatios(CLIMB_GEAR_RATIO, 1.0);
+    stabbyMotor->setGearRatios(1.0, CRABB_ROTOR_TO_SENSOR);
+    stabbyPID.P = STABBY_K_P;
+
+    stabbyMotor->setPIDF(stabbyPID, 0);
+    stabbyMotor->applyConfig();
+    stabbyMotor->enableFOC(true);
 
     climbPID.maxVelocity = climbMotors->getMaxMechSpeed();
     climbPID.maxAcceleration = climbMotors->getMaxMechSpeed() / (1.0_s / 3);
@@ -87,7 +107,7 @@ void Climber::init()
 
     climbMotors->setForwardLimit(FORWARD_LIMIT);
     climbMotors->setReverseLimit(REVERSE_LIMIT);
-    climbMotors->setupFollower(CANIDs::CLIMBER_FOLLOW, false);
+    climbMotors->setupFollower(CANIDs::CLIMBER_FOLLOW, true);
     climbMotors->setPIDF(climbPID, 0);
     climbMotors->setContinuousWrap(true);
     climbMotors->enableFOC(true);
@@ -106,6 +126,12 @@ void Climber::assessInputs()
     if (operatorGamepad->rightStickYActive()) {
         state.climbState = CLIMB_STATE::MANUAL;
         state.manualSpeed = operatorGamepad->rightStickY(2) * 12_V;
+    }
+
+    if (operatorGamepad->DPadLeft()) {
+        stabbyMotor->setSpeed(10_tps);
+    }else{
+        stabbyMotor->setSpeed(0_tps);
     }
 
 }

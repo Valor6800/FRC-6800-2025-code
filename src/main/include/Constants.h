@@ -84,6 +84,7 @@ namespace CANIDs {
     constexpr static int FRONT_LIDAR_SENSOR = 49;
     constexpr static int CRABB = 33;
     constexpr static int ELEVATOR_CAN = 24;
+    constexpr static int CLIMBER_CAN = 25;
 }
 
 #pragma GCC diagnostic push
@@ -265,6 +266,12 @@ namespace Constants {
             default: return frc::Pose3d();
         }};
 
+        static units::angle::turn_t getTurns() { switch (robot) {
+            case Robot::Alpha: return 1.37_tr;
+            case Robot::Gold: return 0.5_tr;
+            default: return 0.5_tr;
+        }};
+
         static frc::Pose3d chocolateCameraPosition(){ switch (robot) {
             case Robot::Alpha: return frc::Pose3d();
             case Robot::Gold: return frc::Pose3d();
@@ -371,8 +378,8 @@ namespace Constants {
                         {
                             GAME_PIECE::CORAL,
                             {
-                                { ELEVATOR_STATE::STOWED, 3.5_in },
-                                { ELEVATOR_STATE::HP, 3.5_in },
+                                { ELEVATOR_STATE::STOWED, 3.65_in },
+                                { ELEVATOR_STATE::HP, 3.65_in },
                                 { ELEVATOR_STATE::ONE, 12.9_in },
                                 { ELEVATOR_STATE::TWO, 14.72_in },
                                 { ELEVATOR_STATE::THREE, 20.44_in },
