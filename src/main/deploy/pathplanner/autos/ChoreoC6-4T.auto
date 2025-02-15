@@ -45,6 +45,18 @@
           "data": {
             "pathName": "HP-B"
           }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "B-HP"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "HP-A"
+          }
         }
       ]
     }
