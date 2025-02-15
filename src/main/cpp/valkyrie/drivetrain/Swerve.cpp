@@ -557,16 +557,16 @@ double Swerve<AzimuthMotor, DriveMotor>::rotationLerping(double input){
     double rot = 0.0;
     double abs = std::abs(input);
     if(abs > P4.first){
-        rot = copysign((((P5.second - P4.second)/(P5.first - P4.first))*(input - P4.first)) + P4.second, input);
+        rot = copysign((((P5.second - P4.second)/(P5.first - P4.first))*(abs - P4.first)) + P4.second, input);
     }
     else if(abs > P3.first){
-        rot = copysign((((P4.second - P3.second)/(P4.first - P3.first))*(input - P3.first)) + P3.second, input);
+        rot = copysign((((P4.second - P3.second)/(P4.first - P3.first))*(abs - P3.first)) + P3.second, input);
     }
     else if(abs > P2.first){
-        rot = copysign((((P3.second - P2.second)/(P3.first - P2.first))*(input - P2.first)) + P2.second, input);
+        rot = copysign((((P3.second - P2.second)/(P3.first - P2.first))*(abs - P2.first)) + P2.second, input);
     }
     else{
-        rot = copysign((((P2.second - P1.second)/(P2.first - P1.first))*(input - P1.first)) + P1.second, input);
+        rot = copysign((((P2.second - P1.second)/(P2.first - P1.first))*(abs - P1.first)) + P1.second, input);
     }
     return rot;
 }

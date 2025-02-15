@@ -7,7 +7,7 @@
 #define DPAD_RIGHT 90
 #define DPAD_LEFT 270
 
-#define DEADBAND_X 0.05f
+#define DEADBAND_X 0.15f
 #define DEADBAND_Y 0.1f
 #define DEADBAND_TRIGGER 0.05f
 
