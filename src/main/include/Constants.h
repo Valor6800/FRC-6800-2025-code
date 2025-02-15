@@ -284,32 +284,32 @@ namespace Constants {
             default: return frc::Pose3d();
         }};
 
-        static frc::Pose3d phishCameraPosition(){ switch (robot){
-            case Robot::Alpha: return frc::Pose3d();
-            case Robot::Gold: return frc::Pose3d();
-            default: return frc::Pose3d(
-                6.5_in,
-                10_in,
-                8.62_in, // change Z
-                frc::Rotation3d(
-                    0_deg,
-                    18_deg,
-                    90_deg
-                )
-            );
-        }};
-
-        static frc::Pose3d coffeeCameraPosition(){ switch (robot){
+        static frc::Pose3d rockyCameraPosition(){ switch (robot){
             case Robot::Alpha: return frc::Pose3d();
             case Robot::Gold: return frc::Pose3d();
             default: return frc::Pose3d(
                 -6.5_in,
-                10_in,
+                -10_in,
                 8.62_in, // change Z
                 frc::Rotation3d(
                     0_deg,
                     18_deg,
-                    90_deg
+                    -90_deg
+                )
+            );
+        }};
+
+        static frc::Pose3d limeCameraPosition(){ switch (robot){
+            case Robot::Alpha: return frc::Pose3d();
+            case Robot::Gold: return frc::Pose3d();
+            default: return frc::Pose3d(
+                6.5_in,
+                -10_in,
+                8.62_in, // change Z
+                frc::Rotation3d(
+                    0_deg,
+                    18_deg,
+                    -90_deg
                 )
             );
         }};
@@ -341,8 +341,8 @@ namespace Constants {
                     std::pair("limelight-mango", mangoCameraPosition()),
                     std::pair("limelight-vanilla", vanillaCameraPosition()),
                     std::pair("limelight-berry", berryCameraPosition()),
-                    std::pair("limelight-phish", phishCameraPosition()),
-                    std::pair("limelight-coffee", coffeeCameraPosition())
+                    std::pair("limelight-rocky", rockyCameraPosition()),
+                    std::pair("limelight-lime", limeCameraPosition())
         };
 
         namespace Scorer {
