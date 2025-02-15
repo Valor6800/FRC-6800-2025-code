@@ -245,6 +245,16 @@ namespace Constants {
             default: return 10;
         }};
 
+    static int NUM_STAGES() { switch (robot) {
+            case Robot::Alpha: return 2;
+            case Robot::Gold: return 3;
+            default: return 3;
+
+        }
+        
+        
+        }
+
         static frc::Pose3d mintCameraPosition(){ switch (robot) {
             case Robot::Alpha: return frc::Pose3d(
                 (6_in + 1.5625_in) - 14_in,
