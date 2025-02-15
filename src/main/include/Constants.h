@@ -284,7 +284,7 @@ namespace Constants {
             default: return frc::Pose3d();
         }};
 
-        static frc::Pose3d phishCameraPosition(){ switch (robot){
+        static frc::Pose3d rockyCameraPosition(){ switch (robot){
             case Robot::Alpha: return frc::Pose3d();
             case Robot::Gold: return frc::Pose3d();
             default: return frc::Pose3d(
@@ -299,7 +299,7 @@ namespace Constants {
             );
         }};
 
-        static frc::Pose3d coffeeCameraPosition(){ switch (robot){
+        static frc::Pose3d limeCameraPosition(){ switch (robot){
             case Robot::Alpha: return frc::Pose3d();
             case Robot::Gold: return frc::Pose3d();
             default: return frc::Pose3d(
@@ -341,8 +341,8 @@ namespace Constants {
                     std::pair("limelight-mango", mangoCameraPosition()),
                     std::pair("limelight-vanilla", vanillaCameraPosition()),
                     std::pair("limelight-berry", berryCameraPosition()),
-                    std::pair("limelight-phish", phishCameraPosition()),
-                    std::pair("limelight-coffee", coffeeCameraPosition())
+                    std::pair("limelight-rocky", rockyCameraPosition()),
+                    std::pair("limelight-lime", limeCameraPosition())
         };
 
         namespace Scorer {
