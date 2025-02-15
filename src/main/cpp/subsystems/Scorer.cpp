@@ -28,7 +28,7 @@
 
 #define ELEVATOR_MOTOR_TO_SENSOR 8.02f
 #define SCORER_SENSOR_TO_MECH 0.75f
-#define PULLEY_CIRCUMFERENCE 1.432_in
+#define PITCH_DIAMETER 1.432_in
 
 using namespace Constants::Scorer;
 
@@ -338,14 +338,19 @@ void Scorer::analyzeDashboard()
     state.tuning = table->GetBoolean("Scope Button", false);
 }
 
-units::meter_t Scorer::convertToMechSpace(units::turn_t turns) 
+// units::meter_t Scorer::convertToMechSpace(units::turn_t turns) 
+// {
+//     return units::meter_t{turns * units::meter_t {PULLEY_CIRCUMFERENCE * M_PI}/1_tr} + ELEVATOR_OFFSET;
+// }
+
+units::meter_t Scorer::convertToMechSpace(units::turn_t turns)
 {
-    return units::meter_t{turns * units::meter_t {PULLEY_CIRCUMFERENCE * M_PI}/1_tr} + ELEVATOR_OFFSET;
+    return units::meter_t{turns * Constants::NUM_STAGES() * units::meter_t{PITCH_DIAMETER * M_PI} / 1_tr} + ELEVATOR_OFFSET;
 }
 
-units::turn_t Scorer::convertToMotorSpace(units::meter_t meters)     
+units::turn_t Scorer::convertToMotorSpace(units::meter_t meters)
 {
-    return (meters - ELEVATOR_OFFSET) / units::meter_t {PULLEY_CIRCUMFERENCE * M_PI} * 1_tr;
+    return (meters - ELEVATOR_OFFSET) / Constants::NUM_STAGES() / units::meter_t {PITCH_DIAMETER * M_PI} * 1_tr;
 }
 
 void Scorer::assignOutputs()
