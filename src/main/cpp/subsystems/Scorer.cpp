@@ -17,6 +17,8 @@
 
 #define SCORER_K_P 0.5
 #define SCORER_K_S 0.45
+#define SCORER_VELOCITY_SLOT 0
+#define SCORER_POSITION_SLOT 1
 #define CORAL_INTAKE_SPEED 20_tps //5
 #define ALGEE_INTAKE_SPEED 15_tps
 #define SCORE_SPEED 20_tps
@@ -37,7 +39,7 @@ Scorer::Scorer(frc::TimedRobot *_robot) :
     hallEffectDebounceSensor(_robot, "HallEffectDebounce"),
     candi(CANIDs::HALL_EFFECT, "baseCAN"),
     elevatorMotor(new valor::PhoenixController(valor::PhoenixControllerType::KRAKEN_X60, CANIDs::ELEV_WHEEL, valor::NeutralMode::Brake, elevatorMotorInverted(), "baseCAN")),
-    scorerMotor(new valor::PhoenixController(Constants::getScorerMotorType(), CANIDs::SCORER_WHEEL, valor::NeutralMode::Brake, scorerMotorInverted(), "baseCAN")),
+    scorerMotor(new valor::PhoenixController<ctre::phoenix6::controls::TorqueCurrentFOC, ctre::phoenix6::controls::VelocityTorqueCurrentFOC>(Constants::getScorerMotorType(), CANIDs::SCORER_WHEEL, valor::NeutralMode::Brake, scorerMotorInverted(), "baseCAN")),
     frontRangeSensor(_robot, "Front Lidar Sensor", CANIDs::FRONT_LIDAR_SENSOR),
     scorerStagingSensor(_robot, "Scorer Staging Sensor", CANIDs::STAGING_LIDAR_SENSOR, "baseCAN"),
     positionMap{std::move(getPositionMap())},
@@ -256,14 +258,25 @@ void Scorer::init()
     scorerMotor->setGearRatios(1, SCORER_SENSOR_TO_MECH);
     scorerMotor->enableFOC(true);
 
-    valor::PIDF scorerPID;
-    scorerPID.maxVelocity = scorerMotor->getMaxMechSpeed();
-    scorerPID.maxAcceleration = scorerMotor->getMaxMechSpeed()/(1.0_s/2);
-    scorerPID.P = SCORER_K_P;
-    scorerPID.S = SCORER_K_S;
+    valor::PIDF scorerVelocityPID;
+    scorerVelocityPID.maxVelocity = scorerMotor->getMaxMechSpeed();
+    scorerVelocityPID.maxAcceleration = scorerMotor->getMaxMechSpeed()/(1.0_s/2);
+    scorerVelocityPID.P = 5;
+    scorerVelocityPID.I = 1;
+    scorerVelocityPID.D = 0.1;
+    scorerVelocityPID.S = 1;
+    scorerVelocityPID.kV = 0.75;
     
-    scorerMotor->setPIDF(scorerPID, 0);
+    scorerMotor->setPIDF(scorerVelocityPID, SCORER_VELOCITY_SLOT);
 
+    valor::PIDF scorerPositionPID;
+    scorerPositionPID.P = 80;
+    scorerPositionPID.D = 7;
+    scorerPositionPID.S = 1;
+    scorerPositionPID.kV = 0.1;
+
+    scorerMotor->setPIDF(scorerPositionPID, SCORER_POSITION_SLOT);
+    
     scorerMotor->applyConfig();
 
 
@@ -354,6 +367,7 @@ void Scorer::assignOutputs()
     //     elevatorMotor->setPower(-3.0_V);
     //     return;
     // }
+    return;
 
     //Elevator State Machine
     if (state.elevState == ELEVATOR_STATE::MANUAL) {
@@ -371,27 +385,27 @@ void Scorer::assignOutputs()
     // Scorer State Machine
     if (state.scoringState == SCORE_STATE::SCORING) {
         if (state.gamePiece == GAME_PIECE::ALGEE) {
-            scorerMotor->setSpeed(ALGEE_SCORE_SPEED);  
+            scorerMotor->setSpeed(ALGEE_SCORE_SPEED, SCORER_VELOCITY_SLOT);  
         } else {
             auto it = scoringSpeedMap.find(state.elevState);
             if (it != scoringSpeedMap.end()) {
-                scorerMotor->setSpeed(it->second);
+                scorerMotor->setSpeed(it->second, SCORER_VELOCITY_SLOT);
             } else {
                 // Fallback to the default SCORE_SPEED 
-                scorerMotor->setSpeed(SCORE_SPEED);
+                scorerMotor->setSpeed(SCORE_SPEED, SCORER_VELOCITY_SLOT);
             }
         }
     } else if (state.scoringState == SCORE_STATE::INTAKING || !scorerStagingSensor.isTriggered()) {
         if(state.gamePiece == GAME_PIECE::ALGEE){
-            scorerMotor->setSpeed(ALGEE_INTAKE_SPEED);
+            scorerMotor->setSpeed(ALGEE_INTAKE_SPEED, SCORER_VELOCITY_SLOT);
         } else{
-            scorerMotor->setSpeed(CORAL_INTAKE_SPEED);
+            scorerMotor->setSpeed(CORAL_INTAKE_SPEED, SCORER_VELOCITY_SLOT);
         }
     
     } else {
         // HOLD the coral at a specific position
         // @todo check inversion
-        scorerMotor->setPosition(1.37_tr);
+        scorerMotor->setPosition(1.37_tr, SCORER_POSITION_SLOT);
     }
 }
 

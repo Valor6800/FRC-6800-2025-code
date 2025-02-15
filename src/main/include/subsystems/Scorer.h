@@ -78,7 +78,7 @@ private:
     ctre::phoenix6::hardware::core::CoreCANdi candi;
 
     valor::PhoenixController<> *elevatorMotor;
-    valor::PhoenixController<> *scorerMotor;
+    valor::PhoenixController<ctre::phoenix6::controls::TorqueCurrentFOC, ctre::phoenix6::controls::VelocityTorqueCurrentFOC> *scorerMotor;
 
     valor::GrappleSensor frontRangeSensor;
     valor::CANrangeSensor scorerStagingSensor;
