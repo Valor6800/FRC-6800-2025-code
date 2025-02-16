@@ -102,7 +102,7 @@ public:
      * @param _canID the CAN ID the CANdle is assigned to
      * @param _canbus the CAN bus the CANdle is attached to
      */
-    CANdleSensor(frc::TimedRobot *_robot, int _ledCount, int _segments, int _canID, std::string _canbus = "");
+    CANdleSensor(frc::TimedRobot *_robot, int _ledCount, int _segments, int _canID, std::string _canbus = "baseCAN");
 
     /**
      * @brief Destroy the Valor CANdle Sensor object
