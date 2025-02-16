@@ -144,6 +144,7 @@ protected:
     units::radian_t angularPosition = 0_rad;
     units::meter_t goalAlign = 0.0_m;
 
+    bool yControllerAligned();
     units::meters_per_second_t yControllerInitialVelocity;
 
 private:

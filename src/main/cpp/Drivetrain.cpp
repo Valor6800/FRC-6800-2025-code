@@ -88,6 +88,8 @@ const units::meter_t WHEEL_DIAMETER(0.0973_m);
 #define POLE_OFFSET 6.758_in
 #define SCORER_TO_ROBOT 0.5_in
 
+#define VIABLE_DUNK_DISTANCE 0.3548_m
+
 Drivetrain::Drivetrain(frc::TimedRobot *_robot, valor::CANdleSensor *_leds) : 
     valor::Swerve<SwerveAzimuthMotor, SwerveDriveMotor>(
         _robot,
@@ -97,7 +99,8 @@ Drivetrain::Drivetrain(frc::TimedRobot *_robot, valor::CANdleSensor *_leds) :
         WHEEL_DIAMETER
     ),
     teleopStart(999999999999),
-    leds(_leds)
+    leds(_leds),
+    frontRangeSensor(_robot, "Front Lidar Sensor", CANIDs::FRONT_LIDAR_SENSOR)
 {
     xPIDF.P = KPX;
     xPIDF.I = KIX;
@@ -110,7 +113,7 @@ Drivetrain::Drivetrain(frc::TimedRobot *_robot, valor::CANdleSensor *_leds) :
     // table->PutNumber("Rot_Pos_Tol", Swerve::rotPosTolerance.to<double>());
     // table->PutNumber("Rot_Vel_Tol", Swerve::rotVelTolerance.to<double>());
 
-    // table->PutNumber("Y_Pos_Tol", Swerve::yPosTolerance.to<double>());
+    table->PutNumber("Y_Pos_Tol", Swerve::yPosTolerance.to<double>());
     // table->PutNumber("Y_Vel_Tol", Swerve::yVelTolerance.to<double>());
 
     Swerve::Y_KP = Y_ALIGN_KP;
@@ -153,7 +156,9 @@ Drivetrain::Drivetrain(frc::TimedRobot *_robot, valor::CANdleSensor *_leds) :
         Constants::pigeonMountPitch(),
         Constants::pigeonMountYaw()
     );
-    
+
+    frontRangeSensor.setMaxDistance(units::millimeter_t{600});
+    table->PutNumber("Viable Dunk Distance (m)", VIABLE_DUNK_DISTANCE.value());
     /*
      * 3.8m/s, 5m/s^2, ~125lbs Apr. 2
      */
@@ -326,7 +331,7 @@ void Drivetrain::analyzeDashboard()
     // Swerve::rotPosTolerance = table->GetNumber("Rot_Pos_Tol", Swerve::rotPosTolerance.to<double>()) * 1_deg;
     // Swerve::rotVelTolerance = table->GetNumber("Rot_Vel_Tol", Swerve::rotVelTolerance.to<double>()) * 1_deg_per_s;
 
-    // Swerve::yPosTolerance = table->GetNumber("Y_Pos_Tol", Swerve::yPosTolerance.to<double>()) * 1_mm;
+    Swerve::yPosTolerance = table->GetNumber("Y_Pos_Tol", Swerve::yPosTolerance.to<double>()) * 1_mm;
     // Swerve::yVelTolerance = table->GetNumber("Y_Vel_Tol", Swerve::yVelTolerance.to<double>()) * 1_mps;
 
     // Swerve::goalAlign = units::meter_t{table->GetNumber("Pole Offset", Swerve::goalAlign.to<double>())};
@@ -449,6 +454,13 @@ void Drivetrain::worldFrameAlignment() {
     robotInTagSpacePublisher.Set(robotInTagSpaceTransform);
     
     Swerve::yDistance = robotInTagSpaceTransform.Y();
+}
+bool Drivetrain::withinXRange() {
+    return frontRangeSensor.getLidarData().convert<units::meter>().value() < table->GetNumber("Viable Dunk Distance (m)", VIABLE_DUNK_DISTANCE.value()) && frontRangeSensor.getLidarData().value() != 0; 
+}
+
+bool Drivetrain::withinYRange() {
+    return yControllerAligned();
 }
 
 units::meters_per_second_t Drivetrain::getRobotSpeeds(){
@@ -663,6 +675,11 @@ void Drivetrain::InitSendable(wpi::SendableBuilder& builder)
         builder.AddDoubleProperty(
             "Unfiltered Y Distance",
             [this] {return unfilteredYDistance;},
+            nullptr
+        );
+        builder.AddDoubleProperty(
+            "Forward Sensor",
+            [this] {return frontRangeSensor.getLidarData().value();},
             nullptr
         );
     }

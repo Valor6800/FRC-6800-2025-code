@@ -162,6 +162,7 @@ public:
      void tagFrameAlignment();
      void getLeastSkewTagDistance(valor::AprilTagsSensor* aprilSensor, units::radian_t leastSkew);
 
+     bool withinXRange(), withinYRange();
 private:
      bool aprilTagOnReef(int id);
 
@@ -186,6 +187,6 @@ private:
      double unfilteredYDistance;
 
      valor::CANdleSensor *leds;
-
+     valor::GrappleSensor frontRangeSensor;
      
 };
