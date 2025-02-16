@@ -15,9 +15,6 @@
 #define ELEV_K_ERROR units::angle::turn_t (0)
 #define ELEVATOR_SENSOR_TO_MECH 1.0f
 
-#define SCORER_K_P 0.5
-#define SCORER_K_S 0.58 //45
-#define SCORER_K_V 0.11
 #define CORAL_INTAKE_SPEED 20_tps //5
 #define ALGEE_INTAKE_SPEED 15_tps
 #define SCORE_SPEED 20_tps
@@ -25,13 +22,8 @@
 
 #define ELEVATOR_FORWARD_LIMIT 6_tr
 #define ELEVATOR_OFFSET 3_in
-#define ELEVATOR_MAGNET_OFFSET 0.321_tr
-#define ELEVATOR_JERK 40_tr_per_s_cu
-
-
 
 #define ELEVATOR_MOTOR_TO_SENSOR 8.02f
-#define SCORER_SENSOR_TO_MECH 1.66666667f //.75
 #define PULLEY_CIRCUMFERENCE 1.432_in
 
 using namespace Constants::Scorer;
@@ -224,6 +216,9 @@ bool Scorer::hallEffectSensorActive()
 void Scorer::init()
 {
     table->PutBoolean("Scope Button", false);
+
+    scorerStagingSensor.setMaxDistance(12_in);
+    scorerStagingSensor.setThresholdDistance(10_cm);
     
     // CANdi init sequence (for reverse hard limit sensor of elevator)
     ctre::phoenix6::configs::CANdiConfiguration candiConfig;
@@ -238,42 +233,30 @@ void Scorer::init()
     elevatorMotor->setForwardLimit(ELEVATOR_FORWARD_LIMIT);
     elevatorMotor->setupReverseHardwareLimit(CANIDs::HALL_EFFECT, ctre::phoenix6::signals::ReverseLimitTypeValue::NormallyOpen);
 
-    valor::PIDF elevatorPID;
+    valor::PIDF elevatorPID = Constants::Scorer::getElevatorPIDF();
     elevatorPID.maxVelocity = elevatorMotor->getMaxMechSpeed();
-    elevatorPID.maxAcceleration = elevatorMotor->getMaxMechSpeed()/(1.0_s/0.83333);
-    elevatorPID.maxJerk = ELEVATOR_JERK;
-    elevatorPID.P = Constants::getElevKP() ;
-    elevatorPID.error = ELEV_K_ERROR;
-    elevatorPID.aFF = Constants::getElevKAFF();
-    elevatorPID.aFFType = valor::FeedForwardType::LINEAR;
-    elevatorMotor->setPIDF(elevatorPID, 0);
+    elevatorPID.maxAcceleration = elevatorMotor->getMaxMechSpeed() / Constants::Scorer::getElevMaxVelRampTime();
+    elevatorMotor->setPIDF(elevatorPID);
     elevatorMotor->setupCANCoder(
         CANIDs::ELEVATOR_CAN,
         Constants::getElevatorMagnetOffset(), 
-        Constants::isElevatorClockwise(),
+        Constants::Scorer::isElevatorClockwise(),
         "baseCAN",
-        Constants::getElevatorAbsoluteRange()
+        Constants::Scorer::getElevatorAbsoluteRange()
     );
     elevatorMotor->applyConfig();
 
     // Scorer init sequence
-    scorerMotor->setGearRatios(1, SCORER_SENSOR_TO_MECH);
+    scorerMotor->setGearRatios(1, Constants::Scorer::getScorerSensorToMech());
     scorerMotor->enableFOC(true);
 
-    valor::PIDF scorerPID;
+    valor::PIDF scorerPID = Constants::Scorer::getScorerPIDF();
     scorerPID.maxVelocity = scorerMotor->getMaxMechSpeed();
-
-
-    scorerPID.maxAcceleration = scorerMotor->getMaxMechSpeed()/(1.0_s/2);
-    scorerPID.P = SCORER_K_P;
-    scorerPID.S = SCORER_K_S;
-    scorerPID.kV = SCORER_K_V;
+    scorerPID.maxAcceleration = scorerMotor->getMaxMechSpeed() / Constants::Scorer::getScorerMaxVelRampTime();
     
-    scorerMotor->setPIDF(scorerPID, 0);
+    scorerMotor->setPIDF(scorerPID);
 
     scorerMotor->applyConfig();
-
-
 
     // Zeroing debounce sensor (utilizes CANdi configured hall effect sensor)
     hallEffectDebounceSensor.setGetter([this] { return hallEffectSensorActive();});
@@ -398,7 +381,7 @@ void Scorer::assignOutputs()
     } else {
         // HOLD the coral at a specific position
         // @todo check inversion
-        scorerMotor->setPosition(Constants::getTurns());
+        scorerMotor->setPosition(getIntakeTurns());
     }
 }
 

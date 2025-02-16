@@ -8,16 +8,7 @@
 #include <pathplanner/lib/auto/NamedCommands.h>
 #include <frc/DriverStation.h>
 
-#define FORWARD_LIMIT 0.75_tr
-#define REVERSE_LIMIT 0.38671875_tr //-.25
-
 #define CLIMB_MANUAL_SPEED units::angular_velocity::turns_per_second_t (0)
-#define CLIMB_K_P 0 //100
-#define CLIMB_K_D 0
-#define CLIMB_K_ERROR units::angle::turn_t (0)
-#define CLIMB_K_JERK units::angular_jerk::turns_per_second_cubed_t (0)
-#define CLIMB_K_AFF 0
-#define CLIMB_K_S 0
 
 #define CRAB_MAX_SPEED units::angular_velocity::turns_per_second_t (0)
 #define CRAB_MAX_ACCEL units::angular_acceleration::turns_per_second_squared_t (0)
@@ -65,15 +56,14 @@ void Climber::resetState()
 
 void Climber::init()
 {
-
-    valor::PIDF climbPID;
+    valor::PIDF climbPID = Constants::Climber::getClimberPIDF();
     valor::PIDF stabbyPID;
 
     climbMotors = new valor::PhoenixController(
         valor::PhoenixControllerType::FALCON_FOC,
         CANIDs::CLIMBER_LEAD,
         valor::NeutralMode::Brake,
-        true,
+        Constants::Climber::climbMotorInverted(),
         "baseCAN"
     );
 
@@ -96,19 +86,12 @@ void Climber::init()
     stabbyMotor->enableFOC(true);
 
     climbPID.maxVelocity = climbMotors->getMaxMechSpeed();
-    climbPID.maxAcceleration = climbMotors->getMaxMechSpeed() / (1.0_s / 3);
-    climbPID.P = CLIMB_K_P;
-    climbPID.D = CLIMB_K_D;
-    climbPID.error = CLIMB_K_ERROR;
-    climbPID.aFF = CLIMB_K_AFF;
-    climbPID.maxJerk = CLIMB_K_JERK;
-    climbPID.aFFType = valor::FeedForwardType::CIRCULAR;
-    climbPID.S = CLIMB_K_S;
+    climbPID.maxAcceleration = climbMotors->getMaxMechSpeed() / Constants::Climber::maxVelocityRampTime();
 
-    climbMotors->setForwardLimit(FORWARD_LIMIT);
-    climbMotors->setReverseLimit(REVERSE_LIMIT);
-    climbMotors->setupFollower(CANIDs::CLIMBER_FOLLOW, true);
-    climbMotors->setPIDF(climbPID, 0);
+    climbMotors->setForwardLimit(Constants::Climber::getForwardLimit());
+    climbMotors->setReverseLimit(Constants::Climber::getReverseLimit());
+    climbMotors->setupFollower(CANIDs::CLIMBER_FOLLOW, Constants::Climber::climbMotorInverted());
+    climbMotors->setPIDF(climbPID);
     climbMotors->setContinuousWrap(true);
     climbMotors->enableFOC(true);
     climbMotors->applyConfig();

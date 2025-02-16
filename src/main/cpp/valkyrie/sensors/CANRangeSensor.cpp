@@ -14,9 +14,6 @@ CANrangeSensor::CANrangeSensor(frc::TimedRobot *_robot, const char *name, int de
     config.ProximityParams.ProximityHysteresis = 0.5_cm;
     device->GetConfigurator().Apply(config);
 
-    setMaxDistance(units::inch_t{12});
-    setThresholdDistance(units::meter_t{0.1});
-
     LaserProximitySensor<units::millimeter_t>::setGetter(
         [this] () {
             units::millimeter_t measurement = device->GetDistance().GetValue();

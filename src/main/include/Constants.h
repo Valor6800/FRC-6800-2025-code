@@ -227,28 +227,10 @@ namespace Constants {
             default: return 0.321_tr;
         }};
 
-    static bool isElevatorClockwise() { switch (robot) {
-            case Robot::Alpha: return false;
-            case Robot::Gold: return true;
-            default: return true;
-        }};
-
-    static units::angle::turn_t getElevatorAbsoluteRange() { switch (robot) {
-            case Robot::Alpha: return .75_tr;
-            case Robot::Gold: return 1_tr;
-            default: return 1_tr;
-        }};
-
-    static double getElevKAFF() { switch (robot) {
+        static double getElevKAFF() { switch (robot) {
             case Robot::Alpha: return 0.5;
             case Robot::Gold: return 0.72;
             default: return 0.72;
-        }};
-
-    static double getElevKP() { switch (robot) {
-            case Robot::Alpha: return 10;
-            case Robot::Gold: return 10;
-            default: return 10;
         }};
 
         static frc::Pose3d mintCameraPosition(){ switch (robot) {
@@ -270,12 +252,6 @@ namespace Constants {
             case Robot::Alpha: return frc::Pose3d();
             case Robot::Gold: return frc::Pose3d();
             default: return frc::Pose3d();
-        }};
-
-        static units::angle::turn_t getTurns() { switch (robot) {
-            case Robot::Alpha: return 1.37_tr;
-            case Robot::Gold: return 0.5_tr;
-            default: return 0.5_tr;
         }};
 
         static frc::Pose3d chocolateCameraPosition(){ switch (robot) {
@@ -414,6 +390,108 @@ namespace Constants {
                 case Robot::Alpha: return true;
                 case Robot::Gold: return false;
                 default: return false;
+            }}
+
+            /// Amount of rotations needed for after detecting coral intake
+            static units::angle::turn_t getIntakeTurns() { switch (robot) {
+                case Robot::Alpha: return 1.37_tr;
+                case Robot::Gold: return 0.5_tr;
+                default: return 0.5_tr;
+            }};
+
+            /// Time to reach max velocity
+            static units::second_t getElevMaxVelRampTime() { switch (robot) {
+                case Robot::Alpha: return 1.0_s / 0.5;
+                default: return 1.0_s / 0.8333;
+            }}
+
+            static double getScorerSensorToMech() { switch (robot) {
+                case Robot::Alpha: return 0.75;
+                default: return 5 / 3;
+            }}
+
+            static bool isElevatorClockwise() { switch (robot) {
+                case Robot::Alpha: return false;
+                case Robot::Gold: return true;
+                default: return true;
+            }};
+
+            static units::angle::turn_t getElevatorAbsoluteRange() { switch (robot) {
+                case Robot::Alpha: return .75_tr;
+                case Robot::Gold: return 1_tr;
+                default: return 1_tr;
+            }};
+
+            static valor::PIDF getElevatorPIDF() { switch (robot) {
+                case Robot::Alpha: {
+                    valor::PIDF pidf;
+                    pidf.P = 10;
+                    pidf.aFF = 0.5;
+                    return pidf;
+                }
+                default: {
+                    valor::PIDF pidf;
+                    pidf.P = 10;
+                    pidf.aFF = 0.72;
+                    pidf.maxJerk = 40_tr_per_s_cu;
+                    return pidf;
+                }
+            }}
+
+            static valor::PIDF getScorerPIDF() { switch (robot) {
+                case Robot::Alpha: {
+                    valor::PIDF pidf;
+                    pidf.P = 0.5;
+                    pidf.S = 0.58;
+                    return pidf;
+                }
+                default: {
+                    valor::PIDF pidf;
+                    pidf.P = 0.5;
+                    pidf.S = 0.58;
+                    pidf.kV = 0.11;
+                    return pidf;
+                }
+            }}
+
+            static units::second_t getScorerMaxVelRampTime() { switch (robot) {
+                case Robot::Alpha: return 1.0_s / 2;
+                default: return 1.0_s / 2;
+            }}
+        }
+
+        namespace Climber {
+            static bool climbMotorInverted() { switch (robot) {
+                case Robot::Alpha: return false;
+                default: return true;
+            }}
+
+            static valor::PIDF getClimberPIDF() { switch (robot) {
+                case Robot::Alpha: {
+                    valor::PIDF pidf;
+                    pidf.P = 100;
+                    return pidf;
+                }
+                default: {
+                    valor::PIDF pidf;
+                    pidf.P = 100;
+                    return pidf;
+                }
+            }}
+
+            static units::second_t maxVelocityRampTime() { switch (robot) {
+                case Robot::Alpha: return 1.0_s / 3;
+                default: return 1.0_s / 3;
+            }}
+
+            static units::turn_t getForwardLimit() { switch (robot) {
+                case Robot::Alpha: return 0.25_tr;
+                default: return 0.75_tr;
+            }}
+
+            static units::turn_t getReverseLimit() { switch (robot) {
+                case Robot::Alpha: return -0.2_tr;
+                default: return 0.38671875_tr;
             }}
         }
 }
