@@ -19,11 +19,11 @@
 
 
 Robot::Robot() :
+    leds(this, LED_COUNT, SEGMENTS, CANIDs::CANDLE),
     drivetrain(this, &leds),
     scorer(this),
     climber(this),
-    valorAuto(),
-    leds(this, LED_COUNT, SEGMENTS, CANIDs::CANDLE, "")
+    valorAuto()
 
 
     /* valorAuto(), */

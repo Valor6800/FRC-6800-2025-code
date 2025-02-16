@@ -52,6 +52,7 @@ class Robot : public frc::TimedRobot {
         // std::vector<frc2::CommandPtr> autoCommands;
         
 
+        valor::CANdleSensor leds;
         Drivetrain drivetrain;
         Scorer scorer;
         Climber climber;
@@ -61,7 +62,6 @@ class Robot : public frc::TimedRobot {
 
         frc::SendableChooser<frc2::Command*> pitSequenceChooser;
 
-        valor::CANdleSensor leds;
 
         // Both an unordered_map and array would work here, but unordered_map will set up a lot more memory than we need
         // We aren't actually using the map functionality because SendableChooser can directly store Command*
