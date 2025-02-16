@@ -5,6 +5,7 @@
 #include <ctre/phoenix6/CANrange.hpp>
 #include <string>
 #include "LaserProximitySensor.h"
+#include "Constants.h"
 
 namespace valor {
 

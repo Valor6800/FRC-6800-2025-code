@@ -209,6 +209,20 @@ namespace Constants {
             default: return 100_mps_sq;
         }};
 
+        static double scorerSensorToMech() { switch (robot) { 
+            case Robot::Alpha: return 0.75;
+            case Robot::Gold: return 1.66666667;
+            default: return 1.66666667;
+
+        }};
+
+        static double thresholdDistance() { switch (robot) {
+            case Robot::Alpha: return 0.14;
+            case Robot::Gold: return 0.1;
+            default: return 0.1;
+        }};
+
+
         static valor::PhoenixControllerType getScorerMotorType() { switch (robot) {
             case Robot::Alpha: return valor::PhoenixControllerType::FALCON_FOC;
             case Robot::Gold: return valor::PhoenixControllerType::KRAKEN_X44;

@@ -31,7 +31,6 @@
 
 
 #define ELEVATOR_MOTOR_TO_SENSOR 8.02f
-#define SCORER_SENSOR_TO_MECH 1.66666667f //.75
 #define PULLEY_CIRCUMFERENCE 1.432_in
 
 using namespace Constants::Scorer;
@@ -257,7 +256,7 @@ void Scorer::init()
     elevatorMotor->applyConfig();
 
     // Scorer init sequence
-    scorerMotor->setGearRatios(1, SCORER_SENSOR_TO_MECH);
+    scorerMotor->setGearRatios(1, Constants::scorerSensorToMech());
     scorerMotor->enableFOC(true);
 
     valor::PIDF scorerPID;
