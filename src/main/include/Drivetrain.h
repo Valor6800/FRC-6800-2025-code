@@ -157,6 +157,7 @@ public:
 
      double doubtX, doubtY;
 
+     bool withinXRange(), withinYRange();
 private:
      bool aprilTagOnReef(int id);
 
@@ -178,6 +179,6 @@ private:
      double unfilteredYDistance;
 
      valor::CANdleSensor *leds;
-
+     valor::GrappleSensor frontRangeSensor;
      
 };

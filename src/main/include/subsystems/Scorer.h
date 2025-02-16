@@ -25,7 +25,7 @@ class Scorer : public valor::BaseSubsystem
 {
 public:
 
-    Scorer(frc::TimedRobot *robot);
+    Scorer(frc::TimedRobot *robot, Drivetrain *drive);
     
     void resetState();
      
@@ -80,9 +80,10 @@ private:
     valor::PhoenixController<> *elevatorMotor;
     valor::PhoenixController<> *scorerMotor;
 
-    valor::GrappleSensor frontRangeSensor;
     valor::CANrangeSensor scorerStagingSensor;
 
     Constants::Scorer::PositionMap positionMap;
     Constants::Scorer::ScoringSpeedMap scoringSpeedMap;
+
+    Drivetrain *drive;
 };

@@ -1,5 +1,6 @@
 #include "Constants.h"
 #include "subsystems/Scorer.h"
+#include "Drivetrain.h"
 #include "units/length.h"
 #include "units/math.h"
 #include "valkyrie/controllers/NeutralMode.h"
@@ -38,19 +39,18 @@
 
 using namespace Constants::Scorer;
 
-#define VIABLE_DUNK_DISTANCE 0.3548_m
 #define VIABLE_ELEVATOR_THRESHOLD 0.02_m
 
-Scorer::Scorer(frc::TimedRobot *_robot) :
+Scorer::Scorer(frc::TimedRobot *_robot, Drivetrain *_drive) :
     valor::BaseSubsystem(_robot, "Scorer"),
     hallEffectDebounceSensor(_robot, "HallEffectDebounce"),
     candi(CANIDs::HALL_EFFECT, "baseCAN"),
     elevatorMotor(new valor::PhoenixController(valor::PhoenixControllerType::KRAKEN_X60, CANIDs::ELEV_WHEEL, valor::NeutralMode::Brake, elevatorMotorInverted(), "baseCAN")),
     scorerMotor(new valor::PhoenixController(Constants::getScorerMotorType(), CANIDs::SCORER_WHEEL, valor::NeutralMode::Brake, scorerMotorInverted(), "baseCAN")),
-    frontRangeSensor(_robot, "Front Lidar Sensor", CANIDs::FRONT_LIDAR_SENSOR),
     scorerStagingSensor(_robot, "Scorer Staging Sensor", CANIDs::STAGING_LIDAR_SENSOR, "baseCAN"),
     positionMap{std::move(getPositionMap())},
-    scoringSpeedMap{std::move(getScoringSpeedMap())}
+    scoringSpeedMap{std::move(getScoringSpeedMap())},
+    drive(_drive)
 {
 
     frc2::CommandScheduler::GetInstance().RegisterSubsystem(this);
@@ -171,8 +171,6 @@ Scorer::Scorer(frc::TimedRobot *_robot) :
             )
         )
     ).ToPtr());
-
-    frontRangeSensor.setMaxDistance(units::millimeter_t{600});
     init();
 }
 
@@ -230,7 +228,6 @@ bool Scorer::hallEffectSensorActive()
 void Scorer::init()
 {
     table->PutBoolean("Scope Button", false);
-    table->PutNumber("Viable Dunk Distance (m)", VIABLE_DUNK_DISTANCE.value());
     table->PutNumber("Elevator Threshold (m)", VIABLE_ELEVATOR_THRESHOLD.value());
     // CANdi init sequence (for reverse hard limit sensor of elevator)
     ctre::phoenix6::configs::CANdiConfiguration candiConfig;
@@ -351,11 +348,11 @@ void Scorer::analyzeDashboard()
 {
     state.scoringState = SCORE_STATE::HOLD;
 
-    bool withinRange = frontRangeSensor.getLidarData().convert<units::meter>().value() < table->GetNumber("Viable Dunk Distance (m)", VIABLE_DUNK_DISTANCE.value()) && frontRangeSensor.getLidarData().value() != 0;
-    units::meter_t elevatorError = units::math::fabs(convertToMechSpace(elevatorMotor->getPosition()) - posMap[state.gamePiece][state.elevState]);
+    
+    units::meter_t elevatorError = units::math::fabs(convertToMechSpace(elevatorMotor->getPosition()) - positionMap[state.gamePiece][state.elevState]);
     bool elevatorWithinThreshold = elevatorError.value() < table->GetNumber("Elevator Threshold (m)", VIABLE_ELEVATOR_THRESHOLD.value());
 
-    if (withinRange && state.scopedState == SCOPED_STATE::SCOPED && elevatorWithinThreshold) {
+    if (drive->withinXRange() && drive->withinYRange() && state.scopedState == SCOPED_STATE::SCOPED && elevatorWithinThreshold) {
         state.scoringState = SCORE_STATE::SCORING;
     }
     state.tuning = table->GetBoolean("Scope Button", false);
@@ -479,11 +476,7 @@ void Scorer::InitSendable(wpi::SendableBuilder& builder)
         nullptr
     );
     
-    builder.AddDoubleProperty(
-        "Forward Sensor",
-        [this] {return frontRangeSensor.getLidarData().value();},
-        nullptr
-    );
+    
 }
 
 
