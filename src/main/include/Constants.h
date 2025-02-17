@@ -215,6 +215,12 @@ namespace Constants {
             default: return valor::PhoenixControllerType::KRAKEN_X44;
         }};
 
+        static valor::PhoenixControllerType getAzimuthMotorType() {switch (robot ){
+            case Robot::Alpha: return valor::PhoenixControllerType::FALCON_FOC;
+            case Robot::Gold: return valor::PhoenixControllerType::KRAKEN_X60_FOC;
+            default: return valor::PhoenixControllerType::KRAKEN_X60_FOC;
+        }}
+
         static units::angle::turn_t getElevatorMagnetOffset() { switch (robot) {
             case Robot::Alpha: return 0.10327_tr; 
             case Robot::Gold: return 0.321_tr; 

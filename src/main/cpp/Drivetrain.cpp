@@ -208,11 +208,12 @@ std::vector<std::pair<SwerveAzimuthMotor*, SwerveDriveMotor*>> Drivetrain::gener
 
     for (size_t i = 0; i < 4; i++) {
         SwerveAzimuthMotor* azimuthMotor = new SwerveAzimuthMotor(
-            valor::PhoenixControllerType::FALCON_FOC,
+            Constants::getAzimuthMotorType(),
             CANIDs::AZIMUTH_CANS[i],
             valor::NeutralMode::Brake,
             Constants::swerveAzimuthsReversals()[i],
             PIGEON_CAN_BUS
+            
         );
         azimuthMotor->setGearRatios(Constants::azimuthGearRatio(), 1.0);
         azimuthMotor->setPIDF(azimuthPID, 0);
