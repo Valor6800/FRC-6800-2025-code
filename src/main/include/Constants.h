@@ -362,6 +362,8 @@ namespace Constants {
                         {
                             GAME_PIECE::ALGEE,
                             {
+                                { ELEVATOR_STATE::STOWED, 5_in },
+                                { ELEVATOR_STATE::HP, 5_in },
                                 { ELEVATOR_STATE::ONE, 5_in },
                                 { ELEVATOR_STATE::TWO, 13.2_in },
                                 { ELEVATOR_STATE::THREE, 14_in },
@@ -385,7 +387,9 @@ namespace Constants {
                         {
                             GAME_PIECE::ALGEE,
                             {
-                                { ELEVATOR_STATE::ONE, 5_in },
+                                { ELEVATOR_STATE::STOWED, 6.39_in},
+                                { ELEVATOR_STATE::HP, 6.39_in },
+                                { ELEVATOR_STATE::ONE, 4.09_in },
                                 { ELEVATOR_STATE::TWO, 10.71_in },
                                 { ELEVATOR_STATE::THREE, 16.22_in },
                                 { ELEVATOR_STATE::FOUR, 30.5_in }

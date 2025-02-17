@@ -19,15 +19,17 @@
 #define ALGEE_INTAKE_SPEED 15_tps
 #define SCORE_SPEED 20_tps
 #define ALGEE_SCORE_SPEED -40_tps
-#define ALGEE_HOLD_SPD 0.2_tps
+#define ALGEE_HOLD_SPD 3_tps
 
 #define ELEVATOR_FORWARD_LIMIT 6_tr
 #define ELEVATOR_OFFSET 3_in
+#define ELEVATOR_MAGNET_OFFSET 0.321_tr
+#define ELEVATOR_JERK 40_tr_per_s_cu
 
 #define ELEVATOR_MOTOR_TO_SENSOR 8.02f
 #define PULLEY_CIRCUMFERENCE 1.432_in
 
-#define ALGAE_CACHE_SIZE 0
+#define ALGAE_CACHE_SIZE 1000
 
 using namespace Constants::Scorer;
 
@@ -210,8 +212,9 @@ void Scorer::resetState()
     state.scopedState = UNSCOPED;
     state.tuning = false;
     state.manualSpeed = 0_V;
-    state.algaeSpikeCurrent = 60;
+    state.algaeSpikeCurrent = 30;
     currentSensor.reset();
+    state.hasAlgae = false;
 }
 
 bool Scorer::hallEffectSensorActive()
@@ -277,7 +280,7 @@ void Scorer::init()
         scorerMotor->setEncoderPosition(0_tr);
     });
 
-    currentSensor.setSpikeSetpoint(state.algaeSpikeCurrent);
+    currentSensor.setSpikeSetpoint(45);
     currentSensor.setGetter([this]() {return scorerMotor->getCurrent().to<double>(); });
     currentSensor.setSpikeCallback([this]() {state.hasAlgae = true;});
     currentSensor.setCacheSize(ALGAE_CACHE_SIZE);
@@ -338,6 +341,7 @@ void Scorer::assessInputs()
 void Scorer::analyzeDashboard()
 {
     state.tuning = table->GetBoolean("Scope Button", false);
+    state.algaeSpikeCurrent = table->GetNumber("Algae Spike Setpoint", 30);
 }
 
 units::meter_t Scorer::convertToMechSpace(units::turn_t turns) 
@@ -364,7 +368,7 @@ void Scorer::assignOutputs()
         if(state.scopedState == SCOPED || state.tuning){
             state.targetHeight = positionMap.at(state.gamePiece).at(state.elevState);
         } else{
-            state.targetHeight = positionMap.at(CORAL).at(HP);
+            state.targetHeight = positionMap.at(state.gamePiece).at(HP);
         }
         units::turn_t targetRotations = convertToMotorSpace(state.targetHeight);
         elevatorMotor->setPosition(targetRotations);
@@ -375,26 +379,23 @@ void Scorer::assignOutputs()
         if (state.gamePiece == GAME_PIECE::ALGEE) {
             scorerMotor->setSpeed(ALGEE_SCORE_SPEED);  
         } else {
-            if (state.hasAlgae) {
-                scorerMotor->setSpeed(ALGEE_HOLD_SPD);
-            } else{
-                auto it = scoringSpeedMap.find(state.elevState);
-                if (it != scoringSpeedMap.end()) {
-                    scorerMotor->setSpeed(it->second);
-                } else {
-                    // Fallback to the default SCORE_SPEED 
-                    scorerMotor->setSpeed(SCORE_SPEED);
-                }
+            auto it = scoringSpeedMap.find(state.elevState);
+            if (it != scoringSpeedMap.end()) {
+                scorerMotor->setSpeed(it->second);
+            } else {
+            // Fallback to the default SCORE_SPEED 
+                scorerMotor->setSpeed(SCORE_SPEED);
             }
         }
+    }else if (state.hasAlgae) {
+        scorerMotor->setSpeed(ALGEE_HOLD_SPD);
     } else if (state.scoringState == SCORE_STATE::INTAKING || !scorerStagingSensor.isTriggered()) {
         if(state.gamePiece == GAME_PIECE::ALGEE){
             scorerMotor->setSpeed(ALGEE_INTAKE_SPEED);
         } else{
             scorerMotor->setSpeed(CORAL_INTAKE_SPEED);
         }
-    
-    } else {
+    } else{
         // HOLD the coral at a specific position
         // @todo check inversion
         scorerMotor->setPosition(getIntakeTurns());
@@ -459,6 +460,11 @@ void Scorer::InitSendable(wpi::SendableBuilder& builder)
     builder.AddDoubleProperty(
         "MANUAL SPEED ELEVATOR",
         [this] { return state.manualSpeed.to<double>(); },
+        nullptr
+    );
+    builder.AddBooleanProperty(
+        "Has Algae",
+        [this] {return state.hasAlgae;},
         nullptr
     );
     
