@@ -87,16 +87,15 @@ const units::meter_t WHEEL_DIAMETER(0.0973_m);
 
 #define Y_ACTIVATION_THRESHOLD 30.0_deg
 
-Drivetrain::Drivetrain(frc::TimedRobot *_robot, valor::CANdleSensor *_leds) : 
+Drivetrain::Drivetrain(frc::TimedRobot *_robot, CANdle& leds) : 
     valor::Swerve<SwerveAzimuthMotor, SwerveDriveMotor>(
         _robot,
         "SwerveDrive",
-        generateModules(),
+        generateModules(leds),
         Constants::moduleDiff(),
         WHEEL_DIAMETER
     ),
-    teleopStart(999999999999),
-    leds(_leds)
+    teleopStart(999999999999)
 {
     xPIDF.P = KPX;
     xPIDF.I = KIX;
@@ -195,7 +194,7 @@ Drivetrain::Drivetrain(frc::TimedRobot *_robot, valor::CANdleSensor *_leds) :
 
 Drivetrain::~Drivetrain(){}
 
-std::vector<std::pair<SwerveAzimuthMotor*, SwerveDriveMotor*>> Drivetrain::generateModules()
+std::vector<std::pair<SwerveAzimuthMotor*, SwerveDriveMotor*>> Drivetrain::generateModules(CANdle& candle)
 {
     std::vector<std::pair<SwerveAzimuthMotor*, SwerveDriveMotor*>> modules;
 
@@ -226,6 +225,7 @@ std::vector<std::pair<SwerveAzimuthMotor*, SwerveDriveMotor*>> Drivetrain::gener
         azimuthMotor->setupCANCoder(CANIDs::CANCODER_CANS[i], Constants::swerveZeros()[i], false, PIGEON_CAN_BUS);
         azimuthMotor->setContinuousWrap(true);
         azimuthMotor->applyConfig();
+        candle.getters[i] = [azimuthMotor] { return CANdle::cancoderMagnetHealthGetter(*azimuthMotor->getCANCoder()); };
 
         SwerveAzimuthMotor* driveMotor = new SwerveDriveMotor(
             valor::PhoenixControllerType::KRAKEN_X60_FOC,
@@ -376,25 +376,6 @@ void Drivetrain::analyzeDashboard()
     Swerve::analyzeDashboard();
 
     visionAcceptanceRadius = (units::meter_t) table->GetNumber("Vision Acceptance", VISION_ACCEPTANCE.to<double>());
-
-    auto azimuthHealthValues = getAzimuthMagnetHealth();
-    for (int i = 0; i < MODULE_COUNT; i++) {
-        int color = 0xAC41FF;
-        switch (azimuthHealthValues[i]) {
-            case SwerveAzimuthMotor::MagnetHealth::GREEN: 
-                color = valor::CANdleSensor::GREEN;
-                break;
-            case SwerveAzimuthMotor::MagnetHealth::ORANGE:
-                color = valor::CANdleSensor::ORANGE;
-                break;
-            case SwerveAzimuthMotor::MagnetHealth::RED:
-                color = valor::CANdleSensor::RED;
-                break;
-        }
-        leds->setLED(i, color);
-    }
-    for (int i = 5; i < 8; i++)
-        leds->setLED(i, valor::CANdleSensor::WHITE);
 
     for (valor::AprilTagsSensor* aprilLime : aprilTagSensors) {
         aprilLime->applyVisionMeasurement(

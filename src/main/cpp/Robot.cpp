@@ -14,15 +14,11 @@
 #define TELE_DOUBTX 0.75f;
 #define TELE_DOUBTY 0.75f;
 
-#define LED_COUNT 86
-#define SEGMENTS 2
-
-
 Robot::Robot() :
-    leds(this, LED_COUNT, SEGMENTS, CANIDs::CANDLE),
-    drivetrain(this, &leds),
-    scorer(this, &drivetrain),
-    climber(this),
+    candle{this},
+    drivetrain(this, candle),
+    scorer(this, &drivetrain, candle),
+    climber(this, candle),
     valorAuto()
 
 

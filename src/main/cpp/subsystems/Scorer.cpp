@@ -35,7 +35,7 @@
 
 using namespace Constants::Scorer;
 
-Scorer::Scorer(frc::TimedRobot *_robot, Drivetrain *_drivetrain) :
+Scorer::Scorer(frc::TimedRobot *_robot, Drivetrain *_drivetrain, CANdle& candle) :
     valor::BaseSubsystem(_robot, "Scorer"),
     hallEffectDebounceSensor(_robot, "HallEffectDebounce"),
     candi(CANIDs::HALL_EFFECT, "baseCAN"),
@@ -169,6 +169,13 @@ Scorer::Scorer(frc::TimedRobot *_robot, Drivetrain *_drivetrain) :
     ).ToPtr());
 
     init();
+    candle.getters[4] = [this] { return CANdle::cancoderMagnetHealthGetter(*elevatorMotor->getCANCoder()); };
+    // Climber is index 5
+    candle.getters[6] = [this] {
+        if (candi.GetS1State().GetValue() == ctre::phoenix6::signals::S1StateValue::Floating)
+            return valor::CANdleSensor::RED;
+        return valor::CANdleSensor::GREEN;
+    };
 }
 
 frc2::CommandPtr Scorer::createScoringSequence() {

@@ -58,8 +58,6 @@ public:
     frc::Pose2d getRawPose();
     frc::Pose2d getCalculatedPose();
 
-    wpi::array<typename AzimuthMotor::MagnetHealth, MODULE_COUNT> getAzimuthMagnetHealth();
-
     void setupGyro(int, const char*, units::degree_t, units::degree_t, units::degree_t);
     void resetGyro();
     frc::Rotation2d getGyro();

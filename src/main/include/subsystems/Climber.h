@@ -6,6 +6,7 @@
 #include "Constants.h"
 #include "valkyrie/controllers/PIDF.h"
 #include "valkyrie/sensors/CurrentSensor.h"
+#include "subsystems/CANdle.h"
 
 #include <frc/smartdashboard/SendableChooser.h>
 #include <frc/smartdashboard/SmartDashboard.h>
@@ -17,7 +18,7 @@ class Climber : public valor::BaseSubsystem
 {
 public:
 
-    Climber(frc::TimedRobot *robot);
+    Climber(frc::TimedRobot *robot, CANdle& candle);
 
     ~Climber();
 

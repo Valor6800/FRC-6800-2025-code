@@ -242,23 +242,9 @@ public:
             getMotor()->GetConfigurator().Apply(config.Feedback);
     }
 
-    enum MagnetHealth
-    {
-        RED,
-        ORANGE,
-        GREEN
-    };
-
-    MagnetHealth getMagnetHealth() {
-        if (cancoder == nullptr) return MagnetHealth::RED; // Some random default value
-        switch (cancoder->GetMagnetHealth().GetValue().value) {
-        case ctre::phoenix6::signals::MagnetHealthValue::Magnet_Green:
-            return MagnetHealth::GREEN;
-        case ctre::phoenix6::signals::MagnetHealthValue::Magnet_Orange:
-            return MagnetHealth::ORANGE;
-        default: // Case for red + invalid
-            return MagnetHealth::RED;
-        };
+    ctre::phoenix6::signals::MagnetHealthValue getMagnetHealth() {
+        if (!cancoder) return ctre::phoenix6::signals::MagnetHealthValue::Magnet_Invalid;
+        return cancoder->GetMagnetHealth().GetValue();
     }
 
     units::turn_t getAbsEncoderPosition() {
@@ -284,9 +270,8 @@ public:
         if (saveImmediately) getMotor()->GetConfigurator().Apply(config.Feedback);
     }
 
-    units::turn_t getCANCoder() override {
-        if (cancoder == nullptr) return 0_tr;
-        return cancoder->GetPosition().GetValue();
+    ctre::phoenix6::hardware::CANcoder *getCANCoder() override {
+        return cancoder;
     }
 
     float getBusUtil(const char* canBusName) {
@@ -331,12 +316,16 @@ public:
             [this] { return getMotor()->GetMotorVoltage().GetValueAsDouble(); },
             nullptr);
         builder.AddDoubleProperty(
-            "CANCoder", 
-            [this] { return getCANCoder().template to<double>(); },
+            "reqPosition", 
+            [this] { return req_pos_out.Position.template to<double>(); },
             nullptr);
-        builder.AddIntegerProperty(
+        builder.AddDoubleProperty(
+            "reqSpeed", 
+            [this] { return req_vel_out.Velocity.template to<double>(); },
+            nullptr);
+        builder.AddStringProperty(
             "Magnet Health",
-            [this] { return cancoder ? cancoder->GetMagnetHealth().GetValue().value : -1; },
+            [this] { return getMagnetHealth().ToString(); },
             nullptr);
         builder.AddBooleanProperty(
             "Undervolting",

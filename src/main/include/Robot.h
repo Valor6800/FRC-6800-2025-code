@@ -14,9 +14,9 @@
 
 #include "valkyrie/Auto.h"
 #include "Drivetrain.h"
+#include "subsystems/CANdle.h"
 #include "subsystems/Scorer.h"
 #include "valkyrie/CharMode.h"
-#include "valkyrie/sensors/CANdleSensor.h"
 
 #include <frc/DriverStation.h>
 #include <frc/DataLogManager.h>
@@ -51,8 +51,7 @@ class Robot : public frc::TimedRobot {
 
         // std::vector<frc2::CommandPtr> autoCommands;
         
-
-        valor::CANdleSensor leds;
+        CANdle candle;
         Drivetrain drivetrain;
         Scorer scorer;
         Climber climber;
