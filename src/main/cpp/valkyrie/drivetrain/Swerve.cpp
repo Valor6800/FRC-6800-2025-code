@@ -146,10 +146,12 @@ void Swerve<AzimuthMotor, DriveMotor>::analyzeDashboard()
     // Linear Speed calculations
     xSpeedMPS = units::meters_per_second_t{xSpeed * maxDriveSpeed};
     ySpeedMPS = units::meters_per_second_t{ySpeed * maxDriveSpeed};
+    rotSpeedRPS = rotSpeed * maxRotationSpeed;
 
     if (frc::DriverStation::GetAlliance() == frc::DriverStation::kRed) {
         xSpeedMPS *= -1.0;
         ySpeedMPS *= -1.0;
+        rotSpeedRPS *= -1.0;
     }
     // Rotational Speed calculations
     units::radian_t robotRotation = getCalculatedPose().Rotation().Radians();
@@ -157,11 +159,7 @@ void Swerve<AzimuthMotor, DriveMotor>::analyzeDashboard()
     rot_controller.Calculate(robotRotation);
     if (alignToTarget) {
         rotSpeedRPS = units::radians_per_second_t{rot_controller.Calculate(robotRotation)} + rot_controller.GetSetpoint().velocity;
-    } 
-    else {
-        rotSpeedRPS = rotSpeed * maxRotationSpeed;
     }
-
 
     units::meters_per_second_t moduleSpeedsRotation = units::meters_per_second_t{rotSpeedRPS.to<double>() * Constants::driveBaseRadius().to<double>()};
     units::meters_per_second_t moduleSpeedsTranslation = units::meters_per_second_t{sqrtf(powf(xSpeedMPS.to<double>(), 2) + powf(ySpeedMPS.to<double>(), 2))};
