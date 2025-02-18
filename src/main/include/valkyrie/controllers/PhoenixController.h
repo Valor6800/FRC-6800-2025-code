@@ -319,14 +319,6 @@ public:
             [this] { return getMotor()->GetSupplyCurrent().GetValueAsDouble(); },
             nullptr);
         builder.AddDoubleProperty(
-            "Device Temp", 
-            [this] { return getMotor()->GetDeviceTemp().GetValueAsDouble(); },
-            nullptr);
-        builder.AddDoubleProperty(
-            "Processor Temp", 
-            [this] { return getMotor()->GetProcessorTemp().GetValueAsDouble(); },
-            nullptr);
-        builder.AddDoubleProperty(
             "Position", 
             [this] { return getPosition().template to<double>(); },
             nullptr);
@@ -342,56 +334,14 @@ public:
             "CANCoder", 
             [this] { return getCANCoder().template to<double>(); },
             nullptr);
-        builder.AddDoubleProperty(
-            "reqPosition", 
-            [this] { return req_pos_out.Position.template to<double>(); },
-            nullptr);
-        builder.AddDoubleProperty(
-            "reqSpeed", 
-            [this] { return req_vel_out.Velocity.template to<double>(); },
-            nullptr);
         builder.AddIntegerProperty(
             "Magnet Health",
             [this] { return cancoder ? cancoder->GetMagnetHealth().GetValue().value : -1; },
             nullptr);
-        builder.AddFloatProperty(
-            "CANivore Bus Utilization",
-            [this] { return getBusUtil("baseCAN"); },
-            nullptr
-        );
         builder.AddBooleanProperty(
             "Undervolting",
             [this] { return getMotor()->GetFault_Undervoltage().GetValue(); },
             nullptr);
-        builder.AddIntegerProperty(
-            "Device ID",
-            [this] { return getMotor()->GetDeviceID(); },
-            nullptr
-            );
-        builder.AddIntegerProperty(
-            "RotorToSensor",
-            [this] { return rotorToSensor; },
-            nullptr);
-        builder.AddIntegerProperty(
-            "SensorToMech",
-            [this] { return sensorToMech; },
-            nullptr
-            );
-        builder.AddDoubleProperty(
-            "Module Max Speed TPS",
-            [this] {return getMaxMotorSpeed().value();},
-            nullptr
-        );
-        builder.AddDoubleProperty(
-            "Position Update Freq",
-            [this] {return getPositionUpdateFrequency().template to<double>();},
-            nullptr
-        );
-        builder.AddDoubleProperty(
-            "Speed Update Freq",
-            [this] {return getSpeedUpdateFrequency().template to<double>();},
-            nullptr
-        );
     }
 
 private:

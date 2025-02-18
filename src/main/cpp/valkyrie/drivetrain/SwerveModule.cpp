@@ -192,11 +192,6 @@ template<class AzimuthMotor, class DriveMotor>
 void SwerveModule<AzimuthMotor, DriveMotor>::InitSendable(wpi::SendableBuilder& builder)
 {
     builder.SetSmartDashboardType("Subsystem");
-    builder.AddDoubleProperty(
-        "magEncoderRotatons",
-        [this] { return getMagEncoderCount().template to<double>(); },
-        nullptr
-    );
     builder.AddDoubleProperty
     (
         "state: angle",

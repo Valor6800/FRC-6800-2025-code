@@ -98,13 +98,6 @@ void VisionSensor::calculate(){
 }
 
 void VisionSensor::InitSendable(wpi::SendableBuilder& builder) {
-    builder.AddDoubleProperty("tx", [this]{ return tx;}, nullptr);
-    builder.AddDoubleProperty("ty", [this]{ return ty;}, nullptr);
     builder.AddDoubleProperty("totalLatency", [this] {return getTotalLatency().to<double>();}, nullptr);
     builder.AddBooleanProperty("hasTarget", [this]{ return hasTarget();}, nullptr);
-    builder.AddBooleanProperty("limeTableExist", [this] {return limeTable != nullptr;}, nullptr);
-    builder.AddDoubleProperty("fps", [this] {return fps;}, nullptr);
-    builder.AddDoubleProperty("CPU Temp", [this] {return cpuTemp.value();}, nullptr);
-    builder.AddDoubleProperty("RAM Usage", [this] {return ramUsage;}, nullptr);
-    builder.AddDoubleProperty("Temp", [this] {return temp.value();}, nullptr);
 }

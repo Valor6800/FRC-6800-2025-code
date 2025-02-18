@@ -147,16 +147,6 @@ void Climber::InitSendable(wpi::SendableBuilder& builder)
         [this]{return state.climbed;},
         nullptr
     );
-    builder.AddDoubleProperty(
-        "Spike Current",
-        [this] {return state.spikeCurrent;},
-        nullptr
-    );
-    builder.AddDoubleProperty(
-        "Cache Size",
-        [this] {return state.cacheSize;},
-        nullptr
-    );
 }
 
 

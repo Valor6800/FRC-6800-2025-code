@@ -632,21 +632,6 @@ void Swerve<AzimuthMotor, DriveMotor>::InitSendable(wpi::SendableBuilder& builde
         },
         nullptr
     );
-    builder.AddDoubleProperty(
-        "Actual Calculated Pose X",
-        [this] { return getCalculatedPose().X().template to<double>(); },
-        nullptr
-    );
-    builder.AddDoubleProperty(
-        "Actual Calculated Pose Y",
-        [this] { return getCalculatedPose().Y().template to<double>(); },
-        nullptr
-    );
-    builder.AddDoubleProperty(
-        "Actual Calculated Pose Theta",
-        [this] { return getCalculatedPose().Rotation().Degrees().template to<double>(); },
-        nullptr
-    );
     builder.AddDoubleArrayProperty(
         "Actual Calculated Pose",
         [this] 
@@ -734,11 +719,6 @@ void Swerve<AzimuthMotor, DriveMotor>::InitSendable(wpi::SendableBuilder& builde
     builder.AddDoubleProperty(
         "Setpoint Velocity",
         [this] {return rot_controller.GetSetpoint().velocity.to<double>();},
-        nullptr
-    );
-    builder.AddDoubleProperty(
-        "Position Tolerance",
-        [this] {return rot_controller.GetPositionTolerance();},
         nullptr
     );
     builder.AddBooleanProperty(
@@ -848,33 +828,25 @@ void Swerve<AzimuthMotor, DriveMotor>::InitSendable(wpi::SendableBuilder& builde
     );
 
     builder.AddDoubleProperty(
-    "Pigeon Estimated Rotational Position",
-    [this] { return angularPosition.value(); },
-    nullptr
-);
-
+        "Pigeon Estimated Rotational Position",
+        [this] { return angularPosition.value(); },
+        nullptr
+    );
     builder.AddDoubleProperty(
-    "Smoothed Angular Acceleration (rad/s^2)",
-    [this] { return getSmoothedAngularAcceleration().value(); },
-    nullptr
-);
+        "Smoothed Angular Acceleration (rad/s^2)",
+        [this] { return getSmoothedAngularAcceleration().value(); },
+        nullptr
+    );
     builder.AddDoubleProperty(
         "Y Controller Error",
         [this] {return y_controller.GetPositionError().to<double>();},
         nullptr
     );
-
-builder.AddDoubleProperty(
-    "Angular Velocity",
-    [this] { return pigeon->GetAngularVelocityZWorld().GetValue().value(); },  
-    nullptr
-);
-
-builder.AddDoubleProperty(
-    "Angular Acceleration (NOT AVERAGED)",
-    [this] { return angularAcceleration.value();},  
-    nullptr
-);
+    builder.AddDoubleProperty(
+        "Angular Acceleration (NOT AVERAGED)",
+        [this] { return angularAcceleration.value();},  
+        nullptr
+    );
 
     
 }

@@ -59,20 +59,12 @@ void CurrentSensor::InitSendable(wpi::SendableBuilder& builder)
 {
     builder.SetSmartDashboardType("Subsystem");
     builder.AddDoubleProperty(
-        "Previous State", 
-        [this] { return prevState; },
-        nullptr);
-    builder.AddDoubleProperty(
         "Current State", 
         [this] { return currState; },
         nullptr);
     builder.AddDoubleProperty(
         "Spiked Setpoint", 
         [this] { return spikedSetpoint; },
-        nullptr);
-    builder.AddDoubleProperty(
-        "Cache Size", 
-        [this] { return cacheSize; },
         nullptr);
     builder.AddDoubleProperty(
         "Raw Sensor Value", 
