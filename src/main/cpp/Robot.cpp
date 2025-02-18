@@ -49,6 +49,7 @@ void Robot::RobotInit() {
 
     frc::LiveWindow::EnableAllTelemetry();
     frc::DataLogManager::Start();
+    frc::DriverStation::StartDataLog(frc::DataLogManager::GetLog());
 
     charMode.init();
     valorAuto.fillAutoList();
