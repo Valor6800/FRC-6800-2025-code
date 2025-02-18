@@ -721,11 +721,6 @@ void Swerve<AzimuthMotor, DriveMotor>::InitSendable(wpi::SendableBuilder& builde
         [this] {return rot_controller.GetSetpoint().velocity.to<double>();},
         nullptr
     );
-    builder.AddBooleanProperty(
-        "At Goal",
-        [this] {return rot_controller.AtGoal();},
-        nullptr
-    );
     builder.AddDoubleProperty(
         "Y Distance",
         [this] {return yDistance.to<double>();},
