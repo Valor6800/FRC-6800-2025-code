@@ -58,8 +58,8 @@ Swerve<AzimuthMotor, DriveMotor>::Swerve(frc::TimedRobot *_robot,
         &rot_controller, "rot_controller"
     );
 
-    int MDX[] = MODULE_DIFF_XS;
-    int MDY[] = MODULE_DIFF_YS;
+    std::vector<int> MDX = Constants::getModuleCoordsX();
+    std::vector<int> MDY = Constants::getModuleCoordsY();
     wpi::array<frc::Translation2d, MODULE_COUNT> motorLocations = wpi::array<frc::Translation2d, MODULE_COUNT>(wpi::empty_array);
     for (size_t i = 0; i < MODULE_COUNT; i++) {
         motorLocations[i] = frc::Translation2d{_module_radius * MDX[i], _module_radius * MDY[i]};
