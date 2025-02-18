@@ -227,7 +227,7 @@ void Scorer::init()
     table->PutBoolean("Scope Button", false);
 
     scorerStagingSensor.setMaxDistance(12_in);
-    scorerStagingSensor.setThresholdDistance(10_cm);
+    scorerStagingSensor.setThresholdDistance(7.7_cm);
     
     // CANdi init sequence (for reverse hard limit sensor of elevator)
     ctre::phoenix6::configs::CANdiConfiguration candiConfig;
@@ -275,9 +275,11 @@ void Scorer::init()
 
     // Beambreak debounce sensor (on scoring mechanism)
     scorerStagingSensor.setRisingEdgeCallback([this] {
-        state.scoringState = HOLD;
-        scorerMotor->setSpeed(0_tps);
-        scorerMotor->setEncoderPosition(0_tr);
+        if (state.gamePiece == GAME_PIECE::CORAL) {
+            state.scoringState = HOLD;
+            scorerMotor->setSpeed(0_tps);
+            scorerMotor->setEncoderPosition(0_tr);
+        }
     });
 
     currentSensor.setSpikeSetpoint(45);
@@ -387,7 +389,7 @@ void Scorer::assignOutputs()
                 scorerMotor->setSpeed(SCORE_SPEED);
             }
         }
-    }else if (state.hasAlgae) {
+    }else if (state.hasAlgae && state.gamePiece == GAME_PIECE::ALGEE) {
         scorerMotor->setSpeed(ALGEE_HOLD_SPD);
     } else if (state.scoringState == SCORE_STATE::INTAKING || !scorerStagingSensor.isTriggered()) {
         if(state.gamePiece == GAME_PIECE::ALGEE){
@@ -435,11 +437,6 @@ void Scorer::InitSendable(wpi::SendableBuilder& builder)
     builder.AddBooleanProperty(
         "State: Scoped",
         [this] { return state.scopedState; },
-        nullptr
-    );
-    builder.AddBooleanProperty(
-        "State: Hall Effect Active",
-        [this] { return hallEffectSensorActive(); },
         nullptr
     );
     builder.AddBooleanProperty(
