@@ -279,7 +279,7 @@ public:
     virtual units::turn_t getAbsEncoderPosition() = 0;
 
     virtual void setupCANCoder(int deviceId, units::turn_t offset, bool clockwise = false, std::string canbus = "", units::turn_t absoluteRange=1_tr, bool saveImmediately = false) = 0;
-    virtual units::turn_t getCANCoder() = 0;
+    virtual ctre::phoenix6::hardware::CANcoder *getCANCoder() = 0;
 
 protected:
 

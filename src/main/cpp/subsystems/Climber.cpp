@@ -32,13 +32,15 @@
 
 using namespace valor;
 
-Climber::Climber(frc::TimedRobot *_robot) : valor::BaseSubsystem(_robot, "Climber"),
+Climber::Climber(frc::TimedRobot *_robot, CANdle& candle) : valor::BaseSubsystem(_robot, "Climber"),
     climbMotors(nullptr),
     currentSensor(_robot, "Climber")
 {
     frc2::CommandScheduler::GetInstance().RegisterSubsystem(this);
     table->PutBoolean("Climbed?", state.climbed);
     init();
+
+    candle.cancoders.push_back(climbMotors->getCANCoder());
 }
 
 Climber::~Climber()

@@ -57,9 +57,9 @@ void NeoController::applyConfig()
 {
 }
 
-units::turn_t NeoController::getCANCoder()
+ctre::phoenix6::hardware::CANcoder *NeoController::getCANCoder()
 {
-    return cancoder ? cancoder->GetAbsolutePosition().GetValue() : 0_tr;
+    return cancoder;
 }
 
 void NeoController::reset()

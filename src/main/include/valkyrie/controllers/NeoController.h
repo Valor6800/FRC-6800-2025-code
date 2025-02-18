@@ -61,7 +61,7 @@ public:
     void setGearRatios(double, double, bool saveImmediately = false) override;
 
     void setupCANCoder(int deviceId, units::turn_t offset, bool clockwise, std::string canbus = "", units::turn_t absoluteRange=1_tr, bool saveImmediately = false) override;
-    units::turn_t getCANCoder() override;
+    ctre::phoenix6::hardware::CANcoder *getCANCoder() override;
     
     void setOpenLoopRamp(units::second_t time, bool saveImmediately = false) override;
 

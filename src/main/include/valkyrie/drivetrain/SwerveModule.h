@@ -41,8 +41,6 @@ public:
 
     frc::Rotation2d getAzimuthPosition();
     
-    AzimuthMotor::MagnetHealth getAzimuthMagnetHealth();
-
     units::meter_t getDrivePosition();
 
     units::meters_per_second_t getDriveSpeed();

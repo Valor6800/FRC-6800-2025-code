@@ -20,13 +20,13 @@
 #include <unordered_map>
 #include "valkyrie/Gamepad.h"
 #include <ctre/phoenix6/core/CoreCANdi.hpp>
-
+#include "subsystems/CANdle.h"
 
 class Scorer : public valor::BaseSubsystem
 {
 public:
 
-    Scorer(frc::TimedRobot *robot);
+    Scorer(frc::TimedRobot *robot, CANdle&);
     
     void resetState();
      

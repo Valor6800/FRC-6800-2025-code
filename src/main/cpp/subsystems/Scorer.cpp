@@ -33,7 +33,7 @@
 
 using namespace Constants::Scorer;
 
-Scorer::Scorer(frc::TimedRobot *_robot) :
+Scorer::Scorer(frc::TimedRobot *_robot, CANdle& candle) :
     valor::BaseSubsystem(_robot, "Scorer"),
     hallEffectDebounceSensor(_robot, "HallEffectDebounce"),
     candi(CANIDs::HALL_EFFECT, "baseCAN"),
@@ -166,6 +166,7 @@ Scorer::Scorer(frc::TimedRobot *_robot) :
     ).ToPtr());
 
     init();
+    candle.cancoders.push_back(elevatorMotor->getCANCoder());
 }
 
 frc2::CommandPtr Scorer::createScoringSequence() {
