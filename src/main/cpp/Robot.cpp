@@ -7,6 +7,7 @@
 #include <Constants.h>
 
 #include <pathplanner/lib/auto/NamedCommands.h>
+#include <ctre/phoenix6/SignalLogger.hpp>
 
 #include <ctime>
 #define AUTO_DOUBTX 3.0f;
@@ -60,6 +61,9 @@ void Robot::RobotInit() {
 
     frc::LiveWindow::EnableAllTelemetry();
     frc::DataLogManager::Start();
+    frc::DriverStation::StartDataLog(frc::DataLogManager::GetLog());
+    // By default it logs to /home/lvuser/logs
+    ctre::phoenix6::SignalLogger::EnableAutoLogging(true);
 
     charMode.init();
     valorAuto.fillAutoList();
