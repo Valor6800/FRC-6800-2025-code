@@ -20,6 +20,8 @@
 #include "valkyrie/BaseSubsystem.h"
 #include "valkyrie/drivetrain/SwerveModule.h"
 #include "valkyrie/CharMode.h"
+#include <networktables/StructArrayTopic.h>
+#include <networktables/StructTopic.h>
 
 #include "Constants.h"
 
