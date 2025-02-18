@@ -126,17 +126,17 @@ namespace Constants {
 
         static units::degree_t pigeonMountPitch(){ switch (robot){ 
             case Robot::Alpha: return 0.037622284_deg; 
-            case Robot::Gold: return 0.037622284_deg;  
+            case Robot::Gold: return 1.0285918_deg;  
             default: return 0.037622284_deg;
         }};
         static units::degree_t pigeonMountRoll(){ switch (robot){ 
             case Robot::Alpha: return -0.784180343_deg;
-            case Robot::Gold: return -0.784180343_deg;
+            case Robot::Gold: return -179.45845_deg;
             default: return -0.784180343_deg;
         }};
         static units::degree_t pigeonMountYaw(){ switch (robot){ 
             case Robot::Alpha: return -90.230049133_deg; 
-            case Robot::Gold: return -90.230049133_deg;
+            case Robot::Gold: return 88.945129_deg;
             default: return -90.230049133_deg; 
         }};
 
