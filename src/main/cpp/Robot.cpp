@@ -47,7 +47,6 @@ void Robot::RobotInit() {
     climber.setGamepads(&gamepadOperator, &gamepadDriver);
     climber.resetState();
 
-    frc::LiveWindow::EnableAllTelemetry();
     frc::DataLogManager::Start();
     frc::DriverStation::StartDataLog(frc::DataLogManager::GetLog());
 

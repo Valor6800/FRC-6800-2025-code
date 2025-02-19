@@ -13,6 +13,7 @@
 
 #include "valkyrie/Gamepad.h"
 #include <frc/Alert.h>
+#include "valkyrie/Loggable.h"
 
 class Climber : public valor::BaseSubsystem
 {
@@ -32,7 +33,8 @@ public:
 
     void setDegrees(units::degree_t deg);
 
-    void InitSendable(wpi::SendableBuilder& builder);
+    void InitLoggable();
+    // void InitSendable(wpi::SendableBuilder& builder);
 
     enum CLIMB_STATE
     {

@@ -36,6 +36,7 @@ Climber::Climber(frc::TimedRobot *_robot, valor::CANdleSensor* _leds) : valor::B
     climbCancoder(new ctre::phoenix6::hardware::CANcoder(CANIDs::CLIMBER_CAN, "baseCAN")),
     leds(_leds)
 {
+    valor::LoggableInstance::GetInstance().AddSubsystem("Climber", this);
     frc2::CommandScheduler::GetInstance().RegisterSubsystem(this);
     init();
 }
@@ -116,9 +117,6 @@ void Climber::init()
         units::volt_t(12.0)
     );
     climbMotors->applyConfig();
-    
-    table->PutNumber("Spike Current", state.spikeCurrent);
-    table->PutNumber("Cache Size", state.cacheSize);
 
     resetState();
 
@@ -212,19 +210,32 @@ frc2::CommandPtr Climber::pitSequence() {
     );
 }
 
-void Climber::InitSendable(wpi::SendableBuilder& builder)
-{
-    builder.SetSmartDashboardType("Subsystem");
-    builder.AddIntegerProperty(
-        "Climb State",
-        [this]{return state.climbState;},
+void Climber::InitLoggable() {
+    AddDoubleProperty(
+        "Climbed?",
+        [this]{return state.hasClimbed;},
         nullptr
     );
-    // builder.AddIntegerProperty(
-    //     "Stabby State",
-    //     [this]{return state.stabState;},
-    //     nullptr
-    // );
 }
+
+// void Climber::InitSendable(wpi::SendableBuilder& builder)
+// {
+//     builder.SetSmartDashboardType("Subsystem");
+//     builder.AddBooleanProperty(
+//         "Climbed?",
+//         [this]{return state.climbed;},
+//         nullptr
+//     );
+//     builder.AddDoubleProperty(
+//         "Spike Current",
+//         [this] {return state.spikeCurrent;},
+//         nullptr
+//     );
+//     builder.AddDoubleProperty(
+//         "Cache Size",
+//         [this] {return state.cacheSize;},
+//         nullptr
+//     );
+// }
 
 

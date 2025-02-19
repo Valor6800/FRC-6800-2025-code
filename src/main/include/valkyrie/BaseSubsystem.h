@@ -13,6 +13,7 @@
 #include <wpi/sendable/Sendable.h>
 #include <wpi/sendable/SendableBuilder.h>
 #include <wpi/sendable/SendableHelper.h>
+#include "valkyrie/Loggable.h"
 
 namespace valor {
 
@@ -43,7 +44,7 @@ namespace valor {
  * Descriptions for each function and their intent is listed in the function description
  * 
  */
-class BaseSubsystem : public frc2::Subsystem, public wpi::Sendable, public wpi::SendableHelper<BaseSubsystem> {
+class BaseSubsystem : public frc2::Subsystem, public valor::Loggable, public wpi::SendableHelper<BaseSubsystem> {
     public:
 
         /**
@@ -63,8 +64,10 @@ class BaseSubsystem : public frc2::Subsystem, public wpi::Sendable, public wpi::
             driverGamepad(NULL)
         {
             table = nt::NetworkTableInstance::GetDefault().GetTable(name);
-            wpi::SendableRegistry::AddLW(this, "BaseSubsystem", subsystemName);
+            // wpi::SendableRegistry::AddLW(this, "BaseSubsystem", subsystemName);
         }
+
+        void InitLoggable() {}
         
         /**
          * @brief Initialize the subsystem
@@ -154,8 +157,6 @@ class BaseSubsystem : public frc2::Subsystem, public wpi::Sendable, public wpi::
             driverGamepad = _driverGamepad;
         }
 
-        virtual void InitSendable(wpi::SendableBuilder& builder) = 0;
-    
     protected:
 
         /**
