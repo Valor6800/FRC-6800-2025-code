@@ -151,7 +151,7 @@ void Swerve<AzimuthMotor, DriveMotor>::analyzeDashboard()
     if (frc::DriverStation::GetAlliance() == frc::DriverStation::kRed) {
         xSpeedMPS *= -1.0;
         ySpeedMPS *= -1.0;
-        rotSpeedRPS *= -1.0;
+        // rotSpeedRPS *= -1.0;
     }
     // Rotational Speed calculations
     units::radian_t robotRotation = getCalculatedPose().Rotation().Radians();

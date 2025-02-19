@@ -3,33 +3,47 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 1.3186475409836067,
-        "y": 0.9621413934426232
+        "x": 7.1,
+        "y": 0.5
       },
       "prevControl": null,
       "nextControl": {
-        "x": 3.092827868852458,
-        "y": 1.6574282786885246
+        "x": 6.125717213114753,
+        "y": 1.405686475409835
       },
       "isLocked": false,
-      "linkedName": "HP1"
+      "linkedName": "C6"
     },
     {
       "anchor": {
-        "x": 3.35655737704918,
-        "y": 3.815215163934426
+        "x": 5.03483606557377,
+        "y": 2.700358606557377
       },
       "prevControl": {
-        "x": 2.19375,
-        "y": 3.1319159836065555
+        "x": 5.838012295081967,
+        "y": 1.777305327868853
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "B"
+      "linkedName": "E"
     }
   ],
   "rotationTargets": [],
-  "constraintZones": [],
+  "constraintZones": [
+    {
+      "name": "Constraints Zone",
+      "minWaypointRelativePos": 0,
+      "maxWaypointRelativePos": 1.0,
+      "constraints": {
+        "maxVelocity": 1.5,
+        "maxAcceleration": 2.5,
+        "maxAngularVelocity": 540.0,
+        "maxAngularAcceleration": 720.0,
+        "nominalVoltage": 12.0,
+        "unlimited": false
+      }
+    }
+  ],
   "pointTowardsZones": [],
   "eventMarkers": [
     {
@@ -45,7 +59,7 @@
     },
     {
       "name": "Enable Scorer",
-      "waypointRelativePos": 0.98,
+      "waypointRelativePos": 0.97,
       "endWaypointRelativePos": null,
       "command": {
         "type": "named",
@@ -65,13 +79,13 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 0.5259690216186781
+    "rotation": 119.99999999999999
   },
   "reversed": false,
-  "folder": "H-R",
+  "folder": "C-R",
   "idealStartingState": {
     "velocity": 0,
-    "rotation": 55.0
+    "rotation": 180.0
   },
   "useDefaultConstraints": true
 }
