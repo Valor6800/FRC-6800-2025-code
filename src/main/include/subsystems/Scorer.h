@@ -4,6 +4,7 @@
 #include "valkyrie/controllers/PhoenixController.h"
 #include "Constants.h"
 #include <vector>
+#include "valkyrie/sensors/CANdleSensor.h"
 #include "valkyrie/sensors/GrappleSensor.h"
 #include "valkyrie/sensors/CANRangeSensor.h"
 #include "valkyrie/sensors/CurrentSensor.h"
@@ -26,7 +27,7 @@ class Scorer : public valor::BaseSubsystem
 {
 public:
 
-    Scorer(frc::TimedRobot *robot);
+    Scorer(frc::TimedRobot *robot, valor::CANdleSensor *leds);
     
     void resetState();
      
@@ -37,7 +38,7 @@ public:
     void InitSendable(wpi::SendableBuilder& builder);
 
     frc2::CommandPtr createScoringSequence();
-    frc2::CommandPtr  elevatorSequence();
+    frc2::CommandPtr createElevatorSequence();
 
 
     enum SCORE_STATE
@@ -72,12 +73,13 @@ public:
     } state;
 
 private:
-    
+
     units::meter_t convertToMechSpace(units::turn_t turns);
     units::turn_t convertToMotorSpace(units::meter_t meters);
 
     bool hallEffectSensorActive();
 
+    valor::CANdleSensor *leds;
     valor::DebounceSensor hallEffectDebounceSensor;
 
     ctre::phoenix6::hardware::core::CoreCANdi candi;
@@ -91,5 +93,5 @@ private:
 
     Constants::Scorer::PositionMap positionMap;
     Constants::Scorer::ScoringSpeedMap scoringSpeedMap;
-    frc2::CommandPtr pitSequenceLevelCommand(ELEVATOR_STATE elevLevel);
+    frc2::CommandPtr pitSequenceLevelCommand(Constants::Scorer::ELEVATOR_STATE elevLevel);
 };

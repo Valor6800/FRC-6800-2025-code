@@ -35,8 +35,9 @@
 
 using namespace Constants::Scorer;
 
-Scorer::Scorer(frc::TimedRobot *_robot) :
+Scorer::Scorer(frc::TimedRobot *_robot, valor::CANdleSensor *leds) :
     valor::BaseSubsystem(_robot, "Scorer"),
+    leds(leds),
     hallEffectDebounceSensor(_robot, "HallEffectDebounce"),
     candi(CANIDs::HALL_EFFECT, "baseCAN"),
     elevatorMotor(new valor::PhoenixController(valor::PhoenixControllerType::KRAKEN_X60, CANIDs::ELEV_WHEEL, valor::NeutralMode::Brake, elevatorMotorInverted(), "baseCAN")),
@@ -181,11 +182,12 @@ frc2::CommandPtr Scorer::createScoringSequence() {
 }
 
 
-frc2::CommandPtr Scorer::pitSequenceLevelCommand(ELEVATOR_STATE elevLevel) {
+frc2::CommandPtr Scorer::pitSequenceLevelCommand(Constants::Scorer::ELEVATOR_STATE elevLevel) {
     return frc2::cmd::Race(
         frc2::cmd::Wait(1_s),
         frc2::FunctionalCommand{
             [this, elevLevel] () {
+                leds->setLED(4, valor::CANdleSensor::WHITE);
                 state.elevState = elevLevel;
                 state.targetHeight = positionMap[state.gamePiece][elevLevel];
             },
@@ -196,7 +198,13 @@ frc2::CommandPtr Scorer::pitSequenceLevelCommand(ELEVATOR_STATE elevLevel) {
             [this] () -> bool {
                 units::turn_t currentPosition = elevatorMotor->getPosition();
                 units::turn_t targetPosition = convertToMotorSpace(state.targetHeight);
-                return std::abs(currentPosition.value() - targetPosition.value()) <= ELEVATOR_TOLERANCE;
+                bool inTolerance = std::abs(currentPosition.value() - targetPosition.value()) <= ELEVATOR_TOLERANCE;
+                if(inTolerance) {
+                    leds->setLED(4, valor::CANdleSensor::GREEN);
+                } else {
+                    leds->setLED(4, valor::CANdleSensor::RED);
+                }
+                return inTolerance;
             },
             { this }
         }.ToPtr()
@@ -204,7 +212,7 @@ frc2::CommandPtr Scorer::pitSequenceLevelCommand(ELEVATOR_STATE elevLevel) {
 }
 
 
-frc2::CommandPtr Scorer::elevatorSequence() {
+frc2::CommandPtr Scorer::createElevatorSequence() {
     return frc2::cmd::Sequence(
         frc2::InstantCommand([this]() { 
             state.scopedState = Scorer::SCOPED_STATE::SCOPED;
