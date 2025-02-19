@@ -3,25 +3,25 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 1.1867827868852459,
-        "y": 0.7943135245901636
+        "x": 1.3785860655737705,
+        "y": 1.058043032786885
       },
       "prevControl": null,
       "nextControl": {
-        "x": 2.337282786885246,
-        "y": 1.096563524590164
+        "x": 2.529086065573771,
+        "y": 1.3602930327868854
       },
       "isLocked": false,
       "linkedName": "HP1"
     },
     {
       "anchor": {
-        "x": 3.752151639344262,
-        "y": 3.083965163934426
+        "x": 3.728176229508197,
+        "y": 2.9281249999999988
       },
       "prevControl": {
-        "x": 3.362151639344262,
-        "y": 2.4794651639344267
+        "x": 3.3381762295081967,
+        "y": 2.3236249999999994
       },
       "nextControl": null,
       "isLocked": false,
@@ -32,17 +32,6 @@
   "constraintZones": [],
   "pointTowardsZones": [],
   "eventMarkers": [
-    {
-      "name": "LEVEL TWO POSITION",
-      "waypointRelativePos": 0.65,
-      "endWaypointRelativePos": null,
-      "command": {
-        "type": "named",
-        "data": {
-          "name": "LEVEL TWO POSITION"
-        }
-      }
-    },
     {
       "name": "Enable Scorer",
       "waypointRelativePos": 0.95,
@@ -65,13 +54,13 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": -29.999999999999996
+    "rotation": 59.99999999999999
   },
   "reversed": false,
   "folder": "H-R",
   "idealStartingState": {
     "velocity": 0,
-    "rotation": -35.0
+    "rotation": 55.0
   },
   "useDefaultConstraints": true
 }
