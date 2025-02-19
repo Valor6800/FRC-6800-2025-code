@@ -12,6 +12,8 @@ CANrangeSensor::CANrangeSensor(frc::TimedRobot *_robot, const char *name, int de
     config.ToFParams.UpdateMode = ctre::phoenix6::signals::UpdateModeValue::ShortRange100Hz;
     config.ProximityParams.ProximityThreshold = 1_cm;
     config.ProximityParams.ProximityHysteresis = 0.5_cm;
+    config.FovParams.FOVRangeX = 15_deg;
+    config.FovParams.FOVRangeY = 15_deg;
     device->GetConfigurator().Apply(config);
 
     LaserProximitySensor<units::millimeter_t>::setGetter(
