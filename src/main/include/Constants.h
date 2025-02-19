@@ -216,13 +216,13 @@ namespace Constants {
         }};
 
         static std::vector<int> getModuleCoordsX(){switch(robot){
-            case Robot::Alpha: return {1, -1, -1, 1};
+            case Robot::Alpha: return {1, 1, -1, -1}; // {1, -1, -1, 1}
             case Robot::Gold: return {-1, 1, 1, -1};
             default: return {-1, 1, 1, -1};
         }};
 
         static std::vector<int> getModuleCoordsY(){switch(robot){
-            case Robot::Alpha: return {-1, -1, 1, 1};
+            case Robot::Alpha: return {1, -1, -1, 1}; // {-1, -1, 1, 1}
             case Robot::Gold: return {1, 1, -1, -1};
             default: return {1, 1, -1, -1}; 
         }};
