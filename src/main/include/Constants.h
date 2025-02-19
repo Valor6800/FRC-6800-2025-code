@@ -391,22 +391,20 @@ namespace Constants {
                         {
                             GAME_PIECE::CORAL,
                             {
-                                { ELEVATOR_STATE::STOWED, 5_in },
-                                { ELEVATOR_STATE::HP, 5_in },
-                                { ELEVATOR_STATE::ONE, 13.57_in },
-                                { ELEVATOR_STATE::TWO, 14_in },
-                                { ELEVATOR_STATE::THREE, 14_in },
+                                { ELEVATOR_STATE::STOWED, 6_in },
+                                { ELEVATOR_STATE::HP, 6.5_in },
+                                { ELEVATOR_STATE::ONE, 25.14_in },
+                                { ELEVATOR_STATE::TWO, 38_in },
+                                { ELEVATOR_STATE::THREE, 51.1_in },
                                 { ELEVATOR_STATE::FOUR, 5_in }
                             }
                         },
                         {
                             GAME_PIECE::ALGEE,
                             {
-                                { ELEVATOR_STATE::STOWED, 5_in },
-                                { ELEVATOR_STATE::HP, 5_in },
-                                { ELEVATOR_STATE::ONE, 5_in },
-                                { ELEVATOR_STATE::TWO, 13.2_in },
-                                { ELEVATOR_STATE::THREE, 14_in },
+                                { ELEVATOR_STATE::ONE, 10_in },
+                                { ELEVATOR_STATE::TWO, 26.4_in },
+                                { ELEVATOR_STATE::THREE, 46.62_in },
                                 { ELEVATOR_STATE::FOUR, 5_in }
                             }
                         }

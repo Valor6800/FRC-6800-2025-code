@@ -27,7 +27,7 @@
 #define ELEVATOR_JERK 40_tr_per_s_cu
 
 #define ELEVATOR_MOTOR_TO_SENSOR 8.02f
-#define PULLEY_CIRCUMFERENCE 1.432_in
+#define PITCH_DIAMETER 1.432_in
 
 #define ALGAE_CACHE_SIZE 1000
 
@@ -371,7 +371,7 @@ void Scorer::assignOutputs()
 
     //Elevator State Machine
     if (state.elevState == ELEVATOR_STATE::MANUAL) {
-        elevatorMotor->setPower(state.manualSpeed + units::volt_t{Constants::getElevKAFF()});
+        elevatorMotor->setPower(state.manualSpeed + units::volt_t{Constants::Scorer::getElevatorPIDF().aFF});
     } else {
         if(state.scopedState == SCOPED || state.tuning){
             state.targetHeight = positionMap.at(state.gamePiece).at(state.elevState);
