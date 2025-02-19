@@ -33,6 +33,17 @@
   "pointTowardsZones": [],
   "eventMarkers": [
     {
+      "name": "LEVEL TWO POSITION",
+      "waypointRelativePos": 0.9,
+      "endWaypointRelativePos": null,
+      "command": {
+        "type": "named",
+        "data": {
+          "name": "LEVEL TWO POSITION"
+        }
+      }
+    },
+    {
       "name": "Enable Scorer",
       "waypointRelativePos": 0.97,
       "endWaypointRelativePos": null,
