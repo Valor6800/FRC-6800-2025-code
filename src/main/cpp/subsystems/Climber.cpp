@@ -60,7 +60,7 @@ void Climber::init()
     valor::PIDF stabbyPID;
 
     climbMotors = new valor::PhoenixController(
-        valor::PhoenixControllerType::FALCON_FOC,
+        valor::PhoenixControllerType::KRAKEN_X60_FOC,
         CANIDs::CLIMBER_LEAD,
         valor::NeutralMode::Brake,
         Constants::Climber::climbMotorInverted(),
