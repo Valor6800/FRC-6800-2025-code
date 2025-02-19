@@ -240,7 +240,8 @@ void Scorer::init()
     elevatorMotor->setGearRatios(ELEVATOR_MOTOR_TO_SENSOR, ELEVATOR_SENSOR_TO_MECH);
     elevatorMotor->enableFOC(true);
     elevatorMotor->setForwardLimit(ELEVATOR_FORWARD_LIMIT);
-    elevatorMotor->setupReverseHardwareLimit(CANIDs::HALL_EFFECT, ctre::phoenix6::signals::ReverseLimitTypeValue::NormallyOpen);
+    if (Constants::getRobot() == Constants::Alpha){elevatorMotor->setReverseLimit(.1_tr);}
+    else {elevatorMotor->setupReverseHardwareLimit(CANIDs::HALL_EFFECT, ctre::phoenix6::signals::ReverseLimitTypeValue::NormallyOpen);}
 
     valor::PIDF elevatorPID = Constants::Scorer::getElevatorPIDF();
     elevatorPID.maxVelocity = elevatorMotor->getMaxMechSpeed();
