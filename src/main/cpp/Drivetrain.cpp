@@ -319,6 +319,9 @@ void Drivetrain::assessInputs()
 void Drivetrain::analyzeDashboard()
 {
     poseErrorPP = currentPosePathPlanner.Get() - targetPosePathPlanner.Get();
+
+    poseErrorPPTopic.Set(poseErrorPP);
+    //
     Swerve::ROT_KP = table->GetNumber("Rot_KP", Swerve::ROT_KP);
     Swerve::ROT_KD = table->GetNumber("Rot_KD", Swerve::ROT_KD);
 
@@ -566,5 +569,4 @@ void Drivetrain::InitSendable(wpi::SendableBuilder& builder)
             [this] {return state.aligned;},
             nullptr
         );
-        poseErrorPPTopic.Set(poseErrorPP); // WARN: Proof of concept
     }

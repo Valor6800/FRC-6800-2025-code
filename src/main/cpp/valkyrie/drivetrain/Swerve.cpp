@@ -674,11 +674,6 @@ void Swerve<AzimuthMotor, DriveMotor>::InitSendable(wpi::SendableBuilder& builde
         nullptr
     );
     builder.AddDoubleProperty(
-        "Setpoint Velocity",
-        [this] {return rot_controller.GetSetpoint().velocity.to<double>();},
-        nullptr
-    );
-    builder.AddDoubleProperty(
         "Y Distance",
         [this] {return yDistance.to<double>();},
         nullptr
@@ -787,11 +782,6 @@ void Swerve<AzimuthMotor, DriveMotor>::InitSendable(wpi::SendableBuilder& builde
     builder.AddDoubleProperty(
         "Smoothed Angular Acceleration (rad/s^2)",
         [this] { return getSmoothedAngularAcceleration().value(); },
-        nullptr
-    );
-    builder.AddDoubleProperty(
-        "Y Controller Error",
-        [this] {return y_controller.GetPositionError().to<double>();},
         nullptr
     );
 
