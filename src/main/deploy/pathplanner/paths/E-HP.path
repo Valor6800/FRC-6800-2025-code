@@ -16,12 +16,12 @@
     },
     {
       "anchor": {
-        "x": 1.3785860655737705,
-        "y": 1.058043032786885
+        "x": 1.3186475409836067,
+        "y": 0.9621413934426232
       },
       "prevControl": {
-        "x": 2.2853360655737704,
-        "y": 1.6625430327868842
+        "x": 2.2253975409836064,
+        "y": 1.5666413934426222
       },
       "nextControl": null,
       "isLocked": false,
@@ -32,6 +32,17 @@
   "constraintZones": [],
   "pointTowardsZones": [],
   "eventMarkers": [
+    {
+      "name": "HP",
+      "waypointRelativePos": 0.05,
+      "endWaypointRelativePos": null,
+      "command": {
+        "type": "named",
+        "data": {
+          "name": "HP"
+        }
+      }
+    },
     {
       "name": "DISABLE Scorer",
       "waypointRelativePos": 0.2,

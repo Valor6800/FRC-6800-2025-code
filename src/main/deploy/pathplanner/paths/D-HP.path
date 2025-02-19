@@ -3,25 +3,25 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 3.9919057377049176,
-        "y": 2.7602971311475404
+        "x": 4.111782786885246,
+        "y": 2.7842725409836064
       },
       "prevControl": null,
       "nextControl": {
-        "x": 3.280155737704918,
-        "y": 2.038797131147541
+        "x": 3.4000327868852462,
+        "y": 2.062772540983607
       },
       "isLocked": false,
       "linkedName": "D"
     },
     {
       "anchor": {
-        "x": 1.3785860655737705,
-        "y": 1.058043032786885
+        "x": 1.3186475409836067,
+        "y": 0.9621413934426232
       },
       "prevControl": {
-        "x": 2.6850860655737705,
-        "y": 1.4870430327868849
+        "x": 2.6251475409836065,
+        "y": 1.391141393442623
       },
       "nextControl": null,
       "isLocked": false,
@@ -40,6 +40,17 @@
         "type": "named",
         "data": {
           "name": "DISABLE Scorer"
+        }
+      }
+    },
+    {
+      "name": "HP",
+      "waypointRelativePos": 0.05,
+      "endWaypointRelativePos": null,
+      "command": {
+        "type": "named",
+        "data": {
+          "name": "HP"
         }
       }
     }
