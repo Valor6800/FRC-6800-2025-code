@@ -304,12 +304,12 @@ namespace Constants {
             case Robot::Gold: return frc::Pose3d();
             default: return frc::Pose3d(
                 6.5_in,
-                -10_in,
+                10_in,
                 8.62_in, // change Z
                 frc::Rotation3d(
                     0_deg,
                     18_deg,
-                    -90_deg
+                    0_deg
                 )
             );
         }};
