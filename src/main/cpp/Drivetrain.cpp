@@ -88,7 +88,7 @@ const units::meter_t WHEEL_DIAMETER(0.0973_m);
 #define POLE_OFFSET 6.758_in
 #define SCORER_TO_ROBOT 0.5_in
 
-#define VIABLE_DUNK_DISTANCE 0.3548_m
+#define VIABLE_DUNK_DISTANCE 0.4_m
 
 Drivetrain::Drivetrain(frc::TimedRobot *_robot, valor::CANdleSensor *_leds) : 
     valor::Swerve<SwerveAzimuthMotor, SwerveDriveMotor>(
