@@ -86,7 +86,8 @@ const units::meter_t WHEEL_DIAMETER(0.0973_m);
 #define RED_REEF_11_ANGLE -120_deg + 180_deg
 
 #define POLE_OFFSET 6.758_in
-#define SCORER_TO_ROBOT 0.5_in
+#define RIGHT_TO_ROBOT 0.5_in
+#define LEFT_TO_ROBOT -1.0_in
 
 Drivetrain::Drivetrain(frc::TimedRobot *_robot, valor::CANdleSensor *_leds) : 
     valor::Swerve<SwerveAzimuthMotor, SwerveDriveMotor>(
@@ -113,6 +114,9 @@ Drivetrain::Drivetrain(frc::TimedRobot *_robot, valor::CANdleSensor *_leds) :
     // table->PutNumber("Y_Pos_Tol", Swerve::yPosTolerance.to<double>());
     // table->PutNumber("Y_Vel_Tol", Swerve::yVelTolerance.to<double>());
 
+    table->PutNumber("LEFT ALIGN OFFSET (in)", LEFT_TO_ROBOT.value());
+    table->PutNumber("RIGHT ALIGN OFFSET (in)", RIGHT_TO_ROBOT.value());
+
     Swerve::Y_KP = Y_ALIGN_KP;
     Swerve::Y_KI = Y_ALIGN_KI;
     Swerve::Y_KD = Y_ALIGN_KD;
@@ -133,7 +137,7 @@ Drivetrain::Drivetrain(frc::TimedRobot *_robot, valor::CANdleSensor *_leds) :
     table->PutBoolean("USE AUTO-ALIGN", true);
     table->PutBoolean("Use World Align", false);
 
-    setRotAlignOffset(90_deg);
+    setRotAlignOffset(0_deg);
 
     for (std::pair<const char*, frc::Pose3d> aprilCam : Constants::aprilCameras) {
         aprilTagSensors.push_back(new valor::AprilTagsSensor(robot, aprilCam.first, aprilCam.second));  
@@ -304,7 +308,7 @@ void Drivetrain::assessInputs()
         }
     }
 
-    Swerve::alignToTarget = driverGamepad->leftTriggerActive() && table->GetBoolean("USE AUTO-ALIGN", true);;
+    Swerve::alignToTarget = driverGamepad->leftTriggerActive() && table->GetBoolean("USE AUTO-ALIGN", true);
 
     if (driverGamepad->leftTriggerActive() && !hasReset) {
         Swerve::resetAlignControllers();
@@ -393,7 +397,7 @@ void Drivetrain::assignOutputs()
 
 void Drivetrain::getLeastSkewTagDistance(valor::AprilTagsSensor* aprilSensor, units::radian_t leastSkew) {
     if(valor::isReefTag(aprilSensor->getTagID())){ 
-        units::degree_t currentSkew = aprilSensor->getTargetToBotPose().Rotation().Y() + 90_deg;
+        units::degree_t currentSkew = aprilSensor->getTargetToBotPose().Rotation().Y() + 0_deg;
         if (state.getTag && leastSkew > units::math::abs(currentSkew)) {
             state.reefTag = aprilSensor->getTagID();
             leastSkew = currentSkew;
@@ -570,10 +574,14 @@ void Drivetrain::alignAngleZoning()
 void Drivetrain::choosePoleDirection(Drivetrain::Direction dir){
     switch (dir) {
         case LEFT:
-            Swerve::goalAlign = -units::math::abs(POLE_OFFSET);
+            Swerve::goalAlign = -units::math::abs(
+                POLE_OFFSET + units::inch_t{table->GetNumber("LEFT ALIGN OFFSET (in)", LEFT_TO_ROBOT.value())}
+            );
             break;
         case RIGHT:
-            Swerve::goalAlign = units::math::abs(POLE_OFFSET); // + SCORER_TO_ROBOT
+            Swerve::goalAlign = units::math::abs(
+                POLE_OFFSET + units::inch_t{table->GetNumber("RIGHT ALIGN OFFSET (in)", RIGHT_TO_ROBOT.value())}
+            ); // + SCORER_TO_ROBOT
             break;
         default:
             Swerve::goalAlign = 0_m;

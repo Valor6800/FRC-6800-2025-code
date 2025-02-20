@@ -195,7 +195,7 @@ void Swerve<AzimuthMotor, DriveMotor>::analyzeDashboard()
         fieldSpaceSpeeds.vy.value()
     }; // meters_per_second_t
     
-    yControllerInitialVelocity = units::meters_per_second_t{currVelocitiesFieldSpace.dot(MAKE_VECTOR(targetAngle - rotAlignOffset))};
+    yControllerInitialVelocity = units::meters_per_second_t{currVelocitiesFieldSpace.dot(MAKE_VECTOR(targetAngle - 90_deg))};
 
     getSkiddingRatio();
 
@@ -208,10 +208,9 @@ void Swerve<AzimuthMotor, DriveMotor>::analyzeDashboard()
     y_controller.SetGoal(goalAlign);
     calculated_y_controller_val = y_controller.Calculate(yDistance, goalAlign);
     if (alignToTarget){
-        
         relativeToTagSpeed = units::meters_per_second_t{calculated_y_controller_val} + (Y_KFF * y_controller.GetSetpoint().velocity);
 
-        pidVector = MAKE_VECTOR(targetAngle - rotAlignOffset) * relativeToTagSpeed.value();
+        pidVector = MAKE_VECTOR(targetAngle - 90_deg) * relativeToTagSpeed.value();
         powerVector = joystickVector + pidVector;
         // powerVector *= dotProduct / fabs(dotProduct);
         xSpeedMPS = units::meters_per_second_t{powerVector[0]};
