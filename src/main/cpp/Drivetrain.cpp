@@ -85,7 +85,8 @@ const units::meter_t WHEEL_DIAMETER(0.0973_m);
 #define RED_REEF_11_ANGLE -120_deg + 180_deg
 
 #define POLE_OFFSET 6.758_in
-#define SCORER_TO_ROBOT 0.5_in
+#define RIGHT_TO_ROBOT 0.5_in
+#define LEFT_TO_ROBOT -1.0_in
 
 #define AA_LEFT_OFFSET 0.0_in // 0.5_in
 #define AA_RIGHT_OFFSET 0.0_in // 1.5_in
@@ -123,6 +124,9 @@ Drivetrain::Drivetrain(frc::TimedRobot *_robot, CANdle& leds) :
     table->PutNumber("Right Align Offset", AA_RIGHT_OFFSET.value());
 
     distanceSensor.setMaxDistance(2_m);
+
+    table->PutNumber("LEFT ALIGN OFFSET (in)", LEFT_TO_ROBOT.value());
+    table->PutNumber("RIGHT ALIGN OFFSET (in)", RIGHT_TO_ROBOT.value());
 
     Swerve::Y_KP = Y_ALIGN_KP;
     Swerve::Y_KI = Y_ALIGN_KI;
@@ -298,6 +302,7 @@ void Drivetrain::assessInputs()
 
     state.alignToTarget = driverGamepad->leftTriggerActive();
     state.climberAlign = driverGamepad->GetBButton();
+
     if (driverGamepad->leftTriggerActive() && !hasReset) {
         Swerve::resetAlignControllers();
         hasReset = true;
@@ -339,7 +344,7 @@ void Drivetrain::analyzeDashboard()
         Swerve::yDistance = units::length::meter_t (state.yEstimate); //units::length::meter_t {filter.Calculate(unfilteredYDistance)};
     }
 
-    else { //TODO: CHANGE THIS TO BE ELASTIC VALUE
+    else {
         Swerve::yDistance = 0_m;
         if (state.alignToTarget) {
             frc::Pose2d robotToCenter{
@@ -482,7 +487,7 @@ void Drivetrain::assignOutputs()
 
 void Drivetrain::getLeastSkewTagDistance(valor::AprilTagsSensor* aprilSensor, units::radian_t leastSkew) {
     if(valor::isReefTag(aprilSensor->getTagID())){ 
-        units::degree_t currentSkew = aprilSensor->getTargetToBotPose().Rotation().Y() + 90_deg;
+        units::degree_t currentSkew = aprilSensor->getTargetToBotPose().Rotation().Y() + 0_deg;
         if (state.getTag && leastSkew > units::math::abs(currentSkew)) {
             state.reefTag = aprilSensor->getTagID();
             leastSkew = currentSkew;

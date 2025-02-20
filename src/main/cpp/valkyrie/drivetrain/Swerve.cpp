@@ -225,7 +225,6 @@ void Swerve<AzimuthMotor, DriveMotor>::analyzeDashboard()
     y_controller.SetGoal(goalAlign);
     calculated_y_controller_val = y_controller.Calculate(yDistance, goalAlign);
     if (yAlign){
-        
         relativeToTagSpeed = units::meters_per_second_t{calculated_y_controller_val} + (Y_KFF * y_controller.GetSetpoint().velocity);
 
         pidVector = MAKE_VECTOR(targetAngle - 90_deg) * relativeToTagSpeed.value();
