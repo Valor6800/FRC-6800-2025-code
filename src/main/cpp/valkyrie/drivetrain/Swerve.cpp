@@ -235,7 +235,6 @@ void Swerve<AzimuthMotor, DriveMotor>::analyzeDashboard()
     calculated_y_controller_val = y_controller.Calculate(yDistance, goalAlign);
     calculated_x_controller_val = x_controller.Calculate(xDistance, xGoalAlign);
     if (yAlign){
-        
         relativeToTagSpeed = units::meters_per_second_t{calculated_y_controller_val} + (Y_KFF * y_controller.GetSetpoint().velocity);
         relativeToTagXSpeed = units::meters_per_second_t{calculated_x_controller_val} + (X_KFF * x_controller.GetSetpoint().velocity);
 
