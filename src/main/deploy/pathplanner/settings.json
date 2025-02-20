@@ -3,8 +3,6 @@
   "robotLength": 0.9,
   "holonomicMode": true,
   "pathFolders": [
-    "C1-4T",
-    "C6-4T",
     "C-R",
     "H-R",
     "R-H",

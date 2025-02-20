@@ -3,7 +3,44 @@
   "command": {
     "type": "sequential",
     "data": {
-      "commands": []
+      "commands": [
+        {
+          "type": "path",
+          "data": {
+            "pathName": "C6-EL4"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "E-HP"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "HP-DL4"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "D-HP"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "HP-CL4"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "C-HP"
+          }
+        }
+      ]
     }
   },
   "resetOdom": true,
