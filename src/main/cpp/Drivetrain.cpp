@@ -129,7 +129,6 @@ Drivetrain::Drivetrain(frc::TimedRobot *_robot, valor::CANdleSensor *_leds) :
     table->PutNumber("Vision Acceptance", VISION_ACCEPTANCE.to<double>() );
     table->PutNumber("KPLIMELIGHT", KP_LIMELIGHT);
     table->PutBoolean("Accepting Vision Measurements", true);
-    table->PutBoolean("USE AUTO-ALIGN", true);
 
     setRotAlignOffset(00_deg);
 
@@ -307,7 +306,7 @@ void Drivetrain::assessInputs()
 
     Swerve::yDistance = units::length::meter_t (state.yEstimate); //units::length::meter_t {filter.Calculate(unfilteredYDistance)};
 
-    Swerve::alignToTarget = driverGamepad->leftTriggerActive() && table->GetBoolean("USE AUTO-ALIGN", true);;
+    Swerve::alignToTarget = driverGamepad->leftTriggerActive();
     if (driverGamepad->leftTriggerActive() && !hasReset) {
         Swerve::resetAlignControllers();
         hasReset = true;

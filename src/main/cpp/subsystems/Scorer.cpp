@@ -212,7 +212,6 @@ void Scorer::resetState()
     state.elevState = ELEVATOR_STATE::STOWED;
     state.gamePiece = CORAL;
     state.scopedState = UNSCOPED;
-    state.tuning = false;
     state.manualSpeed = 0_V;
     state.algaeSpikeCurrent = 30;
     currentSensor.reset();
@@ -333,7 +332,7 @@ void Scorer::assessInputs()
     if (driverGamepad == nullptr || !driverGamepad->IsConnected())
         return;
     
-    if (driverGamepad->leftTriggerActive()) {
+    if (driverGamepad->leftTriggerActive() || driverGamepad->GetLeftBumper()) {
         state.scopedState = SCOPED;
     } else {
         state.scopedState = UNSCOPED;
@@ -351,7 +350,6 @@ void Scorer::assessInputs()
 
 void Scorer::analyzeDashboard()
 {
-    state.tuning = table->GetBoolean("Scope Button", false);
     state.algaeSpikeCurrent = table->GetNumber("Algae Spike Setpoint", 30);
 }
 
@@ -376,7 +374,7 @@ void Scorer::assignOutputs()
     if (state.elevState == ELEVATOR_STATE::MANUAL) {
         elevatorMotor->setPower(state.manualSpeed + units::volt_t{Constants::getElevKAFF()});
     } else {
-        if(state.scopedState == SCOPED || state.tuning){
+        if(state.scopedState == SCOPED){
             state.targetHeight = positionMap.at(state.gamePiece).at(state.elevState);
         } else{
             state.targetHeight = positionMap.at(state.gamePiece).at(HP);
@@ -446,11 +444,6 @@ void Scorer::InitSendable(wpi::SendableBuilder& builder)
     builder.AddBooleanProperty(
         "State: Scoped",
         [this] { return state.scopedState; },
-        nullptr
-    );
-    builder.AddBooleanProperty(
-        "State: Tuning",
-        [this] { return state.tuning; },
         nullptr
     );
     builder.AddDoubleProperty(

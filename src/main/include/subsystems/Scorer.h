@@ -66,8 +66,6 @@ public:
         double algaeSpikeCurrent;
 
         bool hasZeroed;
-        bool tuning;
-
     } state;
 
 private:
