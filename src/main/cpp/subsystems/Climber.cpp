@@ -8,14 +8,7 @@
 #include <pathplanner/lib/auto/NamedCommands.h>
 #include <frc/DriverStation.h>
 
-#define CLIMB_MANUAL_SPEED units::angular_velocity::turns_per_second_t (0)
-
-#define CRAB_MAX_SPEED units::angular_velocity::turns_per_second_t (0)
-#define CRAB_MAX_ACCEL units::angular_acceleration::turns_per_second_squared_t (0)
-#define CRAB_K_P 0
-#define CRAB_K_ERROR units::angle::turn_t (0)
-#define CRAB_K_AFF 0
-#define CRABB_ROTOR_TO_SENSOR 1.6
+#define STABBY_ROTOR_TO_SENSOR 1.6
 #define STABBY_K_P 0.6
 #define STABBY_K_S 0.5
 
@@ -78,7 +71,7 @@ void Climber::init()
     climbMotors->setupCANCoder(CANIDs::CLIMBER_CAN, 0.0_tr, true, "baseCAN", 1_tr); //0.5022
 
     climbMotors->setGearRatios(CLIMB_GEAR_RATIO, 1.0);
-    stabbyMotor->setGearRatios(1.0, CRABB_ROTOR_TO_SENSOR);
+    stabbyMotor->setGearRatios(1.0, STABBY_ROTOR_TO_SENSOR);
     stabbyPID.P = STABBY_K_P;
 
     stabbyMotor->setPIDF(stabbyPID, 0);
@@ -138,13 +131,18 @@ void Climber::assignOutputs()
      }
 }
 
+void Climber::setDegrees(units::degree_t deg)
+{
+    climbMotors->setPosition((deg / 360_deg) * 1_tr);
+}
+
 
 void Climber::InitSendable(wpi::SendableBuilder& builder)
 {
     builder.SetSmartDashboardType("Subsystem");
-    builder.AddBooleanProperty(
-        "Climbed?",
-        [this]{return state.climbed;},
+    builder.AddDoubleProperty(
+        "Climber Pos in Deg",
+        [this] {return units::degree_t{climbMotors->getPosition()}.to<double>();},
         nullptr
     );
 }
