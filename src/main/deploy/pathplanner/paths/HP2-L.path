@@ -3,13 +3,13 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 1.3455000000000001,
-        "y": 6.9597500000000005
+        "x": 1.2946721311475409,
+        "y": 7.027920081967213
       },
       "prevControl": null,
       "nextControl": {
-        "x": 2.3497500000000002,
-        "y": 6.31625
+        "x": 2.298922131147541,
+        "y": 6.384420081967213
       },
       "isLocked": false,
       "linkedName": "HP2"
@@ -71,13 +71,13 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": -145.0
+    "rotation": -57.092523932861056
   },
   "reversed": false,
   "folder": "H-R",
   "idealStartingState": {
     "velocity": 0,
-    "rotation": -145.0
+    "rotation": -59.99999999999999
   },
   "useDefaultConstraints": true
 }
