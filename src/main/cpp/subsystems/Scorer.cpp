@@ -1,5 +1,7 @@
 #include "Constants.h"
 #include "subsystems/Scorer.h"
+#include "units/current.h"
+#include "units/time.h"
 #include "valkyrie/controllers/NeutralMode.h"
 #include "valkyrie/controllers/PIDF.h"
 #include <iostream>
@@ -16,10 +18,10 @@
 #define ELEVATOR_SENSOR_TO_MECH 1.0f
 
 #define CORAL_INTAKE_SPEED 20_tps //5
-#define ALGEE_INTAKE_SPEED 15_tps
+#define ALGEE_INTAKE_SPEED 35_tps
 #define SCORE_SPEED 20_tps
 #define ALGEE_SCORE_SPEED -40_tps
-#define ALGEE_HOLD_SPD 3_tps
+#define ALGEE_HOLD_SPD 0.25_tps
 
 #define ELEVATOR_FORWARD_LIMIT 6_tr
 #define ELEVATOR_OFFSET 3_in
@@ -258,6 +260,13 @@ void Scorer::init()
     // Scorer init sequence
     scorerMotor->setGearRatios(1, Constants::Scorer::getScorerSensorToMech());
     scorerMotor->enableFOC(true);
+    scorerMotor->setCurrentLimits(
+        units::ampere_t{60},
+        units::ampere_t{60},
+        units::ampere_t{45},
+        units::second_t{0.5},
+        true
+    );
 
     valor::PIDF scorerPID = Constants::Scorer::getScorerPIDF();
     scorerPID.maxVelocity = scorerMotor->getMaxMechSpeed();

@@ -131,7 +131,7 @@ Drivetrain::Drivetrain(frc::TimedRobot *_robot, valor::CANdleSensor *_leds) :
     table->PutBoolean("Accepting Vision Measurements", true);
     table->PutBoolean("USE AUTO-ALIGN", true);
 
-    setRotAlignOffset(90_deg);
+    setRotAlignOffset(00_deg);
 
     for (std::pair<const char*, frc::Pose3d> aprilCam : Constants::aprilCameras) {
         aprilTagSensors.push_back(new valor::AprilTagsSensor(robot, aprilCam.first, aprilCam.second));  
@@ -291,7 +291,7 @@ void Drivetrain::assessInputs()
                 aprilLime->getTagID() >= 17 &&
                 aprilLime->getTagID() <= 22)
             ){ 
-                units::degree_t currentSkew = aprilLime->getTargetToBotPose().Rotation().Y() + 90_deg;
+                units::degree_t currentSkew = aprilLime->getTargetToBotPose().Rotation().Y() + 00_deg;
                 if (state.getTag && leastSkew > units::math::abs(currentSkew)) {
                     state.reefTag = aprilLime->getTagID();
                     leastSkew = currentSkew;
