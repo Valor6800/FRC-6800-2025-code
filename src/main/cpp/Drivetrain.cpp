@@ -62,7 +62,7 @@ const units::meter_t WHEEL_DIAMETER(0.0973_m);
 
 #define MT2_POSE true
 
-#define Y_FILTER_CONST 0.99
+#define Y_FILTER_CONST 0.95 // .99
 #define Y_ALIGN_KP 6 
 #define Y_ALIGN_KI 10
 #define Y_ALIGN_KD 0.2
@@ -86,6 +86,9 @@ const units::meter_t WHEEL_DIAMETER(0.0973_m);
 
 #define POLE_OFFSET 6.758_in
 #define SCORER_TO_ROBOT 0.5_in
+
+#define AA_LEFT_OFFSET 0.5_in
+#define AA_RIGHT_OFFSET 1.5_in
 
 Drivetrain::Drivetrain(frc::TimedRobot *_robot, valor::CANdleSensor *_leds) : 
     valor::Swerve<SwerveAzimuthMotor, SwerveDriveMotor>(
@@ -111,6 +114,9 @@ Drivetrain::Drivetrain(frc::TimedRobot *_robot, valor::CANdleSensor *_leds) :
 
     // table->PutNumber("Y_Pos_Tol", Swerve::yPosTolerance.to<double>());
     // table->PutNumber("Y_Vel_Tol", Swerve::yVelTolerance.to<double>());
+    //
+    table->PutNumber("Left Align Offset", AA_LEFT_OFFSET.value());
+    table->PutNumber("Right Align Offset", AA_RIGHT_OFFSET.value());
 
     Swerve::Y_KP = Y_ALIGN_KP;
     Swerve::Y_KI = Y_ALIGN_KI;
@@ -507,10 +513,10 @@ void Drivetrain::alignAngleZoning()
 void Drivetrain::choosePoleDirection(Drivetrain::Direction dir){
     switch (dir) {
         case LEFT:
-            Swerve::goalAlign = -units::math::abs(POLE_OFFSET);
+            Swerve::goalAlign = -units::math::abs(POLE_OFFSET + (units::inch_t) table->GetNumber("Left Align Offset", AA_LEFT_OFFSET.value()));
             break;
         case RIGHT:
-            Swerve::goalAlign = units::math::abs(POLE_OFFSET); // + SCORER_TO_ROBOT
+            Swerve::goalAlign = units::math::abs(POLE_OFFSET + (units::inch_t) table->GetNumber("Right Align Offset", AA_RIGHT_OFFSET.value())); // + SCORER_TO_ROBOT
             break;
         default:
             Swerve::goalAlign = 0_m;
