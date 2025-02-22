@@ -512,6 +512,10 @@ void Drivetrain::alignAngleZoning()
 }
 
 void Drivetrain::choosePoleDirection(Drivetrain::Direction dir){
+    if (state.gamePiece == Constants::Scorer::ALGEE) {
+        Swerve::goalAlign = 0_m;
+        return;
+    }
     switch (dir) {
         case LEFT:
             Swerve::goalAlign = -units::math::abs(POLE_OFFSET + (units::inch_t) table->GetNumber("Left Align Offset", AA_LEFT_OFFSET.value()));
@@ -523,6 +527,11 @@ void Drivetrain::choosePoleDirection(Drivetrain::Direction dir){
             Swerve::goalAlign = 0_m;
             break;
     }
+
+}
+
+void Drivetrain::setGamePieceInRobot(Constants::Scorer::GAME_PIECE piece){
+    state.gamePiece = piece;
 }
 // void Drivetrain::setDriveMotorNeutralMode(valor::NeutralMode mode) {
 //     for (int i = 0; i < SWERVE_COUNT; i++)

@@ -26,7 +26,7 @@ class Scorer : public valor::BaseSubsystem
 {
 public:
 
-    Scorer(frc::TimedRobot *robot);
+    Scorer(frc::TimedRobot *robot, Drivetrain *_drivetrain);
     
     void resetState();
      
@@ -88,4 +88,6 @@ private:
 
     Constants::Scorer::PositionMap positionMap;
     Constants::Scorer::ScoringSpeedMap scoringSpeedMap;
+
+    Drivetrain *drivetrain;
 };

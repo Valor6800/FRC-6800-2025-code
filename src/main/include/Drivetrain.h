@@ -134,6 +134,8 @@ public:
           bool aligned;
           double yEstimate;
 
+          Constants::Scorer::GAME_PIECE gamePiece;
+
      } state;
 
      frc2::FunctionalCommand* getResetOdom();
@@ -152,6 +154,8 @@ public:
      void alignAngleZoning();
 
      void choosePoleDirection(Direction dir);
+
+     void setGamePieceInRobot(Constants::Scorer::GAME_PIECE);
 
      double teleopStart;
 

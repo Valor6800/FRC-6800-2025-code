@@ -35,7 +35,7 @@
 
 using namespace Constants::Scorer;
 
-Scorer::Scorer(frc::TimedRobot *_robot) :
+Scorer::Scorer(frc::TimedRobot *_robot, Drivetrain *_drivetrain) :
     valor::BaseSubsystem(_robot, "Scorer"),
     hallEffectDebounceSensor(_robot, "HallEffectDebounce"),
     candi(CANIDs::HALL_EFFECT, "baseCAN"),
@@ -45,7 +45,8 @@ Scorer::Scorer(frc::TimedRobot *_robot) :
     scorerStagingSensor(_robot, "Scorer Staging Sensor", CANIDs::STAGING_LIDAR_SENSOR, "baseCAN"),
     currentSensor(_robot, "Algae Current Sensor"),
     positionMap{std::move(getPositionMap())},
-    scoringSpeedMap{std::move(getScoringSpeedMap())}
+    scoringSpeedMap{std::move(getScoringSpeedMap())},
+    drivetrain(_drivetrain)
 {
 
     frc2::CommandScheduler::GetInstance().RegisterSubsystem(this);
@@ -351,6 +352,7 @@ void Scorer::assessInputs()
 void Scorer::analyzeDashboard()
 {
     state.algaeSpikeCurrent = table->GetNumber("Algae Spike Setpoint", 30);
+    drivetrain->setGamePieceInRobot(state.gamePiece);
 }
 
 units::meter_t Scorer::convertToMechSpace(units::turn_t turns) 
