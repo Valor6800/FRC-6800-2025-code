@@ -166,7 +166,7 @@ void Swerve<AzimuthMotor, DriveMotor>::analyzeDashboard()
     units::radian_t robotRotation = getCalculatedPose().Rotation().Radians();
     rot_controller.SetGoal(units::radian_t{targetAngle - rotAlignOffset});
     rot_controller.Calculate(robotRotation);
-    if (alignToTarget) {
+    if (rotAlign) {
         rotSpeedRPS = units::radians_per_second_t{rot_controller.Calculate(robotRotation)} + rot_controller.GetSetpoint().velocity;
     }
 
@@ -207,7 +207,7 @@ void Swerve<AzimuthMotor, DriveMotor>::analyzeDashboard()
     
     y_controller.SetGoal(goalAlign);
     calculated_y_controller_val = y_controller.Calculate(yDistance, goalAlign);
-    if (alignToTarget){
+    if (yAlign){
         
         relativeToTagSpeed = units::meters_per_second_t{calculated_y_controller_val} + (Y_KFF * y_controller.GetSetpoint().velocity);
 
@@ -721,8 +721,18 @@ void Swerve<AzimuthMotor, DriveMotor>::InitSendable(wpi::SendableBuilder& builde
     );
     
     builder.AddBooleanProperty(
-        "Locking on Target",
-        [this] {return alignToTarget;},
+        "Align: Locking on Target",
+        [this] {return yAlign && rotAlign;},
+        nullptr
+    );
+    builder.AddBooleanProperty(
+        "Align: Rotation Align",
+        [this] {return rotAlign;},
+        nullptr
+    );
+    builder.AddBooleanProperty(
+        "Align: Y Align",
+        [this] {return yAlign;},
         nullptr
     );
 

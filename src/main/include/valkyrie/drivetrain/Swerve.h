@@ -126,7 +126,7 @@ protected:
     void setRotAlignOffset(units::degree_t angle);
     void resetAlignControllers();
 
-    bool alignToTarget = false;
+    bool yAlign, rotAlign = false;
     units::meter_t yDistance = 0.0_m;
 
     void enableCarpetGrain(double grainMultiplier, bool roughTowardsRed);

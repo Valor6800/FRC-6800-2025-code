@@ -285,7 +285,7 @@ void Drivetrain::assessInputs()
         hasReset = false;
     }
 
-    Swerve::alignToTarget = driverGamepad->leftTriggerActive();
+    state.alignToTarget = driverGamepad->leftTriggerActive();
     if (driverGamepad->leftTriggerActive() && !hasReset) {
         Swerve::resetAlignControllers();
         hasReset = true;
@@ -344,6 +344,7 @@ void Drivetrain::analyzeDashboard()
 
     // Swerve::goalAlign = units::meter_t{table->GetNumber("Pole Offset", Swerve::goalAlign.to<double>())};
     
+
     choosePoleDirection(
         state.gamePiece == Constants::Scorer::ALGEE ? Direction::NONE : state.dir
     );
@@ -354,6 +355,22 @@ void Drivetrain::analyzeDashboard()
     }
 
     alignAngleTags(); 
+
+    if (
+        state.alignToTarget &&
+        state.elevState == Constants::Scorer::ELEVATOR_STATE::ONE &&
+        state.gamePiece == Constants::Scorer::ALGEE
+    ) {
+        Swerve::targetAngle = frc::DriverStation::GetAlliance() == frc::DriverStation::kRed ? 90_deg : -90_deg;
+        Swerve::yAlign = false;
+        Swerve::rotAlign = true;
+    } else if (state.alignToTarget) {
+        Swerve::yAlign = true;
+        Swerve::rotAlign = true;
+    } else {
+        Swerve::yAlign = false;
+        Swerve::rotAlign = false;
+    }
 
     Swerve::analyzeDashboard();
 

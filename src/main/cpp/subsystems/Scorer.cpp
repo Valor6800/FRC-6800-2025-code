@@ -353,6 +353,7 @@ void Scorer::analyzeDashboard()
 {
     state.algaeSpikeCurrent = table->GetNumber("Algae Spike Setpoint", 30);
     drivetrain->setGamePieceInRobot(state.gamePiece);
+    drivetrain->state.elevState = state.elevState;
 }
 
 units::meter_t Scorer::convertToMechSpace(units::turn_t turns) 

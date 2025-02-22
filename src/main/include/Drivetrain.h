@@ -134,8 +134,10 @@ public:
           bool aligned;
           double yEstimate;
 
-          Constants::Scorer::GAME_PIECE gamePiece;
+          bool alignToTarget;
 
+          Constants::Scorer::GAME_PIECE gamePiece;
+          Constants::Scorer::ELEVATOR_STATE elevState;
      } state;
 
      frc2::FunctionalCommand* getResetOdom();
