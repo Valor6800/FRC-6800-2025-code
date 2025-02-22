@@ -3,29 +3,29 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 3.884016393442623,
-        "y": 5.181813524590163
-      },
-      "prevControl": null,
-      "nextControl": {
-        "x": 3.4550163934426226,
-        "y": 5.659563524590164
-      },
-      "isLocked": false,
-      "linkedName": "K"
-    },
-    {
-      "anchor": {
         "x": 1.2946721311475409,
         "y": 7.027920081967213
       },
+      "prevControl": null,
+      "nextControl": {
+        "x": 2.298922131147541,
+        "y": 6.384420081967213
+      },
+      "isLocked": false,
+      "linkedName": "HP2"
+    },
+    {
+      "anchor": {
+        "x": 3.549,
+        "y": 5.0195
+      },
       "prevControl": {
-        "x": 1.8309221311475405,
-        "y": 6.784170081967213
+        "x": 2.457,
+        "y": 5.6240000000000006
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "HP2"
+      "linkedName": "L"
     }
   ],
   "rotationTargets": [],
@@ -33,24 +33,30 @@
   "pointTowardsZones": [],
   "eventMarkers": [
     {
-      "name": "HP",
-      "waypointRelativePos": 0.02,
+      "name": "Enable Scorer",
+      "waypointRelativePos": 0,
       "endWaypointRelativePos": null,
-      "command": {
-        "type": "named",
-        "data": {
-          "name": "HP"
-        }
-      }
+      "command": null
     },
     {
       "name": "Disable Scorer",
-      "waypointRelativePos": 0.2,
+      "waypointRelativePos": 0.05,
       "endWaypointRelativePos": null,
       "command": {
         "type": "named",
         "data": {
           "name": "DISABLE Scorer"
+        }
+      }
+    },
+    {
+      "name": "TROUGH POSITION",
+      "waypointRelativePos": 0.7,
+      "endWaypointRelativePos": null,
+      "command": {
+        "type": "named",
+        "data": {
+          "name": "TROUGH POSITION"
         }
       }
     }
@@ -65,13 +71,13 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": -55.0
+    "rotation": -57.092523932861056
   },
   "reversed": false,
-  "folder": "R-H",
+  "folder": "H-R",
   "idealStartingState": {
     "velocity": 0,
-    "rotation": -59.99999999999999
+    "rotation": -55.0
   },
   "useDefaultConstraints": true
 }

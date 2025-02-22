@@ -7,7 +7,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "C1-JT"
+            "pathName": "C1-J4"
           }
         },
         {
@@ -19,7 +19,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "HP2-KT"
+            "pathName": "HP2-K4"
           }
         },
         {
@@ -31,19 +31,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "HP2-LT"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "L-HP2"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "HP2-AT"
+            "pathName": "HP2-A4"
           }
         }
       ]
