@@ -8,8 +8,8 @@
       },
       "prevControl": null,
       "nextControl": {
-        "x": 2.932672131147541,
-        "y": 6.082170081967212
+        "x": 3.524385245901639,
+        "y": 5.649334016393442
       },
       "isLocked": false,
       "linkedName": "HP2"
@@ -20,8 +20,8 @@
         "y": 4.161499999999999
       },
       "prevControl": {
-        "x": 1.6867499999999997,
-        "y": 4.3077499999999995
+        "x": 0.8870901639344266,
+        "y": 4.066956967213113
       },
       "nextControl": null,
       "isLocked": false,
@@ -29,28 +29,31 @@
     }
   ],
   "rotationTargets": [],
-  "constraintZones": [],
+  "constraintZones": [
+    {
+      "name": "Constraints Zone",
+      "minWaypointRelativePos": 0,
+      "maxWaypointRelativePos": 1.0,
+      "constraints": {
+        "maxVelocity": 1.5,
+        "maxAcceleration": 2.5,
+        "maxAngularVelocity": 540.0,
+        "maxAngularAcceleration": 720.0,
+        "nominalVoltage": 12.0,
+        "unlimited": false
+      }
+    }
+  ],
   "pointTowardsZones": [],
   "eventMarkers": [
     {
-      "name": "Disable Scorer",
-      "waypointRelativePos": 0,
+      "name": "LEVEL FOUR POSITION",
+      "waypointRelativePos": 0.25,
       "endWaypointRelativePos": null,
       "command": {
         "type": "named",
         "data": {
-          "name": "DISABLE Scorer"
-        }
-      }
-    },
-    {
-      "name": "TROUGH POSITION",
-      "waypointRelativePos": 0.7,
-      "endWaypointRelativePos": null,
-      "command": {
-        "type": "named",
-        "data": {
-          "name": "TROUGH POSITION"
+          "name": "LEVEL FOUR POSITION"
         }
       }
     },
@@ -82,7 +85,7 @@
   "folder": "H-R",
   "idealStartingState": {
     "velocity": 0,
-    "rotation": -59.99999999999999
+    "rotation": -55.0
   },
   "useDefaultConstraints": true
 }
