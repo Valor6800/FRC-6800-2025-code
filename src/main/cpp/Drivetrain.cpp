@@ -8,6 +8,7 @@
 #include <string>
 #include "Constants.h"
 #include "Eigen/Core"
+#include "frc/RobotController.h"
 #include "frc2/command/Commands.h"
 #include "frc2/command/FunctionalCommand.h"
 #include "frc2/command/SequentialCommandGroup.h"
@@ -342,7 +343,10 @@ void Drivetrain::analyzeDashboard()
     // Swerve::yVelTolerance = table->GetNumber("Y_Vel_Tol", Swerve::yVelTolerance.to<double>()) * 1_mps;
 
     // Swerve::goalAlign = units::meter_t{table->GetNumber("Pole Offset", Swerve::goalAlign.to<double>())};
-    choosePoleDirection(state.dir);
+    
+    choosePoleDirection(
+        state.gamePiece == Constants::Scorer::ALGEE ? Direction::NONE : state.dir
+    );
     if (state.reefTag != -1){
         state.aligned = (units::math::abs(Swerve::yDistance - Swerve::goalAlign) <= yPosTolerance);
     } else {
@@ -512,10 +516,6 @@ void Drivetrain::alignAngleZoning()
 }
 
 void Drivetrain::choosePoleDirection(Drivetrain::Direction dir){
-    if (state.gamePiece == Constants::Scorer::ALGEE) {
-        Swerve::goalAlign = 0_m;
-        return;
-    }
     switch (dir) {
         case LEFT:
             Swerve::goalAlign = -units::math::abs(POLE_OFFSET + (units::inch_t) table->GetNumber("Left Align Offset", AA_LEFT_OFFSET.value()));
