@@ -136,6 +136,8 @@ public:
 
      } state;
 
+     frc2::FunctionalCommand* getAutoAlignCommand();
+
      frc2::FunctionalCommand* getResetOdom();
 
      units::meters_per_second_t getRobotSpeeds();
