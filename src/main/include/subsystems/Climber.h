@@ -39,17 +39,16 @@ public:
         RETRACTED
     };
 
-    enum CRAB_STATE
+    enum STABBY_STATE
     {
         NO_CRAB,
-        CRABBING,
-        CRABBED
+        CRABBING
     };
 
     struct x
     {
         CLIMB_STATE climbState;
-        CRAB_STATE crabState;
+        STABBY_STATE stabState;
 
         bool climbed;
         double spikeCurrent;

@@ -15,11 +15,11 @@
 #define CLIMB_GEAR_RATIO 145.36
 #define CRAB_GEAR_RATIO 0
 
-#define DEPLOYED_POS units::angle::turn_t (0.1)
-#define RETRACTED_POS units::angle::turn_t (-0.1)
+#define DEPLOYED_POS units::angle::turn_t (0.73)
+#define RETRACTED_POS units::angle::turn_t (0.36)
 #define STOW_POS units::angle::turn_t (0)
 
-#define CRAB_SPEED units::voltage::volt_t (0)
+#define STABBY_SPEED 10_tps
 #define SPIKE_CURRENT 0
 #define CACHE_SIZE 0
 
@@ -42,7 +42,7 @@ Climber::~Climber()
 void Climber::resetState()
 {
     state.climbState = CLIMB_STATE::MANUAL;
-    state.crabState = CRAB_STATE::NO_CRAB;
+    state.stabState = STABBY_STATE::NO_CRAB;
     state.climbed = false;
     currentSensor.reset();
 }
@@ -104,10 +104,16 @@ void Climber::assessInputs()
         state.manualSpeed = operatorGamepad->rightStickY(2) * 12_V;
     }
 
+    if(driverGamepad->GetYButton()){
+        state.climbState = CLIMB_STATE::DEPLOYED;
+    } else if(driverGamepad->GetAButton()){
+        state.climbState = CLIMB_STATE::RETRACTED;
+    }
+
     if (operatorGamepad->DPadLeft()) {
-        stabbyMotor->setSpeed(40_tps);
+        state.stabState = STABBY_STATE::CRABBING;
     }else{
-        stabbyMotor->setSpeed(0_tps);
+        state.stabState = STABBY_STATE::NO_CRAB;
     }
 
 }
@@ -129,6 +135,12 @@ void Climber::assignOutputs()
      } else{
          climbMotors->setPosition(STOW_POS);
      }
+
+     if (state.climbState == CLIMB_STATE::DEPLOYED || state.stabState == STABBY_STATE::CRABBING) {
+        stabbyMotor->setSpeed(STABBY_SPEED);
+     } else{
+        stabbyMotor->setPower(0_V);
+     }
 }
 
 void Climber::setDegrees(units::degree_t deg)
@@ -140,9 +152,14 @@ void Climber::setDegrees(units::degree_t deg)
 void Climber::InitSendable(wpi::SendableBuilder& builder)
 {
     builder.SetSmartDashboardType("Subsystem");
-    builder.AddDoubleProperty(
-        "Climber Pos in Deg",
-        [this] {return units::degree_t{climbMotors->getPosition()}.to<double>();},
+    builder.AddIntegerProperty(
+        "Climb State",
+        [this]{return state.climbState;},
+        nullptr
+    );
+    builder.AddIntegerProperty(
+        "Stabby State",
+        [this]{return state.stabState;},
         nullptr
     );
 }
