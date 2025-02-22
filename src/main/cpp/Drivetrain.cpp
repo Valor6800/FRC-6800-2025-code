@@ -69,12 +69,12 @@ const units::meter_t WHEEL_DIAMETER(0.0973_m);
 
 
 // fix these
-#define BLUE_REEF_17_ANGLE 120_deg
-#define BLUE_REEF_18_ANGLE 180_deg
-#define BLUE_REEF_19_ANGLE -120_deg
-#define BLUE_REEF_20_ANGLE -30_deg
-#define BLUE_REEF_21_ANGLE 0_deg
-#define BLUE_REEF_22_ANGLE  30_deg
+#define BLUE_REEF_17_ANGLE 60_deg // -120_deg + 180_deg
+#define BLUE_REEF_18_ANGLE 0_deg // 180_deg + 180_deg
+#define BLUE_REEF_19_ANGLE -60_deg // 120_deg + 180_deg
+#define BLUE_REEF_20_ANGLE -120_deg // -30_deg - 90_deg
+#define BLUE_REEF_21_ANGLE 180_deg // 0_deg + 180_deg
+#define BLUE_REEF_22_ANGLE  120_deg // 30_deg + 90_deg
 
 // these are correct
 #define RED_REEF_6_ANGLE -60_deg + 180_deg
