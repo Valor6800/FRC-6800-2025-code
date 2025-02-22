@@ -141,10 +141,6 @@ Drivetrain::Drivetrain(frc::TimedRobot *_robot, CANdle& leds) :
         aprilTagSensors.back()->setPipe(valor::VisionSensor::PIPELINE_0);
     }
 
-
-    aprilTagSensors[4]->setPipe(valor::VisionSensor::PIPELINE_1);
-    aprilTagSensors[4]->setCameraPose(Constants::aprilCameras[4].second);
-
     state.dir = NONE;
 
     setupGyro(
