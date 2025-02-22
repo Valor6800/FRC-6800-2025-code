@@ -17,9 +17,9 @@
 #define ELEV_K_ERROR units::angle::turn_t (0)
 #define ELEVATOR_SENSOR_TO_MECH 1.0f
 
-#define CORAL_INTAKE_SPEED 20_tps //5
+#define CORAL_INTAKE_SPEED 3_tps //5
 #define ALGEE_INTAKE_SPEED 35_tps
-#define SCORE_SPEED 20_tps
+#define SCORE_SPEED 40_tps
 #define ALGEE_SCORE_SPEED -40_tps
 #define ALGEE_HOLD_SPD 0.25_tps
 

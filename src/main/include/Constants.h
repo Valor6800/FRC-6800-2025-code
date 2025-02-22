@@ -368,10 +368,10 @@ namespace Constants {
 
             static ScoringSpeedMap getScoringSpeedMap() { switch (robot) {
                 case Robot::Alpha: return {
-                    {ELEVATOR_STATE::ONE, 12_tps},
-                    {ELEVATOR_STATE::TWO, 15_tps},
-                    {ELEVATOR_STATE::THREE, 15_tps},
-                    {ELEVATOR_STATE::FOUR, 15_tps}
+                    {ELEVATOR_STATE::ONE, 48_tps},
+                    {ELEVATOR_STATE::TWO, 60_tps},
+                    {ELEVATOR_STATE::THREE, 60_tps},
+                    {ELEVATOR_STATE::FOUR, 60_tps}
                 };
                 default: return {
                     {ELEVATOR_STATE::ONE, 25_tps},
@@ -387,12 +387,12 @@ namespace Constants {
                         {
                             GAME_PIECE::CORAL,
                             {
-                                { ELEVATOR_STATE::STOWED, 5_in },
-                                { ELEVATOR_STATE::HP, 5_in },
+                                { ELEVATOR_STATE::STOWED, 6.75_in },
+                                { ELEVATOR_STATE::HP, 6.75_in },
                                 { ELEVATOR_STATE::ONE, 13.57_in },
-                                { ELEVATOR_STATE::TWO, 14_in },
-                                { ELEVATOR_STATE::THREE, 14_in },
-                                { ELEVATOR_STATE::FOUR, 5_in }
+                                { ELEVATOR_STATE::TWO, 19.5_in },
+                                { ELEVATOR_STATE::THREE, 15_in },
+                                { ELEVATOR_STATE::FOUR, 16_in }
                             }
                         },
                         {
@@ -448,7 +448,7 @@ namespace Constants {
 
             /// Amount of rotations needed for after detecting coral intake
             static units::angle::turn_t getIntakeTurns() { switch (robot) {
-                case Robot::Alpha: return 1.37_tr;
+                case Robot::Alpha: return 0.5_tr;
                 case Robot::Gold: return 0.5_tr;
                 default: return 0.5_tr;
             }};
@@ -460,7 +460,7 @@ namespace Constants {
             }}
 
             static double getScorerSensorToMech() { switch (robot) {
-                case Robot::Alpha: return 0.75;
+                case Robot::Alpha: return 2.0;
                 default: return 5 / 3;
             }}
 
@@ -496,7 +496,7 @@ namespace Constants {
             static valor::PIDF getScorerPIDF() { switch (robot) {
                 case Robot::Alpha: {
                     valor::PIDF pidf;
-                    pidf.P = 0.5;
+                    pidf.P = 0.2;
                     pidf.S = 0.58;
                     return pidf;
                 }
