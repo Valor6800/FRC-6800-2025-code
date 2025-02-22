@@ -15,11 +15,12 @@
 #define CLIMB_GEAR_RATIO 145.36
 #define CRAB_GEAR_RATIO 0
 
-#define DEPLOYED_POS units::angle::turn_t (0.73)
-#define RETRACTED_POS units::angle::turn_t (0.36)
-#define STOW_POS units::angle::turn_t (0)
+#define DEPLOYED_POS units::angle::turn_t (0.75)
+#define RETRACTED_POS units::angle::turn_t (0.353)
+#define LOCK_OUT_POS units::angle::turn_t (0.369)
+#define STOW_POS units::angle::turn_t (0.5)
 
-#define STABBY_SPEED 10_tps
+#define STABBY_SPEED 40_tps
 #define SPIKE_CURRENT 0
 #define CACHE_SIZE 0
 
@@ -30,7 +31,7 @@ Climber::Climber(frc::TimedRobot *_robot) : valor::BaseSubsystem(_robot, "Climbe
     currentSensor(_robot, "Climber")
 {
     frc2::CommandScheduler::GetInstance().RegisterSubsystem(this);
-    table->PutBoolean("Climbed?", state.climbed);
+    table->PutBoolean("Climbed?", state.hasClimbed);
     init();
 }
 
@@ -41,15 +42,16 @@ Climber::~Climber()
 
 void Climber::resetState()
 {
-    state.climbState = CLIMB_STATE::MANUAL;
+    state.climbState = CLIMB_STATE::STOW;
     state.stabState = STABBY_STATE::NO_CRAB;
-    state.climbed = false;
+    state.hasClimbed = false;
     currentSensor.reset();
 }
 
 void Climber::init()
 {
     valor::PIDF climbPID = Constants::Climber::getClimberPIDF();
+    valor::PIDF climbRetractPID = Constants::Climber::getClimberRetractPIDF();
     valor::PIDF stabbyPID;
 
     climbMotors = new valor::PhoenixController(
@@ -81,10 +83,14 @@ void Climber::init()
     climbPID.maxVelocity = climbMotors->getMaxMechSpeed();
     climbPID.maxAcceleration = climbMotors->getMaxMechSpeed() / Constants::Climber::maxVelocityRampTime();
 
+    climbRetractPID.maxVelocity = climbMotors->getMaxMechSpeed();
+    climbRetractPID.maxAcceleration = climbMotors->getMaxMechSpeed() / Constants::Climber::maxVelocityRampTime();
+
     climbMotors->setForwardLimit(Constants::Climber::getForwardLimit());
     climbMotors->setReverseLimit(Constants::Climber::getReverseLimit());
     climbMotors->setupFollower(CANIDs::CLIMBER_FOLLOW, Constants::Climber::climbMotorInverted());
-    climbMotors->setPIDF(climbPID);
+    climbMotors->setPIDF(climbRetractPID, 1);
+    climbMotors->setPIDF(climbPID, 0);
     climbMotors->setContinuousWrap(true);
     climbMotors->enableFOC(true);
     climbMotors->applyConfig();
@@ -106,14 +112,10 @@ void Climber::assessInputs()
 
     if(driverGamepad->GetYButton()){
         state.climbState = CLIMB_STATE::DEPLOYED;
-    } else if(driverGamepad->GetAButton()){
+    } else if(driverGamepad->GetXButton()){
+        state.climbState = CLIMB_STATE::STOW;
+    } else if(driverGamepad->GetAButton() && operatorGamepad->DPadDown()){
         state.climbState = CLIMB_STATE::RETRACTED;
-    }
-
-    if (operatorGamepad->DPadLeft()) {
-        state.stabState = STABBY_STATE::CRABBING;
-    }else{
-        state.stabState = STABBY_STATE::NO_CRAB;
     }
 
 }
@@ -126,15 +128,20 @@ void Climber::analyzeDashboard()
 void Climber::assignOutputs()
 {
 
-     if (state.climbState == CLIMB_STATE::MANUAL) {
-         climbMotors->setPower(state.manualSpeed);
-     } else if (state.climbState == CLIMB_STATE::DEPLOYED) {
-         climbMotors->setPosition(DEPLOYED_POS);
-     } else if (state.climbState == CLIMB_STATE::RETRACTED) {
-         climbMotors->setPosition(RETRACTED_POS);
-     } else{
-         climbMotors->setPosition(STOW_POS);
-     }
+    if(climbMotors->getPosition() < LOCK_OUT_POS || state.hasClimbed){
+        climbMotors->setPower(0_V);
+        state.hasClimbed = true;
+    } else{
+        if (state.climbState == CLIMB_STATE::MANUAL) {
+            climbMotors->setPower(state.manualSpeed);
+        } else if (state.climbState == CLIMB_STATE::DEPLOYED) {
+            climbMotors->setPosition(DEPLOYED_POS, 0);
+        } else if (state.climbState == CLIMB_STATE::RETRACTED) {
+            climbMotors->setPosition(RETRACTED_POS, 1);
+        } else if(state.climbState == CLIMB_STATE::STOW){
+            climbMotors->setPosition(STOW_POS, 0);
+        }
+    }
 
      if (state.climbState == CLIMB_STATE::DEPLOYED || state.stabState == STABBY_STATE::CRABBING) {
         stabbyMotor->setSpeed(STABBY_SPEED);

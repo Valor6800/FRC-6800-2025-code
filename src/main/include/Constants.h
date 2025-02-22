@@ -538,24 +538,37 @@ namespace Constants {
                 }
                 default: {
                     valor::PIDF pidf;
+                    pidf.P = 10;
+                    return pidf;
+                }
+            }}
+
+            static valor::PIDF getClimberRetractPIDF() { switch (robot) {
+                case Robot::Alpha: {
+                    valor::PIDF pidf;
                     pidf.P = 100;
+                    return pidf;
+                }
+                default: {
+                    valor::PIDF pidf;
+                    pidf.P = 50;
                     return pidf;
                 }
             }}
 
             static units::second_t maxVelocityRampTime() { switch (robot) {
                 case Robot::Alpha: return 1.0_s / 3;
-                default: return 1.0_s / 3;
+                default: return 1.0_s / 5;
             }}
 
             static units::turn_t getForwardLimit() { switch (robot) {
                 case Robot::Alpha: return 0.25_tr;
-                default: return 0.75_tr;
+                default: return 0.77_tr;
             }}
 
             static units::turn_t getReverseLimit() { switch (robot) {
                 case Robot::Alpha: return -0.2_tr;
-                default: return 0.34_tr;
+                default: return 0.325_tr;
             }}
         }
 }

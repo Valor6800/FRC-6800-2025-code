@@ -50,7 +50,7 @@ public:
         CLIMB_STATE climbState;
         STABBY_STATE stabState;
 
-        bool climbed;
+        bool hasClimbed;
         double spikeCurrent;
         double cacheSize;
         units::volt_t manualSpeed;
