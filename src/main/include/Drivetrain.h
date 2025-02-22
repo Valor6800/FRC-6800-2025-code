@@ -140,6 +140,8 @@ public:
           bool climberAlign;
      } state;
 
+     frc2::FunctionalCommand* getAutoAlignCommand();
+
      frc2::FunctionalCommand* getResetOdom();
 
      frc2::CommandPtr pitSequence();

@@ -189,6 +189,16 @@ Drivetrain::Drivetrain(frc::TimedRobot *_robot, CANdle& leds) :
     poseErrorPPTopic = nt::NetworkTableInstance::GetDefault().GetStructTopic<frc::Transform2d>("LiveWindow/BaseSubsystem/SwerveDrive/Pose Error PP").Publish();
     table->PutNumber("Y Controller Activation Degree Threshold", Y_ACTIVATION_THRESHOLD.value());
 
+    pathplanner::NamedCommands::registerCommand("Auto Align", std::move(
+        frc2::SequentialCommandGroup(
+            frc2::InstantCommand(
+                [this](){
+                    getAutoAlignCommand();
+                }  
+            )
+        )
+    ).ToPtr());
+
     resetState();
     init();
 }
@@ -421,6 +431,33 @@ void Drivetrain::assignOutputs()
 
 units::meters_per_second_t Drivetrain::getRobotSpeeds(){
     return units::meters_per_second_t{sqrtf(powf(getRobotRelativeSpeeds().vx.to<double>(), 2) + powf(getRobotRelativeSpeeds().vy.to<double>(), 2))};
+}
+
+frc2::FunctionalCommand * Drivetrain::getAutoAlignCommand(){
+    return new frc2::FunctionalCommand(
+        // on init
+        [&]{
+            Swerve::resetAlignControllers();
+            state.getTag = true;
+        },
+        // execute
+        [&]{
+            choosePoleDirection(Drivetrain::Direction::RIGHT);
+            Swerve::alignToTarget = true;
+        },
+        // on command end
+        [&](bool){
+            state.getTag = false;
+            Swerve::alignToTarget = false;
+            Swerve::resetAlignControllers();
+        },
+        // determines when commmand end
+        [&]{
+            return units::math::abs(Swerve::yDistance - Swerve::goalAlign) <= yPosTolerance;
+        },
+        {}
+    );
+
 }
 
 frc2::FunctionalCommand* Drivetrain::getResetOdom() {
