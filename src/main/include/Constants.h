@@ -286,22 +286,31 @@ namespace Constants {
 
         static frc::Pose3d rockyCameraPosition(){ switch (robot){
             case Robot::Alpha: return frc::Pose3d();
-            case Robot::Gold: return frc::Pose3d();
-            default: return frc::Pose3d(
+            case Robot::Gold: return frc::Pose3d(
+                10_in,
                 -6.5_in,
-                -10_in,
                 8.62_in, // change Z
                 frc::Rotation3d(
                     0_deg,
                     18_deg,
-                    -90_deg
+                    0_deg
                 )
             );
+            default: return frc::Pose3d();
         }};
 
         static frc::Pose3d limeCameraPosition(){ switch (robot){
             case Robot::Alpha: return frc::Pose3d();
-            case Robot::Gold: return frc::Pose3d();
+            case Robot::Gold: return frc::Pose3d( 
+                10_in,
+                6.5_in,
+                8.62_in, // change Z
+                frc::Rotation3d(
+                    0_deg,
+                    18_deg,
+                    0_deg
+                )
+);
             default: return frc::Pose3d(
                 10_in,
                 6.5_in,
@@ -375,9 +384,9 @@ namespace Constants {
                 };
                 default: return {
                     {ELEVATOR_STATE::ONE, 25_tps},
-                    {ELEVATOR_STATE::TWO, 35_tps},
-                    {ELEVATOR_STATE::THREE, 35_tps},
-                    {ELEVATOR_STATE::FOUR, 35_tps}
+                    {ELEVATOR_STATE::TWO, 50_tps},
+                    {ELEVATOR_STATE::THREE, 50_tps},
+                    {ELEVATOR_STATE::FOUR, 50_tps}
                 };
             }}
 

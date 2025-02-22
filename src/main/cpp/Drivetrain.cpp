@@ -64,8 +64,8 @@ const units::meter_t WHEEL_DIAMETER(0.0973_m);
 
 #define Y_FILTER_CONST 0.95 // .99
 #define Y_ALIGN_KP 6 
-#define Y_ALIGN_KI 10
-#define Y_ALIGN_KD 0.2
+#define Y_ALIGN_KI 0
+#define Y_ALIGN_KD 0.65
 
 
 // fix these
@@ -87,8 +87,8 @@ const units::meter_t WHEEL_DIAMETER(0.0973_m);
 #define POLE_OFFSET 6.758_in
 #define SCORER_TO_ROBOT 0.5_in
 
-#define AA_LEFT_OFFSET 0.5_in
-#define AA_RIGHT_OFFSET 1.5_in
+#define AA_LEFT_OFFSET 0.0_in // 0.5_in
+#define AA_RIGHT_OFFSET 0.0_in // 1.5_in
 
 Drivetrain::Drivetrain(frc::TimedRobot *_robot, valor::CANdleSensor *_leds) : 
     valor::Swerve<SwerveAzimuthMotor, SwerveDriveMotor>(
@@ -283,34 +283,6 @@ void Drivetrain::assessInputs()
         state.reefTag = -1;
         hasReset = false;
     }
-    state.yEstimate += Swerve::yControllerInitialVelocity.value() * LOOP_TIME;
-    units::radian_t leastSkew{90_rad};
-    unfilteredYDistance = Swerve::goalAlign.to<double>();
-    for(valor::AprilTagsSensor* aprilLime : aprilTagSensors) {
-        if (aprilLime->hasTarget()) {
-            if(
-                (frc::DriverStation::GetAlliance() == frc::DriverStation::kRed && 
-                aprilLime->getTagID() >= 6 &&
-                aprilLime->getTagID() <= 11) || 
-                (frc::DriverStation::GetAlliance() == frc::DriverStation::kBlue &&
-                aprilLime->getTagID() >= 17 &&
-                aprilLime->getTagID() <= 22)
-            ){ 
-                units::degree_t currentSkew = aprilLime->getTargetToBotPose().Rotation().Y() + 00_deg;
-                if (state.getTag && leastSkew > units::math::abs(currentSkew)) {
-                    state.reefTag = aprilLime->getTagID();
-                    leastSkew = currentSkew;
-                    state.yEstimate = aprilLime->get_botpose_targetspace().X().to<double>();
-                }
-                if (state.reefTag == aprilLime->getTagID()) {
-                    //unfilteredYDistance = aprilLime->get_botpose_targetspace().X().to<double>();
-                    state.yEstimate = Y_FILTER_CONST * state.yEstimate + ((1 - Y_FILTER_CONST) * aprilLime->get_botpose_targetspace().X().to<double>());
-                }
-            }
-        } 
-    }
-
-    Swerve::yDistance = units::length::meter_t (state.yEstimate); //units::length::meter_t {filter.Calculate(unfilteredYDistance)};
 
     Swerve::alignToTarget = driverGamepad->leftTriggerActive();
     if (driverGamepad->leftTriggerActive() && !hasReset) {
@@ -325,6 +297,35 @@ void Drivetrain::analyzeDashboard()
 {
     poseErrorPP = currentPosePathPlanner.Get() - targetPosePathPlanner.Get();
 
+    state.yEstimate += Swerve::yControllerInitialVelocity.value() * LOOP_TIME;
+    units::radian_t leastSkew{90_rad};
+    unfilteredYDistance = Swerve::goalAlign.to<double>();
+    for(valor::AprilTagsSensor* aprilLime : aprilTagSensors) {
+        if (aprilLime->hasTarget()) {
+            if(
+                (frc::DriverStation::GetAlliance() == frc::DriverStation::kRed && 
+                aprilLime->getTagID() >= 6 &&
+                aprilLime->getTagID() <= 11) || 
+                (frc::DriverStation::GetAlliance() == frc::DriverStation::kBlue &&
+                aprilLime->getTagID() >= 17 &&
+                aprilLime->getTagID() <= 22)
+            ){ 
+                units::degree_t currentSkew = aprilLime->getTargetToBotPose().Rotation().Y() + 00_deg;
+                if (/* state.getTag &&  */leastSkew > units::math::abs(currentSkew) && state.reefTag == -1) {
+                    state.reefTag = aprilLime->getTagID();
+                    leastSkew = currentSkew;
+                    state.yEstimate = aprilLime->get_botpose_targetspace().X().to<double>();
+                }
+                if (state.reefTag == aprilLime->getTagID()) {
+                    //unfilteredYDistance = aprilLime->get_botpose_targetspace().X().to<double>();
+                    state.yEstimate = Y_FILTER_CONST * state.yEstimate + ((1 - Y_FILTER_CONST) * aprilLime->get_botpose_targetspace().X().to<double>());
+                }
+            }
+        } 
+    }
+
+    Swerve::yDistance = units::length::meter_t (state.yEstimate); //units::length::meter_t {filter.Calculate(unfilteredYDistance)};
+    //
     poseErrorPPTopic.Set(poseErrorPP);
     //
     Swerve::ROT_KP = table->GetNumber("Rot_KP", Swerve::ROT_KP);

@@ -135,7 +135,7 @@ protected:
     void setSwerveDesiredState(wpi::array<frc::SwerveModuleState, MODULE_COUNT> desiredStates, bool isDriveOpenLoop);
 
     double ROT_KP = 6;
-    double ROT_KD = 0.5;
+    double ROT_KD = 0.2;
     double Y_KP = 0.0;
     double Y_KI = 0.0;
     double Y_KD = 0;
@@ -154,7 +154,7 @@ private:
     const units::radians_per_second_t MAX_ROTATION_VEL = 16_rad_per_s;
     const units::radians_per_second_squared_t MAX_ROTATION_ACCEL = 12_rad_per_s_sq;
     const units::meters_per_second_t MAX_Y_VEL = 5.5_mps;
-    const units::meters_per_second_squared_t MAX_Y_ACCEL = 3_mps_sq;
+    const units::meters_per_second_squared_t MAX_Y_ACCEL = 4_mps_sq;
 
     std::deque<units::angular_acceleration::radians_per_second_squared_t> yawRateBuffer;
 

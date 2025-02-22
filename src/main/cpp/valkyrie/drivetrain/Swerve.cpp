@@ -25,7 +25,7 @@
 #define LOOP_TIME 0.05_s
 #define EPS 1e-9
 
-#define Y_KFF 0.6
+#define Y_KFF 1
 #define I_ZONE 0.05
 
 const units::hertz_t KP_ROTATE(-90);

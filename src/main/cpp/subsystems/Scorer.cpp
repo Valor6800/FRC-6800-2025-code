@@ -260,7 +260,7 @@ void Scorer::init()
     scorerMotor->setGearRatios(1, Constants::Scorer::getScorerSensorToMech());
     scorerMotor->enableFOC(true);
     scorerMotor->setCurrentLimits(
-        units::ampere_t{60},
+        units::ampere_t{100},
         units::ampere_t{60},
         units::ampere_t{45},
         units::second_t{0.5},
