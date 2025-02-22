@@ -105,7 +105,7 @@ void Climber::assessInputs()
     }
 
     if (operatorGamepad->DPadLeft()) {
-        stabbyMotor->setSpeed(10_tps);
+        stabbyMotor->setSpeed(40_tps);
     }else{
         stabbyMotor->setSpeed(0_tps);
     }

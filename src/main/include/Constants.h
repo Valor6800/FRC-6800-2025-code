@@ -546,7 +546,7 @@ namespace Constants {
 
             static units::turn_t getReverseLimit() { switch (robot) {
                 case Robot::Alpha: return -0.2_tr;
-                default: return 0.38671875_tr;
+                default: return 0.34_tr;
             }}
         }
 }
