@@ -24,6 +24,7 @@
 #include <frc/geometry/Pose3d.h>
 #include <networktables/NetworkTable.h>
 #include "valkyrie/controllers/PhoenixController.h"
+#include <frc/RobotBase.h>
 
 
 #define ALPHA_SERIAL_NUMBER "03260AF3"
@@ -107,6 +108,7 @@ namespace Constants {
         };
 
         static std::string getSerialNumber() {
+            if (frc::RobotBase::IsSimulation()) return "";
             std::string env = std::getenv("serialnum");
             if (!env.empty()) return env;
             char buffer[8];
