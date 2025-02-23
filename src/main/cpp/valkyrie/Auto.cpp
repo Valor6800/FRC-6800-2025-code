@@ -35,7 +35,7 @@ frc2::CommandPtr Auto::getSelectedAuto(){
 
 frc2::CommandPtr Auto::getAuto(std::string selection) {
     if (selection == "NONE") return frc2::cmd::None();
-    for (uint i = 0; i < loadedAutos.size(); i++) {
+    for (size_t i = 0; i < loadedAutos.size(); i++) {
         if (loadedAutos[i].first == selection)
             return std::move(loadedAutos[i].second);
     }
@@ -43,7 +43,7 @@ frc2::CommandPtr Auto::getAuto(std::string selection) {
 }
 
 void Auto::preloadAuto(std::string autoName){
-    for (uint i = 0; i < loadedAutos.size(); i++) {
+    for (size_t i = 0; i < loadedAutos.size(); i++) {
         if (loadedAutos[i].first == autoName) {
             return ;
         }
@@ -79,7 +79,7 @@ std::string makeFriendlyName(std::string filename){
     // take last part of the path string when divided with /'s - this should be the filename
     filename = filename.substr(filename.find_last_of('/') + 1);
     std::string n_name = "";
-    for (uint i = 0; i < filename.length(); i ++){
+    for (size_t i = 0; i < filename.length(); i ++){
         // .'s signify the end of the filename and the start of the file extension
         if (filename[i] == '.'){
             break;
@@ -104,9 +104,9 @@ std::vector<std::string> listDirectory(std::string path_name){
 
     for (const auto & entry : std::filesystem::directory_iterator(path_name)){
         if (entry.path().string().find("NONE") != std::string::npos) continue;
-        std::string path = entry.path();
+        std::string path = entry.path().string();
         if (path.find(".path") != std::string::npos || path.find(".auto") != std::string::npos) {
-            files.push_back(entry.path());
+            files.push_back(entry.path().string());
         }
     }
     return files;

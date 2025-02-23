@@ -68,7 +68,7 @@ CANdleSensor::~CANdleSensor()
     delete allSegments.activeAnimation;
 }
 
-void CANdleSensor::setLED(uint led, RGBColor rgb) {
+void CANdleSensor::setLED(int led, RGBColor rgb) {
     candle.SetLEDs(
         rgb.red,
         rgb.green,
@@ -79,7 +79,7 @@ void CANdleSensor::setLED(uint led, RGBColor rgb) {
     );
 }
 
-void CANdleSensor::setLED(uint led, int color) {
+void CANdleSensor::setLED(int led, int color) {
     setLED(led, toRGB(color));
 }
 
