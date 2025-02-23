@@ -26,7 +26,8 @@ frc2::CommandPtr Auto::makeAuto(std::string autoName){
 }
 
 frc2::CommandPtr Auto::getSelectedAuto(){
-    std::string selection = m_chooser.GetSelected(); 
+    std::string selection = m_chooser.GetSelected();
+    selection = selection.erase(0, 6);
     return getAuto(selection);
 }
 
@@ -53,7 +54,7 @@ void Auto::preloadAuto(std::string autoName){
 
 void Auto::preloadSelectedAuto(){
     if (m_chooser.GetSelected() != "" && m_chooser.GetSelected().find("NONE") == std::string::npos) {
-        preloadAuto(m_chooser.GetSelected());
+        preloadAuto(m_chooser.GetSelected().erase(0, 6));
     }
 }
 
