@@ -2,7 +2,7 @@
 #include <iostream>
 #include "frc2/command/Commands.h"
 #include "pathplanner/lib/auto/AutoBuilder.h"
-// #include <frc/Filesystem.h>
+#include <frc/Filesystem.h>
 #include <networktables/NetworkTableInstance.h>
 #include <networktables/NetworkTable.h>
 #include <frc/smartdashboard/SmartDashboard.h>
@@ -15,9 +15,6 @@
 #include <filesystem>
 #include <string>
 using namespace valor; using namespace pathplanner;
-
-#define AUTOS_PATH (std::string)"/home/lvuser/deploy/pathplanner/autos/"
-#define PATHS_PATH (std::string)"/home/lvuser/deploy/pathplanner/paths/"
 
 Auto::Auto(){
     table = nt::NetworkTableInstance::GetDefault().GetTable("auto");
@@ -113,7 +110,7 @@ std::vector<std::string> listDirectory(std::string path_name){
 }
 
 void Auto::fillAutoList(){
-    for (std::string path : listDirectory(AUTOS_PATH)){
+    for (std::string path : listDirectory(frc::filesystem::GetDeployDirectory() + "/pathplanner/autos")){
         // if (path.find("NONE") != std::string::npos) {continue;}
         m_chooser.AddOption(makeFriendlyName(removeFileType(path)), removeFileType(path));
     }
