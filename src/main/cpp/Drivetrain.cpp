@@ -528,15 +528,18 @@ void Drivetrain::alignAngleZoning()
 }
 
 void Drivetrain::choosePoleDirection(Direction dir, Constants::AprilTag tag){
+    
+    std::unordered_map<Constants::AprilTag, Constants::DirectionalOffSet> poleOffset = frc::DriverStation::GetAlliance() == frc::DriverStation::kRed ? Constants::redPoleOffsets : Constants::bluePoleOffsets;
+    units::inch_t offset = poleOffset.find(tag) != poleOffset.end() ? poleOffset.at(tag).at(dir) : 0.0_in;
     switch (dir) {
         case LEFT:
-            Swerve::goalAlign = -units::math::abs(POLE_OFFSET + Constants::poleOffsets.at(tag).at(LEFT));
+            Swerve::goalAlign = -units::math::abs(POLE_OFFSET + offset);
             break;
         case RIGHT:
-            Swerve::goalAlign = units::math::abs(POLE_OFFSET + Constants::poleOffsets.at(tag).at(RIGHT));
+            Swerve::goalAlign = units::math::abs(POLE_OFFSET + offset);
             break;
         default:
-            Swerve::goalAlign = Constants::poleOffsets.find(tag) != Constants::poleOffsets.end() ? Constants::poleOffsets.at(tag).at(NONE) : 0_in;
+            Swerve::goalAlign = poleOffset.find(tag) != poleOffset.end() ? poleOffset.at(tag).at(NONE) : 0_in;
             break;
     }
 

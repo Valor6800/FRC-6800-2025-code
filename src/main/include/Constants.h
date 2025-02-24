@@ -414,7 +414,7 @@ namespace Constants {
             {7,
                 {
                     {LEFT, 0_in},
-                    {RIGHT, 0_in},
+                    {RIGHT, 10_in},
                     {NONE, 0_in}
                 }},
             {8,
@@ -442,8 +442,6 @@ namespace Constants {
                     {NONE, 0_in}
                 }},
         };
-
-        static std::unordered_map<AprilTag, DirectionalOffSet> poleOffsets = frc::DriverStation::GetAlliance() == frc::DriverStation::kRed ? redPoleOffsets : bluePoleOffsets;
 
         namespace Scorer {
             enum ELEVATOR_STATE
