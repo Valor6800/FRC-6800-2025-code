@@ -150,6 +150,8 @@ protected:
 
     units::meters_per_second_t yControllerInitialVelocity;
 
+    units::degree_t getRotControllerError();
+
 private:
     const units::radians_per_second_t MAX_ROTATION_VEL = 16_rad_per_s;
     const units::radians_per_second_squared_t MAX_ROTATION_ACCEL = 12_rad_per_s_sq;
