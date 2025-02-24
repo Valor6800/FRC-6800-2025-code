@@ -57,10 +57,10 @@ const units::meter_t WHEEL_DIAMETER(0.0973_m);
 
 #define MT2_POSE true
 
-#define Y_FILTER_CONST 0.95 // .99
-#define Y_ALIGN_KP 6 
-#define Y_ALIGN_KI 0
-#define Y_ALIGN_KD 0.65
+#define Y_FILTER_CONST 0.99 // .99
+#define Y_ALIGN_KP 10
+#define Y_ALIGN_KI 10
+#define Y_ALIGN_KD 0.3
 
 
 // fix these
@@ -114,6 +114,7 @@ Drivetrain::Drivetrain(frc::TimedRobot *_robot, valor::CANdleSensor *_leds) :
     //
     table->PutNumber("Left Align Offset", AA_LEFT_OFFSET.value());
     table->PutNumber("Right Align Offset", AA_RIGHT_OFFSET.value());
+    table->PutNumber("Y Filter Const", Y_FILTER_CONST);
 
     Swerve::Y_KP = Y_ALIGN_KP;
     Swerve::Y_KI = Y_ALIGN_KI;
@@ -270,8 +271,6 @@ void Drivetrain::assessInputs()
         state.dir = RIGHT;
     } else if(operatorGamepad->GetLeftBumperButton()){
         state.dir = LEFT;
-    } else if(operatorGamepad->leftTriggerActive()){
-        state.dir = NONE;
     }
     // state.lockingToReef = driverGamepad->GetAButtonPressed();
     state.getTag = false;
@@ -316,7 +315,7 @@ void Drivetrain::analyzeDashboard()
                 }
                 if (state.reefTag == aprilLime->getTagID()) {
                     //unfilteredYDistance = aprilLime->get_botpose_targetspace().X().to<double>();
-                    state.yEstimate = Y_FILTER_CONST * state.yEstimate + ((1 - Y_FILTER_CONST) * aprilLime->get_botpose_targetspace().X().to<double>());
+                    state.yEstimate = table->GetNumber("Y Filter Const", Y_FILTER_CONST) * state.yEstimate + ((1 - table->GetNumber("Y Filter Const", Y_FILTER_CONST)) * aprilLime->get_botpose_targetspace().X().to<double>());
                 }
             }
         } 
