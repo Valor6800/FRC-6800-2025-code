@@ -134,6 +134,9 @@ Drivetrain::Drivetrain(frc::TimedRobot *_robot, CANdle& leds) :
     table->PutNumber("KPLIMELIGHT", KP_LIMELIGHT);
     table->PutBoolean("Accepting Vision Measurements", true);
 
+    table->PutBoolean("Align Right", false);
+    table->PutBoolean("Align Left", false);
+
     setRotAlignOffset(00_deg);
 
     for (std::pair<const char*, frc::Pose3d> aprilCam : Constants::getAprilCameras()) {
@@ -248,7 +251,7 @@ std::vector<std::pair<SwerveAzimuthMotor*, SwerveDriveMotor*>> Drivetrain::gener
 void Drivetrain::resetState()
 {
     Swerve::resetState();
-
+    state.disabled = false;
     resetEncoders();
     resetOdometry(frc::Pose2d{0_m, 0_m, 0_rad});
 }
@@ -292,6 +295,17 @@ void Drivetrain::assessInputs()
 
 void Drivetrain::analyzeDashboard()
 {
+    if(state.disabled){
+        state.right = table->GetBoolean("Align Right", false);
+        state.left = table->GetBoolean("Align Left", false);
+        if (state.right) {
+            state.dir = RIGHT;
+        } else if(state.left) {
+            state.dir = LEFT;
+        } else{
+            state.dir = NONE;
+        }
+    }
     poseErrorPP = currentPosePathPlanner.Get() - targetPosePathPlanner.Get();
 
     state.yEstimate += Swerve::yControllerInitialVelocity.value() * LOOP_TIME;
@@ -624,6 +638,16 @@ void Drivetrain::InitSendable(wpi::SendableBuilder& builder)
         builder.AddBooleanProperty(
             "Aligned",
             [this] {return state.aligned;},
+            nullptr
+        );
+        builder.AddBooleanProperty(
+            "Align Right",
+            [this] {return state.right;},
+            nullptr
+        );
+        builder.AddBooleanProperty(
+            "Align Left",
+            [this] {return state.left;},
             nullptr
         );
     }
