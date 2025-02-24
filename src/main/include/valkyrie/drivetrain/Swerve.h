@@ -120,6 +120,7 @@ protected:
     std::unique_ptr<frc::SwerveDrivePoseEstimator<MODULE_COUNT>> rawEstimator;
     std::unique_ptr<frc::SwerveDrivePoseEstimator<MODULE_COUNT>> calcEstimator;
 
+    bool toast;
     bool lockingToTarget;
     units::degree_t targetAngle;
     void setRotAlignOffset(units::degree_t angle);
