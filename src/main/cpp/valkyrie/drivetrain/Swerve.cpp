@@ -260,6 +260,12 @@ void Swerve<AzimuthMotor, DriveMotor>::setRotAlignOffset(units::degree_t angle) 
     rotAlignOffset = angle;
 }
 
+
+template<class AzimuthMotor, class DriveMotor>
+units::degree_t Swerve<AzimuthMotor, DriveMotor>::getRotControllerError() {
+    return rot_controller.GetPositionError();
+}
+
 template<class AzimuthMotor, class DriveMotor>
 void Swerve<AzimuthMotor, DriveMotor>::driveRobotRelative(frc::ChassisSpeeds speeds) {
     auto desiredStates = getModuleStates(speeds);

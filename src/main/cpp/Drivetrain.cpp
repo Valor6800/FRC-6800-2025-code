@@ -85,6 +85,8 @@ const units::meter_t WHEEL_DIAMETER(0.0973_m);
 #define AA_LEFT_OFFSET 0.0_in // 0.5_in
 #define AA_RIGHT_OFFSET 0.0_in // 1.5_in
 
+#define Y_ACTIVATION_THRESHOLD 30.0_deg
+
 Drivetrain::Drivetrain(frc::TimedRobot *_robot, valor::CANdleSensor *_leds) : 
     valor::Swerve<SwerveAzimuthMotor, SwerveDriveMotor>(
         _robot,
@@ -185,6 +187,7 @@ Drivetrain::Drivetrain(frc::TimedRobot *_robot, valor::CANdleSensor *_leds) :
     );
 
     poseErrorPPTopic = nt::NetworkTableInstance::GetDefault().GetStructTopic<frc::Transform2d>("LiveWindow/BaseSubsystem/SwerveDrive/Pose Error PP").Publish();
+    table->PutNumber("Y Controller Activation Degree Threshold", Y_ACTIVATION_THRESHOLD.value());
 
     resetState();
     init();
@@ -306,7 +309,7 @@ void Drivetrain::analyzeDashboard()
                 aprilLime->getTagID() <= 22)
             ){ 
                 units::degree_t currentSkew = aprilLime->getTargetToBotPose().Rotation().Y() + 00_deg;
-                if (/* state.getTag &&  */leastSkew > units::math::abs(currentSkew) && state.reefTag == -1) {
+                if (leastSkew > units::math::abs(currentSkew) && state.reefTag == -1) {
                     state.reefTag = aprilLime->getTagID();
                     leastSkew = currentSkew;
                     state.yEstimate = aprilLime->get_botpose_targetspace().X().to<double>();
@@ -360,7 +363,10 @@ void Drivetrain::analyzeDashboard()
         Swerve::yAlign = false;
         Swerve::rotAlign = true;
     } else if (state.alignToTarget) {
-        Swerve::yAlign = true;
+        Swerve::yAlign = units::math::abs(getRotControllerError()) < (units::degree_t) table->GetNumber(
+            "Y Controller Activation Degree Threshold",
+            Y_ACTIVATION_THRESHOLD.value()
+        );
         Swerve::rotAlign = true;
     } else {
         Swerve::yAlign = false;
