@@ -85,7 +85,7 @@ Swerve<AzimuthMotor, DriveMotor>::Swerve(frc::TimedRobot *_robot,
     rawPosePublisher = nt::NetworkTableInstance::GetDefault().GetStructTopic<frc::Pose2d>("LiveWindow/BaseSubsystem/SwerveDrive/Actual Raw Pose").Publish();
     calculatedPosePublisher = nt::NetworkTableInstance::GetDefault().GetStructTopic<frc::Pose2d>("LiveWindow/BaseSubsystem/SwerveDrive/Actual Calculated Pose").Publish();
     robotVelocitiesPublisher = nt::NetworkTableInstance::GetDefault().GetStructTopic<frc::ChassisSpeeds>("LiveWindow/BaseSubsystem/SwerveDrive/Robot Velocities").Publish();
-
+    table->PutBoolean("Toast", false);
     resetState();
 }
 
@@ -129,6 +129,10 @@ void Swerve<AzimuthMotor, DriveMotor>::assessInputs()
 template<class AzimuthMotor, class DriveMotor>
 void Swerve<AzimuthMotor, DriveMotor>::analyzeDashboard()
 {
+    toast = table->GetBoolean("Toast", false); 
+    if(toast) {
+        resetGyro();
+    }
     rawPosePublisher.Set(rawEstimator->GetEstimatedPosition());
     calculatedPosePublisher.Set(getCalculatedPose());
     robotVelocitiesPublisher.Set(getRobotRelativeSpeeds());
@@ -803,6 +807,11 @@ void Swerve<AzimuthMotor, DriveMotor>::InitSendable(wpi::SendableBuilder& builde
     builder.AddDoubleProperty(
         "Angular Acceleration (NOT AVERAGED)",
         [this] { return angularAcceleration.value();},  
+        nullptr
+    );
+    builder.AddBooleanProperty(
+        "Toast",
+        [this] {return toast;},
         nullptr
     );
 }
