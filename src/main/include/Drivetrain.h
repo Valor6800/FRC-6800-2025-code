@@ -80,11 +80,7 @@ typedef valor::PhoenixController<> SwerveAzimuthMotor;
 class Drivetrain : public valor::Swerve<SwerveAzimuthMotor, SwerveDriveMotor>
 {
 public:
-    enum Direction {
-        LEFT,
-        RIGHT,
-        NONE
-     };
+
      /**
       * @brief Construct a new Drivetrain object
       * 
@@ -155,7 +151,7 @@ public:
      // align the robot using the position on the field
      void alignAngleZoning();
 
-     void choosePoleDirection(Direction dir);
+     void choosePoleDirection(Direction dir, Constants::AprilTag tag);
 
      void setGamePieceInRobot(Constants::Scorer::GAME_PIECE);
 

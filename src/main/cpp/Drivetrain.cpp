@@ -2,16 +2,11 @@
 #include <cmath> 
 #include <cstddef>
 #include <frc/DriverStation.h>
-#include <iostream>
 #include <math.h>
 #include <pathplanner/lib/auto/AutoBuilder.h>
 #include <string>
 #include "Constants.h"
-#include "Eigen/Core"
-#include "frc/RobotController.h"
-#include "frc2/command/Commands.h"
 #include "frc2/command/FunctionalCommand.h"
-#include "frc2/command/SequentialCommandGroup.h"
 #include "units/acceleration.h"
 #include "units/base.h"
 #include "units/length.h"
@@ -22,7 +17,6 @@
 #include "valkyrie/sensors/VisionSensor.h"
 #include <frc2/command/InstantCommand.h> 
 #include <pathplanner/lib/auto/NamedCommands.h>
-#include <unordered_map>
 #include <utility>
 #include "frc/geometry/Pose3d.h"
 #include <pathplanner/lib/controllers/PPHolonomicDriveController.h>
@@ -346,7 +340,8 @@ void Drivetrain::analyzeDashboard()
     
 
     choosePoleDirection(
-        state.gamePiece == Constants::Scorer::ALGEE ? Direction::NONE : state.dir
+        state.gamePiece == Constants::Scorer::ALGEE ? Direction::NONE : state.dir,
+        state.gamePiece == Constants::Scorer::ALGEE ? -1 : state.reefTag
     );
     if (state.reefTag != -1){
         state.aligned = (units::math::abs(Swerve::yDistance - Swerve::goalAlign) <= yPosTolerance);
@@ -532,16 +527,16 @@ void Drivetrain::alignAngleZoning()
     }
 }
 
-void Drivetrain::choosePoleDirection(Drivetrain::Direction dir){
+void Drivetrain::choosePoleDirection(Direction dir, Constants::AprilTag tag){
     switch (dir) {
         case LEFT:
-            Swerve::goalAlign = -units::math::abs(POLE_OFFSET + (units::inch_t) table->GetNumber("Left Align Offset", AA_LEFT_OFFSET.value()));
+            Swerve::goalAlign = -units::math::abs(POLE_OFFSET + Constants::poleOffsets.at(tag).at(LEFT));
             break;
         case RIGHT:
-            Swerve::goalAlign = units::math::abs(POLE_OFFSET + (units::inch_t) table->GetNumber("Right Align Offset", AA_RIGHT_OFFSET.value())); // + SCORER_TO_ROBOT
+            Swerve::goalAlign = units::math::abs(POLE_OFFSET + Constants::poleOffsets.at(tag).at(RIGHT));
             break;
         default:
-            Swerve::goalAlign = 0_m;
+            Swerve::goalAlign = Constants::poleOffsets.find(tag) != Constants::poleOffsets.end() ? Constants::poleOffsets.at(tag).at(NONE) : 0_in;
             break;
     }
 

@@ -6,6 +6,8 @@
 
 #pragma once
 
+#include "Eigen/Core"
+#include "frc/DriverStation.h"
 #include "frc/RobotController.h"
 #include <cmath>
 #include <iostream> 
@@ -44,6 +46,12 @@
  * command-specific namespaces within this header, which can then be used where
  * they are needed.
  */
+
+enum Direction {
+    LEFT,
+    RIGHT,
+    NONE
+};
 
 namespace OIConstants {
     constexpr static int GAMEPAD_BASE_LOCATION = 1;
@@ -353,6 +361,89 @@ namespace Constants {
                     std::pair("limelight-rocky", rockyCameraPosition()),
                     std::pair("limelight-lime", limeCameraPosition())
         };
+    
+        typedef int AprilTag;
+        typedef std::unordered_map<Direction, units::inch_t> DirectionalOffSet;
+
+        static std::unordered_map<AprilTag, DirectionalOffSet> bluePoleOffsets {
+            {17,
+                {
+                    {LEFT, 0_in},
+                    {RIGHT, 0_in},
+                    {NONE, 0_in}
+                }},
+            {18,
+                {
+                    {LEFT, 0_in},
+                    {RIGHT, 0_in},
+                    {NONE, 0_in}
+                }},
+            {19,
+                {
+                    {LEFT, 0_in},
+                    {RIGHT, 0_in},
+                    {NONE, 0_in}
+                }},
+            {20,
+                {
+                    {LEFT, 0_in},
+                    {RIGHT, 0_in},
+                    {NONE, 0_in}
+                }},
+            {21,
+                {
+                    {LEFT, 0_in},
+                    {RIGHT, 0_in},
+                    {NONE, 0_in}
+                }},
+            {22,
+                {
+                    {LEFT, 0_in},
+                    {RIGHT, 0_in},
+                    {NONE, 0_in}
+                }}
+        };
+
+        static std::unordered_map<AprilTag, DirectionalOffSet> redPoleOffsets {
+            {6,
+                {
+                    {LEFT, 0_in},
+                    {RIGHT, 0_in},
+                    {NONE, 0_in}
+                }},
+            {7,
+                {
+                    {LEFT, 0_in},
+                    {RIGHT, 0_in},
+                    {NONE, 0_in}
+                }},
+            {8,
+                {
+                    {LEFT, 0_in},
+                    {RIGHT, 0_in},
+                    {NONE, 0_in}
+                }},
+            {9,
+                {
+                    {LEFT, 0_in},
+                    {RIGHT, 0_in},
+                    {NONE, 0_in}
+                }},
+            {10,
+                {
+                    {LEFT, 0_in},
+                    {RIGHT, 0_in},
+                    {NONE, 0_in}
+                }},
+            {11,
+                {
+                    {LEFT, 0_in},
+                    {RIGHT, 0_in},
+                    {NONE, 0_in}
+                }},
+        };
+
+        static std::unordered_map<AprilTag, DirectionalOffSet> poleOffsets = frc::DriverStation::GetAlliance() == frc::DriverStation::kRed ? redPoleOffsets : bluePoleOffsets;
 
         namespace Scorer {
             enum ELEVATOR_STATE
