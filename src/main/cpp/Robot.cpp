@@ -77,7 +77,6 @@ void Robot::DisabledInit() { }
 
 void Robot::DisabledPeriodic() { 
     valorAuto.preloadSelectedAuto();
-    drivetrain.state.disabled = true;
 }
 
 /**
