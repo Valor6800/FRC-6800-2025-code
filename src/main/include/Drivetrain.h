@@ -134,7 +134,6 @@ public:
           bool alignToTarget;
           bool right;
           bool left;
-          bool disabled;
 
           Constants::Scorer::GAME_PIECE gamePiece;
           Constants::Scorer::ELEVATOR_STATE elevState;

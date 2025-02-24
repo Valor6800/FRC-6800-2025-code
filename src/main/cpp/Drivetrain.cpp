@@ -251,7 +251,6 @@ std::vector<std::pair<SwerveAzimuthMotor*, SwerveDriveMotor*>> Drivetrain::gener
 void Drivetrain::resetState()
 {
     Swerve::resetState();
-    state.disabled = false;
     resetEncoders();
     resetOdometry(frc::Pose2d{0_m, 0_m, 0_rad});
 }
@@ -295,7 +294,7 @@ void Drivetrain::assessInputs()
 
 void Drivetrain::analyzeDashboard()
 {
-    if(state.disabled){
+    if(robot->IsDisabled()){
         state.right = table->GetBoolean("Align Right", false);
         state.left = table->GetBoolean("Align Left", false);
         if (state.right) {
@@ -638,16 +637,6 @@ void Drivetrain::InitSendable(wpi::SendableBuilder& builder)
         builder.AddBooleanProperty(
             "Aligned",
             [this] {return state.aligned;},
-            nullptr
-        );
-        builder.AddBooleanProperty(
-            "Align Right",
-            [this] {return state.right;},
-            nullptr
-        );
-        builder.AddBooleanProperty(
-            "Align Left",
-            [this] {return state.left;},
             nullptr
         );
     }
