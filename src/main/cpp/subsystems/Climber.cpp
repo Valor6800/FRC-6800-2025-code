@@ -80,7 +80,7 @@ void Climber::init()
     stabbyMotor->applyConfig();
     stabbyMotor->enableFOC(true);
 
-    climbPID.maxVelocity = climbMotors->getMaxMechSpeed();
+    climbPID.maxVelocity = climbMotors->getMaxMechSpeed() / 2.0;
     climbPID.maxAcceleration = climbMotors->getMaxMechSpeed() / Constants::Climber::maxVelocityRampTime();
 
     climbRetractPID.maxVelocity = climbMotors->getMaxMechSpeed();
