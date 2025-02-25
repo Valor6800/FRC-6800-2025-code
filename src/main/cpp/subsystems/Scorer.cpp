@@ -168,10 +168,6 @@ Scorer::Scorer(frc::TimedRobot *_robot, Drivetrain *_drivetrain) :
 }
 
 frc2::CommandPtr Scorer::scorerPitSequenceStage(GAME_PIECE gamePiece, ELEVATOR_STATE elevState) {
-    units::turn_t targetPos = convertToMotorSpace(positionMap[state.gamePiece][elevState]);
-    units::turns_per_second_t targetScoreSpeed = SCORE_SPEED;
-    auto it = scoringSpeedMap.find(elevState);
-    if (it != scoringSpeedMap.end()) targetScoreSpeed = it->second;
     return frc2::cmd::Deadline(
         frc2::cmd::Wait(3_s),
         frc2::FunctionalCommand{
@@ -190,8 +186,10 @@ frc2::CommandPtr Scorer::scorerPitSequenceStage(GAME_PIECE gamePiece, ELEVATOR_S
                 elevatorStage.SetText(msg);
                 elevatorStage.Set(true);
             },
-            [this, targetPos] {
-                elevatorPositionSuccess.Set(units::math::abs(elevatorMotor->getPosition() - targetPos) < 1_tr);
+            [this] {
+                units::inch_t currentPos = convertToMechSpace(elevatorMotor->getPosition());
+                units::inch_t targetPos = positionMap[state.gamePiece][state.elevState];
+                elevatorPositionSuccess.Set(units::math::abs(targetPos - currentPos) < 0.25_in);
                 elevatorPositionFail.Set(!elevatorPositionSuccess.Get());
             },
             [this](bool) {
