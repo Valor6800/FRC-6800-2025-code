@@ -86,6 +86,7 @@ const units::meter_t WHEEL_DIAMETER(0.0973_m);
 
 #define AA_LEFT_OFFSET 0.0_in // 0.5_in
 #define AA_RIGHT_OFFSET 0.0_in // 1.5_in
+#define VIABLE_DUNK_DISTANCE 0.3548_m
 
 #define Y_ACTIVATION_THRESHOLD 30.0_deg
 
@@ -110,7 +111,7 @@ Drivetrain::Drivetrain(frc::TimedRobot *_robot, CANdle& leds) :
     // table->PutNumber("Rot_Pos_Tol", Swerve::rotPosTolerance.to<double>());
     // table->PutNumber("Rot_Vel_Tol", Swerve::rotVelTolerance.to<double>());
 
-    // table->PutNumber("Y_Pos_Tol", Swerve::yPosTolerance.to<double>());
+    table->PutNumber("Y_Pos_Tol", Swerve::yPosTolerance.to<double>());
     // table->PutNumber("Y_Vel_Tol", Swerve::yVelTolerance.to<double>());
     //
     table->PutNumber("Left Align Offset", AA_LEFT_OFFSET.value());
@@ -154,7 +155,8 @@ Drivetrain::Drivetrain(frc::TimedRobot *_robot, CANdle& leds) :
         Constants::pigeonMountPitch(),
         Constants::pigeonMountYaw()
     );
-    
+
+    table->PutNumber("Viable Dunk Distance (m)", VIABLE_DUNK_DISTANCE.value());
     /*
      * 3.8m/s, 5m/s^2, ~125lbs Apr. 2
      */
@@ -338,7 +340,7 @@ void Drivetrain::analyzeDashboard()
     // Swerve::rotPosTolerance = table->GetNumber("Rot_Pos_Tol", Swerve::rotPosTolerance.to<double>()) * 1_deg;
     // Swerve::rotVelTolerance = table->GetNumber("Rot_Vel_Tol", Swerve::rotVelTolerance.to<double>()) * 1_deg_per_s;
 
-    // Swerve::yPosTolerance = table->GetNumber("Y_Pos_Tol", Swerve::yPosTolerance.to<double>()) * 1_mm;
+    Swerve::yPosTolerance = table->GetNumber("Y_Pos_Tol", Swerve::yPosTolerance.to<double>()) * 1_mm;
     // Swerve::yVelTolerance = table->GetNumber("Y_Vel_Tol", Swerve::yVelTolerance.to<double>()) * 1_mps;
 
     // Swerve::goalAlign = units::meter_t{table->GetNumber("Pole Offset", Swerve::goalAlign.to<double>())};
@@ -548,6 +550,13 @@ void Drivetrain::alignAngleZoning()
     }
 }
 
+bool Drivetrain::withinXRange() {
+    return false;
+}
+bool Drivetrain::withinYRange() {
+    return false;
+}
+
 void Drivetrain::choosePoleDirection(Direction dir, Constants::AprilTag tag){
     
     std::unordered_map<Constants::AprilTag, Constants::DirectionalOffSet> poleOffset = frc::DriverStation::GetAlliance() == frc::DriverStation::kRed ? Constants::redPoleOffsets : Constants::bluePoleOffsets;
@@ -618,6 +627,11 @@ void Drivetrain::InitSendable(wpi::SendableBuilder& builder)
         builder.AddBooleanProperty(
             "Aligned",
             [this] {return state.aligned;},
+            nullptr
+        );
+        builder.AddDoubleProperty(
+            "Unfiltered Y Distance",
+            [this] {return unfilteredYDistance;},
             nullptr
         );
     }

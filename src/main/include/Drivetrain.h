@@ -162,6 +162,9 @@ public:
 
      double doubtX, doubtY;
 
+
+     bool withinXRange(), withinYRange();
+
 private:
      frc2::CommandPtr pitSequenceCommand(const frc::ChassisSpeeds&);
      bool aprilTagOnReef(int id);
