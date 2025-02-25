@@ -8,10 +8,6 @@
 
 #include <pathplanner/lib/auto/NamedCommands.h>
 
-#include <frc2/command/SequentialCommandGroup.h>
-#include <frc2/command/InstantCommand.h>
-#include <frc2/command/WaitCommand.h>
-
 #include <frc/DriverStation.h>
 
 #define ELEV_K_ERROR units::angle::turn_t (0)
@@ -171,58 +167,60 @@ Scorer::Scorer(frc::TimedRobot *_robot, Drivetrain *_drivetrain) :
     init();
 }
 
-frc2::CommandPtr Scorer::createScoringSequence() {
-    return frc2::SequentialCommandGroup(
-        frc2::InstantCommand([this]() { state.scoringState = Scorer::SCORE_STATE::SCORING; }),
-        frc2::WaitCommand(5_s),
-        frc2::InstantCommand([this]() { state.scoringState = Scorer::SCORE_STATE::INTAKING; }),
-        frc2::WaitCommand(5_s),
-        frc2::InstantCommand([this]() { state.scoringState = Scorer::SCORE_STATE::HOLD; })
-    ).ToPtr();
-}
-
-frc2::CommandPtr Scorer::elevatorPitSequenceStage(ELEVATOR_STATE elevState) {
+frc2::CommandPtr Scorer::scorerPitSequenceStage(GAME_PIECE gamePiece, ELEVATOR_STATE elevState) {
     units::turn_t targetPos = convertToMotorSpace(positionMap[state.gamePiece][elevState]);
-    return frc2::cmd::Race(
-        frc2::cmd::Wait(1_s),
+    units::turns_per_second_t targetScoreSpeed = SCORE_SPEED;
+    auto it = scoringSpeedMap.find(elevState);
+    if (it != scoringSpeedMap.end()) targetScoreSpeed = it->second;
+    return frc2::cmd::Deadline(
+        frc2::cmd::Wait(3_s),
         frc2::FunctionalCommand{
-            [this, elevState] {
-                this->state.elevState = elevState;
-            },
-            [] {},
-            [](bool interrupted) {
-                if (interrupted) {
-                    // Set LEDs that elevator failed
-                    std::cout << "ELEVATOR FAILED\n";
-                } else {
-                    // Set LEDs that elevator succeeded
-                    std::cout << "ELEVATOR SUCCEEDED\n";
-                }
+            [this, elevState, gamePiece] {
+                state.elevState = elevState;
+                state.gamePiece = gamePiece;
+                std::string msg = "Elevator going to ";
+                if (gamePiece == ALGEE) msg += "algae ";
+                else if (gamePiece == CORAL) msg += "coral ";
+                if (elevState == STOWED) msg += "stowed";
+                else if (elevState == HP) msg += "human player";
+                else if (elevState == ONE) msg += "L1";
+                else if (elevState == TWO) msg += "L2";
+                else if (elevState == THREE) msg += "L3";
+                else if (elevState == FOUR) msg += "L4";
+                elevatorStage.SetText(msg);
+                elevatorStage.Set(true);
             },
             [this, targetPos] {
-                units::turn_t currentPos = elevatorMotor->getPosition();
-                return units::math::abs(targetPos - currentPos) < 0.5_tr;
+                elevatorPositionSuccess.Set(units::math::abs(elevatorMotor->getPosition() - targetPos) < 1_tr);
+                elevatorPositionFail.Set(!elevatorPositionSuccess.Get());
             },
-            { this }
+            [this](bool) {
+                elevatorPositionFail.Set(false);
+                elevatorPositionSuccess.Set(false);
+            },
+            [this] { return false; }
         }.ToPtr()
     );
 }
 
-frc2::CommandPtr Scorer::elevatorPitSequence() {
+frc2::CommandPtr Scorer::scorerPitSequence() {
     return frc2::cmd::Sequence(
         frc2::cmd::RunOnce([this] {
             state.scopedState = SCOPED_STATE::SCOPED;
-            state.gamePiece = GAME_PIECE::CORAL;
+            state.scoringState = SCORING;
         }),
-        elevatorPitSequenceStage(ELEVATOR_STATE::STOWED),
-        elevatorPitSequenceStage(ELEVATOR_STATE::ONE),
-        elevatorPitSequenceStage(ELEVATOR_STATE::STOWED),
-        elevatorPitSequenceStage(ELEVATOR_STATE::TWO),
-        elevatorPitSequenceStage(ELEVATOR_STATE::STOWED),
-        elevatorPitSequenceStage(ELEVATOR_STATE::THREE),
-        elevatorPitSequenceStage(ELEVATOR_STATE::STOWED),
-        elevatorPitSequenceStage(ELEVATOR_STATE::FOUR),
-        elevatorPitSequenceStage(ELEVATOR_STATE::STOWED)
+        scorerPitSequenceStage(GAME_PIECE::CORAL, ELEVATOR_STATE::HP),
+        scorerPitSequenceStage(GAME_PIECE::CORAL, ELEVATOR_STATE::ONE),
+        scorerPitSequenceStage(GAME_PIECE::CORAL, ELEVATOR_STATE::TWO),
+        scorerPitSequenceStage(GAME_PIECE::CORAL, ELEVATOR_STATE::THREE),
+        scorerPitSequenceStage(GAME_PIECE::CORAL, ELEVATOR_STATE::FOUR),
+        scorerPitSequenceStage(GAME_PIECE::CORAL, ELEVATOR_STATE::STOWED),
+        scorerPitSequenceStage(GAME_PIECE::ALGEE, ELEVATOR_STATE::STOWED),
+        scorerPitSequenceStage(GAME_PIECE::ALGEE, ELEVATOR_STATE::FOUR),
+        frc2::cmd::RunOnce([this] {
+            resetState();
+            elevatorStage.Set(false);
+        })
     );
 }
 
@@ -408,7 +406,7 @@ void Scorer::assignOutputs()
     // Scorer State Machine
     if (state.scoringState == SCORE_STATE::SCORING) {
         if (state.gamePiece == GAME_PIECE::ALGEE) {
-            // scorerMotor->setSpeed(ALGEE_SCORE_SPEED);  
+            scorerMotor->setSpeed(ALGEE_SCORE_SPEED);  
         } else {
             auto it = scoringSpeedMap.find(state.elevState);
             if (it != scoringSpeedMap.end()) {

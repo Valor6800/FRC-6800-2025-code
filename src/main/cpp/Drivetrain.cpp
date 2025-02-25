@@ -24,6 +24,7 @@
 #include "units/angle.h"
 #include <ctre/phoenix6/TalonFX.hpp>
 #include <units/math.h>
+#include <frc/Alert.h>
 
 using namespace pathplanner;
 
@@ -459,44 +460,35 @@ frc2::FunctionalCommand* Drivetrain::getResetOdom() {
     );
 }
 
-frc2::CommandPtr Drivetrain::pitStateCommand(const frc::SwerveModuleState& state) {
+frc2::CommandPtr Drivetrain::pitSequenceCommand(const frc::ChassisSpeeds& speeds) {
+    auto targetStates = getModuleStates(speeds);
     return frc2::cmd::Sequence(
-        frc2::cmd::Parallel(
-            frc2::cmd::Wait(1_s),
-            frc2::FunctionalCommand{
-                [this, state] {
-                    testMode = true;
-                    for (int i = 0; i < 4; i++)
-                        testModeDesiredStates[i] = state;
-                },
-                [] {},
-                [](bool interrupted) {
-                    if (interrupted) {
-                        std::cout << "DRIVETRAIN DIDN'T WORK\n";
-                    } else {
-                        std::cout << "DRIVETRAIN WORKED\n";
-                    }
-                },
-                [this, state]() {
-                    for (auto curState : getAllModuleStates()) {
-                        std::cout << "Current angle: " << curState.angle.Degrees().value() << '\n';
-                        std::cout << "Target angle: " << state.angle.Degrees().value() << "\n\n";
-                        if (units::math::abs(units::math::fmod(curState.angle.Degrees(), 180_deg) - units::math::fmod(state.angle.Degrees(), 180_deg)) > 1_deg) return false;
-                    }
-                    return true;
-                },
-                { this }
-            }.ToPtr()
-        )
+        frc2::cmd::Deadline(
+            frc2::cmd::Wait(5_s),
+            frc2::cmd::RunOnce([this, targetStates] {
+                testModeDesiredStates = targetStates;
+            })
+        ),
+        frc2::cmd::RunOnce([this] {
+            for (int i = 0; i < MODULE_COUNT; i++)
+                testModeDesiredStates[i].speed = 0_mps;
+        }),
+        frc2::cmd::Wait(1_s)
     );
 }
 
 frc2::CommandPtr Drivetrain::pitSequence() {
     return frc2::cmd::Sequence(
-        pitStateCommand(frc::SwerveModuleState{1_mps, 90_deg}),
-        pitStateCommand(frc::SwerveModuleState{2_mps, 45_deg}),
-        pitStateCommand(frc::SwerveModuleState{-1_mps, 180_deg}),
-        pitStateCommand(frc::SwerveModuleState{0_mps, 0_deg})
+        pitSequenceCommand(frc::ChassisSpeeds{0_mps, 2_mps, 0_rad_per_s}),
+        pitSequenceCommand(frc::ChassisSpeeds{0_mps, -2_mps, 0_rad_per_s}),
+        pitSequenceCommand(frc::ChassisSpeeds(0_mps, 0_mps, 2_rad_per_s)),
+        pitSequenceCommand(frc::ChassisSpeeds{0_mps, 0_mps, -2_rad_per_s}),
+        pitSequenceCommand(frc::ChassisSpeeds{1_mps, 0_mps, 0_rad_per_s}),
+        pitSequenceCommand(frc::ChassisSpeeds{-1_mps, 0_mps, 0_rad_per_s}),
+        frc2::cmd::RunOnce([this] {
+            for (int i = 0; i < MODULE_COUNT; i++)
+                testModeDesiredStates[i].angle = 0_deg;
+        })
     );
 }
 

@@ -73,6 +73,7 @@ public:
     void resetEncoders();
 
     wpi::array<frc::SwerveModulePosition, MODULE_COUNT> getModuleStates();
+    wpi::array<frc::SwerveModuleState, MODULE_COUNT> getModuleStates(frc::ChassisSpeeds chassisSpeeds);
     void updateAngularPosition();
 
     /**
@@ -148,7 +149,6 @@ protected:
     units::radian_t angularPosition = 0_rad;
     units::meter_t goalAlign = 0.0_m;
     units::meters_per_second_t yControllerInitialVelocity;
-    bool testMode;
     wpi::array<frc::SwerveModuleState, MODULE_COUNT> testModeDesiredStates{wpi::empty_array};
 
     units::degree_t getRotControllerError();
@@ -171,7 +171,6 @@ private:
                                                                     units::velocity::meters_per_second_t,
                                                                     units::angular_velocity::radians_per_second_t,
                                                                     bool);
-    wpi::array<frc::SwerveModuleState, MODULE_COUNT> getModuleStates(frc::ChassisSpeeds chassisSpeeds);
 
     double _drivetrain_accel;
 

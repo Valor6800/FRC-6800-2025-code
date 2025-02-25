@@ -50,6 +50,7 @@
 #include <frc/filter/LinearFilter.h>
 
 #include <ctre/phoenix6/Pigeon2.hpp>
+#include <frc/Alert.h>
 
 #define SWERVE_COUNT 4
 
@@ -138,7 +139,6 @@ public:
 
      frc2::FunctionalCommand* getResetOdom();
 
-     frc2::CommandPtr pitStateCommand(const frc::SwerveModuleState&);
      frc2::CommandPtr pitSequence();
 
      units::meters_per_second_t getRobotSpeeds();
@@ -163,6 +163,7 @@ public:
      double doubtX, doubtY;
 
 private:
+     frc2::CommandPtr pitSequenceCommand(const frc::ChassisSpeeds&);
      bool aprilTagOnReef(int id);
 
      bool hasReset;

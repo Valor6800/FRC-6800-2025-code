@@ -235,9 +235,9 @@ void Swerve<AzimuthMotor, DriveMotor>::assignOutputs()
             swerveModules[i]->setAzimuthPosition(frc::Rotation2d());
             swerveModules[i]->setDrivePower(units::volt_t (12));
         }
-    } else if (testMode) {
+    } else if (frc::DriverStation::IsTest()) {
         setSwerveDesiredState(testModeDesiredStates, true);
-    } else{
+    } else {
         drive(xSpeedMPS, ySpeedMPS, rotSpeedRPS, true);
     }
 }

@@ -144,9 +144,9 @@ void Climber::assignOutputs()
     }
 
      if (state.climbState == CLIMB_STATE::DEPLOYED || state.stabState == STABBY_STATE::CRABBING) {
-        stabbyMotor->setSpeed(STABBY_SPEED);
+        // stabbyMotor->setSpeed(STABBY_SPEED);
      } else{
-        stabbyMotor->setPower(0_V);
+        // stabbyMotor->setPower(0_V);
      }
 }
 
@@ -155,6 +155,34 @@ void Climber::setDegrees(units::degree_t deg)
     climbMotors->setPosition((deg / 360_deg) * 1_tr);
 }
 
+frc2::CommandPtr Climber::pitSequenceStage(CLIMB_STATE climbState) {
+    units::turn_t climbPos = STOW_POS;
+    if (climbState == RETRACTED) climbPos = RETRACTED_POS;
+    else if (climbState == DEPLOYED) climbPos = DEPLOYED_POS;
+    return frc2::cmd::Parallel(
+        frc2::cmd::Wait(5_s),
+        frc2::FunctionalCommand{
+            [this, climbState] {
+                climberPosSuccess.Set(false);
+                climberPosFail.Set(false);
+                state.climbState = climbState;
+            },
+            [this, climbPos] {
+            },
+            [](bool) {},
+            [] { return false; },
+            { this }
+        }.ToPtr()
+    );
+}
+
+frc2::CommandPtr Climber::pitSequence() {
+    return frc2::cmd::Sequence(
+        pitSequenceStage(STOW),
+        pitSequenceStage(DEPLOYED),
+        pitSequenceStage(RETRACTED)
+    );
+}
 
 void Climber::InitSendable(wpi::SendableBuilder& builder)
 {

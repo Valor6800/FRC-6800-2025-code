@@ -20,6 +20,7 @@
 #include <unordered_map>
 #include "valkyrie/Gamepad.h"
 #include <ctre/phoenix6/core/CoreCANdi.hpp>
+#include <frc/Alert.h>
 
 
 class Scorer : public valor::BaseSubsystem
@@ -36,9 +37,7 @@ public:
     void assignOutputs();
     void InitSendable(wpi::SendableBuilder& builder);
 
-    frc2::CommandPtr createScoringSequence();
-
-    frc2::CommandPtr elevatorPitSequence();
+    frc2::CommandPtr scorerPitSequence();
 
     enum SCORE_STATE
     {
@@ -70,7 +69,7 @@ public:
     } state;
 
 private:
-    frc2::CommandPtr elevatorPitSequenceStage(Constants::Scorer::ELEVATOR_STATE);
+    frc2::CommandPtr scorerPitSequenceStage(Constants::Scorer::GAME_PIECE, Constants::Scorer::ELEVATOR_STATE);
     
     units::meter_t convertToMechSpace(units::turn_t turns);
     units::turn_t convertToMotorSpace(units::meter_t meters);
@@ -92,4 +91,8 @@ private:
     Constants::Scorer::ScoringSpeedMap scoringSpeedMap;
 
     Drivetrain *drivetrain;
+
+    frc::Alert elevatorStage{"Elevator going to stage", frc::Alert::AlertType::kInfo};
+    frc::Alert elevatorPositionSuccess{"Elevator position within tolerance", frc::Alert::AlertType::kInfo};
+    frc::Alert elevatorPositionFail{"Elevator position outside tolerance", frc::Alert::AlertType::kError};
 };
