@@ -7,14 +7,18 @@ using namespace ctre::phoenix6::signals;
 
 CANdle::CANdle(frc::TimedRobot *robot) :
     valor::BaseSubsystem{robot, "CANdle"},
-    candle{robot, LED_COUNT, SEGMENTS, CANIDs::CANDLE} {}
-
-void CANdle::analyzeDashboard() {}
-
-void CANdle::assignOutputs() {
-    for (size_t i = 0; i < getters.size(); i++)
-        if (getters[i]) candle.setLED(i, getters[i]());
+    candle{robot, LED_COUNT, SEGMENTS, CANIDs::CANDLE} {
+    frc2::CommandScheduler::GetInstance().RegisterSubsystem(this);
 }
+
+void CANdle::analyzeDashboard() {
+    for (size_t i = 0; i < getters.size(); i++) {
+        if (getters[i]) candle.setLED(i, getters[i]());
+        else candle.setLED(i, valor::CANdleSensor::WHITE);
+    }
+}
+
+void CANdle::assignOutputs() {}
 
 void CANdle::InitSendable(wpi::SendableBuilder& builder) {
     builder.SetSmartDashboardType("Subsystem");
