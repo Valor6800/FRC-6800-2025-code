@@ -168,6 +168,9 @@ public:
 
      double doubtX, doubtY;
 
+
+     bool withinXRange(), withinYRange();
+
 private:
 
      valor::CANrangeSensor distanceSensor;

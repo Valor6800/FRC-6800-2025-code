@@ -232,6 +232,11 @@ void Swerve<AzimuthMotor, DriveMotor>::analyzeDashboard()
 }
 
 template<class AzimuthMotor, class DriveMotor>
+bool Swerve<AzimuthMotor, DriveMotor>::yControllerAligned() {
+    return y_controller.AtGoal();
+}
+
+template<class AzimuthMotor, class DriveMotor>
 void Swerve<AzimuthMotor, DriveMotor>::assignOutputs()
 {
     if (rotTest) {

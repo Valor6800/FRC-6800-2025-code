@@ -151,6 +151,8 @@ protected:
     units::meters_per_second_t yVelTolerance = 0.0_mps; //0.01_mps;
     units::radian_t angularPosition = 0_rad;
     units::meter_t goalAlign = 0.0_m;
+
+    bool yControllerAligned();
     units::meters_per_second_t yControllerInitialVelocity;
     wpi::array<frc::SwerveModuleState, MODULE_COUNT> testModeDesiredStates{wpi::empty_array};
 

@@ -86,7 +86,6 @@ private:
     valor::PhoenixController<> *elevatorMotor;
     valor::PhoenixController<> *scorerMotor;
 
-    valor::GrappleSensor frontRangeSensor;
     valor::CANrangeSensor scorerStagingSensor;
     valor::CurrentSensor currentSensor;
 
