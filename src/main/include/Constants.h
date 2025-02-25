@@ -367,9 +367,9 @@ namespace Constants {
                 std::pair("limelight-choco", chocolateCameraPosition()),
                 std::pair("limelight-vanilla", vanillaCameraPosition()),
                 std::pair("limelight-berry", berryCameraPosition()),
-        };
-
-        static CameraVector aprilCameras = getAprilCameras();
+            };
+        }
+        }
     
         typedef int AprilTag;
         typedef std::unordered_map<Direction, units::inch_t> DirectionalOffSet;
@@ -450,8 +450,7 @@ namespace Constants {
                     {RIGHT, 0_in},
                     {NONE, 0_in}
                 }},
-            };
-        }};
+        };
 
         namespace Scorer {
             enum ELEVATOR_STATE

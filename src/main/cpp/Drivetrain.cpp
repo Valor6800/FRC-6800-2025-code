@@ -136,7 +136,7 @@ Drivetrain::Drivetrain(frc::TimedRobot *_robot, CANdle& leds) :
 
     setRotAlignOffset(00_deg);
 
-    for (std::pair<const char*, frc::Pose3d> aprilCam : Constants::aprilCameras) {
+    for (std::pair<const char*, frc::Pose3d> aprilCam : Constants::getAprilCameras()) {
         aprilTagSensors.push_back(new valor::AprilTagsSensor(robot, aprilCam.first, aprilCam.second));  
         aprilTagSensors.back()->setPipe(valor::VisionSensor::PIPELINE_0);
     }
