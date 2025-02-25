@@ -571,11 +571,36 @@ void Drivetrain::alignAngleZoning()
     }
 }
 
+
 bool Drivetrain::withinXRange() {
-    return false;
+    if (state.reefTag == -1){
+        return false;
+    }
+
+    units::meter_t summation = 0_m;
+    int size = 0;
+    
+    for (valor::AprilTagsSensor* aprilLime : aprilTagSensors) {
+        if (state.reefTag == aprilLime->getTagID() ) {
+            units::meter_t zValue = aprilLime->get_botpose_targetspace().Z();
+            summation += zValue;
+            size++;
+        }
+    }
+    if (size == 0){
+        return false;
+    }
+
+    units::meter_t average = summation / size;
+
+    return (average < (units::meter_t) table->GetNumber("Viable Dunk Distance (m)", VIABLE_DUNK_DISTANCE.value()));
+        
 }
+
+
+
 bool Drivetrain::withinYRange() {
-    return false;
+    return yControllerAligned();
 }
 
 void Drivetrain::choosePoleDirection(Direction dir, Constants::AprilTag tag){
