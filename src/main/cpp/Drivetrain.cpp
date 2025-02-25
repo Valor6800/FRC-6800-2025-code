@@ -206,6 +206,8 @@ std::vector<std::pair<SwerveAzimuthMotor*, SwerveDriveMotor*>> Drivetrain::gener
     drivePID.setMaxVelocity(Constants::driveKVel(), WHEEL_DIAMETER);
     drivePID.setMaxAcceleration(Constants::driveKAcc(), WHEEL_DIAMETER);
     drivePID.P = Constants::driveKP();
+    drivePID.D = Constants::driveKD();
+    drivePID.kV = 0.9;
     drivePID.error = 0.0027_tr;
 
     for (size_t i = 0; i < 4; i++) {

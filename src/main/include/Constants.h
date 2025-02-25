@@ -203,8 +203,13 @@ namespace Constants {
 
         static double driveKP(){ switch (robot) {
             case Robot::Alpha: return 5.0;
-            case Robot::Gold: return 5.0;
+            case Robot::Gold: return 0; // 4
             default: return 5.0;
+        }};
+        static double driveKD(){ switch(robot){
+            case Robot::Alpha: return 0.01;
+            case Robot::Gold: return 0; // 0.001
+            default: return 0.001;
         }};
         static units::meters_per_second_t driveKVel(){ switch (robot) {
             case Robot::Alpha: return 5.36_mps;
