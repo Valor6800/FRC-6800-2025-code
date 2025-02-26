@@ -146,9 +146,9 @@ void Climber::assignOutputs()
     }
 
      if (state.climbState == CLIMB_STATE::DEPLOYED || state.stabState == STABBY_STATE::CRABBING) {
-        // stabbyMotor->setSpeed(STABBY_SPEED);
+        stabbyMotor->setSpeed(STABBY_SPEED);
      } else{
-        // stabbyMotor->setPower(0_V);
+        stabbyMotor->setPower(0_V);
      }
 }
 
