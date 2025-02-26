@@ -291,11 +291,11 @@ void Drivetrain::assessInputs()
     }
 
     state.alignToTarget = driverGamepad->leftTriggerActive();
+    state.climberAlign = driverGamepad->GetBButton();
     if (driverGamepad->leftTriggerActive() && !hasReset) {
         Swerve::resetAlignControllers();
         hasReset = true;
     }
-    // state.climberAlign = driverGamepad->GetBButton();
 
     Swerve::assessInputs();
 }
@@ -374,12 +374,12 @@ void Drivetrain::analyzeDashboard()
 
     alignAngleTags(); 
 
-    /*if(state.climberAlign){
+
+    if (state.climberAlign){
         Swerve::targetAngle = frc::DriverStation::GetAlliance() == frc::DriverStation::kRed ? 90_deg : -90_deg;
         Swerve::yAlign = false;
         Swerve::rotAlign = true;
-    }*/
-    if (
+    } else if (
         state.alignToTarget &&
         state.elevState == Constants::Scorer::ELEVATOR_STATE::ONE &&
         state.gamePiece == Constants::Scorer::ALGEE

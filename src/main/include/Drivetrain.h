@@ -132,13 +132,13 @@ public:
           bool aligned;
           double yEstimate;
 
-          bool alignToTarget;
           bool right;
           bool left;
+          bool alignToTarget, climberAlign;
 
           Constants::Scorer::GAME_PIECE gamePiece;
           Constants::Scorer::ELEVATOR_STATE elevState;
-          bool climberAlign;
+
           units::angle::degree_t netAngle;
      } state;
 
