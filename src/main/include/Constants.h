@@ -203,7 +203,7 @@ namespace Constants {
 
         static double driveKP(){ switch (robot) {
             case Robot::Alpha: return 5.0;
-            case Robot::Gold: return 0; // 4
+            case Robot::Gold: return 3.0; // 4
             default: return 5.0;
         }};
         static double driveKD(){ switch(robot){
