@@ -403,9 +403,15 @@ void Scorer::analyzeDashboard()
     }
 
     units::meter_t elevatorError = units::math::fabs(convertToMechSpace(elevatorMotor->getPosition()) - positionMap[state.gamePiece][state.elevState]);
-    bool elevatorWithinThreshold = elevatorError.value() < table->GetNumber("Elevator Threshold (m)", VIABLE_ELEVATOR_THRESHOLD.value());
-
-    if (drivetrain->withinXRange() && drivetrain->withinYRange() && state.scopedState == SCOPED_STATE::SCOPED && elevatorWithinThreshold) {
+    elevatorWithinThreshold = elevatorError.value() < table->GetNumber("Elevator Threshold (m)", VIABLE_ELEVATOR_THRESHOLD.value());
+    
+    if (
+        drivetrain->withinXRange() &&
+        drivetrain->withinYRange() &&
+        state.scopedState == SCOPED_STATE::SCOPED &&
+        elevatorWithinThreshold &&
+        state.gamePiece == GAME_PIECE::CORAL
+    ) {
         state.scoringState = SCORE_STATE::SCORING;
     }
 

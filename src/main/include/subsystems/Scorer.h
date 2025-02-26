@@ -101,4 +101,6 @@ private:
     nt::StructPublisher<frc::Pose3d> visualizerStage1;
     nt::StructPublisher<frc::Pose3d> visualizerStage2;
     nt::StructPublisher<frc::Pose3d> visualizerStage3;
+
+    bool elevatorWithinThreshold;
 };

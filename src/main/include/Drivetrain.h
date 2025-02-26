@@ -174,6 +174,8 @@ public:
 private:
 
      valor::CANrangeSensor distanceSensor;
+     units::meter_t averageXDistance;
+
      frc2::CommandPtr pitSequenceCommand(const frc::ChassisSpeeds&);
      bool aprilTagOnReef(int id);
 

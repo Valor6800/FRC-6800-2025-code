@@ -147,7 +147,7 @@ protected:
     units::degree_t rotPosTolerance = 0.0_deg; //1.0_deg;
     units::degrees_per_second_t rotVelTolerance = 0_deg_per_s; //1_deg_per_s;
 
-    units::millimeter_t yPosTolerance = 0_mm;  //20_mm;
+    units::millimeter_t yPosTolerance = 50_mm;  //20_mm;
     units::meters_per_second_t yVelTolerance = 0.0_mps; //0.01_mps;
     units::radian_t angularPosition = 0_rad;
     units::meter_t goalAlign = 0.0_m;

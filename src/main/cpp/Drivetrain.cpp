@@ -88,7 +88,7 @@ const units::meter_t WHEEL_DIAMETER(0.0973_m);
 
 #define AA_LEFT_OFFSET 0.0_in // 0.5_in
 #define AA_RIGHT_OFFSET 0.0_in // 1.5_in
-#define VIABLE_DUNK_DISTANCE 0.3548_m
+#define VIABLE_DUNK_DISTANCE 0.50_m
 
 #define Y_ACTIVATION_THRESHOLD 30.0_deg
 
@@ -578,23 +578,21 @@ bool Drivetrain::withinXRange() {
     }
 
     units::meter_t summation = 0_m;
-    int size = 0;
+    double size = 0.0;
     
     for (valor::AprilTagsSensor* aprilLime : aprilTagSensors) {
         if (state.reefTag == aprilLime->getTagID() ) {
-            units::meter_t zValue = aprilLime->get_botpose_targetspace().Z();
+            units::meter_t zValue = -aprilLime->get_botpose_targetspace().Z();
             summation += zValue;
             size++;
         }
     }
-    if (size == 0){
+    if (size == 0.0){
         return false;
     }
 
-    units::meter_t average = summation / size;
-
-    return (average < (units::meter_t) table->GetNumber("Viable Dunk Distance (m)", VIABLE_DUNK_DISTANCE.value()));
-        
+    averageXDistance = summation / size;
+    return (averageXDistance < (units::meter_t) table->GetNumber("Viable Dunk Distance (m)", VIABLE_DUNK_DISTANCE.value()));
 }
 
 
@@ -679,6 +677,16 @@ void Drivetrain::InitSendable(wpi::SendableBuilder& builder)
             [this] {return state.aligned;},
             nullptr
         );
+        builder.AddBooleanProperty(
+            "Within X Range",
+            [this] {return withinXRange();},
+            nullptr
+        );
+        builder.AddBooleanProperty(
+            "Within Y Range",
+            [this] {return withinYRange();},
+            nullptr
+        );
         builder.AddDoubleProperty(
             "Distance",
             [this] {return distanceSensor.getLidarData().value();},
@@ -687,6 +695,12 @@ void Drivetrain::InitSendable(wpi::SendableBuilder& builder)
         builder.AddDoubleProperty(
             "Unfiltered Y Distance",
             [this] {return unfilteredYDistance;},
+            nullptr
+        );
+
+        builder.AddDoubleProperty(
+            "Average X Distance",
+            [this] {return averageXDistance.value();},
             nullptr
         );
     }
