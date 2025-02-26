@@ -809,9 +809,4 @@ void Swerve<AzimuthMotor, DriveMotor>::InitSendable(wpi::SendableBuilder& builde
         [this] { return angularAcceleration.value();},  
         nullptr
     );
-    builder.AddBooleanProperty(
-        "Toast",
-        [this] {return toast;},
-        nullptr
-    );
 }
