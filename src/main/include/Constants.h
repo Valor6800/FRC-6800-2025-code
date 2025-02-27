@@ -151,7 +151,7 @@ namespace Constants {
         static std::vector<units::turn_t> swerveZeros(){ switch (robot){
             case Robot::Alpha: return {0.4240722_tr, 0.85498046875_tr, 0.471924_tr, 0.081299_tr};
             case Robot::Gold: return {0.4111328_tr, 0.8432617_tr, 0.09814453_tr, 0.134521484_tr};
-            default: return {0.4111328_tr, 0.8432617_tr, 0.09814453_tr, 0.134521484_tr};
+            default: return {0.88134765625_tr, 0.684326171875_tr, 0.183349609375_tr, 0.9716796875_tr};
         }};
         static double driveGearRatio(){ switch (robot){
             case Robot::Alpha: return 5.51f;
