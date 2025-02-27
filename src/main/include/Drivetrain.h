@@ -135,6 +135,7 @@ public:
 
           Constants::Scorer::GAME_PIECE gamePiece;
           Constants::Scorer::ELEVATOR_STATE elevState;
+          bool climberAlign;
      } state;
 
      frc2::FunctionalCommand* getResetOdom();
@@ -157,6 +158,8 @@ public:
      void choosePoleDirection(Direction dir, Constants::AprilTag tag);
 
      void setGamePieceInRobot(Constants::Scorer::GAME_PIECE);
+
+     void setTeleopStartTime();
 
      double teleopStart;
 

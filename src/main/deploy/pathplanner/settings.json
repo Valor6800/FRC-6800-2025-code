@@ -9,8 +9,10 @@
     "tests"
   ],
   "autoFolders": [
-    "tests",
-    "pit sequences"
+    "L1",
+    "L2",
+    "pit sequences",
+    "tests"
   ],
   "defaultMaxVel": 3.5,
   "defaultMaxAccel": 3.5,

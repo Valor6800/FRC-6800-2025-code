@@ -3,13 +3,13 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 1.3186475409836067,
-        "y": 0.9621413934426232
+        "x": 1.319,
+        "y": 0.962
       },
       "prevControl": null,
       "nextControl": {
-        "x": 3.0688524590163935,
-        "y": 2.172899590163934
+        "x": 3.0692049180327867,
+        "y": 2.1727581967213108
       },
       "isLocked": false,
       "linkedName": "HP1"
@@ -17,11 +17,11 @@
     {
       "anchor": {
         "x": 3.25,
-        "y": 3.94
+        "y": 3.85
       },
       "prevControl": {
         "x": 1.5423155737704917,
-        "y": 3.74732581967213
+        "y": 3.6573258196721303
       },
       "nextControl": null,
       "isLocked": false,
@@ -59,7 +59,7 @@
     },
     {
       "name": "Enable Scorer",
-      "waypointRelativePos": 0.98,
+      "waypointRelativePos": 0.99,
       "endWaypointRelativePos": null,
       "command": {
         "type": "named",

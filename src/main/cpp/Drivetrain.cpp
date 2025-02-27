@@ -55,7 +55,7 @@ const units::meter_t WHEEL_DIAMETER(0.0973_m);
 
 #define VISION_ACCEPTANCE 3.5_m // meters
 
-#define TIME_TELEOP_VERT 105.0f
+#define TIME_TELEOP_VERT 90.0f
 
 #define MT2_POSE true
 
@@ -270,8 +270,6 @@ void Drivetrain::assessInputs()
         state.dir = RIGHT;
     } else if(operatorGamepad->GetLeftBumperButton()){
         state.dir = LEFT;
-    } else if(operatorGamepad->leftTriggerActive()){
-        state.dir = NONE;
     }
     // state.lockingToReef = driverGamepad->GetAButtonPressed();
     state.getTag = false;
@@ -287,6 +285,7 @@ void Drivetrain::assessInputs()
         Swerve::resetAlignControllers();
         hasReset = true;
     }
+    // state.climberAlign = driverGamepad->GetBButton();
 
     Swerve::assessInputs();
 }
@@ -354,6 +353,11 @@ void Drivetrain::analyzeDashboard()
 
     alignAngleTags(); 
 
+    /*if(state.climberAlign){
+        Swerve::targetAngle = frc::DriverStation::GetAlliance() == frc::DriverStation::kRed ? 90_deg : -90_deg;
+        Swerve::yAlign = false;
+        Swerve::rotAlign = true;
+    }*/
     if (
         state.alignToTarget &&
         state.elevState == Constants::Scorer::ELEVATOR_STATE::ONE &&
@@ -566,6 +570,10 @@ void Drivetrain::choosePoleDirection(Direction dir, Constants::AprilTag tag){
 
 void Drivetrain::setGamePieceInRobot(Constants::Scorer::GAME_PIECE piece){
     state.gamePiece = piece;
+}
+
+void Drivetrain::setTeleopStartTime(){
+    teleopStart = frc::Timer::GetFPGATimestamp().to<double>();
 }
 // void Drivetrain::setDriveMotorNeutralMode(valor::NeutralMode mode) {
 //     for (int i = 0; i < SWERVE_COUNT; i++)

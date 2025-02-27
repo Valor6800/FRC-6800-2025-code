@@ -104,6 +104,7 @@ void Robot::AutonomousPeriodic() {
 
 void Robot::TeleopInit() {
     scorer.resetState();
+    drivetrain.setTeleopStartTime();
 }
 /**
  * This function is called periodically during operator control.
