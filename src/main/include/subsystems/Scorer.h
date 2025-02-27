@@ -97,6 +97,7 @@ private:
     frc::Alert elevatorStage{"Elevator going to stage", frc::Alert::AlertType::kInfo};
     frc::Alert elevatorPositionSuccess{"Elevator position within tolerance", frc::Alert::AlertType::kInfo};
     frc::Alert elevatorPositionFail{"Elevator position outside tolerance", frc::Alert::AlertType::kError};
+    frc::Alert elevatorBButtonWait{"Elevator waiting for driver B button...", frc::Alert::AlertType::kInfo};
     
     nt::StructPublisher<frc::Pose3d> visualizerStage1;
     nt::StructPublisher<frc::Pose3d> visualizerStage2;

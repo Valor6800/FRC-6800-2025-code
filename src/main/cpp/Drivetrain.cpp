@@ -468,7 +468,7 @@ frc2::CommandPtr Drivetrain::pitSequenceCommand(const frc::ChassisSpeeds& speeds
     auto targetStates = getModuleStates(speeds);
     return frc2::cmd::Sequence(
         frc2::cmd::Deadline(
-            frc2::cmd::Wait(5_s),
+            frc2::cmd::Wait(3_s),
             frc2::cmd::RunOnce([this, targetStates] {
                 testModeDesiredStates = targetStates;
             })
@@ -487,8 +487,8 @@ frc2::CommandPtr Drivetrain::pitSequence() {
         pitSequenceCommand(frc::ChassisSpeeds{0_mps, -0.5_mps, 0_rad_per_s}),
         pitSequenceCommand(frc::ChassisSpeeds(0_mps, 0_mps, 2_rad_per_s)),
         pitSequenceCommand(frc::ChassisSpeeds{0_mps, 0_mps, -2_rad_per_s}),
-        pitSequenceCommand(frc::ChassisSpeeds{0.5_mps, 0_mps, 0_rad_per_s}),
-        pitSequenceCommand(frc::ChassisSpeeds{-0.5_mps, 0_mps, 0_rad_per_s}),
+        pitSequenceCommand(frc::ChassisSpeeds{maxDriveSpeed / 2, 0_mps, 0_rad_per_s}),
+        pitSequenceCommand(frc::ChassisSpeeds{-maxDriveSpeed / 2, 0_mps, 0_rad_per_s}),
         frc2::cmd::RunOnce([this] {
             for (int i = 0; i < MODULE_COUNT; i++)
                 testModeDesiredStates[i].angle = 0_deg;

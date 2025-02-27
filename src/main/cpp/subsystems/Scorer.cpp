@@ -199,6 +199,7 @@ frc2::CommandPtr Scorer::scorerPitSequenceStage(GAME_PIECE gamePiece, ELEVATOR_S
                 else if (elevState == FOUR) msg += "L4";
                 elevatorStage.SetText(msg);
                 elevatorStage.Set(true);
+                elevatorBButtonWait.Set(false);
             },
             [this] {
                 units::inch_t currentPos = convertToMechSpace(elevatorMotor->getPosition());
@@ -217,17 +218,26 @@ frc2::CommandPtr Scorer::scorerPitSequenceStage(GAME_PIECE gamePiece, ELEVATOR_S
 
 frc2::CommandPtr Scorer::scorerPitSequence() {
     return frc2::cmd::Sequence(
-        frc2::cmd::RunOnce([this] {
-            state.scopedState = SCOPED_STATE::SCOPED;
-            state.scoringState = SCORING;
-        }),
+        frc2::cmd::RunOnce([this] { state.scopedState = SCOPED; }),
         scorerPitSequenceStage(GAME_PIECE::CORAL, ELEVATOR_STATE::HP),
         scorerPitSequenceStage(GAME_PIECE::CORAL, ELEVATOR_STATE::ONE),
+        frc2::cmd::RunOnce([this] { elevatorBButtonWait.Set(true); }),
+        frc2::cmd::WaitUntil([this] { return driverGamepad->GetBButton(); }),
+        frc2::cmd::RunOnce([this] { state.scoringState = SCORING; }),
+        frc2::cmd::RunOnce([this] { elevatorBButtonWait.Set(true); }),
+        frc2::cmd::WaitUntil([this] { return driverGamepad->GetBButton(); }),
         scorerPitSequenceStage(GAME_PIECE::CORAL, ELEVATOR_STATE::TWO),
         scorerPitSequenceStage(GAME_PIECE::CORAL, ELEVATOR_STATE::THREE),
         scorerPitSequenceStage(GAME_PIECE::CORAL, ELEVATOR_STATE::FOUR),
         scorerPitSequenceStage(GAME_PIECE::CORAL, ELEVATOR_STATE::STOWED),
+        frc2::cmd::RunOnce([this] {
+            state.scoringState = HOLD;
+            elevatorBButtonWait.Set(true);
+        }),
+        frc2::cmd::WaitUntil([this] { return driverGamepad->GetBButton(); }),
         scorerPitSequenceStage(GAME_PIECE::ALGEE, ELEVATOR_STATE::STOWED),
+        frc2::cmd::RunOnce([this] { state.scoringState = SCORING; }),
+        frc2::cmd::Wait(3_s),
         scorerPitSequenceStage(GAME_PIECE::ALGEE, ELEVATOR_STATE::FOUR),
         frc2::cmd::RunOnce([this] {
             resetState();
