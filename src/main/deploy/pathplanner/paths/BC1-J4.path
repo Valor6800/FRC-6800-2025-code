@@ -3,49 +3,63 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 7.059000000000001,
-        "y": 2.962249999999999
+        "x": 7.1,
+        "y": 7.5
       },
       "prevControl": null,
       "nextControl": {
-        "x": 6.162000000000001,
-        "y": 3.108499999999999
+        "x": 5.9818647540983605,
+        "y": 7.010092213114754
       },
       "isLocked": false,
-      "linkedName": "C4"
+      "linkedName": "B-C1"
     },
     {
       "anchor": {
-        "x": 4.974897540983607,
-        "y": 2.868186475409835
+        "x": 4.943250000000001,
+        "y": 5.1365
       },
       "prevControl": {
-        "x": 5.9986475409836055,
-        "y": 3.1411864754098366
+        "x": 5.590586065573771,
+        "y": 6.359245901639345
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "E"
+      "linkedName": "B-I"
     }
   ],
   "rotationTargets": [],
-  "constraintZones": [],
+  "constraintZones": [
+    {
+      "name": "Constraints Zone",
+      "minWaypointRelativePos": 0,
+      "maxWaypointRelativePos": 1.0,
+      "constraints": {
+        "maxVelocity": 1.5,
+        "maxAcceleration": 2.5,
+        "maxAngularVelocity": 540.0,
+        "maxAngularAcceleration": 720.0,
+        "nominalVoltage": 12.0,
+        "unlimited": false
+      }
+    }
+  ],
   "pointTowardsZones": [],
   "eventMarkers": [
     {
-      "name": "TROUGH POSITION",
-      "waypointRelativePos": 0.5,
+      "name": "LEVEL FOUR POSITION",
+      "waypointRelativePos": 0.25,
       "endWaypointRelativePos": null,
       "command": {
         "type": "named",
         "data": {
-          "name": "TROUGH POSITION"
+          "name": "LEVEL FOUR POSITION"
         }
       }
     },
     {
       "name": "Enable Scorer",
-      "waypointRelativePos": 0.95,
+      "waypointRelativePos": 0.98,
       "endWaypointRelativePos": null,
       "command": {
         "type": "named",
@@ -65,7 +79,7 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 119.99999999999999
+    "rotation": -119.99999999999999
   },
   "reversed": false,
   "folder": "C-R",

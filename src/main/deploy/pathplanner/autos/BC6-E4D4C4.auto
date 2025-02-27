@@ -7,37 +7,43 @@
         {
           "type": "path",
           "data": {
-            "pathName": "C1-J4"
+            "pathName": "BC6-EL4"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "J-HP2"
+            "pathName": "E-HP"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "HP2-K4"
+            "pathName": "HP-DL4"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "K-HP2"
+            "pathName": "D-HP"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "HP2-A4"
+            "pathName": "HP-CL4"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "C-HP"
           }
         }
       ]
     }
   },
   "resetOdom": true,
-  "folder": null,
+  "folder": "Blue Autos",
   "choreoAuto": false
 }

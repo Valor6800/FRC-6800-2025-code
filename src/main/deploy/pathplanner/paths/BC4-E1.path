@@ -3,16 +3,16 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 7.1,
-        "y": 0.5
+        "x": 7.059000000000001,
+        "y": 2.962249999999999
       },
       "prevControl": null,
       "nextControl": {
-        "x": 6.125717213114753,
-        "y": 1.405686475409835
+        "x": 6.162000000000001,
+        "y": 3.108499999999999
       },
       "isLocked": false,
-      "linkedName": "C6"
+      "linkedName": "B-C4"
     },
     {
       "anchor": {
@@ -20,46 +20,32 @@
         "y": 2.868186475409835
       },
       "prevControl": {
-        "x": 5.778073770491804,
-        "y": 1.9451331967213115
+        "x": 5.9986475409836055,
+        "y": 3.1411864754098366
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "E"
+      "linkedName": "B-E"
     }
   ],
   "rotationTargets": [],
-  "constraintZones": [
-    {
-      "name": "Constraints Zone",
-      "minWaypointRelativePos": 0,
-      "maxWaypointRelativePos": 1.0,
-      "constraints": {
-        "maxVelocity": 1.5,
-        "maxAcceleration": 2.5,
-        "maxAngularVelocity": 540.0,
-        "maxAngularAcceleration": 720.0,
-        "nominalVoltage": 12.0,
-        "unlimited": false
-      }
-    }
-  ],
+  "constraintZones": [],
   "pointTowardsZones": [],
   "eventMarkers": [
     {
-      "name": "LEVEL FOUR POSITION",
-      "waypointRelativePos": 0.25,
+      "name": "TROUGH POSITION",
+      "waypointRelativePos": 0.5,
       "endWaypointRelativePos": null,
       "command": {
         "type": "named",
         "data": {
-          "name": "LEVEL FOUR POSITION"
+          "name": "TROUGH POSITION"
         }
       }
     },
     {
       "name": "Enable Scorer",
-      "waypointRelativePos": 0.98,
+      "waypointRelativePos": 0.95,
       "endWaypointRelativePos": null,
       "command": {
         "type": "named",

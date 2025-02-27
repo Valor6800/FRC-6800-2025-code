@@ -12,7 +12,7 @@
         "y": 6.384420081967213
       },
       "isLocked": false,
-      "linkedName": "HP2"
+      "linkedName": "B-HP2"
     },
     {
       "anchor": {
@@ -25,7 +25,7 @@
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "L"
+      "linkedName": "B-L"
     }
   ],
   "rotationTargets": [],

@@ -4,62 +4,48 @@
     {
       "anchor": {
         "x": 7.1,
-        "y": 7.5
+        "y": 0.5
       },
       "prevControl": null,
       "nextControl": {
-        "x": 5.9818647540983605,
-        "y": 7.010092213114754
+        "x": 6.125717213114753,
+        "y": 1.405686475409835
       },
       "isLocked": false,
-      "linkedName": "C1"
+      "linkedName": "B-C6"
     },
     {
       "anchor": {
-        "x": 4.943250000000001,
-        "y": 5.1365
+        "x": 4.974897540983607,
+        "y": 2.868186475409835
       },
       "prevControl": {
-        "x": 5.590586065573771,
-        "y": 6.359245901639345
+        "x": 5.778073770491804,
+        "y": 1.9451331967213115
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "I"
+      "linkedName": "B-E"
     }
   ],
   "rotationTargets": [],
-  "constraintZones": [
-    {
-      "name": "Constraints Zone",
-      "minWaypointRelativePos": 0,
-      "maxWaypointRelativePos": 1.0,
-      "constraints": {
-        "maxVelocity": 1.5,
-        "maxAcceleration": 2.5,
-        "maxAngularVelocity": 540.0,
-        "maxAngularAcceleration": 720.0,
-        "nominalVoltage": 12.0,
-        "unlimited": false
-      }
-    }
-  ],
+  "constraintZones": [],
   "pointTowardsZones": [],
   "eventMarkers": [
     {
-      "name": "LEVEL FOUR POSITION",
+      "name": "LEVEL TWO POSITION",
       "waypointRelativePos": 0.25,
       "endWaypointRelativePos": null,
       "command": {
         "type": "named",
         "data": {
-          "name": "LEVEL FOUR POSITION"
+          "name": "LEVEL TWO POSITION"
         }
       }
     },
     {
       "name": "Enable Scorer",
-      "waypointRelativePos": 0.98,
+      "waypointRelativePos": 0.97,
       "endWaypointRelativePos": null,
       "command": {
         "type": "named",
@@ -79,7 +65,7 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": -119.99999999999999
+    "rotation": 119.99999999999999
   },
   "reversed": false,
   "folder": "C-R",

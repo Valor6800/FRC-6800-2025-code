@@ -3,29 +3,29 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 1.3186475409836067,
-        "y": 0.9621413934426232
+        "x": 7.1,
+        "y": 7.5
       },
       "prevControl": null,
       "nextControl": {
-        "x": 2.469147540983607,
-        "y": 1.2643913934426236
+        "x": 5.702073030340999,
+        "y": 7.5
       },
       "isLocked": false,
-      "linkedName": "B-HP1"
+      "linkedName": "B-C1"
     },
     {
       "anchor": {
-        "x": 3.800102459016393,
-        "y": 3.0120389344262293
+        "x": 4.953,
+        "y": 5.1365
       },
       "prevControl": {
-        "x": 3.410102459016393,
-        "y": 2.40753893442623
+        "x": 5.264999999999999,
+        "y": 6.589249999999999
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "B-C"
+      "linkedName": "B-I"
     }
   ],
   "rotationTargets": [],
@@ -33,13 +33,19 @@
   "pointTowardsZones": [],
   "eventMarkers": [
     {
-      "name": "LEVEL TWO POSITION",
-      "waypointRelativePos": 0.25,
+      "name": "Hold",
+      "waypointRelativePos": 0,
+      "endWaypointRelativePos": null,
+      "command": null
+    },
+    {
+      "name": "TROUGH POSITION",
+      "waypointRelativePos": 0.7,
       "endWaypointRelativePos": null,
       "command": {
         "type": "named",
         "data": {
-          "name": "LEVEL TWO POSITION"
+          "name": "TROUGH POSITION"
         }
       }
     },
@@ -65,13 +71,13 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 59.99999999999999
+    "rotation": -119.99999999999999
   },
   "reversed": false,
-  "folder": "H-R",
+  "folder": "C-R",
   "idealStartingState": {
     "velocity": 0,
-    "rotation": 55.0
+    "rotation": 180.0
   },
   "useDefaultConstraints": true
 }
