@@ -54,16 +54,20 @@ protected:
     void AddStructProperty(std::string_view name, std::function<T()> getter, std::function<void(const T)> setter) {
         if (std::holds_alternative<NTInfo>(infos)) {
             NTInfo& ntinfo = std::get<NTInfo>(infos);
-            // FIXME: Setter
             if (!entriesAdded) {
                 nt::StructTopic topic = ntinfo.table->GetStructTopic<T>(name);
+                auto publisher = new nt::StructPublisher{topic.Publish()};
                 ntinfo.fields.push_back(std::make_pair(
-                    new nt::StructPublisher{topic.Publish()},
-                    new nt::StructSubscriber{topic.Subscribe()}
+                    publisher,
+                    new nt::StructSubscriber{topic.Subscribe({}, { .excludePublisher = publisher->GetHandle() })}
                 ));
             }
             auto field = ntinfo.fields[entryIdx++];
-            static_cast<nt::StructPublisher<T>*>(field.first.get())->Set(getter());
+            if (getter)
+                static_cast<nt::StructPublisher<T>*>(field.first.get())->Set(getter());
+            if (setter)
+                for (auto timestampedValue : static_cast<nt::StructSubscriber<T>*>(field.second)->ReadQueue())
+                    setter(timestampedValue.value);
         } else if (std::holds_alternative<LogInfo>(infos)) {
             LogInfo& logInfo = std::get<LogInfo>(infos);
             if (!entriesAdded) logInfo.entries.push_back(new wpi::log::StructLogEntry<T>{frc::DataLogManager::GetLog(), logInfo.path + "/" + std::string{name}});
@@ -72,24 +76,8 @@ protected:
     }
 
     template<class T>
-    void AddStructArrayProperty(std::string_view name, std::function<std::vector<T>()> getter, std::function<void(std::span<const T>)>) {
-        if (std::holds_alternative<NTInfo>(infos)) {
-            // FIXME: Setter
-            NTInfo& ntinfo = std::get<NTInfo>(infos);
-            if (!entriesAdded) {
-                nt::StructArrayTopic topic = ntinfo.table->GetStructArrayTopic<T>(name);
-                ntinfo.fields.push_back(std::make_pair(
-                    new nt::StructArrayPublisher{topic.Publish()},
-                    new nt::StructArraySubscriber{topic.Subscribe()}
-                ));
-            }
-            auto field = ntinfo.fields[entryIdx++];
-            static_cast<nt::StructArrayPublisher<T>*>(field.first.get())->Set(getter());
-        } else {
-            LogInfo& logInfo = std::get<LogInfo>(infos);
-            if (!entriesAdded) logInfo.entries.push_back(new wpi::log::StructArrayLogEntry<T>{frc::DataLogManager::GetLog(), logInfo.path + "/" + std::string{name}});
-            static_cast<wpi::log::StructArrayLogEntry<T>*>(logInfo.entries[entryIdx++])->Update(getter());
-        }
+    inline void AddStructArrayProperty(std::string_view name, std::function<std::vector<T>()> getter, std::function<void(std::span<const T>)> setter) {
+        AddNotLWLoggableProperty<wpi::log::StructLogEntry<T>>(nt::NetworkTableInstance::GetStructArrayTopic, name, getter, setter);
     }
 
 private:
@@ -107,15 +95,41 @@ private:
             (std::get<NTInfo>(infos).builder->*func)(name, getter, setter);
         else if (std::holds_alternative<LogInfo>(infos)) {
             LogInfo& logInfo = std::get<LogInfo>(infos);
-            if (!entriesAdded) logInfo.entries.push_back(new DataLogEntryType{frc::DataLogManager::GetLog(), logInfo.path + "/" + std::string{name}});
-            static_cast<DataLogEntryType*>(logInfo.entries[entryIdx++])->Update(getter());
+            // if (!entriesAdded) logInfo.entries.push_back(std::unique_ptr{new DataLogEntryType{frc::DataLogManager::GetLog(), logInfo.path + "/" + std::string{name}}});
+            static_cast<DataLogEntryType*>(logInfo.entries[entryIdx++].get())->Update(getter());
+        }
+    }
+
+    template<typename DataLogEntryType, typename NTTopicType, typename Getter, typename Setter>
+    void AddNoLWLoggableProperty(NTTopicType (nt::NetworkTableInstance::*getTopic)(std::string_view), std::string_view name, std::function<Getter()> getter, std::function<void(Setter)> setter) {
+        if (std::holds_alternative<NTInfo>(infos)) {
+            NTInfo& ntinfo = std::get<NTInfo>(infos);
+            if (!entriesAdded) {
+                NTTopicType topic = (nt::NetworkTableInstance::GetDefault().*getTopic)(name);
+                auto publisher = new NTTopicType::PublisherType{topic.Publish()};
+                ntinfo.fields.emplace_back(
+                    publisher,
+                    new NTTopicType::SubscriberType{topic.Subscribe({}, { .excludePublisher = publisher->GetHandle() })}
+                );
+            }
+
+            auto [publisher, subscriber] = ntinfo.fields[entryIdx++];
+            if (getter)
+                static_cast<NTTopicType::PublisherType*>(publisher.get())->Set(getter());
+            if (setter)
+                for (auto timestampedValue : static_cast<NTTopicType::SubscriberType*>(subscriber)->ReadQueue())
+                    setter(timestampedValue.value);
+        } else {
+            LogInfo& logInfo = std::get<LogInfo>(infos);
+            // if (!entriesAdded) logInfo.entries.push_back(std::unique_ptr{new DataLogEntryType{frc::DataLogManager::GetLog(), logInfo.path + "/" + std::string{name}}});
+            static_cast<DataLogEntryType*>(logInfo.entries[entryIdx++].get())->Update(getter());
         }
     }
 
     struct LogInfo {
         std::string path;
         std::vector<Loggable*> children;
-        std::vector<wpi::log::DataLogEntry*> entries;
+        std::vector<std::unique_ptr<wpi::log::DataLogEntry>> entries;
     };
 
     struct NTInfo {
