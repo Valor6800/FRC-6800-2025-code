@@ -163,6 +163,20 @@ Scorer::Scorer(frc::TimedRobot *_robot, Drivetrain *_drivetrain, CANdle& candle)
             )
         )
     ).ToPtr());
+    pathplanner::NamedCommands::registerCommand("Auto Align", std::move(
+        frc2::SequentialCommandGroup(
+            frc2::InstantCommand(
+                [this](){
+                    drivetrain->getAutoAlignCommand();
+                }  
+            ),
+            frc2::InstantCommand(
+                [this](){
+                    state.scoringState = Scorer::SCORE_STATE::SCORING;
+                }
+            )
+        )
+    ).ToPtr());
 
     init();
     candle.getters[4] = [this] { return CANdle::cancoderMagnetHealthGetter(*elevatorMotor->getCANCoder()); };
@@ -228,6 +242,14 @@ frc2::CommandPtr Scorer::scorerPitSequence() {
         })
     );
 }
+
+/*frc2::CommandPtr Scorer::getScoringCommand(){
+    return frc2::InstantCommand(
+        [this]{
+            state.scoringState = Scorer::SCORE_STATE::SCORING;
+        }
+    ).ToPtr();
+};*/
 
 void Scorer::resetState()
 {

@@ -189,16 +189,6 @@ Drivetrain::Drivetrain(frc::TimedRobot *_robot, CANdle& leds) :
     poseErrorPPTopic = nt::NetworkTableInstance::GetDefault().GetStructTopic<frc::Transform2d>("LiveWindow/BaseSubsystem/SwerveDrive/Pose Error PP").Publish();
     table->PutNumber("Y Controller Activation Degree Threshold", Y_ACTIVATION_THRESHOLD.value());
 
-    pathplanner::NamedCommands::registerCommand("Auto Align", std::move(
-        frc2::SequentialCommandGroup(
-            frc2::InstantCommand(
-                [this](){
-                    getAutoAlignCommand();
-                }  
-            )
-        )
-    ).ToPtr());
-
     resetState();
     init();
 }

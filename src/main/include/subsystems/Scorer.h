@@ -38,6 +38,7 @@ public:
     void InitSendable(wpi::SendableBuilder& builder);
 
     frc2::CommandPtr scorerPitSequence();
+    // frc2::CommandPtr getScoringCommand();
 
     enum SCORE_STATE
     {
