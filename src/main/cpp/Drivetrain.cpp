@@ -438,18 +438,22 @@ frc2::FunctionalCommand * Drivetrain::getAutoAlignCommand(){
         // on init
         [&]{
             Swerve::resetAlignControllers();
-            state.getTag = true;
+            // state.getTag = true;
         },
         // execute
         [&]{
-            choosePoleDirection(Drivetrain::Direction::RIGHT);
-            Swerve::alignToTarget = true;
+            choosePoleDirection(Direction::RIGHT, state.reefTag);
+            Swerve::yAlign = true;
+            Swerve::rotAlign = true;
+            // Swerve::alignToTarget = true;
         },
         // on command end
         [&](bool){
-            state.getTag = false;
-            Swerve::alignToTarget = false;
+            // state.getTag = false;
+            // Swerve::alignToTarget = false;
             Swerve::resetAlignControllers();
+            Swerve::yAlign = false;
+            Swerve::rotAlign = false;
         },
         // determines when commmand end
         [&]{
