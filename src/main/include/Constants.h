@@ -434,7 +434,7 @@ namespace Constants {
             {8,
                 {
                     {LEFT, 0_in},
-                    {RIGHT, 0_in},
+                    {RIGHT, -1.75_in},
                     {NONE, 0_in}
                 }},
             {9,
@@ -527,9 +527,9 @@ namespace Constants {
                                 { ELEVATOR_STATE::STOWED, 3.25_in },
                                 { ELEVATOR_STATE::HP, 3.25_in },
                                 { ELEVATOR_STATE::ONE, 12.9_in },
-                                { ELEVATOR_STATE::TWO, 14.72_in },
-                                { ELEVATOR_STATE::THREE, 20.44_in },
-                                { ELEVATOR_STATE::FOUR, 27.9_in }
+                                { ELEVATOR_STATE::TWO, 14.1_in },
+                                { ELEVATOR_STATE::THREE, 19.5_in },
+                                { ELEVATOR_STATE::FOUR, 27.25_in }
                             }
                         },
                         {
