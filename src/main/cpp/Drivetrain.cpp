@@ -162,7 +162,7 @@ Drivetrain::Drivetrain(frc::TimedRobot *_robot, CANdle& leds) :
             if (state.useCalculatedEstimator) {
                 return getCalculatedPose();
             }
-            return getRawPose();
+            return getCalculatedPose();
         }, // Robot pose supplier
         [this](frc::Pose2d pose){ resetOdometry(pose); }, // Method to reset odometry (will be called if your auto has a starting pose)
         [this](){ return getRobotRelativeSpeeds(); }, // ChassisSpeeds supplier. MUST BE ROBOT RELATIVE

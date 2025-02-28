@@ -204,8 +204,8 @@ private:
     nt::StructPublisher<frc::Pose2d> rawPosePublisher, calculatedPosePublisher;
     nt::StructPublisher<frc::ChassisSpeeds> robotVelocitiesPublisher;
 
-    SwerveSetpointGenerator setpointGenerator;
-    SwerveSetpoint previousSetpoint;
+    // SwerveSetpointGenerator setpointGenerator;
+    // SwerveSetpoint previousSetpoint;
 };
 
 }
