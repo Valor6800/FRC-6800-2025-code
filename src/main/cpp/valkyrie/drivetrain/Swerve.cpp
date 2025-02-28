@@ -1,6 +1,7 @@
 #include "valkyrie/drivetrain/Swerve.h"
 #include "Eigen/Core"
 #include "frc/Timer.h"
+#include "frc/geometry/Rotation2d.h"
 #include "frc/kinematics/ChassisSpeeds.h"
 #include "networktables/NetworkTableInstance.h"
 #include "units/angle.h"
@@ -452,6 +453,15 @@ template<class AzimuthMotor, class DriveMotor>
 void Swerve<AzimuthMotor, DriveMotor>::resetGyro(){
     frc::Pose2d initialPose = getRawPose();
     frc::Pose2d desiredPose = frc::Pose2d(initialPose.X(), initialPose.Y(), frc::Rotation2d(0_deg));
+    resetOdometry(desiredPose);
+    angularPosition = desiredPose.Rotation().Radians();
+
+}
+
+template<class AzimuthMotor, class DriveMotor>
+void Swerve<AzimuthMotor, DriveMotor>::resetGyro(frc::Rotation2d rotOffset){
+    frc::Pose2d initialPose = getRawPose();
+    frc::Pose2d desiredPose = frc::Pose2d(initialPose.X(), initialPose.Y(), rotOffset);
     resetOdometry(desiredPose);
     angularPosition = desiredPose.Rotation().Radians();
 

@@ -6,6 +6,7 @@
 #include <pathplanner/lib/auto/AutoBuilder.h>
 #include <string>
 #include "Constants.h"
+#include "frc/geometry/Rotation2d.h"
 #include "frc2/command/FunctionalCommand.h"
 #include "units/acceleration.h"
 #include "units/base.h"
@@ -136,6 +137,7 @@ Drivetrain::Drivetrain(frc::TimedRobot *_robot, CANdle& leds) :
 
     table->PutBoolean("Align Right", false);
     table->PutBoolean("Align Left", false);
+    table->PutBoolean("Practice Mode", false);
 
     setRotAlignOffset(00_deg);
 
@@ -391,6 +393,10 @@ void Drivetrain::analyzeDashboard()
     }
 
     Swerve::analyzeDashboard();
+
+    if (toast && table->GetBoolean("Practice Mode", false)) {
+        resetGyro(frc::Rotation2d(RED_REEF_6_ANGLE));
+    }
 
     visionAcceptanceRadius = (units::meter_t) table->GetNumber("Vision Acceptance", VISION_ACCEPTANCE.to<double>());
 

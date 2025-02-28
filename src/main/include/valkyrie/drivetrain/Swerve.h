@@ -13,6 +13,7 @@
 #include <deque>
 #include "Eigen/Core"
 #include "frc/EigenCore.h"
+#include "frc/geometry/Rotation2d.h"
 #include "networktables/StructTopic.h"
 #include "units/angle.h"
 #include "units/length.h"
@@ -63,6 +64,7 @@ public:
 
     void setupGyro(int, const char*, units::degree_t, units::degree_t, units::degree_t);
     void resetGyro();
+    void resetGyro(frc::Rotation2d rotOffset);
     frc::Rotation2d getGyro();
 
     /**
