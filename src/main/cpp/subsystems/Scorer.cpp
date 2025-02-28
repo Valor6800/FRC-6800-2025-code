@@ -167,12 +167,13 @@ Scorer::Scorer(frc::TimedRobot *_robot, Drivetrain *_drivetrain, CANdle& candle)
         frc2::SequentialCommandGroup(
             frc2::InstantCommand(
                 [this](){
-                    drivetrain->getAutoAlignCommand();
+                    drivetrain->getAutoAlignCommand()->Schedule();
                 }  
             ),
             frc2::InstantCommand(
                 [this](){
                     state.scoringState = Scorer::SCORE_STATE::SCORING;
+                    frc2::cmd::Wait(0.25_s);
                 }
             )
         )
