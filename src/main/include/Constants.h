@@ -177,7 +177,7 @@ namespace Constants {
         static std::vector<bool> swerveDrivesReversals(){ switch (robot){
             case Robot::Alpha: return {true, false, true, false};
             case Robot::Gold: return {true, true, true, true};
-            default: return {true, true, true, true};
+            default: return {false, false, false, false};
         }};
         static std::vector<bool> swerveAzimuthsReversals(){ switch (robot){
             case Robot::Alpha: return {true, false, true, false};

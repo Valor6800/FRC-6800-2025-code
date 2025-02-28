@@ -8,20 +8,20 @@
       },
       "prevControl": null,
       "nextControl": {
-        "x": 3.524385245901639,
-        "y": 5.649334016393442
+        "x": 3.0688524590163935,
+        "y": 5.181813524590163
       },
       "isLocked": false,
       "linkedName": "B-HP2"
     },
     {
       "anchor": {
-        "x": 3.1492500000000003,
-        "y": 4.112749999999999
+        "x": 3.17,
+        "y": 4.22
       },
       "prevControl": {
-        "x": 0.9553401639344266,
-        "y": 4.018206967213113
+        "x": 1.803168032786885,
+        "y": 4.1149077868852455
       },
       "nextControl": null,
       "isLocked": false,
@@ -59,7 +59,7 @@
     },
     {
       "name": "Enable Scorer",
-      "waypointRelativePos": 0.95,
+      "waypointRelativePos": 0.99,
       "endWaypointRelativePos": null,
       "command": {
         "type": "named",

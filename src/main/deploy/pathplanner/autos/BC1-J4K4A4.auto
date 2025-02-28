@@ -33,6 +33,12 @@
           "data": {
             "pathName": "HP2-A4"
           }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "A4-HP2"
+          }
         }
       ]
     }
