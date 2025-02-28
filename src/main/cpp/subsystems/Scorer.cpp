@@ -491,6 +491,16 @@ void Scorer::InitSendable(wpi::SendableBuilder& builder)
         [this] {return state.hasAlgae;},
         nullptr
     );
+    builder.AddBooleanProperty(
+        "CORAL",
+        [this] {return state.gamePiece == GAME_PIECE::CORAL;},
+        nullptr
+    );
+    builder.AddBooleanProperty(
+        "ALGAE",
+        [this] {return state.gamePiece == GAME_PIECE::ALGEE;},
+        nullptr
+    );
 }
 
 
