@@ -255,7 +255,7 @@ namespace Constants {
         static units::angle::turn_t getElevatorMagnetOffset() { switch (robot) {
             case Robot::Alpha: return 0.10327_tr; 
             case Robot::Gold: return 0.672852_tr; 
-            default: return 0.672852_tr;
+            default: return 0.998_tr;
         }};
 
         static double getElevKAFF() { switch (robot) {
@@ -585,7 +585,7 @@ namespace Constants {
             static units::angle::turn_t getElevatorAbsoluteRange() { switch (robot) {
                 case Robot::Alpha: return .75_tr;
                 case Robot::Gold: return 1_tr;
-                default: return 1_tr;
+                default: return 0.5_tr;
             }};
 
             static valor::PIDF getElevatorPIDF() { switch (robot) {
