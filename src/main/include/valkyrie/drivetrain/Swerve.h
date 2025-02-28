@@ -24,6 +24,9 @@
 #include "valkyrie/CharMode.h"
 #include <networktables/StructArrayTopic.h>
 #include <networktables/StructTopic.h>
+#include <pathplanner/lib/util/swerve/SwerveSetpointGenerator.h>
+#include <pathplanner/lib/util/swerve/SwerveSetpoint.h>
+#include <pathplanner/lib/config/RobotConfig.h>
 
 #include "Constants.h"
 
@@ -94,6 +97,7 @@ public:
     bool isRobotSkidding();
     
     wpi::array<frc::SwerveModuleState, MODULE_COUNT> getAllModuleStates();
+    std::vector<frc::SwerveModuleState> getAllModuleStatesAsVector();
     void updateAngularAcceleration();
     units::angular_acceleration::radians_per_second_squared_t getSmoothedAngularAcceleration();
     double rotationLerping(double);
@@ -199,6 +203,9 @@ private:
 
     nt::StructPublisher<frc::Pose2d> rawPosePublisher, calculatedPosePublisher;
     nt::StructPublisher<frc::ChassisSpeeds> robotVelocitiesPublisher;
+
+    SwerveSetpointGenerator setpointGenerator;
+    SwerveSetpoint previousSetpoint;
 };
 
 }

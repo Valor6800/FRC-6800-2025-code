@@ -86,6 +86,14 @@ Swerve<AzimuthMotor, DriveMotor>::Swerve(frc::TimedRobot *_robot,
     calculatedPosePublisher = nt::NetworkTableInstance::GetDefault().GetStructTopic<frc::Pose2d>("LiveWindow/BaseSubsystem/SwerveDrive/Actual Calculated Pose").Publish();
     robotVelocitiesPublisher = nt::NetworkTableInstance::GetDefault().GetStructTopic<frc::ChassisSpeeds>("LiveWindow/BaseSubsystem/SwerveDrive/Robot Velocities").Publish();
     table->PutBoolean("Toast", false);
+    RobotConfig config = RobotConfig::fromGUISettings();
+
+    setpointGenerator = SwerveSetpointGenerator(config, 9.4_rad_per_s);
+
+    frc::ChassisSpeeds currentSpeeds = getRobotRelativeSpeeds();
+    std::vector<frc::SwerveModuleState> currentStates = getAllModuleStatesAsVector();
+    previousSetpoint = SwerveSetpoint(currentSpeeds, currentStates, DriveFeedforwards::zeros(config.numModules));
+
     resetState();
 }
 
@@ -510,6 +518,15 @@ wpi::array<frc::SwerveModuleState, MODULE_COUNT> Swerve<AzimuthMotor, DriveMotor
     return moduleStates;
 }
 
+template <class AzimuthMotor, class DriveMotor>
+std::vector<frc::SwerveModuleState> valor::Swerve<AzimuthMotor, DriveMotor>::getAllModuleStatesAsVector()
+{
+    std::vector<frc::SwerveModuleState> states;
+    for (size_t i = 0; i < swerveModules.size(); i++){
+        states.push_back(swerveModules[i]->getState());
+    }
+    return states;
+}
 template<class AzimuthMotor, class DriveMotor>
 double Swerve<AzimuthMotor, DriveMotor>::getSkiddingRatio()
 {
