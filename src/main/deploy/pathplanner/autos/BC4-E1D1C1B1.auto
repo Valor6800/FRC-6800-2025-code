@@ -7,7 +7,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "BC6-EL2"
+            "pathName": "BC4-E1"
           }
         },
         {
@@ -50,6 +50,6 @@
     }
   },
   "resetOdom": true,
-  "folder": "L2",
+  "folder": "Blue Autos",
   "choreoAuto": false
 }

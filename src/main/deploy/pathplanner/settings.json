@@ -10,10 +10,7 @@
   ],
   "autoFolders": [
     "Blue Autos",
-    "L1",
-    "L2",
     "Red Autos",
-    "pit sequences",
     "tests"
   ],
   "defaultMaxVel": 3.5,
