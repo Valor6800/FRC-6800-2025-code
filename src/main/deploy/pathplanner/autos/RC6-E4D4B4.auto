@@ -7,37 +7,37 @@
         {
           "type": "path",
           "data": {
-            "pathName": "RC1-J4"
+            "pathName": "RC6-E4"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "RJ-HP2"
+            "pathName": "RE-HP"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "RHP2-KL4"
+            "pathName": "RHP-D4"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "RK-HP2"
+            "pathName": "RD-HP"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "RHP2-A4"
+            "pathName": "RHP-B4"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "RA-HP2"
+            "pathName": "RB-HP"
           }
         }
       ]

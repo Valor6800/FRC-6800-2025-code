@@ -13,31 +13,31 @@
         {
           "type": "path",
           "data": {
-            "pathName": "J-HP2"
+            "pathName": "BJ-HP2"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "HP2-K4"
+            "pathName": "BHP2-K4"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "K-HP2"
+            "pathName": "BK-HP2"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "HP2-A4"
+            "pathName": "BHP2-A4"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "A-HP2"
+            "pathName": "BA-HP2"
           }
         }
       ]

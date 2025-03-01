@@ -3,68 +3,59 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 10.4483,
-        "y": 0.5519
+        "x": 4.998872950819672,
+        "y": 5.241752049180327
       },
       "prevControl": null,
       "nextControl": {
-        "x": 11.744201639338005,
-        "y": 1.5894512295097813
+        "x": 4.072622950819672,
+        "y": 6.051002049180328
       },
       "isLocked": false,
-      "linkedName": "R-C1"
+      "linkedName": "B-I"
     },
     {
       "anchor": {
-        "x": 12.5493,
-        "y": 2.8099
+        "x": 1.2946721311475409,
+        "y": 7.027920081967213
       },
       "prevControl": {
-        "x": 11.98587786885246,
-        "y": 2.042686885245902
+        "x": 2.8254221311475414,
+        "y": 6.091920081967213
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "R-J"
+      "linkedName": "B-HP2"
     }
   ],
-  "rotationTargets": [],
-  "constraintZones": [
+  "rotationTargets": [
     {
-      "name": "Constraints Zone",
-      "minWaypointRelativePos": 0,
-      "maxWaypointRelativePos": 1.0,
-      "constraints": {
-        "maxVelocity": 1.5,
-        "maxAcceleration": 2.5,
-        "maxAngularVelocity": 540.0,
-        "maxAngularAcceleration": 720.0,
-        "nominalVoltage": 12.0,
-        "unlimited": false
-      }
+      "waypointRelativePos": 0.5,
+      "rotationDegrees": -55.0
     }
   ],
+  "constraintZones": [],
   "pointTowardsZones": [],
   "eventMarkers": [
     {
-      "name": "LEVEL FOUR POSITION",
-      "waypointRelativePos": 0.25,
+      "name": "HP Position",
+      "waypointRelativePos": 0.02,
       "endWaypointRelativePos": null,
       "command": {
         "type": "named",
         "data": {
-          "name": "LEVEL FOUR POSITION"
+          "name": "HP"
         }
       }
     },
     {
-      "name": "Enable Scorer",
-      "waypointRelativePos": 0.98,
+      "name": "Disable Scorer",
+      "waypointRelativePos": 0.2,
       "endWaypointRelativePos": null,
       "command": {
         "type": "named",
         "data": {
-          "name": "Enable Scorer"
+          "name": "DISABLE Scorer"
         }
       }
     }
@@ -79,13 +70,13 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 59.99999999999999
+    "rotation": -55.0
   },
   "reversed": false,
-  "folder": "C-R",
+  "folder": "R-H",
   "idealStartingState": {
     "velocity": 0,
-    "rotation": 0.0
+    "rotation": -119.99999999999999
   },
   "useDefaultConstraints": true
 }

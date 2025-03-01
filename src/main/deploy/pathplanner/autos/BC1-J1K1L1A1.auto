@@ -13,37 +13,37 @@
         {
           "type": "path",
           "data": {
-            "pathName": "J-HP2"
+            "pathName": "BJ-HP2"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "HP2-KT"
+            "pathName": "BHP2-K1"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "K-HP2"
+            "pathName": "BK-HP2"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "HP2-LT"
+            "pathName": "BHP2-L1"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "L-HP2"
+            "pathName": "BL-HP2"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "HP2-AT"
+            "pathName": "BHP2-A1"
           }
         }
       ]
