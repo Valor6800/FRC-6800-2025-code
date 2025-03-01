@@ -16,8 +16,8 @@
 #define CRAB_GEAR_RATIO 0
 
 #define DEPLOYED_POS units::angle::turn_t (0.75)
-#define RETRACTED_POS units::angle::turn_t (0.353)
-#define LOCK_OUT_POS units::angle::turn_t (0.369)
+#define RETRACTED_POS units::angle::turn_t (0.387)// (0.353)
+#define LOCK_OUT_POS units::angle::turn_t (0.392)
 #define STOW_POS units::angle::turn_t (0.5)
 
 #define STABBY_SPEED 40_tps
