@@ -434,7 +434,7 @@ namespace Constants {
             {8,
                 {
                     {LEFT, 0_in},
-                    {RIGHT, -1.75_in},
+                    {RIGHT, 0_in},
                     {NONE, 0_in}
                 }},
             {9,
