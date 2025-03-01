@@ -757,6 +757,12 @@ void Swerve<AzimuthMotor, DriveMotor>::InitSendable(wpi::SendableBuilder& builde
     );
 
     builder.AddDoubleProperty(
+        "Align: Y Goal Align",
+        [this] {return goalAlign.value();},
+        nullptr
+    );
+
+    builder.AddDoubleProperty(
         "Skidding Ratio",
         [this] {return getSkiddingRatio();},
         nullptr
