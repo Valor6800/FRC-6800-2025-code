@@ -55,7 +55,7 @@ const units::meter_t WHEEL_DIAMETER(0.0973_m);
 
 #define VISION_ACCEPTANCE 3.5_m // meters
 
-#define TIME_TELEOP_VERT 90.0f
+#define TIME_TELEOP_VERT 100.0f
 
 #define MT2_POSE true
 
@@ -177,10 +177,10 @@ Drivetrain::Drivetrain(frc::TimedRobot *_robot, CANdle& leds) :
             // This will flip the path being followed to the red side of the field.
             // THE ORIGIN WILL REMAIN ON THE BLUE SIDE
 
-            auto alliance = frc::DriverStation::GetAlliance();
-            if (alliance) {
+            // auto alliance = frc::DriverStation::GetAlliance();
+            /*if (alliance) {
                 return alliance.value() == frc::DriverStation::Alliance::kRed;
-            }
+            }*/
             return false;
         },
         this // Reference to this subsystem to set requirements
@@ -569,7 +569,7 @@ void Drivetrain::choosePoleDirection(Direction dir, Constants::AprilTag tag){
     units::inch_t offset = poleOffset.find(tag) != poleOffset.end() ? poleOffset.at(tag).at(dir) : 0.0_in;
     switch (dir) {
         case LEFT:
-            Swerve::goalAlign = -units::math::abs(POLE_OFFSET + offset);
+            Swerve::goalAlign = -units::math::abs(POLE_OFFSET - offset);
             break;
         case RIGHT:
             Swerve::goalAlign = units::math::abs(POLE_OFFSET + offset);

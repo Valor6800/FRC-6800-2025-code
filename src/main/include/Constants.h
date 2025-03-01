@@ -382,38 +382,38 @@ namespace Constants {
         static std::unordered_map<AprilTag, DirectionalOffSet> bluePoleOffsets {
             {17,
                 {
-                    {LEFT, 0_in},
-                    {RIGHT, 0_in},
+                    {LEFT, -1.25_cm},
+                    {RIGHT, -1.25_cm},
                     {NONE, 0_in}
                 }},
             {18,
                 {
-                    {LEFT, 0_in},
-                    {RIGHT, 0_in},
+                    {LEFT, -1.25_cm},
+                    {RIGHT, -1.25_cm},
                     {NONE, 0_in}
                 }},
             {19,
                 {
-                    {LEFT, 0_in},
-                    {RIGHT, 0_in},
+                    {LEFT, -1.25_cm},
+                    {RIGHT, -1.25_cm},
                     {NONE, 0_in}
                 }},
             {20,
                 {
-                    {LEFT, 0_in},
-                    {RIGHT, 0_in},
+                    {LEFT, -1.25_cm},
+                    {RIGHT, -1.25_cm},
                     {NONE, 0_in}
                 }},
             {21,
                 {
-                    {LEFT, 0_in},
-                    {RIGHT, 0_in},
+                    {LEFT, -1.25_cm},
+                    {RIGHT, -1.25_cm},
                     {NONE, 0_in}
                 }},
             {22,
                 {
-                    {LEFT, 0_in},
-                    {RIGHT, 0_in},
+                    {LEFT, -1.25_cm},
+                    {RIGHT, -1.25_cm},
                     {NONE, 0_in}
                 }}
         };
@@ -421,38 +421,38 @@ namespace Constants {
         static std::unordered_map<AprilTag, DirectionalOffSet> redPoleOffsets {
             {6,
                 {
-                    {LEFT, 0_in},
-                    {RIGHT, 0_in},
+                    {LEFT, -1.25_cm},
+                    {RIGHT, -1.25_cm},
                     {NONE, 0_in}
                 }},
             {7,
                 {
-                    {LEFT, 0_in},
-                    {RIGHT, 0_in},
+                    {LEFT, -1.25_cm},
+                    {RIGHT, -1.25_cm},
                     {NONE, 0_in}
                 }},
             {8,
                 {
-                    {LEFT, 0_in},
-                    {RIGHT, 0_in},
+                    {LEFT, -1.25_cm},
+                    {RIGHT, -1.25_cm},
                     {NONE, 0_in}
                 }},
             {9,
                 {
-                    {LEFT, 0_in},
-                    {RIGHT, 0_in},
+                    {LEFT, -1.25_cm},
+                    {RIGHT, -1.25_cm},
                     {NONE, 0_in}
                 }},
             {10,
                 {
-                    {LEFT, 0_in},
-                    {RIGHT, 0_in},
+                    {LEFT, -1.25_cm},
+                    {RIGHT, -1.25_cm},
                     {NONE, 0_in}
                 }},
             {11,
                 {
-                    {LEFT, 0_in},
-                    {RIGHT, 0_in},
+                    {LEFT, -1.25_cm},
+                    {RIGHT, -1.25_cm},
                     {NONE, 0_in}
                 }},
         };

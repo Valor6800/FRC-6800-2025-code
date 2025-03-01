@@ -45,7 +45,7 @@ Climber::~Climber()
 void Climber::resetState()
 {
     state.climbState = CLIMB_STATE::STOW;
-    state.stabState = STABBY_STATE::NO_CRAB;
+    // state.stabState = STABBY_STATE::NO_CRAB;
     state.hasClimbed = false;
     currentSensor.reset();
 }
@@ -64,23 +64,23 @@ void Climber::init()
         "baseCAN"
     );
 
-    stabbyMotor = new valor::PhoenixController(
-        valor::PhoenixControllerType::KRAKEN_X44_FOC, 
-        CANIDs::CRABB, 
-        valor::NeutralMode::Coast, 
-        false, 
-        "baseCAN"     
-    );
+    // stabbyMotor = new valor::PhoenixController(
+    //     valor::PhoenixControllerType::KRAKEN_X44_FOC, 
+    //     CANIDs::CRABB, 
+    //     valor::NeutralMode::Coast, 
+    //     false, 
+    //     "baseCAN"     
+    // );
     
     climbMotors->setupCANCoder(CANIDs::CLIMBER_CAN, 0.0_tr, true, "baseCAN", 1_tr); //0.5022
 
     climbMotors->setGearRatios(CLIMB_GEAR_RATIO, 1.0);
-    stabbyMotor->setGearRatios(1.0, STABBY_ROTOR_TO_SENSOR);
+    // stabbyMotor->setGearRatios(1.0, STABBY_ROTOR_TO_SENSOR);
     stabbyPID.P = STABBY_K_P;
 
-    stabbyMotor->setPIDF(stabbyPID, 0);
-    stabbyMotor->applyConfig();
-    stabbyMotor->enableFOC(true);
+    // stabbyMotor->setPIDF(stabbyPID, 0);
+    // stabbyMotor->applyConfig();
+    // stabbyMotor->enableFOC(true);
 
     climbPID.maxVelocity = climbMotors->getMaxMechSpeed() / 2.0;
     climbPID.maxAcceleration = climbMotors->getMaxMechSpeed() / Constants::Climber::maxVelocityRampTime();
@@ -145,11 +145,11 @@ void Climber::assignOutputs()
         }
     }
 
-     if (state.climbState == CLIMB_STATE::DEPLOYED || state.stabState == STABBY_STATE::CRABBING) {
-        stabbyMotor->setSpeed(STABBY_SPEED);
-     } else{
-        stabbyMotor->setPower(0_V);
-     }
+    //  if (state.climbState == CLIMB_STATE::DEPLOYED || state.stabState == STABBY_STATE::CRABBING) {
+    //     stabbyMotor->setSpeed(STABBY_SPEED);
+    //  } else{
+    //     stabbyMotor->setPower(0_V);
+    //  }
 }
 
 void Climber::setDegrees(units::degree_t deg)
@@ -194,11 +194,11 @@ void Climber::InitSendable(wpi::SendableBuilder& builder)
         [this]{return state.climbState;},
         nullptr
     );
-    builder.AddIntegerProperty(
-        "Stabby State",
-        [this]{return state.stabState;},
-        nullptr
-    );
+    // builder.AddIntegerProperty(
+    //     "Stabby State",
+    //     [this]{return state.stabState;},
+    //     nullptr
+    // );
 }
 
 

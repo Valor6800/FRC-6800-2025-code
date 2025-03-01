@@ -51,7 +51,7 @@ public:
     struct x
     {
         CLIMB_STATE climbState;
-        STABBY_STATE stabState;
+        // STABBY_STATE stabState;
 
         bool hasClimbed;
         double spikeCurrent;
@@ -63,13 +63,13 @@ public:
 private:
     frc2::CommandPtr pitSequenceStage(CLIMB_STATE);
 
-    valor::PhoenixController<> *stabbyMotor;
+    // valor::PhoenixController<> *stabbyMotor;
     valor::PhoenixController<> *climbMotors;
     valor::CurrentSensor currentSensor;
 
     frc::Alert climberPosSuccess{"Climber position is within tolerance", frc::Alert::AlertType::kInfo};
     frc::Alert climberPosFail{"Climber position not within tolerance", frc::Alert::AlertType::kError};
-    frc::Alert stabbySpeedSuccess{"Stabby speed is within tolerance", frc::Alert::AlertType::kInfo};
-    frc::Alert stabbySpeedFail{"Stabby speed is not within tolerance", frc::Alert::AlertType::kError};
+    // frc::Alert stabbySpeedSuccess{"Stabby speed is within tolerance", frc::Alert::AlertType::kInfo};
+    // frc::Alert stabbySpeedFail{"Stabby speed is not within tolerance", frc::Alert::AlertType::kError};
 };
 
