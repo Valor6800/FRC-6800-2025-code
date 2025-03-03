@@ -76,7 +76,7 @@ Swerve<AzimuthMotor, DriveMotor>::Swerve(frc::TimedRobot *_robot,
     rot_controller.SetTolerance(rotPosTolerance, rotVelTolerance);
     y_controller.SetTolerance(yPosTolerance, yVelTolerance);
     maxDriveSpeed = swerveModules[0]->getMaxDriveSpeed();
-    maxRotationSpeed = units::radian_t{2.0 * M_PI} * swerveModules[0]->getMaxDriveSpeed() / _module_radius;
+    maxRotationSpeed = /* units::radian_t{2.0 * M_PI} * */ swerveModules[0]->getMaxDriveSpeed() / _module_radius;
 
     kinematics = std::make_unique<frc::SwerveDriveKinematics<MODULE_COUNT>>(motorLocations);
     rawEstimator = std::make_unique<frc::SwerveDrivePoseEstimator<MODULE_COUNT>>(*kinematics, getGyro(), getModuleStates(), frc::Pose2d{0_m, 0_m, 0_rad});
@@ -185,6 +185,7 @@ void Swerve<AzimuthMotor, DriveMotor>::analyzeDashboard()
     units::meters_per_second_t moduleSpeedsRotation = units::meters_per_second_t{rotSpeedRPS.to<double>() * Constants::driveBaseRadius().to<double>()};
     units::meters_per_second_t moduleSpeedsTranslation = units::meters_per_second_t{sqrtf(powf(xSpeedMPS.to<double>(), 2) + powf(ySpeedMPS.to<double>(), 2))};
     
+
     if (moduleSpeedsTranslation + moduleSpeedsRotation > maxDriveSpeed) {
         units::meters_per_second_t adjustedModuleSpeedsTranslation = std::max(maxDriveSpeed - moduleSpeedsRotation, 0_mps);
         xSpeedMPS *= adjustedModuleSpeedsTranslation / moduleSpeedsTranslation;
