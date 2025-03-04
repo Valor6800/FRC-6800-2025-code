@@ -239,6 +239,7 @@ void Scorer::resetState()
     state.algaeSpikeCurrent = 30;
     currentSensor.reset();
     state.hasAlgae = false;
+    state.protectChin = false;
 }
 
 bool Scorer::hallEffectSensorActive()
@@ -313,6 +314,13 @@ void Scorer::init()
         }
     });
 
+     scorerStagingSensor.setFallingEdgeCallback([this] {
+        if (state.gamePiece == GAME_PIECE::CORAL) {
+            state.protectChin = true;
+           
+        }
+    });
+
     currentSensor.setSpikeSetpoint(45);
     currentSensor.setGetter([this]() {return scorerMotor->getCurrent().to<double>(); });
     currentSensor.setSpikeCallback([this]() {state.hasAlgae = true;});
@@ -361,6 +369,7 @@ void Scorer::assessInputs()
         state.scopedState = UNSCOPED;
     }
 
+
     if (driverGamepad->rightTriggerActive()) {
         state.scoringState = SCORE_STATE::SCORING;
         state.hasAlgae = false;
@@ -373,6 +382,11 @@ void Scorer::assessInputs()
 
 void Scorer::analyzeDashboard()
 {
+
+    if (state.scoringState != SCORE_STATE::SCORING){
+        state.protectChin = false;
+    }
+
     state.algaeSpikeCurrent = table->GetNumber("Algae Spike Setpoint", 30);
     drivetrain->setGamePieceInRobot(state.gamePiece);
     drivetrain->state.elevState = state.elevState;
@@ -408,33 +422,33 @@ void Scorer::assignOutputs()
         elevatorMotor->setPosition(targetRotations);
     }
 
-    // Scorer State Machine
-    if (state.scoringState == SCORE_STATE::SCORING) {
-        if (state.gamePiece == GAME_PIECE::ALGEE) {
-            scorerMotor->setSpeed(ALGEE_SCORE_SPEED);  
+  // Scorer State Machine
+if (state.scoringState == SCORE_STATE::SCORING) {
+    if (state.gamePiece == GAME_PIECE::ALGEE) {
+        scorerMotor->setSpeed(ALGEE_SCORE_SPEED);
+    } else if (!state.protectChin) {
+        auto it = scoringSpeedMap.find(state.elevState);
+        if (it != scoringSpeedMap.end()) {
+            scorerMotor->setSpeed(it->second);
         } else {
-            auto it = scoringSpeedMap.find(state.elevState);
-            if (it != scoringSpeedMap.end()) {
-                scorerMotor->setSpeed(it->second);
-            } else {
-            // Fallback to the default SCORE_SPEED 
-                scorerMotor->setSpeed(SCORE_SPEED);
-            }
+            scorerMotor->setSpeed(SCORE_SPEED);
         }
-    }else if (state.hasAlgae && state.gamePiece == GAME_PIECE::ALGEE) {
+    } else {
+        scorerMotor->setSpeed(0_tps);
+    }
+    } else if (state.hasAlgae && state.gamePiece == GAME_PIECE::ALGEE) {
         scorerMotor->setSpeed(ALGEE_HOLD_SPD);
     } else if (state.scoringState == SCORE_STATE::INTAKING || !scorerStagingSensor.isTriggered()) {
-        if(state.gamePiece == GAME_PIECE::ALGEE){
+        if (state.gamePiece == GAME_PIECE::ALGEE) {
             scorerMotor->setSpeed(ALGEE_INTAKE_SPEED);
-        } else{
+        } else {
             scorerMotor->setSpeed(CORAL_INTAKE_SPEED);
         }
-    } else{
-        // HOLD the coral at a specific position
-        // @todo check inversion
+    } else {
         scorerMotor->setPosition(getIntakeTurns());
     }
 }
+
 
 
 void Scorer::InitSendable(wpi::SendableBuilder& builder)
@@ -499,6 +513,12 @@ void Scorer::InitSendable(wpi::SendableBuilder& builder)
     builder.AddBooleanProperty(
         "ALGAE",
         [this] {return state.gamePiece == GAME_PIECE::ALGEE;},
+        nullptr
+    );
+
+    builder.AddBooleanProperty(
+        "CHIN PROTECTED?",
+        [this] {return state.protectChin;},
         nullptr
     );
 }
