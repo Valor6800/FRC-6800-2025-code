@@ -137,6 +137,7 @@ protected:
     
     frc::ChassisSpeeds getRobotRelativeSpeeds();
     void setSwerveDesiredState(wpi::array<frc::SwerveModuleState, MODULE_COUNT> desiredStates, bool isDriveOpenLoop);
+    void setSwerveDesiredState(std::vector<frc::SwerveModuleState> desiredStates, bool isDriveOpenLoop);
 
     double ROT_KP = 6;
     double ROT_KD = 0.2;
@@ -206,8 +207,8 @@ private:
     nt::StructPublisher<frc::Pose2d> rawPosePublisher, calculatedPosePublisher;
     nt::StructPublisher<frc::ChassisSpeeds> robotVelocitiesPublisher;
 
-    // SwerveSetpointGenerator setpointGenerator;
-    // SwerveSetpoint previousSetpoint;
+    SwerveSetpointGenerator setpointGenerator;
+    SwerveSetpoint previousSetpoint;
 };
 
 }

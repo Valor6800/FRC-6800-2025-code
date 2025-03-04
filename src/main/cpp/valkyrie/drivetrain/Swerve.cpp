@@ -91,11 +91,11 @@ Swerve<AzimuthMotor, DriveMotor>::Swerve(frc::TimedRobot *_robot,
     table->PutBoolean("Toast", false);
     RobotConfig config = RobotConfig::fromGUISettings();
 
-    /*setpointGenerator = SwerveSetpointGenerator(config, 9.4_rad_per_s);
+    setpointGenerator = SwerveSetpointGenerator(config, 9.4_rad_per_s);
 
     frc::ChassisSpeeds currentSpeeds = getRobotRelativeSpeeds();
     std::vector<frc::SwerveModuleState> currentStates = getAllModuleStatesAsVector();
-    previousSetpoint = SwerveSetpoint(currentSpeeds, currentStates, DriveFeedforwards::zeros(config.numModules));*/
+    previousSetpoint = SwerveSetpoint(currentSpeeds, currentStates, DriveFeedforwards::zeros(config.numModules));
 
     resetState();
 }
@@ -292,8 +292,13 @@ units::degree_t Swerve<AzimuthMotor, DriveMotor>::getRotControllerError() {
 
 template<class AzimuthMotor, class DriveMotor>
 void Swerve<AzimuthMotor, DriveMotor>::driveRobotRelative(frc::ChassisSpeeds speeds) {
-    auto desiredStates = getModuleStates(speeds);
-    setSwerveDesiredState(desiredStates, false);
+    previousSetpoint = setpointGenerator.generateSetpoint(
+        previousSetpoint,
+        speeds,
+        0.02_s
+    );
+    // auto desiredStates = getModuleStates(speeds);
+    setSwerveDesiredState(previousSetpoint.moduleStates, false);
 }
 
 template<class AzimuthMotor, class DriveMotor>
@@ -363,6 +368,14 @@ void Swerve<AzimuthMotor, DriveMotor>::updateAngularPosition() {
 
 template<class AzimuthMotor, class DriveMotor>
 void Swerve<AzimuthMotor, DriveMotor>::setSwerveDesiredState(wpi::array<frc::SwerveModuleState, MODULE_COUNT> desiredStates, bool isDriveOpenLoop)
+{
+    for (size_t i = 0; i < MODULE_COUNT; i++) {
+        swerveModules[i]->setDesiredState(desiredStates[i], isDriveOpenLoop);
+    }
+}
+
+template<class AzimuthMotor, class DriveMotor>
+void Swerve<AzimuthMotor, DriveMotor>::setSwerveDesiredState(std::vector<frc::SwerveModuleState> desiredStates, bool isDriveOpenLoop)
 {
     for (size_t i = 0; i < MODULE_COUNT; i++) {
         swerveModules[i]->setDesiredState(desiredStates[i], isDriveOpenLoop);
