@@ -3,16 +3,16 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 16.31526639344262,
-        "y": 7.051895491803278
+        "x": 16.17141393442623,
+        "y": 7.027920081967213
       },
       "prevControl": null,
       "nextControl": {
-        "x": 15.266381667905625,
-        "y": 6.380351100395163
+        "x": 14.073565573770491,
+        "y": 5.445543032786886
       },
       "isLocked": false,
-      "linkedName": "R-HP1"
+      "linkedName": "FR-HP"
     },
     {
       "anchor": {
@@ -20,8 +20,8 @@
         "y": 5.2301929625425645
       },
       "prevControl": {
-        "x": 14.467759787776423,
-        "y": 5.923195110513924
+        "x": 14.313319672131147,
+        "y": 5.68529713114754
       },
       "nextControl": null,
       "isLocked": false,
@@ -32,11 +32,24 @@
   "constraintZones": [
     {
       "name": "Constraints Zone",
-      "minWaypointRelativePos": 0,
+      "minWaypointRelativePos": 0.35,
       "maxWaypointRelativePos": 1.0,
       "constraints": {
         "maxVelocity": 1.5,
         "maxAcceleration": 2.5,
+        "maxAngularVelocity": 540.0,
+        "maxAngularAcceleration": 720.0,
+        "nominalVoltage": 12.0,
+        "unlimited": false
+      }
+    },
+    {
+      "name": "Constraints Zone",
+      "minWaypointRelativePos": 0,
+      "maxWaypointRelativePos": 0.35,
+      "constraints": {
+        "maxVelocity": 3.5,
+        "maxAcceleration": 4.0,
         "maxAngularVelocity": 540.0,
         "maxAngularAcceleration": 720.0,
         "nominalVoltage": 12.0,
@@ -78,13 +91,13 @@
     "unlimited": false
   },
   "goalEndState": {
-    "velocity": 0,
+    "velocity": 0.15,
     "rotation": -119.99999999999999
   },
   "reversed": false,
   "folder": "H-R",
   "idealStartingState": {
-    "velocity": 0,
+    "velocity": 1.0,
     "rotation": -125.00000000000001
   },
   "useDefaultConstraints": true

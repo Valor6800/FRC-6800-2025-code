@@ -1,0 +1,61 @@
+{
+  "version": "2025.0",
+  "command": {
+    "type": "sequential",
+    "data": {
+      "commands": [
+        {
+          "type": "path",
+          "data": {
+            "pathName": "FRC6-E4"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "FRE-HP"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "FRHP-D4"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "FRD-HP"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "FRHP-C4"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "FRC-HP"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "FRHP-B4"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "FRB-HP"
+          }
+        }
+      ]
+    }
+  },
+  "resetOdom": true,
+  "folder": "Red Autos",
+  "choreoAuto": false
+}
