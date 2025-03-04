@@ -8,8 +8,8 @@
       },
       "prevControl": null,
       "nextControl": {
-        "x": 5.702073030340999,
-        "y": 7.5
+        "x": 6.4155,
+        "y": 7.52525
       },
       "isLocked": false,
       "linkedName": "B-C1"
@@ -17,41 +17,70 @@
     {
       "anchor": {
         "x": 4.998872950819672,
+        "y": 7.301
+      },
+      "prevControl": {
+        "x": 6.159242162786354,
+        "y": 7.472534586640047
+      },
+      "nextControl": {
+        "x": 4.0755,
+        "y": 7.164499999999999
+      },
+      "isLocked": false,
+      "linkedName": "B-PC1"
+    },
+    {
+      "anchor": {
+        "x": 4.998872950819672,
         "y": 5.241752049180327
       },
       "prevControl": {
-        "x": 5.310872950819671,
-        "y": 6.694502049180326
+        "x": 6.8054999999999986,
+        "y": 6.647749999999999
       },
       "nextControl": null,
       "isLocked": false,
       "linkedName": "B-J"
     }
   ],
-  "rotationTargets": [],
-  "constraintZones": [],
+  "rotationTargets": [
+    {
+      "waypointRelativePos": 1.6723467862481267,
+      "rotationDegrees": -119.99999999999999
+    }
+  ],
+  "constraintZones": [
+    {
+      "name": "Constraints Zone",
+      "minWaypointRelativePos": 1.1,
+      "maxWaypointRelativePos": 2.0,
+      "constraints": {
+        "maxVelocity": 1.5,
+        "maxAcceleration": 2.5,
+        "maxAngularVelocity": 540.0,
+        "maxAngularAcceleration": 720.0,
+        "nominalVoltage": 12.0,
+        "unlimited": false
+      }
+    }
+  ],
   "pointTowardsZones": [],
   "eventMarkers": [
     {
-      "name": "Hold",
-      "waypointRelativePos": 0,
-      "endWaypointRelativePos": null,
-      "command": null
-    },
-    {
-      "name": "TROUGH POSITION",
-      "waypointRelativePos": 0.7,
+      "name": "LEVEL FOUR POSITION",
+      "waypointRelativePos": 1.4027118644067744,
       "endWaypointRelativePos": null,
       "command": {
         "type": "named",
         "data": {
-          "name": "TROUGH POSITION"
+          "name": "LEVEL FOUR POSITION"
         }
       }
     },
     {
       "name": "Enable Scorer",
-      "waypointRelativePos": 0.95,
+      "waypointRelativePos": 1.98,
       "endWaypointRelativePos": null,
       "command": {
         "type": "named",

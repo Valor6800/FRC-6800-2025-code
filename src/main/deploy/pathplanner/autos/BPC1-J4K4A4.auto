@@ -1,0 +1,49 @@
+{
+  "version": "2025.0",
+  "command": {
+    "type": "sequential",
+    "data": {
+      "commands": [
+        {
+          "type": "path",
+          "data": {
+            "pathName": "BPC1-J4"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "BJ-HP2"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "BHP2-K4"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "BK-HP2"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "BHP2-A4"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "BA-HP2"
+          }
+        }
+      ]
+    }
+  },
+  "resetOdom": true,
+  "folder": "Blue Autos",
+  "choreoAuto": false
+}
