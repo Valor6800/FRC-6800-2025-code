@@ -3,36 +3,36 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 16.31526639344262,
-        "y": 7.051895491803278
+        "x": 16.17141393442623,
+        "y": 7.027920081967213
       },
       "prevControl": null,
       "nextControl": {
-        "x": 15.266381667905625,
-        "y": 6.380351100395163
+        "x": 14.55787781300934,
+        "y": 4.668674758962613
       },
       "isLocked": false,
-      "linkedName": "R-HP1"
+      "linkedName": "FR-HP"
     },
     {
       "anchor": {
-        "x": 13.585811577752555,
-        "y": 5.2301929625425645
+        "x": 14.383300000000002,
+        "y": 4.2
       },
       "prevControl": {
-        "x": 14.467759787776423,
-        "y": 5.923195110513924
+        "x": 14.59965453652971,
+        "y": 4.515693269900369
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "R-D"
+      "linkedName": "R-B"
     }
   ],
   "rotationTargets": [],
   "constraintZones": [
     {
       "name": "Constraints Zone",
-      "minWaypointRelativePos": 0,
+      "minWaypointRelativePos": 0.35,
       "maxWaypointRelativePos": 1.0,
       "constraints": {
         "maxVelocity": 1.5,
@@ -79,12 +79,12 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": -119.99999999999999
+    "rotation": 180.0
   },
   "reversed": false,
   "folder": "H-R",
   "idealStartingState": {
-    "velocity": 0,
+    "velocity": 1.0,
     "rotation": -125.00000000000001
   },
   "useDefaultConstraints": true
