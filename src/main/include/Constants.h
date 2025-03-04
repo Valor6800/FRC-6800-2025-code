@@ -625,6 +625,13 @@ namespace Constants {
                 case Robot::Alpha: return 1.0_s / 2;
                 default: return 1.0_s / 2;
             }}
+
+            static units::length::millimeter_t getIndexerLidarDectionDistance() { switch (robot) {
+                case Robot::Alpha: return 12.0_mm;
+                case Robot::Gold: return 7.0_mm;
+                case Robot::Black: return 10.0_mm;
+                default: return 10.0_mm;
+            }}
         }
 
         namespace Climber {
