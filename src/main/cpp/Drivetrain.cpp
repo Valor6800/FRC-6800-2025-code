@@ -457,8 +457,17 @@ frc2::FunctionalCommand* Drivetrain::getResetOdom() {
 }
 
 frc2::CommandPtr Drivetrain::pitSequenceCommand(const frc::ChassisSpeeds& speeds) {
-    auto targetStates = getModuleStates(speeds);
+    auto targetStates = getModuleStates(speeds);  // Get wheel states for the given speeds
+
     return frc2::cmd::Sequence(
+        frc2::cmd::RunOnce([this, speeds] {
+            drivetrainForward.Set(speeds.vx > 0_mps);
+            drivetrainBackward.Set(speeds.vx < 0_mps);
+            drivetrainLeft.Set(speeds.vy > 0_mps);
+            drivetrainRight.Set(speeds.vy < 0_mps);
+            drivetrainRotateCounterclockwise.Set(speeds.omega > 0_rad_per_s);
+            drivetrainRotateClockwise.Set(speeds.omega < 0_rad_per_s);
+        }),
         frc2::cmd::Deadline(
             frc2::cmd::Wait(5_s),
             frc2::cmd::RunOnce([this, targetStates] {
@@ -468,6 +477,14 @@ frc2::CommandPtr Drivetrain::pitSequenceCommand(const frc::ChassisSpeeds& speeds
         frc2::cmd::RunOnce([this] {
             for (int i = 0; i < MODULE_COUNT; i++)
                 testModeDesiredStates[i].speed = 0_mps;
+
+            // Clear alerts after stopping
+            drivetrainForward.Set(false);
+            drivetrainBackward.Set(false);
+            drivetrainLeft.Set(false);
+            drivetrainRight.Set(false);
+            drivetrainRotateCounterclockwise.Set(false);
+            drivetrainRotateClockwise.Set(false);
         }),
         frc2::cmd::Wait(1_s)
     );

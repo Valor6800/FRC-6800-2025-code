@@ -191,4 +191,12 @@ private:
      valor::CANdleSensor *leds;
      
      nt::StructPublisher<frc::Transform2d> poseErrorPPTopic;
+     
+    frc::Alert drivetrainForward{"Drivetrain moving forward", frc::Alert::AlertType::kInfo};
+    frc::Alert drivetrainBackward{"Drivetrain moving backward", frc::Alert::AlertType::kInfo};
+    frc::Alert drivetrainLeft{"Drivetrain moving left", frc::Alert::AlertType::kInfo};
+    frc::Alert drivetrainRight{"Drivetrain moving right", frc::Alert::AlertType::kInfo};
+    frc::Alert drivetrainRotateCounterclockwise{"Drivetrain rotating counterclockwise", frc::Alert::AlertType::kInfo};
+    frc::Alert drivetrainRotateClockwise{"Drivetrain rotating clockwise", frc::Alert::AlertType::kInfo};
+
 };
