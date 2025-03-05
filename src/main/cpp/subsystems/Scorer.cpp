@@ -283,6 +283,13 @@ void Scorer::init()
         Constants::Scorer::getElevatorAbsoluteRange()
     );
     elevatorMotor->applyConfig();
+    elevatorMotor->setCurrentLimits(
+        units::ampere_t{100},
+        units::ampere_t{60},
+        units::ampere_t{45},
+        units::second_t{0.5},
+        true
+    );
 
     // Scorer init sequence
     scorerMotor->setGearRatios(1, Constants::Scorer::getScorerSensorToMech());

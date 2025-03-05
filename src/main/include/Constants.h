@@ -568,7 +568,7 @@ namespace Constants {
             /// Time to reach max velocity
             static units::second_t getElevMaxVelRampTime() { switch (robot) {
                 case Robot::Alpha: return 1.0_s / 5;
-                default: return 1.0_s / 0.8333;
+                default: return 12.6_s/42;
             }}
 
             static double getScorerSensorToMech() { switch (robot) {
@@ -600,7 +600,7 @@ namespace Constants {
                     valor::PIDF pidf;
                     pidf.P = 10;
                     pidf.aFF = 0.72;
-                    pidf.maxJerk = 40_tr_per_s_cu;
+                    pidf.maxJerk = 100_tr_per_s_cu;
                     return pidf;
                 }
             }}
