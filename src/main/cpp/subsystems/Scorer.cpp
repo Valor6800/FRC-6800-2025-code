@@ -172,6 +172,10 @@ Scorer::Scorer(frc::TimedRobot *_robot, Drivetrain *_drivetrain, CANdle& candle)
             return valor::CANdleSensor::RED;
         return valor::CANdleSensor::GREEN;
     };
+
+    visualizerStage1 = nt::NetworkTableInstance::GetDefault().GetStructTopic<frc::Pose3d>("LiveWindow/BaseSubsystem/Scorer/Stage1Height").Publish();
+    visualizerStage2 = nt::NetworkTableInstance::GetDefault().GetStructTopic<frc::Pose3d>("LiveWindow/BaseSubsystem/Scorer/Stage2Height").Publish();
+    visualizerStage3 = nt::NetworkTableInstance::GetDefault().GetStructTopic<frc::Pose3d>("LiveWindow/BaseSubsystem/Scorer/Stage3Height").Publish();
 }
 
 frc2::CommandPtr Scorer::scorerPitSequenceStage(GAME_PIECE gamePiece, ELEVATOR_STATE elevState) {
@@ -390,6 +394,11 @@ void Scorer::analyzeDashboard()
     state.algaeSpikeCurrent = table->GetNumber("Algae Spike Setpoint", 30);
     drivetrain->setGamePieceInRobot(state.gamePiece);
     drivetrain->state.elevState = state.elevState;
+
+    units::turn_t height = elevatorMotor->getPosition();
+    visualizerStage1.Set(frc::Pose3d{0_m, 0_m, convertToMechSpace(height), frc::Rotation3d()});
+    visualizerStage2.Set(frc::Pose3d{0_m, 0_m, convertToMechSpace(height * 2), frc::Rotation3d()});
+    visualizerStage3.Set(frc::Pose3d{0_m, 0_m, convertToMechSpace(height * 3), frc::Rotation3d()});
 }
 
 units::meter_t Scorer::convertToMechSpace(units::turn_t turns) 

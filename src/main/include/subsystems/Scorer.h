@@ -22,6 +22,7 @@
 #include <ctre/phoenix6/core/CoreCANdi.hpp>
 #include "subsystems/CANdle.h"
 #include <frc/Alert.h>
+#include <networktables/StructTopic.h>
 
 class Scorer : public valor::BaseSubsystem
 {
@@ -97,4 +98,8 @@ private:
     frc::Alert elevatorStage{"Elevator going to stage", frc::Alert::AlertType::kInfo};
     frc::Alert elevatorPositionSuccess{"Elevator position within tolerance", frc::Alert::AlertType::kInfo};
     frc::Alert elevatorPositionFail{"Elevator position outside tolerance", frc::Alert::AlertType::kError};
+    
+    nt::StructPublisher<frc::Pose3d> visualizerStage1;
+    nt::StructPublisher<frc::Pose3d> visualizerStage2;
+    nt::StructPublisher<frc::Pose3d> visualizerStage3;
 };
