@@ -573,26 +573,11 @@ void Drivetrain::alignAngleZoning()
 
 
 bool Drivetrain::withinXRange() {
-    if (state.reefTag == -1){
-        return false;
-    }
-
-    units::meter_t summation = 0_m;
-    double size = 0.0;
-    
-    for (valor::AprilTagsSensor* aprilLime : aprilTagSensors) {
-        if (state.reefTag == aprilLime->getTagID() ) {
-            units::meter_t zValue = -aprilLime->get_botpose_targetspace().Z();
-            summation += zValue;
-            size++;
-        }
-    }
-    if (size == 0.0){
-        return false;
-    }
-
-    averageXDistance = summation / size;
-    return (averageXDistance < (units::meter_t) table->GetNumber("Viable Dunk Distance (m)", VIABLE_DUNK_DISTANCE.value()));
+    units::meter_t measuredDistance = distanceSensor.getLidarData();
+    if (measuredDistance < 0_m) {
+        return false; 
+    }    
+    return (measuredDistance < (units::meter_t) table->GetNumber("Viable Dunk Distance (m)", VIABLE_DUNK_DISTANCE.value()));
 }
 
 
