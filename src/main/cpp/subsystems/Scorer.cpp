@@ -38,6 +38,7 @@ using namespace Constants::Scorer;
 
 Scorer::Scorer(frc::TimedRobot *_robot, Drivetrain *_drivetrain, CANdle& candle) :
     valor::BaseSubsystem(_robot, "Scorer"),
+    candle(candle),
     hallEffectDebounceSensor(_robot, "HallEffectDebounce"),
     candi(CANIDs::HALL_EFFECT, "baseCAN"),
     elevatorMotor(new valor::PhoenixController(valor::PhoenixControllerType::KRAKEN_X60, CANIDs::ELEV_WHEEL, valor::NeutralMode::Brake, elevatorMotorInverted(), "baseCAN")),
@@ -473,6 +474,12 @@ void Scorer::assignOutputs()
     if (!state.hasZeroed) {
         elevatorMotor->setPower(-3.0_V);
         return;
+    }
+
+    if(state.gamePiece == ALGEE) {
+        candle.setLED(7, valor::CANdleSensor::GREEN);
+    } else if (state.gamePiece == CORAL) {
+        candle.setLED(7, valor::CANdleSensor::ORANGE);
     }
 
     //Elevator State Machine

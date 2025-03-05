@@ -77,6 +77,7 @@ private:
     units::meter_t convertToMechSpace(units::turn_t turns);
     units::turn_t convertToMotorSpace(units::meter_t meters);
 
+    CANdle &candle;
     bool hallEffectSensorActive();
     bool cancoderSensorBad();
 
