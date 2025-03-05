@@ -2,6 +2,7 @@
 #include <cmath> 
 #include <cstddef>
 #include <frc/DriverStation.h>
+#include <iterator>
 #include <math.h>
 #include <pathplanner/lib/auto/AutoBuilder.h>
 #include <string>
@@ -22,6 +23,7 @@
 #include <pathplanner/lib/controllers/PPHolonomicDriveController.h>
 #include "frc/geometry/Rotation3d.h"
 #include "units/angle.h"
+#include "wpi/detail/value_t.h"
 #include <ctre/phoenix6/TalonFX.hpp>
 #include <units/math.h>
 #include <frc/Alert.h>
@@ -97,7 +99,9 @@ Drivetrain::Drivetrain(frc::TimedRobot *_robot, CANdle& leds) :
         Constants::moduleDiff(),
         WHEEL_DIAMETER
     ),
-    teleopStart(999999999999)
+    teleopStart(999999999999),
+    distanceSensor(_robot, "Front Distance Sensor", CANIDs::CAN_RANGE_DRIVETRAIN_SENSOR, "baseCAN")
+
 {
     xPIDF.P = KPX;
     xPIDF.I = KIX;
@@ -115,6 +119,8 @@ Drivetrain::Drivetrain(frc::TimedRobot *_robot, CANdle& leds) :
     //
     table->PutNumber("Left Align Offset", AA_LEFT_OFFSET.value());
     table->PutNumber("Right Align Offset", AA_RIGHT_OFFSET.value());
+
+    distanceSensor.setMaxDistance(2_m);
 
     Swerve::Y_KP = Y_ALIGN_KP;
     Swerve::Y_KI = Y_ALIGN_KI;
@@ -637,6 +643,11 @@ void Drivetrain::InitSendable(wpi::SendableBuilder& builder)
         builder.AddBooleanProperty(
             "Aligned",
             [this] {return state.aligned;},
+            nullptr
+        );
+        builder.AddDoubleProperty(
+            "Distance",
+            [this] {return distanceSensor.getLidarData().value();},
             nullptr
         );
     }
