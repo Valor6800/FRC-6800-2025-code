@@ -18,12 +18,12 @@ public:
         return candle.toRGB(color);
     }
 
-    void setLED(int led, valor::CANdleSensor::RGBColor rgb) {
-        return candle.setLED(led, rgb);
+    void setColor(int segment, valor::CANdleSensor::RGBColor rgb) {
+        return candle.setColor(segment, rgb);
     }
 
-    void setLED(int led, int color) {
-        return candle.setLED(led, toRGB(color));
+    void setColor(int segment, int color) {
+        return candle.setColor(segment, toRGB(color));
     }
 
     wpi::array<std::function<int()>, 8> getters{wpi::empty_array};

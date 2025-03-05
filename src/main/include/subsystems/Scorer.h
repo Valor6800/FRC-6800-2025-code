@@ -7,6 +7,7 @@
 #include "valkyrie/sensors/GrappleSensor.h"
 #include "valkyrie/sensors/CANRangeSensor.h"
 #include "valkyrie/sensors/CurrentSensor.h"
+#include "valkyrie/sensors/CANdleSensor.h"
 #include "valkyrie/controllers/PIDF.h"
 #include <frc/smartdashboard/SendableChooser.h>
 #include <frc/smartdashboard/SmartDashboard.h>
@@ -28,7 +29,7 @@ class Scorer : public valor::BaseSubsystem
 {
 public:
 
-    Scorer(frc::TimedRobot *robot, Drivetrain *drivetrain, CANdle&);
+    Scorer(frc::TimedRobot *robot, Drivetrain *drivetrain, CANdle&, valor::CANdleSensor *leds);
     
     void resetState();
      
@@ -77,7 +78,8 @@ private:
     units::meter_t convertToMechSpace(units::turn_t turns);
     units::turn_t convertToMotorSpace(units::meter_t meters);
 
-    CANdle &candle;
+    valor::CANdleSensor *leds;
+
     bool hallEffectSensorActive();
     bool cancoderSensorBad();
 
