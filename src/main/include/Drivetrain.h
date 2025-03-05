@@ -1,5 +1,6 @@
 #pragma once
 
+#include <valkyrie/sensors/CANRangeSensor.h>
 #include "frc/geometry/Pose3d.h" 
 #include "units/acceleration.h"
 #include "units/length.h"
@@ -168,6 +169,8 @@ public:
      double doubtX, doubtY;
 
 private:
+
+     valor::CANrangeSensor distanceSensor;
      frc2::CommandPtr pitSequenceCommand(const frc::ChassisSpeeds&);
      bool aprilTagOnReef(int id);
 
