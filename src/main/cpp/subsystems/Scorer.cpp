@@ -342,10 +342,15 @@ void Scorer::init()
     currentSensor.setSpikeCallback([this]() {state.hasAlgae = true;});
     currentSensor.setCacheSize(ALGAE_CACHE_SIZE);
 
+
     resetState();
 
-    // Must be at the end of init() because the CANdi has to be setup before reading
-    state.hasZeroed = hallEffectSensorActive();
+    // Must be at the end of init() because the CANdi has to be setup before reading   
+    if (elevatorMotor->GetFault_BadMagnet() || (elevatorMotor->getMagnetHealth() == ctre::phoenix6::signals::MagnetHealthValue::Magnet_Red)){
+        state.hasZeroed = hallEffectSensorActive();
+    } else{
+        state.hasZeroed = true;
+    }
 }
 
 void Scorer::assessInputs()
@@ -443,10 +448,10 @@ units::turn_t Scorer::convertToMotorSpace(units::meter_t meters)
 
 void Scorer::assignOutputs()
 {
-    // if (!state.hasZeroed) {
-    //     elevatorMotor->setPower(-3.0_V);
-    //     return;
-    // }
+    if (!state.hasZeroed) {
+        elevatorMotor->setPower(-3.0_V);
+        return;
+    }
 
     //Elevator State Machine
     if (state.elevState == ELEVATOR_STATE::MANUAL) {

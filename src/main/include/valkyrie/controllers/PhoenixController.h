@@ -293,6 +293,17 @@ public:
         return res_velocity.GetAppliedUpdateFrequency();
     }
 
+    bool GetFault_BadMagnet(bool refresh = true) {
+        if (cancoder) {
+            auto& faultSignal = cancoder->GetFault_BadMagnet();
+            if (refresh) {
+                faultSignal.Refresh();
+            }
+            return faultSignal.GetValue();
+        }
+        return false;
+    }
+
     void InitSendable(wpi::SendableBuilder& builder) override {
         builder.SetSmartDashboardType("Subsystem");
         builder.AddDoubleProperty(
