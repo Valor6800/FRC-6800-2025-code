@@ -71,7 +71,7 @@ void Climber::init()
     //     "baseCAN"     
     // );
     
-    climbMotors->setupCANCoder(CANIDs::CLIMBER_CAN, 0.0_tr, true, "baseCAN", 1_tr); //0.5022
+    climbMotors->setupCANCoder(CANIDs::CLIMBER_CAN, Constants::Climber::magnetOffset(), true, "baseCAN", 1_tr); //0.5022
 
     climbMotors->setGearRatios(CLIMB_GEAR_RATIO, 1.0);
     // stabbyMotor->setGearRatios(1.0, STABBY_ROTOR_TO_SENSOR);

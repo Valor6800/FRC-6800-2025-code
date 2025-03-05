@@ -629,6 +629,12 @@ namespace Constants {
         }
 
         namespace Climber {
+            static units::turn_t magnetOffset() { switch (robot) {
+                case Robot::Alpha: return 0_tr;
+                case Robot::Gold: return 0_tr;
+                default: return 0.5_tr;
+            }}
+
             static bool climbMotorInverted() { switch (robot) {
                 case Robot::Alpha: return false;
                 default: return true;
