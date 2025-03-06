@@ -541,7 +541,7 @@ namespace Constants {
                                 { ELEVATOR_STATE::ONE, 4.09_in },
                                 { ELEVATOR_STATE::TWO, 10.71_in + .5_in},
                                 { ELEVATOR_STATE::THREE, 16.22_in + .5_in},
-                                { ELEVATOR_STATE::FOUR, 30.5_in }
+                                { ELEVATOR_STATE::FOUR, 29.9_in }
                             }
                         }
                     };
