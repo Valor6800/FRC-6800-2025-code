@@ -9,7 +9,7 @@
       "prevControl": null,
       "nextControl": {
         "x": 14.073565573770491,
-        "y": 5.445543032786886
+        "y": 5.445543032786887
       },
       "isLocked": false,
       "linkedName": "FR-HP"
@@ -48,7 +48,7 @@
       "minWaypointRelativePos": 0,
       "maxWaypointRelativePos": 0.35,
       "constraints": {
-        "maxVelocity": 3.5,
+        "maxVelocity": 4.0,
         "maxAcceleration": 4.0,
         "maxAngularVelocity": 540.0,
         "maxAngularAcceleration": 720.0,
@@ -61,7 +61,7 @@
   "eventMarkers": [
     {
       "name": "LEVEL FOUR POSITION",
-      "waypointRelativePos": 0.25,
+      "waypointRelativePos": 0.35,
       "endWaypointRelativePos": null,
       "command": {
         "type": "named",
@@ -91,7 +91,7 @@
     "unlimited": false
   },
   "goalEndState": {
-    "velocity": 0.15,
+    "velocity": 0.0,
     "rotation": -119.99999999999999
   },
   "reversed": false,
