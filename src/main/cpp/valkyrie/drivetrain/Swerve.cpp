@@ -2,6 +2,8 @@
 #include "Eigen/Core"
 #include "frc/Timer.h"
 #include "frc/kinematics/ChassisSpeeds.h"
+#include "gcem_incl/inv_sqrt.hpp"
+#include "gcem_incl/max.hpp"
 #include "networktables/NetworkTableInstance.h"
 #include "units/angle.h"
 #include "units/angular_velocity.h"
@@ -10,6 +12,7 @@
 #include "units/velocity.h"
 #include "valkyrie/controllers/PhoenixController.h"
 #include "wpi/sendable/SendableRegistry.h"
+#include <cmath>
 #include <iostream>
 
 #include <cstdio>
@@ -76,7 +79,7 @@ Swerve<AzimuthMotor, DriveMotor>::Swerve(frc::TimedRobot *_robot,
     rot_controller.SetTolerance(rotPosTolerance, rotVelTolerance);
     y_controller.SetTolerance(yPosTolerance, yVelTolerance);
     maxDriveSpeed = swerveModules[0]->getMaxDriveSpeed();
-    maxRotationSpeed = /* units::radian_t{2.0 * M_PI} * */ swerveModules[0]->getMaxDriveSpeed() / _module_radius;
+    maxRotationSpeed = units::radians_per_second_t{(swerveModules[0]->getMaxDriveSpeed() / _module_radius).value()};
 
     kinematics = std::make_unique<frc::SwerveDriveKinematics<MODULE_COUNT>>(motorLocations);
     rawEstimator = std::make_unique<frc::SwerveDrivePoseEstimator<MODULE_COUNT>>(*kinematics, getGyro(), getModuleStates(), frc::Pose2d{0_m, 0_m, 0_rad});
@@ -131,7 +134,7 @@ void Swerve<AzimuthMotor, DriveMotor>::assessInputs()
 
     xSpeed = driverGamepad->leftStickY(2);
     ySpeed = driverGamepad->leftStickX(2);
-    rotSpeed = rotationLerping(driverGamepad->rightStickX(1));
+    rotSpeed = copysign(fmin(fabs(driverGamepad->rightStickX(1)), gcem::inv_sqrt(2)), driverGamepad->rightStickX(1));
 }
 
 template<class AzimuthMotor, class DriveMotor>
@@ -182,7 +185,7 @@ void Swerve<AzimuthMotor, DriveMotor>::analyzeDashboard()
         rotSpeedRPS = units::radians_per_second_t{rot_controller.Calculate(robotRotation)} + rot_controller.GetSetpoint().velocity;
     }
 
-    units::meters_per_second_t moduleSpeedsRotation = units::meters_per_second_t{rotSpeedRPS.to<double>() * Constants::driveBaseRadius().to<double>()};
+    units::meters_per_second_t moduleSpeedsRotation = units::math::abs(units::meters_per_second_t{rotSpeedRPS.to<double>() * Constants::driveBaseRadius().to<double>()});
     units::meters_per_second_t moduleSpeedsTranslation = units::meters_per_second_t{sqrtf(powf(xSpeedMPS.to<double>(), 2) + powf(ySpeedMPS.to<double>(), 2))};
     
 
@@ -634,7 +637,7 @@ void Swerve<AzimuthMotor, DriveMotor>::InitSendable(wpi::SendableBuilder& builde
         nullptr
     );
     builder.AddDoubleProperty(
-        "Commanded Rot Speed MPS",
+        "Commanded Rot Speed RPS",
         [this] { return rotSpeedRPS.value(); },
         nullptr
     );
