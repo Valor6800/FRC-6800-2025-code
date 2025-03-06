@@ -554,6 +554,12 @@ void Scorer::InitSendable(wpi::SendableBuilder& builder)
         [this] {return state.protectChin;},
         nullptr
     );
+
+    builder.AddBooleanProperty(
+    "Elevator Within Threshold", 
+    [this] { return elevatorWithinThreshold; },
+    nullptr
+);
 }
 
 
