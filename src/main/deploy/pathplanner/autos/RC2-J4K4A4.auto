@@ -1,0 +1,49 @@
+{
+  "version": "2025.0",
+  "command": {
+    "type": "sequential",
+    "data": {
+      "commands": [
+        {
+          "type": "path",
+          "data": {
+            "pathName": "RC2-J4"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "RJ-HP2"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "RHP2-KL4"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "RK-HP2"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "RHP2-A4"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "RA-HP2"
+          }
+        }
+      ]
+    }
+  },
+  "resetOdom": true,
+  "folder": "Red Autos",
+  "choreoAuto": false
+}
