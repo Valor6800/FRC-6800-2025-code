@@ -257,6 +257,7 @@ bool Scorer::hallEffectSensorActive()
 void Scorer::init()
 {
     table->PutBoolean("Scope Button", false);
+     table->PutBoolean("Auto Dunk Enabled", true);
 
     scorerStagingSensor.setMaxDistance(12_in);
     scorerStagingSensor.setThresholdDistance(7.7_cm);
@@ -396,7 +397,10 @@ void Scorer::assessInputs()
 } 
 
 void Scorer::analyzeDashboard()
+
 {
+
+    bool autoDunkEnabled = table->GetBoolean("Auto Dunk Enabled", true);
 
     if (state.scoringState != SCORE_STATE::SCORING){
         state.protectChin = false;
@@ -406,11 +410,13 @@ void Scorer::analyzeDashboard()
     elevatorWithinThreshold = elevatorError.value() < table->GetNumber("Elevator Threshold (m)", VIABLE_ELEVATOR_THRESHOLD.value());
     
     if (
+        autoDunkEnabled &&
         drivetrain->withinXRange() &&
         drivetrain->withinYRange() &&
         state.scopedState == SCOPED_STATE::SCOPED &&
         elevatorWithinThreshold &&
-        state.gamePiece == GAME_PIECE::CORAL
+        state.gamePiece == GAME_PIECE::CORAL &&
+        (state.elevState == TWO || state.elevState == THREE)
     ) {
         state.scoringState = SCORE_STATE::SCORING;
     }

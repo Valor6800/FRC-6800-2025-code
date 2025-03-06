@@ -233,7 +233,7 @@ void Swerve<AzimuthMotor, DriveMotor>::analyzeDashboard()
 
 template<class AzimuthMotor, class DriveMotor>
 bool Swerve<AzimuthMotor, DriveMotor>::yControllerAligned() {
-    return units::math::abs((units::meter_t) y_controller.GetPositionError()) < yPosTolerance;
+    return units::math::abs((units::meter_t) yDistance-goalAlign) < yPosTolerance;
 }
 
 template<class AzimuthMotor, class DriveMotor>
