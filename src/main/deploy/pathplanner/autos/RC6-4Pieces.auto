@@ -45,12 +45,6 @@
           "data": {
             "pathName": "FRHP-B4"
           }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "FRB-HP"
-          }
         }
       ]
     }
