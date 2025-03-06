@@ -97,7 +97,10 @@ public:
     bool isRobotSkidding();
     
     wpi::array<frc::SwerveModuleState, MODULE_COUNT> getAllModuleStates();
+
+    // this function is soley used for Swerve Setpoint Generator
     std::vector<frc::SwerveModuleState> getAllModuleStatesAsVector();
+    
     void updateAngularAcceleration();
     units::angular_acceleration::radians_per_second_squared_t getSmoothedAngularAcceleration();
     double rotationLerping(double);

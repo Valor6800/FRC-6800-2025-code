@@ -545,9 +545,10 @@ template <class AzimuthMotor, class DriveMotor>
 std::vector<frc::SwerveModuleState> valor::Swerve<AzimuthMotor, DriveMotor>::getAllModuleStatesAsVector()
 {
     std::vector<frc::SwerveModuleState> states;
-    for (size_t i = 0; i < swerveModules.size(); i++){
-        states.push_back(swerveModules[i]->getState());
-    }
+    states.push_back(swerveModules[0]->getState());
+    states.push_back(swerveModules[1]->getState());
+    states.push_back(swerveModules[3]->getState());
+    states.push_back(swerveModules[2]->getState());
     return states;
 }
 template<class AzimuthMotor, class DriveMotor>
