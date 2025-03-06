@@ -78,6 +78,7 @@ private:
     units::turn_t convertToMotorSpace(units::meter_t meters);
 
     bool hallEffectSensorActive();
+    bool cancoderSensorBad();
 
     valor::DebounceSensor hallEffectDebounceSensor;
 
