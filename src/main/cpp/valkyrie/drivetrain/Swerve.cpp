@@ -134,7 +134,7 @@ void Swerve<AzimuthMotor, DriveMotor>::assessInputs()
 
     xSpeed = driverGamepad->leftStickY(2);
     ySpeed = driverGamepad->leftStickX(2);
-    rotSpeed = copysign(fmin(fabs(driverGamepad->rightStickX(1)), gcem::inv_sqrt(2)), driverGamepad->rightStickX(1));
+    rotSpeed = copysign(fmin(fabs(rotationLerping(driverGamepad->rightStickX(1))), gcem::inv_sqrt(2)), driverGamepad->rightStickX(1));
 }
 
 template<class AzimuthMotor, class DriveMotor>
