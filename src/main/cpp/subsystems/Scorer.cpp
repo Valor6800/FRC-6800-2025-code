@@ -254,6 +254,13 @@ bool Scorer::hallEffectSensorActive()
     return candi.GetS1Closed().GetValue();
 }
 
+bool Scorer::cancoderSensorBad()
+{
+    return (elevatorMotor->GetFault_BadMagnet() || (elevatorMotor->getMagnetHealth() == ctre::phoenix6::signals::MagnetHealthValue::Magnet_Red) || elevatorMotor->getMagnetHealth() == ctre::phoenix6::signals::MagnetHealthValue::Magnet_Invalid);
+       
+}
+
+
 void Scorer::init()
 {
     table->PutBoolean("Scope Button", false);
@@ -318,6 +325,10 @@ void Scorer::init()
     // Zeroing debounce sensor (utilizes CANdi configured hall effect sensor)
     hallEffectDebounceSensor.setGetter([this] { return hallEffectSensorActive();});
     hallEffectDebounceSensor.setRisingEdgeCallback([this] {
+        if (cancoderSensorBad())
+        {
+            elevatorMotor->setEncoderPosition(0_tr);
+        }
         state.hasZeroed = true;
     });
 
@@ -344,9 +355,9 @@ void Scorer::init()
 
 
     resetState();
-
+    
     // Must be at the end of init() because the CANdi has to be setup before reading   
-    if (elevatorMotor->GetFault_BadMagnet() || (elevatorMotor->getMagnetHealth() == ctre::phoenix6::signals::MagnetHealthValue::Magnet_Red)){
+    if (cancoderSensorBad()){
         state.hasZeroed = hallEffectSensorActive();
     } else{
         state.hasZeroed = true;
@@ -567,10 +578,10 @@ void Scorer::InitSendable(wpi::SendableBuilder& builder)
     );
 
     builder.AddBooleanProperty(
-    "Elevator Within Threshold", 
-    [this] { return elevatorWithinThreshold; },
-    nullptr
-);
+        "ZEROED?",
+        [this] {return state.hasZeroed;},
+        nullptr
+    );
 }
 
 
