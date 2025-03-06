@@ -254,7 +254,7 @@ namespace Constants {
 
         static units::angle::turn_t getElevatorMagnetOffset() { switch (robot) {
             case Robot::Alpha: return 0.10327_tr; 
-            case Robot::Gold: return 0.672852_tr; 
+            case Robot::Gold: return 0.989014_tr;
             default: return 0.998_tr;
         }};
 
@@ -568,7 +568,7 @@ namespace Constants {
             /// Time to reach max velocity
             static units::second_t getElevMaxVelRampTime() { switch (robot) {
                 case Robot::Alpha: return 1.0_s / 5;
-                default: return 12.6_s/42;
+                default: return 12.6_s/32.0; // should be 42.0 but the elevator slips
             }}
 
             static double getScorerSensorToMech() { switch (robot) {
