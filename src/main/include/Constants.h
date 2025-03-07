@@ -277,7 +277,16 @@ namespace Constants {
                 )
             );
             case Robot::Gold: return frc::Pose3d();
-            default: return frc::Pose3d();
+            default: return frc::Pose3d(
+                10_in,
+                -6.5_in,
+                8.62_in, // change Z
+                frc::Rotation3d(
+                    0_deg,
+                    18_deg,
+                    0_deg
+                )
+            );
         }};
 
         static frc::Pose3d vanillaCameraPosition(){ switch (robot) {
@@ -349,7 +358,16 @@ namespace Constants {
                 )
             );
             case Robot::Gold: return frc::Pose3d();
-            default: return frc::Pose3d();
+            default: return frc::Pose3d(
+                10_in,
+                6.5_in,
+                8.62_in, // change Z
+                frc::Rotation3d(
+                    0_deg,
+                    18_deg,
+                    0_deg
+                )
+            );
         }};
 
         static frc::Pose3d berryCameraPosition(){ switch (robot){
@@ -362,17 +380,17 @@ namespace Constants {
 
         static CameraVector getAprilCameras(){ switch (robot){
             case Robot::Alpha: return CameraVector{
-                std::pair("limelight-mint", mintCameraPosition()),
-                std::pair("limelight-mango", mangoCameraPosition())
+                std::pair("limelight-choco", chocolateCameraPosition()),
+                std::pair("limelight-vanilla", vanillaCameraPosition()),
+                std::pair("limelight-berry", berryCameraPosition()), 
             };
             case Robot::Gold: return CameraVector{
                 std::pair("limelight-rocky", rockyCameraPosition()),
                 std::pair("limelight-lime", limeCameraPosition())
             };
             default: return CameraVector{
-                std::pair("limelight-choco", chocolateCameraPosition()),
-                std::pair("limelight-vanilla", vanillaCameraPosition()),
-                std::pair("limelight-berry", berryCameraPosition()),
+                std::pair("limelight-mint", mintCameraPosition()),
+                std::pair("limelight-mango", mangoCameraPosition())
             };
         }
         }
