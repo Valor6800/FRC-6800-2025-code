@@ -387,6 +387,17 @@ void Drivetrain::analyzeDashboard()
         Swerve::targetAngle = frc::DriverStation::GetAlliance() == frc::DriverStation::kRed ? 90_deg : -90_deg;
         Swerve::yAlign = false;
         Swerve::rotAlign = true;
+    } else if (
+        state.alignToTarget &&
+        state.elevState == Constants::Scorer::ELEVATOR_STATE::FOUR &&
+        state.gamePiece == Constants::Scorer::GAME_PIECE::ALGEE
+    ) {
+        state.netAngle = frc::DriverStation::kRed ? 180_deg : 0_deg;
+        if (units::math::abs(state.netAngle - calcEstimator.get()->GetEstimatedPosition().Rotation().Degrees()) < 10_deg) {
+            Swerve::targetAngle = state.netAngle;
+            Swerve::yAlign = false;
+            Swerve::rotAlign = true;
+        }
     } else if (state.alignToTarget) {
         Swerve::yAlign = units::math::abs(getRotControllerError()) < (units::degree_t) table->GetNumber(
             "Y Controller Activation Degree Threshold",
