@@ -631,7 +631,7 @@ namespace Constants {
         namespace Climber {
             static units::turn_t magnetOffset() { switch (robot) {
                 case Robot::Alpha: return 0_tr;
-                case Robot::Gold: return 0_tr;
+                case Robot::Gold: return -0.5_tr;
                 default: return 0.5_tr;
             }}
 
