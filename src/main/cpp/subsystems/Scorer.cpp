@@ -425,8 +425,27 @@ void Scorer::assessInputs()
 void Scorer::analyzeDashboard()
 
 {
-
     bool autoDunkEnabled = table->GetBoolean("Auto Dunk Enabled", true);
+
+    int detectedTag = drivetrain->state.reefTag;
+
+    if (state.gamePiece == GAME_PIECE::ALGEE) {
+        if (detectedTag >= 6 && detectedTag <= 11) {
+            if (detectedTag % 2 == 1) {
+                state.elevState = ELEVATOR_STATE::THREE;
+            } else {
+                state.elevState = ELEVATOR_STATE::TWO;
+            }
+        }
+
+        if (detectedTag >= 17 && detectedTag <= 22) {
+            if (detectedTag % 2 == 1) {
+                state.elevState = ELEVATOR_STATE::TWO;
+            } else {
+                state.elevState = ELEVATOR_STATE::THREE;
+            }
+        }
+    }
 
     if (state.scoringState != SCORE_STATE::SCORING || (state.elevState == ELEVATOR_STATE::ONE && state.gamePiece == GAME_PIECE::CORAL)){
         state.protectChin = false;
