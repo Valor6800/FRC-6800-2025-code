@@ -35,7 +35,7 @@ const units::hertz_t KP_ROTATE(-90);
 const units::hertz_t KD_ROTATE(-30);
 
 const std::pair<double, double> P1{0.0, 0.0};
-const std::pair<double, double> P2{0.6, 0.05};
+const std::pair<double, double> P2{0.6, 0.1};
 const std::pair<double, double> P3{0.8, 0.2};
 const std::pair<double, double> P4{0.9, 0.3};
 const std::pair<double, double> P5{1.0, 1.0};
@@ -134,8 +134,8 @@ void Swerve<AzimuthMotor, DriveMotor>::assessInputs()
 
     xSpeed = driverGamepad->leftStickY(2);
     ySpeed = driverGamepad->leftStickX(2);
-    // rotSpeed = copysign(fmin(fabs(rotationLerping(driverGamepad->rightStickX(1))), gcem::inv_sqrt(2)), driverGamepad->rightStickX(1));
-    rotSpeed = rotationLerping(driverGamepad->rightStickX(1) * gcem::inv_sqrt(2));
+    rotSpeed = copysign(fmin(fabs(rotationLerping(driverGamepad->rightStickX(1))), gcem::inv_sqrt(2)), driverGamepad->rightStickX(1));
+    //rotSpeed = rotationLerping(driverGamepad->rightStickX(1)) * gcem::inv_sqrt(2);
 }
 
 template<class AzimuthMotor, class DriveMotor>
