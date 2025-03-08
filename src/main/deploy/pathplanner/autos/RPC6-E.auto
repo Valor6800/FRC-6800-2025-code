@@ -1,0 +1,55 @@
+{
+  "version": "2025.0",
+  "command": {
+    "type": "sequential",
+    "data": {
+      "commands": [
+        {
+          "type": "path",
+          "data": {
+            "pathName": "RC6-Push"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "RPC6-E4"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "RE-HP"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "RHP-D4"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "RD-HP"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "RHP-B4"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "RB-HP"
+          }
+        }
+      ]
+    }
+  },
+  "resetOdom": true,
+  "folder": "Red Autos",
+  "choreoAuto": false
+}
