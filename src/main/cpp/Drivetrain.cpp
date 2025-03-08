@@ -89,7 +89,7 @@ const units::meter_t WHEEL_DIAMETER(0.0973_m);
 #define AA_LEFT_OFFSET 0.0_in // 0.5_in
 #define AA_RIGHT_OFFSET 0.0_in // 1.5_in
 #define VIABLE_DUNK_DISTANCE 0.28_m //0.3
-#define VIABLE_DUNK_SPEED 10.0_mps
+#define VIABLE_DUNK_SPEED 1.1_mps
 
 #define Y_ACTIVATION_THRESHOLD 30.0_deg
 
