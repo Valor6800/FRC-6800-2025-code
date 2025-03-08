@@ -21,7 +21,7 @@ CANdleSensor::CANdleSensor(frc::TimedRobot *_robot, int _ledCount, int _segments
     config.statusLedOffWhenActive = true;
     config.disableWhenLOS = false;
     // If the 12V line should be on, off, or modulated (for single LED colors)
-    config.vBatOutputMode = ctre::phoenix::led::VBatOutputMode::Off;
+    config.vBatOutputMode = ctre::phoenix::led::VBatOutputMode::On;
     candle.ConfigFactoryDefault(100);
     candle.ConfigAllSettings(config, 100);
     int segmentLEDCount = (ledCount-8)/segments;
