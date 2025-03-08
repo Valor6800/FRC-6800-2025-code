@@ -31,19 +31,19 @@
         {
           "type": "path",
           "data": {
-            "pathName": "BHP-BL4"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "BB-HP"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
             "pathName": "BHP-CL4"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "BC-HP"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "BHP-BL4"
           }
         }
       ]
