@@ -88,7 +88,7 @@ const units::meter_t WHEEL_DIAMETER(0.0973_m);
 
 #define AA_LEFT_OFFSET 0.0_in // 0.5_in
 #define AA_RIGHT_OFFSET 0.0_in // 1.5_in
-#define VIABLE_DUNK_DISTANCE 0.5_m
+#define VIABLE_DUNK_DISTANCE 0.28_m //0.3
 
 #define Y_ACTIVATION_THRESHOLD 30.0_deg
 
@@ -101,7 +101,7 @@ Drivetrain::Drivetrain(frc::TimedRobot *_robot, CANdle& leds) :
         WHEEL_DIAMETER
     ),
     teleopStart(999999999999),
-    distanceSensor(_robot, "Front Distance Sensor", CANIDs::CAN_RANGE_DRIVETRAIN_SENSOR, "baseCAN")
+    distanceSensor(_robot, "Front Distance Sensor", CANIDs::FRONT_LEFT_LIDAR_SENSOR, "")
 
 {
     xPIDF.P = KPX;

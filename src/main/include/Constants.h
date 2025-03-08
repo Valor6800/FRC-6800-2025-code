@@ -86,11 +86,11 @@ namespace CANIDs {
     constexpr static int ELEV_WHEEL = 30;
     constexpr static int CLIMBER_LEAD = 31;
     constexpr static int CLIMBER_FOLLOW = 32;
-    constexpr static int CAN_RANGE_DRIVETRAIN_SENSOR = 41;
     constexpr static int HALL_EFFECT = 46;
     constexpr static int CANDLE = 60;
     constexpr static int STAGING_LIDAR_SENSOR = 47;
-    constexpr static int FRONT_LIDAR_SENSOR = 49;
+    constexpr static int FRONT_RIGHT_LIDAR_SENSOR = 49;
+    constexpr static int FRONT_LEFT_LIDAR_SENSOR = 48;
     constexpr static int CRABB = 33;
     constexpr static int ELEVATOR_CAN = 24;
     constexpr static int CLIMBER_CAN = 25;
@@ -255,7 +255,7 @@ namespace Constants {
 
         static units::angle::turn_t getElevatorMagnetOffset() { switch (robot) {
             case Robot::Alpha: return 0.10327_tr; 
-            case Robot::Gold: return 0.801025_tr; //  0.989014_tr;
+            case Robot::Gold: return 0.052979_tr; //  0.989014_tr;
             default: return 0.286377_tr;
         }};
 
@@ -401,38 +401,38 @@ namespace Constants {
         static std::unordered_map<AprilTag, DirectionalOffSet> bluePoleOffsets {
             {17,
                 {
-                    {LEFT, -1.25_cm},
-                    {RIGHT, -1.25_cm},
+                    {LEFT, 0_cm},
+                    {RIGHT, 0_cm},
                     {NONE, 0_in}
                 }},
             {18,
                 {
-                    {LEFT, -1.25_cm},
-                    {RIGHT, -1.25_cm},
+                    {LEFT, 0_cm},
+                    {RIGHT, 0_cm},
                     {NONE, 0_in}
                 }},
             {19,
                 {
-                    {LEFT, -1.25_cm},
-                    {RIGHT, -1.25_cm},
+                    {LEFT, 0_cm},
+                    {RIGHT, 0_cm},
                     {NONE, 0_in}
                 }},
             {20,
                 {
-                    {LEFT, -1.25_cm},
-                    {RIGHT, -1.25_cm},
+                    {LEFT, 0_cm},
+                    {RIGHT, 0_cm},
                     {NONE, 0_in}
                 }},
             {21,
                 {
-                    {LEFT, -1.25_cm},
-                    {RIGHT, -1.25_cm},
+                    {LEFT, 0_cm},
+                    {RIGHT, 0_cm},
                     {NONE, 0_in}
                 }},
             {22,
                 {
-                    {LEFT, -1.25_cm},
-                    {RIGHT, -1.25_cm},
+                    {LEFT, 0_cm},
+                    {RIGHT, 0_cm},
                     {NONE, 0_in}
                 }}
         };
@@ -440,38 +440,38 @@ namespace Constants {
         static std::unordered_map<AprilTag, DirectionalOffSet> redPoleOffsets {
             {6,
                 {
-                    {LEFT, -1.25_cm},
-                    {RIGHT, -1.25_cm},
+                    {LEFT, 0_cm},
+                    {RIGHT, 0_cm},
                     {NONE, 0_in}
                 }},
             {7,
                 {
-                    {LEFT, -1.25_cm},
-                    {RIGHT, -1.25_cm},
+                    {LEFT, 0_cm},
+                    {RIGHT, 0_cm},
                     {NONE, 0_in}
                 }},
             {8,
                 {
-                    {LEFT, -1.25_cm},
-                    {RIGHT, -1.25_cm},
+                    {LEFT, 0_cm},
+                    {RIGHT, 0_cm},
                     {NONE, 0_in}
                 }},
             {9,
                 {
-                    {LEFT, -1.25_cm},
-                    {RIGHT, -1.25_cm},
+                    {LEFT, 0_cm},
+                    {RIGHT, 0_cm},
                     {NONE, 0_in}
                 }},
             {10,
                 {
-                    {LEFT, -1.25_cm},
-                    {RIGHT, -1.25_cm},
+                    {LEFT, 0_cm},
+                    {RIGHT, 0_cm},
                     {NONE, 0_in}
                 }},
             {11,
                 {
-                    {LEFT, -1.25_cm},
-                    {RIGHT, -1.25_cm},
+                    {LEFT, 0_cm},
+                    {RIGHT, 0_cm},
                     {NONE, 0_in}
                 }},
         };
@@ -506,8 +506,8 @@ namespace Constants {
                 };
                 default: return {
                     {ELEVATOR_STATE::ONE, 12_tps},
-                    {ELEVATOR_STATE::TWO, 20_tps},
-                    {ELEVATOR_STATE::THREE, 20_tps},
+                    {ELEVATOR_STATE::TWO, 13_tps},
+                    {ELEVATOR_STATE::THREE, 13_tps},
                     {ELEVATOR_STATE::FOUR, 40_tps}
                 };
             }}
@@ -546,9 +546,9 @@ namespace Constants {
                                 { ELEVATOR_STATE::STOWED, 3.25_in },
                                 { ELEVATOR_STATE::HP, 3.25_in },
                                 { ELEVATOR_STATE::ONE, 10.2_in },
-                                { ELEVATOR_STATE::TWO, 14.1_in },
-                                { ELEVATOR_STATE::THREE, 19.5_in },
-                                { ELEVATOR_STATE::FOUR, 27.25_in }
+                                { ELEVATOR_STATE::TWO, 13.6_in }, //Tomball: 14.1
+                                { ELEVATOR_STATE::THREE, 19.0_in }, //Tomball: 19.5
+                                { ELEVATOR_STATE::FOUR, 26.75_in } //Tomball: 27.25
                             }
                         },
                         {
@@ -587,7 +587,7 @@ namespace Constants {
             /// Time to reach max velocity
             static units::second_t getElevMaxVelRampTime() { switch (robot) {
                 case Robot::Alpha: return 1.0_s / 5;
-                default: return 12.6_s/22.0; // should be 42.0 but the elevator slips
+                default: return 12.6_s/32.0; // should be 42.0 but the elevator slips
             }}
 
             static double getScorerSensorToMech() { switch (robot) {
