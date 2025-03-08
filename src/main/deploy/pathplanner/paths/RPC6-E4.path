@@ -3,53 +3,40 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 16.17141393442623,
-        "y": 7.027920081967213
+        "x": 10.388000000000002,
+        "y": 7.552
       },
       "prevControl": null,
       "nextControl": {
-        "x": 14.073565573770491,
-        "y": 5.445543032786887
+        "x": 11.40972131147541,
+        "y": 7.027920081967213
       },
       "isLocked": false,
-      "linkedName": "FR-HP"
+      "linkedName": "R-PC6"
     },
     {
       "anchor": {
-        "x": 13.585811577752555,
-        "y": 5.2301929625425645
+        "x": 12.645300000000002,
+        "y": 5.2559000000000005
       },
       "prevControl": {
-        "x": 14.313319672131147,
-        "y": 5.68529713114754
+        "x": 11.61608606557377,
+        "y": 5.937038934426229
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "FR-D"
+      "linkedName": "R-E"
     }
   ],
   "rotationTargets": [],
   "constraintZones": [
     {
       "name": "Constraints Zone",
-      "minWaypointRelativePos": 0.35,
+      "minWaypointRelativePos": 0.2,
       "maxWaypointRelativePos": 1.0,
       "constraints": {
         "maxVelocity": 1.5,
         "maxAcceleration": 2.5,
-        "maxAngularVelocity": 540.0,
-        "maxAngularAcceleration": 720.0,
-        "nominalVoltage": 12.0,
-        "unlimited": false
-      }
-    },
-    {
-      "name": "Constraints Zone",
-      "minWaypointRelativePos": 0,
-      "maxWaypointRelativePos": 0.35,
-      "constraints": {
-        "maxVelocity": 4.0,
-        "maxAcceleration": 4.0,
         "maxAngularVelocity": 540.0,
         "maxAngularAcceleration": 720.0,
         "nominalVoltage": 12.0,
@@ -61,7 +48,7 @@
   "eventMarkers": [
     {
       "name": "LEVEL FOUR POSITION",
-      "waypointRelativePos": 0.35,
+      "waypointRelativePos": 0.2,
       "endWaypointRelativePos": null,
       "command": {
         "type": "named",
@@ -91,14 +78,14 @@
     "unlimited": false
   },
   "goalEndState": {
-    "velocity": 0.0,
-    "rotation": -119.99999999999999
+    "velocity": 0,
+    "rotation": -59.99999999999999
   },
   "reversed": false,
-  "folder": "H-R",
+  "folder": "Push Paths",
   "idealStartingState": {
-    "velocity": 1.0,
-    "rotation": -125.00000000000001
+    "velocity": 0,
+    "rotation": 0.0
   },
   "useDefaultConstraints": true
 }

@@ -1,0 +1,54 @@
+{
+  "version": "2025.0",
+  "waypoints": [
+    {
+      "anchor": {
+        "x": 10.448,
+        "y": 7.5519
+      },
+      "prevControl": null,
+      "nextControl": {
+        "x": 10.198,
+        "y": 7.5519
+      },
+      "isLocked": false,
+      "linkedName": "R-C6"
+    },
+    {
+      "anchor": {
+        "x": 10.388000000000002,
+        "y": 7.552
+      },
+      "prevControl": {
+        "x": 10.638000000000002,
+        "y": 7.552
+      },
+      "nextControl": null,
+      "isLocked": false,
+      "linkedName": "R-PC6"
+    }
+  ],
+  "rotationTargets": [],
+  "constraintZones": [],
+  "pointTowardsZones": [],
+  "eventMarkers": [],
+  "globalConstraints": {
+    "maxVelocity": 3.5,
+    "maxAcceleration": 3.5,
+    "maxAngularVelocity": 540.0,
+    "maxAngularAcceleration": 720.0,
+    "nominalVoltage": 12.0,
+    "unlimited": false
+  },
+  "goalEndState": {
+    "velocity": 0,
+    "rotation": 0.0
+  },
+  "reversed": false,
+  "folder": "Push Paths",
+  "idealStartingState": {
+    "velocity": 0,
+    "rotation": 0.0
+  },
+  "useDefaultConstraints": true
+}

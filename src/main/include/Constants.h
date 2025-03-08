@@ -256,7 +256,7 @@ namespace Constants {
         static units::angle::turn_t getElevatorMagnetOffset() { switch (robot) {
             case Robot::Alpha: return 0.10327_tr; 
             case Robot::Gold: return 0.052979_tr; //  0.989014_tr;
-            default: return 0.286377_tr;
+            default: return 0.179443359375_tr;
         }};
 
         static double getElevKAFF() { switch (robot) {
