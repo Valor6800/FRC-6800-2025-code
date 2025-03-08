@@ -392,8 +392,8 @@ void Drivetrain::analyzeDashboard()
         state.elevState == Constants::Scorer::ELEVATOR_STATE::FOUR &&
         state.gamePiece == Constants::Scorer::GAME_PIECE::ALGEE
     ) {
-        state.netAngle = frc::DriverStation::kRed ? 180_deg : 0_deg;
-        if (units::math::abs(state.netAngle - calcEstimator.get()->GetEstimatedPosition().Rotation().Degrees()) < 10_deg) {
+        state.netAngle = frc::DriverStation::GetAlliance() == frc::DriverStation::kRed ? 180_deg : 0_deg;
+        if (units::math::abs((frc::Rotation2d(state.netAngle) - (calcEstimator.get()->GetEstimatedPosition().Rotation())).Degrees()) < 60_deg) {
             Swerve::targetAngle = state.netAngle;
             Swerve::yAlign = false;
             Swerve::rotAlign = true;
