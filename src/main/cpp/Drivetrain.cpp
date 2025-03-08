@@ -101,8 +101,8 @@ Drivetrain::Drivetrain(frc::TimedRobot *_robot, CANdle& leds) :
         WHEEL_DIAMETER
     ),
     teleopStart(999999999999),
-    leftDistanceSensor(_robot, "LEFT Front Distance Sensor", CANIDs::LEFT_CAN_RANGE_DRIVETRAIN_SENSOR, " "),
-    rightdistanceSensor(_robot, "FRIGHT ront Distance Sensor", CANIDs::RIGHT_CAN_RANGE_DRIVETRAIN_SENSOR, " ")
+    leftDistanceSensor(_robot, "LEFT Front Distance Sensor", CANIDs::LEFT_CAN_RANGE_DRIVETRAIN_SENSOR, ""),
+    rightdistanceSensor(_robot, "RIGHT FRONT Distance Sensor", CANIDs::RIGHT_CAN_RANGE_DRIVETRAIN_SENSOR, "")
 
 {
     xPIDF.P = KPX;
@@ -599,6 +599,7 @@ bool Drivetrain::withinXRange() {
             return false;
         }
         return (measuredDistance < (units::meter_t) table->GetNumber("Viable Dunk Distance (m)", VIABLE_DUNK_DISTANCE.value()));
+        
     }
     return false;
 }
