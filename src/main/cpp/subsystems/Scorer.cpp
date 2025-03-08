@@ -444,8 +444,9 @@ void Scorer::analyzeDashboard()
         drivetrain->withinYRange() &&
         state.scopedState == SCOPED_STATE::SCOPED &&
         elevatorWithinThreshold &&
+        autoDunk &&
         state.gamePiece == GAME_PIECE::CORAL &&
-        (state.elevState == TWO || state.elevState == THREE)
+        (state.elevState == TWO || state.elevState == THREE || state.elevState == FOUR)
     ) {
         state.scoringState = SCORE_STATE::SCORING;
     }

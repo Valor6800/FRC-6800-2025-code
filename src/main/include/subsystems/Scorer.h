@@ -71,6 +71,8 @@ public:
         bool protectChin;
     } state;
 
+    bool autoDunk;
+
 private:
     frc2::CommandPtr scorerPitSequenceStage(Constants::Scorer::GAME_PIECE, Constants::Scorer::ELEVATOR_STATE);
     
