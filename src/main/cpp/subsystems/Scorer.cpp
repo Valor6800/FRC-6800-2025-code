@@ -428,7 +428,7 @@ void Scorer::analyzeDashboard()
 
     bool autoDunkEnabled = table->GetBoolean("Auto Dunk Enabled", true);
 
-    if (state.scoringState != SCORE_STATE::SCORING){
+    if (state.scoringState != SCORE_STATE::SCORING || (state.elevState == ELEVATOR_STATE::ONE && state.gamePiece == GAME_PIECE::CORAL)){
         state.protectChin = false;
     }
 
@@ -480,6 +480,9 @@ void Scorer::assignOutputs()
     } else {
         if(state.scopedState == SCOPED){
             state.targetHeight = positionMap.at(state.gamePiece).at(state.elevState);
+            if (state.elevState == ELEVATOR_STATE::ONE && state.gamePiece == GAME_PIECE::CORAL && state.scoringState == SCORE_STATE::SCORING) {
+                state.targetHeight += 4_in;
+            }
         } else{
             state.targetHeight = positionMap.at(state.gamePiece).at(HP);
         }
