@@ -101,7 +101,8 @@ Drivetrain::Drivetrain(frc::TimedRobot *_robot, CANdle& leds) :
         WHEEL_DIAMETER
     ),
     teleopStart(999999999999),
-    distanceSensor(_robot, "Front Distance Sensor", CANIDs::FRONT_LEFT_LIDAR_SENSOR, "")
+    leftDistanceSensor(_robot, "LEFT Front Distance Sensor", CANIDs::LEFT_CAN_RANGE_DRIVETRAIN_SENSOR, " "),
+    rightdistanceSensor(_robot, "FRIGHT ront Distance Sensor", CANIDs::RIGHT_CAN_RANGE_DRIVETRAIN_SENSOR, " ")
 
 {
     xPIDF.P = KPX;
@@ -121,7 +122,8 @@ Drivetrain::Drivetrain(frc::TimedRobot *_robot, CANdle& leds) :
     table->PutNumber("Left Align Offset", AA_LEFT_OFFSET.value());
     table->PutNumber("Right Align Offset", AA_RIGHT_OFFSET.value());
 
-    distanceSensor.setMaxDistance(2_m);
+    leftDistanceSensor.setMaxDistance(2_m);
+    rightdistanceSensor.setMaxDistance(2_m);
 
     Swerve::Y_KP = Y_ALIGN_KP;
     Swerve::Y_KI = Y_ALIGN_KI;
@@ -584,14 +586,22 @@ void Drivetrain::alignAngleZoning()
 
 
 bool Drivetrain::withinXRange() {
-    units::meter_t measuredDistance = distanceSensor.getLidarData();
-    if (measuredDistance < 0_m) {
-        return false; 
-    }    
-    return (measuredDistance < (units::meter_t) table->GetNumber("Viable Dunk Distance (m)", VIABLE_DUNK_DISTANCE.value()));
+    if (state.dir == LEFT) {
+        units::meter_t measuredDistance = rightdistanceSensor.getLidarData();
+        if (measuredDistance < 0_m) {
+            return false;
+        }
+        return (measuredDistance < (units::meter_t) table->GetNumber("Viable Dunk Distance (m)", VIABLE_DUNK_DISTANCE.value()));
+    } 
+    else if (state.dir == RIGHT) {
+        units::meter_t measuredDistance = leftDistanceSensor.getLidarData();
+        if (measuredDistance < 0_m) {
+            return false;
+        }
+        return (measuredDistance < (units::meter_t) table->GetNumber("Viable Dunk Distance (m)", VIABLE_DUNK_DISTANCE.value()));
+    }
+    return false;
 }
-
-
 
 bool Drivetrain::withinYRange() {
     return yControllerAligned();
@@ -684,8 +694,13 @@ void Drivetrain::InitSendable(wpi::SendableBuilder& builder)
             nullptr
         );
         builder.AddDoubleProperty(
-            "Distance",
-            [this] {return distanceSensor.getLidarData().value();},
+            "left lidar distance",
+            [this] {return leftDistanceSensor.getLidarData().value();},
+            nullptr
+        );
+          builder.AddDoubleProperty(
+            "right lidar distance",
+            [this] {return rightdistanceSensor.getLidarData().value();},
             nullptr
         );
         builder.AddDoubleProperty(

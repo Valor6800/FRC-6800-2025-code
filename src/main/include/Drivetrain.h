@@ -174,7 +174,8 @@ public:
 
 private:
 
-     valor::CANrangeSensor distanceSensor;
+     valor::CANrangeSensor leftDistanceSensor;
+     valor::CANrangeSensor rightdistanceSensor;
      units::meter_t averageXDistance;
 
      frc2::CommandPtr pitSequenceCommand(const frc::ChassisSpeeds&);
