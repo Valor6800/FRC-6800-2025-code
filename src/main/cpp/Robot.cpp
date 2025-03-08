@@ -87,6 +87,7 @@ void Robot::DisabledPeriodic() {
 // TODO: re-add the neutral mode back in
 void Robot::AutonomousInit() {
     drivetrain.resetState();
+    scorer.autoDunk = false;
     drivetrain.doubtX = AUTO_DOUBTX;
     drivetrain.doubtY = AUTO_DOUBTY;
 
@@ -105,6 +106,7 @@ void Robot::AutonomousPeriodic() {
 
 void Robot::TeleopInit() {
     scorer.resetState();
+    scorer.autoDunk = true;
     drivetrain.setTeleopStartTime();
 }
 /**
