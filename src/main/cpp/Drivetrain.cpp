@@ -89,6 +89,7 @@ const units::meter_t WHEEL_DIAMETER(0.0973_m);
 #define AA_LEFT_OFFSET 0.0_in // 0.5_in
 #define AA_RIGHT_OFFSET 0.0_in // 1.5_in
 #define VIABLE_DUNK_DISTANCE 0.28_m //0.3
+#define VIABLE_DUNK_SPEED 10.0_mps
 
 #define Y_ACTIVATION_THRESHOLD 30.0_deg
 
@@ -164,6 +165,7 @@ Drivetrain::Drivetrain(frc::TimedRobot *_robot, CANdle& leds) :
     );
 
     table->PutNumber("Viable Dunk Distance (m)", VIABLE_DUNK_DISTANCE.value());
+    table->PutNumber("Viable Dunk speed", VIABLE_DUNK_SPEED.value());
     /*
      * 3.8m/s, 5m/s^2, ~125lbs Apr. 2
      */
@@ -604,8 +606,19 @@ bool Drivetrain::withinXRange() {
     return false;
 }
 
+
 bool Drivetrain::withinYRange() {
     return yControllerAligned();
+}
+
+bool Drivetrain::isSpeedBelowThreshold() {
+    frc::ChassisSpeeds speeds = getRobotRelativeSpeeds();
+    
+    units::meters_per_second_t totalSpeed = units::math::hypot(
+        speeds.vx, 
+        speeds.vy
+    );
+    return (totalSpeed < (units::meters_per_second_t) table->GetNumber("Viable Dunk speed", VIABLE_DUNK_SPEED.value()));
 }
 
 void Drivetrain::choosePoleDirection(Direction dir, Constants::AprilTag tag){

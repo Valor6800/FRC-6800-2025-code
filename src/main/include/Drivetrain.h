@@ -169,8 +169,7 @@ public:
 
      double doubtX, doubtY;
 
-
-     bool withinXRange(), withinYRange();
+     bool withinXRange(), withinYRange(), isSpeedBelowThreshold();
 
 private:
 

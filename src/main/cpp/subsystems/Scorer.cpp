@@ -437,6 +437,7 @@ void Scorer::analyzeDashboard()
     
     if (
         autoDunkEnabled &&
+        drivetrain->isSpeedBelowThreshold() &&
         drivetrain->withinXRange() &&
         drivetrain->withinYRange() &&
         state.scopedState == SCOPED_STATE::SCOPED &&
