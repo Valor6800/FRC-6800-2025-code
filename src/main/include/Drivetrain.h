@@ -176,7 +176,7 @@ public:
 
      bool withinXRange(units::meter_t), withinYRange(), isSpeedBelowThreshold();
 
-     void worldFrameAlignment();
+     void worldFrameAlignment(frc::Pose2d reefTagPose);
      void tagFrameAlignment();
      void getLeastSkewTagDistance(valor::AprilTagsSensor* aprilSensor, units::radian_t leastSkew);
 
