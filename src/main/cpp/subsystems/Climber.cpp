@@ -16,10 +16,10 @@
 #define CLIMB_GEAR_RATIO 145.36
 #define CRAB_GEAR_RATIO 0
 
-#define DEPLOYED_POS units::angle::turn_t (0.75)
-#define RETRACTED_POS units::angle::turn_t (0.367)// (0.353)
-#define LOCK_OUT_POS units::angle::turn_t (0.372)
-#define STOW_POS units::angle::turn_t (0.5)
+#define DEPLOYED_POS units::angle::turn_t (0.5)
+#define RETRACTED_POS units::angle::turn_t (0.9)// (0.353)
+#define LOCK_OUT_POS units::angle::turn_t (0.8)
+#define STOW_POS units::angle::turn_t (0.25)
 
 #define STABBY_SPEED 40_tps
 #define SPIKE_CURRENT 0
@@ -72,7 +72,14 @@ void Climber::init()
     //     "baseCAN"     
     // );
     
-    climbMotors->setupCANCoder(CANIDs::CLIMBER_CAN, Constants::Climber::magnetOffset(), true, "baseCAN", 1_tr); //0.5022
+    // climbMotors->setupCANCoder(CANIDs::CLIMBER_CAN, Constants::Climber::magnetOffset(), true, "baseCAN", 1_tr); //0.5022
+
+    ctre::phoenix6::hardware::CANcoder* climbCancoder = new ctre::phoenix6::hardware::CANcoder(CANIDs::CLIMBER_CAN, "baseCAN");
+    ctre::phoenix6::configs::MagnetSensorConfigs cancoderConfig;
+    cancoderConfig.AbsoluteSensorDiscontinuityPoint = 1_tr;
+    cancoderConfig.SensorDirection = ctre::phoenix6::signals::SensorDirectionValue::Clockwise_Positive;
+    cancoderConfig.MagnetOffset = -Constants::Climber::magnetOffset();
+    climbCancoder->GetConfigurator().Apply(cancoderConfig);
 
     climbMotors->setGearRatios(CLIMB_GEAR_RATIO, 1.0);
     // stabbyMotor->setGearRatios(1.0, STABBY_ROTOR_TO_SENSOR);
@@ -105,6 +112,8 @@ void Climber::init()
     table->PutNumber("Cache Size", state.cacheSize);
 
     resetState();
+
+    climbMotors->setEncoderPosition(climbCancoder->GetPosition().GetValue());
 }
 
 void Climber::assessInputs()
@@ -136,7 +145,7 @@ void Climber::analyzeDashboard()
 void Climber::assignOutputs()
 {
 
-    if(climbMotors->getPosition() < LOCK_OUT_POS || state.hasClimbed){
+    if(climbMotors->getPosition() >= LOCK_OUT_POS || state.hasClimbed){
         climbMotors->setPower(0_V);
         state.hasClimbed = true;
     } else{
