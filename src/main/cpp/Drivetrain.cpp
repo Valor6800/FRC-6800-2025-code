@@ -7,6 +7,7 @@
 #include <pathplanner/lib/auto/AutoBuilder.h>
 #include <string>
 #include "Constants.h"
+#include "frc/geometry/Pose2d.h"
 #include "frc2/command/FunctionalCommand.h"
 #include "units/acceleration.h"
 #include "units/base.h"
@@ -365,50 +366,33 @@ void Drivetrain::analyzeDashboard()
         }
 
         Swerve::yDistance = units::length::meter_t (state.yEstimate); //units::length::meter_t {filter.Calculate(unfilteredYDistance)};
-    }
+    } else {
+        frc::Pose2d robotToCenter{
+            getCalculatedPose().Translation() + frc::Translation2d(-17.5482504_m / 2.0, -8.0519016_m / 2.0),
+            getCalculatedPose().Rotation()
+        };
 
-    else {
-        Swerve::yDistance = 0_m;
-        if (state.alignToTarget) {
-            frc::Pose2d robotToCenter{
-                getCalculatedPose().Translation() + frc::Translation2d(-17.5482504_m / 2.0, -8.0519016_m / 2.0),
-                getCalculatedPose().Rotation()
-            };
+        std::pair<int, frc::Pose3d> temp = valor::getNearestTag( 
+            robotToCenter,
+            frc::DriverStation::kRed == frc::DriverStation::GetAlliance() ? valor::redReefAprilTagPoses : valor::blueReefAprilTagPoses
+        );
 
-            std::pair<int, frc::Pose3d> temp = valor::getNearestTag( 
-                robotToCenter,
-                frc::DriverStation::kRed == frc::DriverStation::GetAlliance() ? valor::redReefAprilTagPoses : valor::blueReefAprilTagPoses
-            );
+        std::pair<int, frc::Pose2d> reefTagPose{ temp.first, temp.second.ToPose2d()};
 
-            std::pair<int, frc::Pose2d> reefTagPose{ temp.first, temp.second.ToPose2d()};
-
-            reefTagPose = std::pair<int, frc::Pose2d>{
-                reefTagPose.first,
-                frc::Pose2d{
-                    reefTagPose.second.Translation() + frc::Translation2d(17.5482504_m / 2.0, 8.0519016_m / 2.0),
-                    reefTagPose.second.Rotation()
-                }
-            };
-
-            state.reefTag = reefTagPose.first;
-
-            reefPublisher.Set(reefTagPose.second);
-
-            frc::Transform2d reefTagTransform{
-                reefTagPose.second.Translation(),
+        reefTagPose = std::pair<int, frc::Pose2d>{
+            reefTagPose.first,
+            frc::Pose2d{
+                reefTagPose.second.Translation() + frc::Translation2d(17.5482504_m / 2.0, 8.0519016_m / 2.0),
                 reefTagPose.second.Rotation()
-            };
+            }
+        };
 
-            frc::Transform2d robotTransform{
-                getCalculatedPose().Translation(),
-                getCalculatedPose().Rotation()
-            };
+        state.reefTag = reefTagPose.first;
 
-            frc::Transform2d robotInTagSpaceTransform = reefTagTransform.Inverse() + robotTransform;
+        reefPublisher.Set(reefTagPose.second);
 
-            robotInTagSpacePublisher.Set(robotInTagSpaceTransform);
-
-            Swerve::yDistance = robotInTagSpaceTransform.Y();
+        if (state.alignToTarget) {
+            worldFrameAlignment(reefTagPose.second);
         }
     }
 
@@ -531,45 +515,22 @@ void Drivetrain::tagFrameAlignment() {
     }
 }
 
-void Drivetrain::worldFrameAlignment() {
-    frc::Pose2d robotToCenter{
-        getCalculatedPose().Translation() + frc::Translation2d(-17.5482504_m / 2.0, -8.0519016_m / 2.0),
-        getCalculatedPose().Rotation()
-    };
+void Drivetrain::worldFrameAlignment(frc::Pose2d reefTagPose) {
+            frc::Transform2d reefTagTransform{
+                reefTagPose.Translation(),
+                reefTagPose.Rotation()
+            };
 
-    std::pair<int, frc::Pose3d> temp = valor::getNearestTag(
-        robotToCenter,
-        frc::DriverStation::kRed == frc::DriverStation::GetAlliance() ? valor::redReefAprilTagPoses : valor::blueReefAprilTagPoses
-    );
-    std::pair<int, frc::Pose2d> reefTagPose{ temp.first, temp.second.ToPose2d()};
-    
-    reefTagPose = std::pair<int, frc::Pose2d>{
-        reefTagPose.first,
-        frc::Pose2d{
-            reefTagPose.second.Translation() + frc::Translation2d(17.5482504_m / 2.0, 8.0519016_m / 2.0),
-            reefTagPose.second.Rotation()
-        }
-    };
-    
-    state.reefTag = reefTagPose.first;
-    
-    reefPublisher.Set(reefTagPose.second);
-    
-    frc::Transform2d reefTagTransform{
-        reefTagPose.second.Translation(),
-        reefTagPose.second.Rotation()
-    };
-    
-    frc::Transform2d robotTransform{
-        getCalculatedPose().Translation(),
-        getCalculatedPose().Rotation()
-    };
-    
-    frc::Transform2d robotInTagSpaceTransform = reefTagTransform.Inverse() + robotTransform;
-    
-    robotInTagSpacePublisher.Set(robotInTagSpaceTransform);
-    
-    Swerve::yDistance = robotInTagSpaceTransform.Y();
+            frc::Transform2d robotTransform{
+                getCalculatedPose().Translation(),
+                getCalculatedPose().Rotation()
+            };
+
+            frc::Transform2d robotInTagSpaceTransform = reefTagTransform.Inverse() + robotTransform;
+
+            robotInTagSpacePublisher.Set(robotInTagSpaceTransform);
+
+            Swerve::yDistance = robotInTagSpaceTransform.Y();
 }
 
 units::meters_per_second_t Drivetrain::getRobotSpeeds(){
