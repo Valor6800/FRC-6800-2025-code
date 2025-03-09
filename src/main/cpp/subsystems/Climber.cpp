@@ -13,13 +13,15 @@
 #define STABBY_K_P 0.6
 #define STABBY_K_S 0.5
 
-#define CLIMB_GEAR_RATIO 145.36
+#define CLIMB_GEAR_RATIO 58.1432
 #define CRAB_GEAR_RATIO 0
 
-#define DEPLOYED_POS units::angle::turn_t (0.5)
-#define RETRACTED_POS units::angle::turn_t (0.9)// (0.353)
-#define LOCK_OUT_POS units::angle::turn_t (0.8)
-#define STOW_POS units::angle::turn_t (0.25)
+#define DEPLOYED_POS units::angle::turn_t (1.6) // (1.71)
+#define RETRACTED_POS units::angle::turn_t (3.05)// (0.353)
+#define LOCK_OUT_POS units::angle::turn_t (3.00) // (2.7)
+#define STOW_POS units::angle::turn_t (0.5)
+
+// soft limit of 3
 
 #define STABBY_SPEED 40_tps
 #define SPIKE_CURRENT 0
@@ -34,7 +36,7 @@ Climber::Climber(frc::TimedRobot *_robot, CANdle& candle) : valor::BaseSubsystem
     frc2::CommandScheduler::GetInstance().RegisterSubsystem(this);
     init();
 
-    candle.getters[5] = [this] { return CANdle::cancoderMagnetHealthGetter(*climbMotors->getCANCoder()); };
+    // candle.getters[5] = [this] { return CANdle::cancoderMagnetHealthGetter(*climbMotors->getCANCoder()); };
 }
 
 Climber::~Climber()
@@ -77,13 +79,21 @@ void Climber::init()
     ctre::phoenix6::hardware::CANcoder* climbCancoder = new ctre::phoenix6::hardware::CANcoder(CANIDs::CLIMBER_CAN, "baseCAN");
     ctre::phoenix6::configs::MagnetSensorConfigs cancoderConfig;
     cancoderConfig.AbsoluteSensorDiscontinuityPoint = 1_tr;
-    cancoderConfig.SensorDirection = ctre::phoenix6::signals::SensorDirectionValue::Clockwise_Positive;
+    cancoderConfig.SensorDirection = ctre::phoenix6::signals::SensorDirectionValue::CounterClockwise_Positive;
     cancoderConfig.MagnetOffset = -Constants::Climber::magnetOffset();
     climbCancoder->GetConfigurator().Apply(cancoderConfig);
 
-    climbMotors->setGearRatios(CLIMB_GEAR_RATIO, 1.0);
+    climbMotors->setCurrentLimits(
+        units::ampere_t{100},
+        units::ampere_t{60},
+        units::ampere_t{45},
+        units::second_t{0.5},
+        true
+    );
+
+    climbMotors->setGearRatios(1.0, CLIMB_GEAR_RATIO);
     // stabbyMotor->setGearRatios(1.0, STABBY_ROTOR_TO_SENSOR);
-    stabbyPID.P = STABBY_K_P;
+    // stabbyPID.P = STABBY_K_P;
 
     // stabbyMotor->setPIDF(stabbyPID, 0);
     // stabbyMotor->applyConfig();
@@ -97,7 +107,7 @@ void Climber::init()
 
     climbMotors->setForwardLimit(Constants::Climber::getForwardLimit());
     climbMotors->setReverseLimit(Constants::Climber::getReverseLimit());
-    climbMotors->setupFollower(CANIDs::CLIMBER_FOLLOW, Constants::Climber::climbMotorInverted());
+    // climbMotors->setupFollower(CANIDs::CLIMBER_FOLLOW, Constants::Climber::climbMotorInverted());
     climbMotors->setPIDF(climbRetractPID, 1);
     climbMotors->setPIDF(climbPID, 0);
     climbMotors->setContinuousWrap(true);
@@ -113,7 +123,7 @@ void Climber::init()
 
     resetState();
 
-    climbMotors->setEncoderPosition(climbCancoder->GetPosition().GetValue());
+    climbMotors->setEncoderPosition(climbCancoder->GetAbsolutePosition().GetValue());
 }
 
 void Climber::assessInputs()
@@ -145,20 +155,21 @@ void Climber::analyzeDashboard()
 void Climber::assignOutputs()
 {
 
-    if(climbMotors->getPosition() >= LOCK_OUT_POS || state.hasClimbed){
-        climbMotors->setPower(0_V);
-        state.hasClimbed = true;
-    } else{
+    // if(climbMotors->getPosition() >= LOCK_OUT_POS || state.hasClimbed){
+    //     climbMotors->setPower(0_V);
+    //     state.hasClimbed = true;
+    // } else{
         if (state.climbState == CLIMB_STATE::MANUAL) {
             climbMotors->setPower(state.manualSpeed);
-        } else if (state.climbState == CLIMB_STATE::DEPLOYED) {
-            climbMotors->setPosition(DEPLOYED_POS, 0);
-        } else if (state.climbState == CLIMB_STATE::RETRACTED) {
-            climbMotors->setPosition(RETRACTED_POS, 1);
-        } else if(state.climbState == CLIMB_STATE::STOW){
-            climbMotors->setPosition(STOW_POS, 0);
         }
-    }
+        // } else if (state.climbState == CLIMB_STATE::DEPLOYED) {
+        //     climbMotors->setPosition(DEPLOYED_POS, 0);
+        // } else if (state.climbState == CLIMB_STATE::RETRACTED) {
+        //     climbMotors->setPosition(RETRACTED_POS, 1);
+        // } else if(state.climbState == CLIMB_STATE::STOW){
+        //     climbMotors->setPosition(STOW_POS, 0);
+        // }
+    // }
 
     //  if (state.climbState == CLIMB_STATE::DEPLOYED || state.stabState == STABBY_STATE::CRABBING) {
     //     stabbyMotor->setSpeed(STABBY_SPEED);
