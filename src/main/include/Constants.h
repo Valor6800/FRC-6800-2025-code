@@ -650,7 +650,7 @@ namespace Constants {
             static units::turn_t magnetOffset() { switch (robot) {
                 case Robot::Alpha: return 0_tr;
                 case Robot::Gold: return -0.572509_tr;
-                default: return 0.492187_tr;
+                default: return 0.0875_tr;
             }}
 
             static bool climbMotorInverted() { switch (robot) {
@@ -691,12 +691,12 @@ namespace Constants {
 
             static units::turn_t getForwardLimit() { switch (robot) {
                 case Robot::Alpha: return 0.25_tr;
-                default: return 0.77_tr;
+                default: return 3.1_tr;
             }}
 
             static units::turn_t getReverseLimit() { switch (robot) {
                 case Robot::Alpha: return -0.2_tr;
-                default: return 0.325_tr;
+                default: return 0.5_tr;
             }}
         }
 }
