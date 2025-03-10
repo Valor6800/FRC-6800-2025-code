@@ -16,10 +16,11 @@
 #define CLIMB_GEAR_RATIO 58.1432
 #define CRAB_GEAR_RATIO 0
 
-#define DEPLOYED_POS units::angle::turn_t (1.6) // (1.71)
-#define RETRACTED_POS units::angle::turn_t (3.05)// (0.353)
-#define LOCK_OUT_POS units::angle::turn_t (3.00) // (2.7)
+#define DEPLOYED_POS units::angle::turn_t (1.5) // (1.6
+#define RETRACTED_POS units::angle::turn_t (3.646)// (0.36
+#define LOCK_OUT_POS units::angle::turn_t (0.3) // (2.7)
 #define STOW_POS units::angle::turn_t (0.5)
+//enocder climb value at .3
 
 // soft limit of 3
 
@@ -59,7 +60,7 @@ void Climber::init()
     valor::PIDF stabbyPID;
 
     climbMotors = new valor::PhoenixController(
-        valor::PhoenixControllerType::KRAKEN_X60_FOC,
+        valor::PhoenixControllerType::KRAKEN_X44_FOC,
         CANIDs::CLIMBER_LEAD,
         valor::NeutralMode::Brake,
         Constants::Climber::climbMotorInverted(),
@@ -76,7 +77,7 @@ void Climber::init()
     
     // climbMotors->setupCANCoder(CANIDs::CLIMBER_CAN, Constants::Climber::magnetOffset(), true, "baseCAN", 1_tr); //0.5022
 
-    ctre::phoenix6::hardware::CANcoder* climbCancoder = new ctre::phoenix6::hardware::CANcoder(CANIDs::CLIMBER_CAN, "baseCAN");
+   climbCancoder = new ctre::phoenix6::hardware::CANcoder(CANIDs::CLIMBER_CAN, "baseCAN");
     ctre::phoenix6::configs::MagnetSensorConfigs cancoderConfig;
     cancoderConfig.AbsoluteSensorDiscontinuityPoint = 1_tr;
     cancoderConfig.SensorDirection = ctre::phoenix6::signals::SensorDirectionValue::CounterClockwise_Positive;
@@ -110,7 +111,7 @@ void Climber::init()
     // climbMotors->setupFollower(CANIDs::CLIMBER_FOLLOW, Constants::Climber::climbMotorInverted());
     climbMotors->setPIDF(climbRetractPID, 1);
     climbMotors->setPIDF(climbPID, 0);
-    climbMotors->setContinuousWrap(true);
+    climbMotors->setContinuousWrap(false);
     climbMotors->enableFOC(true);
     climbMotors->setVoltageLimits(
         units::volt_t(0.0),
@@ -155,21 +156,20 @@ void Climber::analyzeDashboard()
 void Climber::assignOutputs()
 {
 
-    // if(climbMotors->getPosition() >= LOCK_OUT_POS || state.hasClimbed){
-    //     climbMotors->setPower(0_V);
-    //     state.hasClimbed = true;
-    // } else{
+    if(climbCancoder->GetAbsolutePosition().GetValue()<= LOCK_OUT_POS || state.hasClimbed){
+        climbMotors->setPower(0_V);
+        state.hasClimbed = true;
+    } else{
         if (state.climbState == CLIMB_STATE::MANUAL) {
             climbMotors->setPower(state.manualSpeed);
+        } else if (state.climbState == CLIMB_STATE::DEPLOYED) {
+            climbMotors->setPosition(DEPLOYED_POS, 0);
+        } else if (state.climbState == CLIMB_STATE::RETRACTED) {
+            climbMotors->setPosition(RETRACTED_POS, 1);
+        } else if(state.climbState == CLIMB_STATE::STOW){
+            climbMotors->setPosition(STOW_POS, 0);
         }
-        // } else if (state.climbState == CLIMB_STATE::DEPLOYED) {
-        //     climbMotors->setPosition(DEPLOYED_POS, 0);
-        // } else if (state.climbState == CLIMB_STATE::RETRACTED) {
-        //     climbMotors->setPosition(RETRACTED_POS, 1);
-        // } else if(state.climbState == CLIMB_STATE::STOW){
-        //     climbMotors->setPosition(STOW_POS, 0);
-        // }
-    // }
+    }
 
     //  if (state.climbState == CLIMB_STATE::DEPLOYED || state.stabState == STABBY_STATE::CRABBING) {
     //     stabbyMotor->setSpeed(STABBY_SPEED);

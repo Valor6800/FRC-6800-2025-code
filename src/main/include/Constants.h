@@ -666,7 +666,7 @@ namespace Constants {
                 }
                 default: {
                     valor::PIDF pidf;
-                    pidf.P = 10;
+                    pidf.P = 10; //10
                     return pidf;
                 }
             }}
@@ -691,7 +691,8 @@ namespace Constants {
 
             static units::turn_t getForwardLimit() { switch (robot) {
                 case Robot::Alpha: return 0.25_tr;
-                default: return 3.1_tr;
+                case Robot::Gold: return 3.1_tr;
+                default: return 3.646_tr;
             }}
 
             static units::turn_t getReverseLimit() { switch (robot) {
