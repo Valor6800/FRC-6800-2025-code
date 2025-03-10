@@ -14,6 +14,7 @@
 #include <fstream>
 #include <frc/RobotController.h>
 #include <frc/geometry/Rotation3d.h>
+#include <numbers>
 #include <units/angle.h>
 #include <units/length.h>
 #include <units/angular_velocity.h>
@@ -393,6 +394,10 @@ namespace Constants {
                 std::pair("limelight-mango", mangoCameraPosition())
             };
         }
+        }
+
+        static double cameraStandardDeviationLBF(units::meter_t distance) {
+            return 3.73 * powf(10, -5) * powf(M_E, 3.43 * distance.value());
         }
     
         typedef int AprilTag;

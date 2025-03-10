@@ -421,9 +421,14 @@ void Drivetrain::analyzeDashboard()
         aprilLime->applyVisionMeasurement(
             calcEstimator.get(),
             getRobotSpeeds(),
-            table->GetBoolean("Accepting Vision Measurements", true),
-            doubtX,
-            doubtY
+            table->GetBoolean("Accepting Vision Measurements", true)
+        );
+
+        aprilLime->applyVisionMeasurement(
+            alignEstimator.get(),
+            true,
+            Constants::cameraStandardDeviationLBF(aprilLime->get_botpose_targetspace().Y()),
+            Constants::cameraStandardDeviationLBF(aprilLime->get_botpose_targetspace().Y())
         );
     }
 

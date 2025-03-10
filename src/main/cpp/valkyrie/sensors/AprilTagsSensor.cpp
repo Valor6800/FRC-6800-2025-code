@@ -67,17 +67,30 @@ frc::Pose3d AprilTagsSensor::getPoseFromAprilTag() {
     ); 
 }
 
-void AprilTagsSensor::applyVisionMeasurement(frc::SwerveDrivePoseEstimator<4> *estimator, units::velocity::meters_per_second_t speed, bool accept, double doubtX, double doubtY, double doubtRot) {
-    if (!hasTarget() || !accept) return;
+void AprilTagsSensor::applyVisionMeasurement(
+    frc::SwerveDrivePoseEstimator<4> *estimator,
+    units::velocity::meters_per_second_t speed,
+    bool accept
+) {
     dp = DP;
     vp = VP;
  
-    //std::vector<double> botToTargetPose = limeTable->GetNumberArray("botpose_targetspace", std::span<const double>());
-    //if (botToTargetPose.size() == 6) distance = units::meter_t(sqrtf(powf(botToTargetPose[0], 2) + powf(botToTargetPose[1], 2)));
-    //else distance = 0_m; return;
-    double newDoubtX = doubtX + (distance.to<double>() * dp) + (vp * speed.to<double>());
-    double newDoubtY = doubtY + (distance.to<double>() * dp) + (vp * speed.to<double>());
+    double newDoubtX = (distance.to<double>() * dp) + (vp * speed.to<double>());
+    double newDoubtY = (distance.to<double>() * dp) + (vp * speed.to<double>());
+
+    applyVisionMeasurement(estimator, accept, newDoubtX, newDoubtY);
+}
+
+void AprilTagsSensor::applyVisionMeasurement(
+    frc::SwerveDrivePoseEstimator<4> *estimator,
+    bool accept,
+    double doubtX,
+    double doubtY
+) {
+    if (!hasTarget() || !accept) return;
+
     if (distance >= normalVisionOutlier) return;
+
     units::millisecond_t totalLatency = getTotalLatency();
 
     frc::Pose2d tGone = frc::Pose2d{
@@ -85,15 +98,14 @@ void AprilTagsSensor::applyVisionMeasurement(frc::SwerveDrivePoseEstimator<4> *e
         currState.ToPose2d().Y(),
         estimator->GetEstimatedPosition().Rotation()
     };
-    limeTable->PutNumber("new doubt x", newDoubtX);
-    limeTable->PutNumber("new doubt y", newDoubtY);
 
     if (tGone.X() == 0.0_m || tGone.Y() == 0.0_m)
         return;
+
     estimator->AddVisionMeasurement(
         tGone,  
         frc::Timer::GetFPGATimestamp() - totalLatency,
-        {newDoubtX, newDoubtY, std::numeric_limits<double>::max()}
+        {doubtX, doubtY, std::numeric_limits<double>::max()}
     );
 }
 
