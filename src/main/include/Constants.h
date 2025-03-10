@@ -603,7 +603,7 @@ namespace Constants {
 
             static units::angle::turn_t getElevatorAbsoluteRange() { switch (robot) {
                 case Robot::Alpha: return .75_tr;
-                case Robot::Gold: return 1_tr;
+                case Robot::Gold: return 0.5_tr;
                 default: return 0.5_tr;
             }};
 
