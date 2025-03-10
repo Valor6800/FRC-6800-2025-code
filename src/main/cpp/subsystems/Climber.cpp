@@ -2,6 +2,7 @@
 #include <iostream>
 #include <math.h>
 
+#include "units/voltage.h"
 #include "valkyrie/controllers/NeutralMode.h"
 #include "Constants.h"
 
@@ -94,6 +95,10 @@ void Climber::init()
     climbMotors->setPIDF(climbPID, 0);
     climbMotors->setContinuousWrap(true);
     climbMotors->enableFOC(true);
+    climbMotors->setVoltageLimits(
+        units::volt_t(0.0),
+        units::volt_t(12.0)
+    );
     climbMotors->applyConfig();
     
     table->PutNumber("Spike Current", state.spikeCurrent);

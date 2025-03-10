@@ -1,5 +1,6 @@
 #pragma once
 
+#include "units/voltage.h"
 #include "valkyrie/controllers/BaseController.h"
 #include <ctre/phoenix6/TalonFX.hpp>
 #include <string>
@@ -122,6 +123,15 @@ public:
         if (saveImmediately) {
             getMotor()->GetConfigurator().Apply(config.CurrentLimits);
             getMotor()->GetConfigurator().Apply(config.TorqueCurrent);
+        }
+    }
+
+    void setVoltageLimits(units::volt_t reverseLimit, units::volt_t forwardLimit, bool saveImmediately = false) {
+        config.Voltage.PeakForwardVoltage = forwardLimit;
+        config.Voltage.PeakReverseVoltage = reverseLimit;
+
+        if (saveImmediately) {
+            getMotor()->GetConfigurator().Apply(config.Voltage);
         }
     }
 
