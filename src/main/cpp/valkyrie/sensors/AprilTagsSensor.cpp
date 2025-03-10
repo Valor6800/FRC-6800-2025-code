@@ -83,12 +83,14 @@ void AprilTagsSensor::applyVisionMeasurement(
     //std::vector<double> botToTargetPose = limeTable->GetNumberArray("botpose_targetspace", std::span<const double>());
     //if (botToTargetPose.size() == 6) distance = units::meter_t(sqrtf(powf(botToTargetPose[0], 2) + powf(botToTargetPose[1], 2)));
     //else distance = 0_m; return;
+
     double newDoubtX = doubtX + (distance.to<double>() * dp) + (vp * speed.to<double>());
     double newDoubtY = doubtY + (distance.to<double>() * dp) + (vp * speed.to<double>());
     double newDoubtRot = doubtRot + (distance.to<double>() * dp) + (vp * speed.to<double>()) + (avp * fabs(angular_velocity.value()));
 
 
     if (distance >= normalVisionOutlier) return;
+
     units::millisecond_t totalLatency = getTotalLatency();
 
     frc::Rotation2d newAngle = estimator->GetEstimatedPosition().Rotation();
@@ -111,6 +113,7 @@ void AprilTagsSensor::applyVisionMeasurement(
 
     if (tGone.X() == 0.0_m || tGone.Y() == 0.0_m)
         return;
+
     estimator->AddVisionMeasurement(
         tGone,  
         frc::Timer::GetFPGATimestamp() - totalLatency,

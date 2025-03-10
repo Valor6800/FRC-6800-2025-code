@@ -30,7 +30,7 @@
 #include <ctre/phoenix6/TalonFX.hpp>
 #include <units/math.h>
 #include <frc/Alert.h>
-#include <AprilTagPositions.h>
+#include "AprilTagPositions.h"
 
 using namespace pathplanner;
 
@@ -238,6 +238,7 @@ Drivetrain::Drivetrain(frc::TimedRobot *_robot, valor::CANdleSensor* _leds) :
     reefPublisher = nt::NetworkTableInstance::GetDefault().GetStructTopic<frc::Pose2d>("Reef Pose").Publish();
 
     doubtRot = 1;
+    robotInTagSpacePublisher = nt::NetworkTableInstance::GetDefault().GetStructTopic<frc::Transform2d>("Robot In Tag Space Transform").Publish();
 
     resetState();
     init();
@@ -362,6 +363,33 @@ void Drivetrain::analyzeDashboard()
 
     Swerve::yDistance = units::length::meter_t (state.yEstimate); //units::length::meter_t {filter.Calculate(unfilteredYDistance)};
     Swerve::xDistance = units::length::meter_t (state.xEstimate);
+
+    if (true){ //TODO: CHANGE THIS TO BE ELASTIC VALUE
+
+        Swerve::yDistance = 0_m;
+
+        if (state.reefTag != -1) {
+            frc::Transform2d reefTagTransform{
+                valor::aprilTagPositions.at(state.reefTag).Translation().ToTranslation2d(),
+                valor::aprilTagPositions.at(state.reefTag).Rotation().ToRotation2d()
+            };
+
+            reefPublisher.Set(reefTagTransform);
+
+            frc::Transform2d robotTransform{
+                getCalculatedPose().Translation(),
+                getCalculatedPose().Rotation()
+            };
+
+            frc::Transform2d robotInTagSpaceTransform = reefTagTransform.Inverse() + robotTransform;
+
+            robotInTagSpacePublisher.Set(robotInTagSpaceTransform);
+
+            Swerve::yDistance = robotInTagSpaceTransform.Y();
+        }
+    }
+
+    poseErrorPP = currentPosePathPlanner.Get() - targetPosePathPlanner.Get();
 
     poseErrorPPTopic.Set(poseErrorPP);
     //
@@ -515,7 +543,16 @@ void Drivetrain::analyzeDashboard()
                 doubtY,
                 doubtRot
             );
+
         }
+        
+
+        aprilLime->applyVisionMeasurement(
+            alignEstimator.get(),
+            true,
+            Constants::cameraStandardDeviationLBF(aprilLime->get_botpose_targetspace().Y()),
+            Constants::cameraStandardDeviationLBF(aprilLime->get_botpose_targetspace().Y())
+        );
     }
 
     if (!driverGamepad || !driverGamepad->IsConnected() || !operatorGamepad || !operatorGamepad->IsConnected())
