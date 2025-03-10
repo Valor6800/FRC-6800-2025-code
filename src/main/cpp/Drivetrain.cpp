@@ -505,12 +505,17 @@ void Drivetrain::analyzeDashboard()
             aprilLime->applyVisionMeasurement(
                 calcEstimator.get(),
                 getRobotSpeeds(),
-                table->GetBoolean("Accepting Vision Measurements", true),
                 doubtX,
                 doubtY,
                 doubtRot
             );
         }
+
+        aprilLime->applyVisionMeasurement(
+            alignEstimator.get(),
+            Constants::cameraStandardDeviationLBF(aprilLime->get_botpose_targetspace().Y()),
+            Constants::cameraStandardDeviationLBF(aprilLime->get_botpose_targetspace().Y())
+        );
     }
 
     if (!driverGamepad || !driverGamepad->IsConnected() || !operatorGamepad || !operatorGamepad->IsConnected())
