@@ -107,6 +107,8 @@ public:
     bool xAlign = false;
     bool dumbAutoAlign = false;
 
+    bool xAlign = false;
+
     void InitSendable(wpi::SendableBuilder& builder) override;
 
 protected:
@@ -128,6 +130,7 @@ protected:
     std::unique_ptr<frc::SwerveDriveKinematics<MODULE_COUNT>> kinematics;
     std::unique_ptr<frc::SwerveDrivePoseEstimator<MODULE_COUNT>> rawEstimator;
     std::unique_ptr<frc::SwerveDrivePoseEstimator<MODULE_COUNT>> calcEstimator;
+    std::unique_ptr<frc::SwerveDrivePoseEstimator<MODULE_COUNT>> alignEstimator;
 
     bool toast;
     bool lockingToTarget;
@@ -221,7 +224,7 @@ private:
     Eigen::Vector2d joystickVector, yAlignVector, powerVector, xAlignVector;
     units::angle::degree_t rotAlignOffset;
 
-    nt::StructPublisher<frc::Pose2d> rawPosePublisher, calculatedPosePublisher;
+    nt::StructPublisher<frc::Pose2d> rawPosePublisher, calculatedPosePublisher, alignPosePublisher;
     nt::StructPublisher<frc::ChassisSpeeds> robotVelocitiesPublisher;
 
     // SwerveSetpointGenerator setpointGenerator;

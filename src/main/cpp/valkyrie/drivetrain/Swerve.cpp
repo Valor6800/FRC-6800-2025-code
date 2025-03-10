@@ -86,9 +86,11 @@ Swerve<AzimuthMotor, DriveMotor>::Swerve(frc::TimedRobot *_robot,
     kinematics = std::make_unique<frc::SwerveDriveKinematics<MODULE_COUNT>>(motorLocations);
     rawEstimator = std::make_unique<frc::SwerveDrivePoseEstimator<MODULE_COUNT>>(*kinematics, getGyro(), getModuleStates(), frc::Pose2d{0_m, 0_m, 0_rad});
     calcEstimator = std::make_unique<frc::SwerveDrivePoseEstimator<MODULE_COUNT>>(*kinematics, getGyro(), getModuleStates(), frc::Pose2d{0_m, 0_m, 0_rad});
+    alignEstimator = std::make_unique<frc::SwerveDrivePoseEstimator<MODULE_COUNT>>(*kinematics, getGyro(), getModuleStates(), frc::Pose2d{0.001_m, 0.001_m, 0.001_rad});
 
     rawPosePublisher = nt::NetworkTableInstance::GetDefault().GetStructTopic<frc::Pose2d>("LiveWindow/BaseSubsystem/SwerveDrive/Actual Raw Pose").Publish();
     calculatedPosePublisher = nt::NetworkTableInstance::GetDefault().GetStructTopic<frc::Pose2d>("LiveWindow/BaseSubsystem/SwerveDrive/Actual Calculated Pose").Publish();
+    alignPosePublisher = nt::NetworkTableInstance::GetDefault().GetStructTopic<frc::Pose2d>("LiveWindow/BaseSubsystem/SwerveDrive/Align Pose").Publish();
     robotVelocitiesPublisher = nt::NetworkTableInstance::GetDefault().GetStructTopic<frc::ChassisSpeeds>("LiveWindow/BaseSubsystem/SwerveDrive/Robot Velocities").Publish();
     table->PutBoolean("Toast", false);
     RobotConfig config = RobotConfig::fromGUISettings();
@@ -112,6 +114,7 @@ Swerve<AzimuthMotor, DriveMotor>::~Swerve()
 
     rawEstimator.release();
     calcEstimator.release();
+    alignEstimator.release();
 }
 
 template<class AzimuthMotor, class DriveMotor>
@@ -149,6 +152,7 @@ void Swerve<AzimuthMotor, DriveMotor>::analyzeDashboard()
     }
     rawPosePublisher.Set(rawEstimator->GetEstimatedPosition());
     calculatedPosePublisher.Set(getCalculatedPose());
+    alignPosePublisher.Set(alignEstimator->GetEstimatedPosition());
     robotVelocitiesPublisher.Set(getRobotRelativeSpeeds());
 
     y_controller.SetP(Y_KP);
@@ -168,6 +172,8 @@ void Swerve<AzimuthMotor, DriveMotor>::analyzeDashboard()
 
     rawEstimator->UpdateWithTime(frc::Timer::GetFPGATimestamp(), getGyro(), getModuleStates());
     calcEstimator->UpdateWithTime(frc::Timer::GetFPGATimestamp(), getGyro(), getModuleStates());
+    alignEstimator->UpdateWithTime(frc::Timer::GetFPGATimestamp(), getGyro(), getModuleStates());
+
     updateAngularPosition();
 
     updateAngularAcceleration();
@@ -400,6 +406,7 @@ void Swerve<AzimuthMotor, DriveMotor>::resetOdometry(frc::Pose2d pose)
 {
     rawEstimator->ResetPosition(getGyro(), getModuleStates(), pose);
     calcEstimator->ResetPosition(getGyro(), getModuleStates(), pose);
+    alignEstimator->ResetPosition(getGyro(), getModuleStates(), pose);
 }
 
 template<class AzimuthMotor, class DriveMotor>

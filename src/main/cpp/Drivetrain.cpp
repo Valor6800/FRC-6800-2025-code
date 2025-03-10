@@ -484,7 +484,16 @@ void Drivetrain::analyzeDashboard()
                 doubtY,
                 doubtRot
             );
+
         }
+        
+
+        aprilLime->applyVisionMeasurement(
+            alignEstimator.get(),
+            true,
+            Constants::cameraStandardDeviationLBF(aprilLime->get_botpose_targetspace().Y()),
+            Constants::cameraStandardDeviationLBF(aprilLime->get_botpose_targetspace().Y())
+        );
     }
 
     if (!driverGamepad || !driverGamepad->IsConnected() || !operatorGamepad || !operatorGamepad->IsConnected())
