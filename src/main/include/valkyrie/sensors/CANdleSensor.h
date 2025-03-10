@@ -36,11 +36,11 @@ class CANdleSensor : public valor::BaseSensor<int>{
 public:
 
     static const int VALOR_GOLD = 0xEEA800;
-    static const int VALOR_PURPLE = 0xAC41FF;
-    static const int RED = 0xFF0000;
-    static const int ORANGE = 0xFFA500;
-    static const int GREEN = 0x00FF00;
-    static const int LIGHT_BLUE = 0x00FFF9;
+    static const int VALOR_PURPLE = 0x41ACFF;
+    static const int RED = 0x00FF00;
+    static const int ORANGE = 0xA5FF00;
+    static const int GREEN = 0xFF0000;
+    // static const int LIGHT_BLUE = 0x00FFF9;
     static const int WHITE = 0x000000;
 
     /**

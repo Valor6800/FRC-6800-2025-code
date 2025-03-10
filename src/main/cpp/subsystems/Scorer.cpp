@@ -477,9 +477,11 @@ void Scorer::assignOutputs()
     }
 
     if(state.gamePiece == ALGEE) {
-        leds->setColor(1, valor::CANdleSensor::GREEN);
+        leds->setColor(1, valor::CANdleSensor::VALOR_PURPLE);
+        // leds->setColor(2, valor::CANdleSensor::VALOR_PURPLE);
     } else if (state.gamePiece == CORAL) {
         leds->setColor(1, valor::CANdleSensor::ORANGE);
+        // leds->setColor(2, valor::CANdleSensor::ORANGE);
     }
 
     //Elevator State Machine

@@ -17,11 +17,11 @@ CANdleSensor::CANdleSensor(frc::TimedRobot *_robot, int _ledCount, int _segments
     ctre::phoenix::led::CANdleConfiguration config;
     // Should match the type of LED strip connected to the CANdle
     config.stripType = ctre::phoenix::led::LEDStripType::GRB;
-    config.brightnessScalar = 0.25;
+    config.brightnessScalar = 0.9;
     config.statusLedOffWhenActive = true;
     config.disableWhenLOS = false;
     // If the 12V line should be on, off, or modulated (for single LED colors)
-    config.vBatOutputMode = ctre::phoenix::led::VBatOutputMode::Off;
+    config.vBatOutputMode = ctre::phoenix::led::VBatOutputMode::On;
     candle.ConfigFactoryDefault(100);
     candle.ConfigAllSettings(config, 100);
     int segmentLEDCount = (ledCount-8)/segments;
@@ -45,7 +45,8 @@ CANdleSensor::CANdleSensor(frc::TimedRobot *_robot, int _ledCount, int _segments
     allSegments.startLed = 0;
     allSegments.endLed = ledCount;
     allSegments.activeAnimation = NULL;
-    allSegments.currentColor = toRGB(VALOR_GOLD);
+    //allSegments.currentColor = toRGB(VALOR_GOLD);
+    allSegments.currentColor = toRGB(0xFF0000);
     allSegments.recentlyChanged = false;
     allSegments.activeAnimationType = AnimationType::None;
     setGetter([this] { return 0; });
