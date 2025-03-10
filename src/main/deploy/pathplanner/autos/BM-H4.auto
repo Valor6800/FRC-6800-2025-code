@@ -7,13 +7,19 @@
         {
           "type": "path",
           "data": {
-            "pathName": "FRC6-E4"
+            "pathName": "BCM-H4"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "BH-Back"
           }
         }
       ]
     }
   },
   "resetOdom": true,
-  "folder": null,
+  "folder": "Blue Autos",
   "choreoAuto": false
 }
