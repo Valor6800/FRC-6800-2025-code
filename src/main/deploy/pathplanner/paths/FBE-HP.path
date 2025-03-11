@@ -63,13 +63,13 @@
       }
     },
     {
-      "name": "DISABLE Scorer",
+      "name": "Intaking",
       "waypointRelativePos": 0.2,
       "endWaypointRelativePos": null,
       "command": {
         "type": "named",
         "data": {
-          "name": "DISABLE Scorer"
+          "name": "Intaking"
         }
       }
     }

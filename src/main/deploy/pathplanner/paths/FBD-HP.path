@@ -3,13 +3,13 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 3.8960040983606556,
-        "y": 2.8561987704918033
+        "x": 3.9463999999999997,
+        "y": 2.8056
       },
       "prevControl": null,
       "nextControl": {
-        "x": 3.1570886833379332,
-        "y": 2.278576757425337
+        "x": 3.2074845849772773,
+        "y": 2.2279779869335337
       },
       "isLocked": false,
       "linkedName": "FB-D"
@@ -58,13 +58,13 @@
       }
     },
     {
-      "name": "Disable Scorer",
+      "name": "Intaking",
       "waypointRelativePos": 0.05,
       "endWaypointRelativePos": null,
       "command": {
         "type": "named",
         "data": {
-          "name": "DISABLE Scorer"
+          "name": "Intaking"
         }
       }
     }

@@ -168,6 +168,28 @@ Scorer::Scorer(frc::TimedRobot *_robot, Drivetrain *_drivetrain, valor::CANdleSe
             )
         )
     ).ToPtr());
+    pathplanner::NamedCommands::registerCommand("Algae1", std::move(
+        frc2::SequentialCommandGroup(
+            frc2::InstantCommand(
+                [this](){
+                    state.scopedState = SCOPED_STATE::SCOPED;
+                    state.gamePiece = GAME_PIECE::ALGEE;
+                    state.elevState = ELEVATOR_STATE::ONE;
+                    // state.scoringState = SCORE_STATE::INTAKING;
+                }
+            )
+        )
+    ).ToPtr());
+    pathplanner::NamedCommands::registerCommand("Barge", std::move(
+        frc2::SequentialCommandGroup(
+            frc2::InstantCommand(
+                [this](){
+                    state.gamePiece = GAME_PIECE::ALGEE;
+                    state.elevState = ELEVATOR_STATE::FOUR;
+                }
+            )
+        )
+    ).ToPtr());
     init();
 
     visualizerStage1 = nt::NetworkTableInstance::GetDefault().GetStructTopic<frc::Pose3d>("LiveWindow/BaseSubsystem/Scorer/Stage1Height").Publish();
