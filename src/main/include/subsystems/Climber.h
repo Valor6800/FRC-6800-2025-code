@@ -62,7 +62,6 @@ public:
 
 private:
     frc2::CommandPtr pitSequenceStage(CLIMB_STATE);
-    ctre::phoenix6::hardware::CANcoder* climbCancoder;
 
     // valor::PhoenixController<> *stabbyMotor;
     valor::PhoenixController<> *climbMotors;

@@ -76,11 +76,6 @@ void Climber::init()
     // );
     
     // climbMotors->setupCANCoder(CANIDs::CLIMBER_CAN, Constants::Climber::magnetOffset(), true, "baseCAN", 1_tr); //0.5022
-
-<<<<<<< Updated upstream
-   climbCancoder = new ctre::phoenix6::hardware::CANcoder(CANIDs::CLIMBER_CAN, "baseCAN");
-=======
->>>>>>> Stashed changes
     ctre::phoenix6::configs::MagnetSensorConfigs cancoderConfig;
     cancoderConfig.AbsoluteSensorDiscontinuityPoint = 1_tr;
     cancoderConfig.SensorDirection = ctre::phoenix6::signals::SensorDirectionValue::CounterClockwise_Positive;
@@ -153,8 +148,12 @@ void Climber::assessInputs()
 
 void Climber::analyzeDashboard()
 {
-    int color = valor::CANdleSensor::cancoderMagnetHealthGetter(climbCancoder);
-    leds->setLED(LEDConstants::LED_POS_CLIMBER, color);
+    if (climbCancoder) {
+        int color = valor::CANdleSensor::cancoderMagnetHealthGetter(climbCancoder);
+        leds->setLED(LEDConstants::LED_POS_CLIMBER, color);
+    } else {
+        leds->setLED(LEDConstants::LED_POS_CLIMBER, valor::CANdleSensor::RED);
+    }
 }
 
 void Climber::assignOutputs()
