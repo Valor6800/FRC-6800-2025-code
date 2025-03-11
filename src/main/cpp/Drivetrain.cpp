@@ -308,12 +308,7 @@ void Drivetrain::analyzeDashboard()
 {
     for (size_t i = 0; i < azimuthControllers.size(); i++) {
         auto cancoder = azimuthControllers[i]->getCANCoder();
-        if (cancoder) {
-            int color = valor::CANdleSensor::cancoderMagnetHealthGetter(cancoder);
-            leds->setLED(i, color);
-        } else {
-            leds->setLED(i, valor::CANdleSensor::RED);
-        }
+        leds->setLED(i, valor::CANdleSensor::cancoderMagnetHealthGetter(cancoder));
     }
 
     if(robot->IsDisabled()){

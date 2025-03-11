@@ -83,7 +83,7 @@ public:
         ctre::phoenix::led::Animation *activeAnimation;
         AnimationType activeAnimationType;
         int startLed;
-        int endLed;
+        int ledCount;
         bool recentlyChanged;
     };
 

@@ -1,5 +1,5 @@
 #include "valkyrie/sensors/CANdleSensor.h"
-
+#include <cmath>
 #include <string>
 
 using namespace valor;
@@ -24,28 +24,39 @@ CANdleSensor::CANdleSensor(frc::TimedRobot *_robot, int _ledCount, int _segments
     config.vBatOutputMode = ctre::phoenix::led::VBatOutputMode::On;
     candle.ConfigFactoryDefault(100);
     candle.ConfigAllSettings(config, 100);
-    int segmentLEDCount = (ledCount-8)/segments;
+    int segmentLEDCount = std::floor((ledCount - 8) / segments);
+    int remainderLEDCount = (ledCount - 8) % segments;
+    int currentStartLED = 0;
+
     //54
-    for (int i = 0; i<segments + 1; i++){
+    for (int i = 0; i < segments + 1; i++){
         SegmentSettings newSegment;
         newSegment.recentlyChanged = true;
-        newSegment.currentColor = toRGB(VALOR_GOLD);
+        newSegment.currentColor = toRGB(OFF);
         newSegment.activeAnimation = NULL;
         newSegment.activeAnimationType = AnimationType::None;
         if (i == 0){
             newSegment.startLed = 0;
-            newSegment.endLed = 8;
+            newSegment.ledCount = 8;
+        } else {
+            newSegment.startLed = currentStartLED;
+            
+            // Distribute extra LEDs in an alternating way
+            if ((i % 2 == 0 && i != 0 && remainderLEDCount > 0) || (i == segments && remainderLEDCount > 0)) {
+                newSegment.ledCount = segmentLEDCount + 1;
+                remainderLEDCount--;
+            } else {
+                newSegment.ledCount = segmentLEDCount;
+            }
         }
-        else{
-            newSegment.startLed = (segmentLEDCount*(i-1)) + 9;
-            newSegment.endLed = segmentLEDCount;
-        }
+        // Update start LED for next segment
+        currentStartLED = newSegment.startLed + newSegment.ledCount;
         segmentMap[i] = newSegment;
     }
     allSegments.startLed = 0;
-    allSegments.endLed = ledCount;
+    allSegments.ledCount = ledCount;
     allSegments.activeAnimation = NULL;
-    allSegments.currentColor = toRGB(VALOR_GOLD);
+    allSegments.currentColor = toRGB(OFF);
     allSegments.recentlyChanged = false;
     allSegments.activeAnimationType = AnimationType::None;
     setGetter([this] { return 0; });
@@ -53,11 +64,12 @@ CANdleSensor::CANdleSensor(frc::TimedRobot *_robot, int _ledCount, int _segments
 
 int CANdleSensor::cancoderMagnetHealthGetter(ctre::phoenix6::hardware::CANcoder* cancoder) {
     using namespace ctre::phoenix6::signals;
-    auto value = cancoder->GetMagnetHealth().GetValue();
-    if (value == MagnetHealthValue::Magnet_Green) return valor::CANdleSensor::GREEN;
-    else if (value == MagnetHealthValue::Magnet_Orange) return valor::CANdleSensor::ORANGE;
-    else if (value == MagnetHealthValue::Magnet_Red) return valor::CANdleSensor::RED;
-    return valor::CANdleSensor::WHITE;
+    if (cancoder && cancoder->IsConnected()) {
+        auto value = cancoder->GetMagnetHealth().GetValue();
+        if (value == MagnetHealthValue::Magnet_Green) return valor::CANdleSensor::GREEN;
+        else if (value == MagnetHealthValue::Magnet_Orange) return valor::CANdleSensor::ORANGE;
+    }
+    return valor::CANdleSensor::RED;
 }
 
 CANdleSensor::RGBColor CANdleSensor::toRGB(int color)
@@ -139,7 +151,7 @@ void CANdleSensor::setAnimation(CANdleSensor::SegmentSettings *segment, Animatio
             segment->currentColor.blue,
             0,
             speed,
-            segment->endLed,
+            segment->ledCount,
             ctre::phoenix::led::ColorFlowAnimation::Forward,
             segment->startLed
         );
@@ -147,7 +159,7 @@ void CANdleSensor::setAnimation(CANdleSensor::SegmentSettings *segment, Animatio
         segment->activeAnimation = new ctre::phoenix::led::FireAnimation(
             brightness,
             speed,
-            segment->endLed,
+            segment->ledCount,
             1,
             1,
             false,
@@ -160,7 +172,7 @@ void CANdleSensor::setAnimation(CANdleSensor::SegmentSettings *segment, Animatio
             segment->currentColor.blue,
             0,
             speed,
-            segment->endLed,
+            segment->ledCount,
             ctre::phoenix::led::LarsonAnimation::Front,
             2,
             segment->startLed
@@ -169,7 +181,7 @@ void CANdleSensor::setAnimation(CANdleSensor::SegmentSettings *segment, Animatio
         segment->activeAnimation = new ctre::phoenix::led::RainbowAnimation(
             brightness,
             speed,
-            segment->endLed,
+            segment->ledCount,
             false,
             segment->startLed
         );
@@ -178,7 +190,7 @@ void CANdleSensor::setAnimation(CANdleSensor::SegmentSettings *segment, Animatio
         segment->activeAnimation = new ctre::phoenix::led::RgbFadeAnimation(
             brightness,
             speed,
-            segment->endLed,
+            segment->ledCount,
             segment->startLed
         );
     } else if (animation == AnimationType::SingleFade){
@@ -188,7 +200,7 @@ void CANdleSensor::setAnimation(CANdleSensor::SegmentSettings *segment, Animatio
             segment->currentColor.blue,
             0,
             speed,
-            segment->endLed,
+            segment->ledCount,
             segment->startLed
         );
     } else if (animation == AnimationType::Strobe){
@@ -198,7 +210,7 @@ void CANdleSensor::setAnimation(CANdleSensor::SegmentSettings *segment, Animatio
             segment->currentColor.blue,
             0,
             speed,
-            segment->endLed,
+            segment->ledCount,
             segment->startLed
         );
     } else if (animation == AnimationType::Twinkle){
@@ -208,7 +220,7 @@ void CANdleSensor::setAnimation(CANdleSensor::SegmentSettings *segment, Animatio
             segment->currentColor.blue,
             0,
             speed,
-            segment->endLed,
+            segment->ledCount,
             ctre::phoenix::led::TwinkleAnimation::TwinklePercent::Percent100,
             segment->startLed
         );
@@ -219,7 +231,7 @@ void CANdleSensor::setAnimation(CANdleSensor::SegmentSettings *segment, Animatio
             segment->currentColor.blue,
             0,
             speed,
-            segment->endLed,
+            segment->ledCount,
             ctre::phoenix::led::TwinkleOffAnimation::TwinkleOffPercent::Percent100,
             segment->startLed
         );
@@ -257,8 +269,8 @@ CANdleSensor::RGBColor CANdleSensor::getColor(int segment) {
 void CANdleSensor::reset()
 {
     clearAnimation();
-    prevState = 0xFFFFFF;
-    currState = 0xFFFFFF;
+    prevState = OFF;
+    currState = OFF;
 }
 
 void CANdleSensor::calculate()
@@ -277,7 +289,7 @@ void CANdleSensor::calculate()
                 segmentMap[segment.first].currentColor.blue,
                 0,
                 segmentMap[segment.first].startLed,
-                segmentMap[segment.first].endLed
+                segmentMap[segment.first].ledCount
             );
             segmentMap[segment.first].recentlyChanged = false;
         }

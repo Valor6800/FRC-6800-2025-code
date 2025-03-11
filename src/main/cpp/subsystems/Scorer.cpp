@@ -420,12 +420,8 @@ void Scorer::analyzeDashboard()
 {
 
     auto cancoder = elevatorMotor->getCANCoder();
-    if (cancoder) {
-        int color = valor::CANdleSensor::cancoderMagnetHealthGetter(cancoder);
-        leds->setLED(LEDConstants::LED_POS_ELEVATOR, color);
-    } else {
-        leds->setLED(LEDConstants::LED_POS_ELEVATOR, valor::CANdleSensor::RED);
-    }
+    leds->setLED(LEDConstants::LED_POS_ELEVATOR, valor::CANdleSensor::cancoderMagnetHealthGetter(cancoder));
+
     if (candi.GetS1State().GetValue() == ctre::phoenix6::signals::S1StateValue::Floating) {
         leds->setLED(LEDConstants::LED_POS_CANDI, valor::CANdleSensor::RED);
     } else {
@@ -456,7 +452,7 @@ void Scorer::analyzeDashboard()
 
     int botColor = state.gamePiece == GAME_PIECE::CORAL ? valor::CANdleSensor::VALOR_GOLD : valor::CANdleSensor::VALOR_PURPLE;
     int topColor = state.scoringState == SCORE_STATE::SCORING ? valor::CANdleSensor::GREEN :
-        (state.scopedState == SCOPED_STATE::SCOPED ? valor::CANdleSensor::RED : valor::CANdleSensor::OFF);
+        (state.scopedState == SCOPED_STATE::SCOPED ? valor::CANdleSensor::RED : valor::CANdleSensor::VALOR_GOLD);
     leds->setColor(0, botColor);
     leds->setColor(1, topColor);
     leds->setColor(2, topColor);

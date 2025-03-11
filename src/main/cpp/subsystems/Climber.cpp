@@ -148,12 +148,7 @@ void Climber::assessInputs()
 
 void Climber::analyzeDashboard()
 {
-    if (climbCancoder) {
-        int color = valor::CANdleSensor::cancoderMagnetHealthGetter(climbCancoder);
-        leds->setLED(LEDConstants::LED_POS_CLIMBER, color);
-    } else {
-        leds->setLED(LEDConstants::LED_POS_CLIMBER, valor::CANdleSensor::RED);
-    }
+    leds->setLED(LEDConstants::LED_POS_CLIMBER, valor::CANdleSensor::cancoderMagnetHealthGetter(climbCancoder));
 }
 
 void Climber::assignOutputs()
