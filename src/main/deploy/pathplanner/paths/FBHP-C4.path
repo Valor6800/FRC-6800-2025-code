@@ -3,12 +3,12 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 1.2946721311475409,
+        "x": 1.295,
         "y": 0.9261782786885238
       },
       "prevControl": null,
       "nextControl": {
-        "x": 2.169774590163934,
+        "x": 2.170102459016393,
         "y": 1.5974897540983592
       },
       "isLocked": false,
@@ -16,12 +16,12 @@
     },
     {
       "anchor": {
-        "x": 3.622309938658767,
-        "y": 3.035654465447589
+        "x": 3.6723999999999997,
+        "y": 2.9856000000000003
       },
       "prevControl": {
-        "x": 3.0229246927571283,
-        "y": 2.5801216785623433
+        "x": 3.073014754098361,
+        "y": 2.5300672131147546
       },
       "nextControl": null,
       "isLocked": false,
@@ -72,7 +72,7 @@
     },
     {
       "name": "Enable Scorer",
-      "waypointRelativePos": 1.0,
+      "waypointRelativePos": 0.98,
       "endWaypointRelativePos": null,
       "command": {
         "type": "named",

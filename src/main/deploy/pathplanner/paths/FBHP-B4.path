@@ -72,7 +72,7 @@
     },
     {
       "name": "Enable Scorer",
-      "waypointRelativePos": 0.98,
+      "waypointRelativePos": 0.96,
       "endWaypointRelativePos": null,
       "command": {
         "type": "named",

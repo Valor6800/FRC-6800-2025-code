@@ -15,6 +15,36 @@
           "data": {
             "pathName": "FBE-HP"
           }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "FBHP-D4"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "FBD-HP"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "FBHP-C4"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "FBC-HP"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "FBHP-B4"
+          }
         }
       ]
     }
