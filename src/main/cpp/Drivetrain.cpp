@@ -93,18 +93,18 @@ const units::meter_t WHEEL_DIAMETER(0.0973_m);
 
 #define Y_ACTIVATION_THRESHOLD 30.0_deg
 
-Drivetrain::Drivetrain(frc::TimedRobot *_robot, CANdle& leds) : 
+Drivetrain::Drivetrain(frc::TimedRobot *_robot, valor::CANdleSensor* _leds) : 
     valor::Swerve<SwerveAzimuthMotor, SwerveDriveMotor>(
         _robot,
         "SwerveDrive",
-        generateModules(leds),
+        generateModules(),
         Constants::moduleDiff(),
         WHEEL_DIAMETER
     ),
     teleopStart(999999999999),
     leftDistanceSensor(_robot, "LEFT Front Distance Sensor", CANIDs::LEFT_CAN_RANGE_DRIVETRAIN_SENSOR, ""),
-    rightdistanceSensor(_robot, "RIGHT FRONT Distance Sensor", CANIDs::RIGHT_CAN_RANGE_DRIVETRAIN_SENSOR, "")
-
+    rightdistanceSensor(_robot, "RIGHT FRONT Distance Sensor", CANIDs::RIGHT_CAN_RANGE_DRIVETRAIN_SENSOR, ""),
+    leds(_leds)
 {
     xPIDF.P = KPX;
     xPIDF.I = KIX;
@@ -207,7 +207,7 @@ Drivetrain::Drivetrain(frc::TimedRobot *_robot, CANdle& leds) :
 
 Drivetrain::~Drivetrain(){}
 
-std::vector<std::pair<SwerveAzimuthMotor*, SwerveDriveMotor*>> Drivetrain::generateModules(CANdle& candle)
+std::vector<std::pair<SwerveAzimuthMotor*, SwerveDriveMotor*>> Drivetrain::generateModules()
 {
     std::vector<std::pair<SwerveAzimuthMotor*, SwerveDriveMotor*>> modules;
 
@@ -240,7 +240,7 @@ std::vector<std::pair<SwerveAzimuthMotor*, SwerveDriveMotor*>> Drivetrain::gener
         azimuthMotor->setupCANCoder(CANIDs::CANCODER_CANS[i], Constants::swerveZeros()[i], false, PIGEON_CAN_BUS);
         azimuthMotor->setContinuousWrap(true);
         azimuthMotor->applyConfig();
-        candle.getters[i] = [azimuthMotor] { return CANdle::cancoderMagnetHealthGetter(*azimuthMotor->getCANCoder()); };
+        azimuthControllers.push_back(azimuthMotor);
 
         SwerveAzimuthMotor* driveMotor = new SwerveDriveMotor(
             valor::PhoenixControllerType::KRAKEN_X60_FOC,
@@ -306,6 +306,16 @@ void Drivetrain::assessInputs()
 
 void Drivetrain::analyzeDashboard()
 {
+    for (size_t i = 0; i < azimuthControllers.size(); i++) {
+        auto cancoder = azimuthControllers[i]->getCANCoder();
+        if (cancoder) {
+            int color = valor::CANdleSensor::cancoderMagnetHealthGetter(cancoder);
+            leds->setLED(i, color);
+        } else {
+            leds->setLED(i, valor::CANdleSensor::RED);
+        }
+    }
+
     if(robot->IsDisabled()){
         state.right = table->GetBoolean("Align Right", false);
         state.left = table->GetBoolean("Align Left", false);

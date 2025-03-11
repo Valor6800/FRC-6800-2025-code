@@ -17,15 +17,15 @@ CANdleSensor::CANdleSensor(frc::TimedRobot *_robot, int _ledCount, int _segments
     ctre::phoenix::led::CANdleConfiguration config;
     // Should match the type of LED strip connected to the CANdle
     config.stripType = ctre::phoenix::led::LEDStripType::GRB;
-    config.brightnessScalar = 0.25;
+    config.brightnessScalar = 0.75;
     config.statusLedOffWhenActive = true;
     config.disableWhenLOS = false;
     // If the 12V line should be on, off, or modulated (for single LED colors)
-    config.vBatOutputMode = ctre::phoenix::led::VBatOutputMode::Off;
+    config.vBatOutputMode = ctre::phoenix::led::VBatOutputMode::On;
     candle.ConfigFactoryDefault(100);
     candle.ConfigAllSettings(config, 100);
     int segmentLEDCount = (ledCount-8)/segments;
-    //286
+    //54
     for (int i = 0; i<segments + 1; i++){
         SegmentSettings newSegment;
         newSegment.recentlyChanged = true;
@@ -38,7 +38,7 @@ CANdleSensor::CANdleSensor(frc::TimedRobot *_robot, int _ledCount, int _segments
         }
         else{
             newSegment.startLed = (segmentLEDCount*(i-1)) + 9;
-            newSegment.endLed = segmentLEDCount - 1;
+            newSegment.endLed = segmentLEDCount;
         }
         segmentMap[i] = newSegment;
     }
@@ -49,6 +49,15 @@ CANdleSensor::CANdleSensor(frc::TimedRobot *_robot, int _ledCount, int _segments
     allSegments.recentlyChanged = false;
     allSegments.activeAnimationType = AnimationType::None;
     setGetter([this] { return 0; });
+}
+
+int CANdleSensor::cancoderMagnetHealthGetter(ctre::phoenix6::hardware::CANcoder* cancoder) {
+    using namespace ctre::phoenix6::signals;
+    auto value = cancoder->GetMagnetHealth().GetValue();
+    if (value == MagnetHealthValue::Magnet_Green) return valor::CANdleSensor::GREEN;
+    else if (value == MagnetHealthValue::Magnet_Orange) return valor::CANdleSensor::ORANGE;
+    else if (value == MagnetHealthValue::Magnet_Red) return valor::CANdleSensor::RED;
+    return valor::CANdleSensor::WHITE;
 }
 
 CANdleSensor::RGBColor CANdleSensor::toRGB(int color)
@@ -263,8 +272,8 @@ void CANdleSensor::calculate()
         }
         if (segmentMap[segment.first].recentlyChanged) {
             candle.SetLEDs(
-                segmentMap[segment.first].currentColor.red,
                 segmentMap[segment.first].currentColor.green,
+                segmentMap[segment.first].currentColor.red,
                 segmentMap[segment.first].currentColor.blue,
                 0,
                 segmentMap[segment.first].startLed,

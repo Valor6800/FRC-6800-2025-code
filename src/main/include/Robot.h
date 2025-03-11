@@ -14,7 +14,7 @@
 
 #include "valkyrie/Auto.h"
 #include "Drivetrain.h"
-#include "subsystems/CANdle.h"
+#include "valkyrie/sensors/CANdleSensor.h"
 #include "subsystems/Scorer.h"
 #include "valkyrie/CharMode.h"
 
@@ -52,10 +52,12 @@ class Robot : public frc::TimedRobot {
 
         // std::vector<frc2::CommandPtr> autoCommands;
         
-        CANdle candle;
+        valor::CANdleSensor leds;
         Drivetrain drivetrain;
         Scorer scorer;
         Climber climber;
+
+        static int cancoderMagnetHealthGetter(ctre::phoenix6::hardware::CANcoder& cancoder);
 
         valor::Auto valorAuto;
         valor::CharMode charMode;

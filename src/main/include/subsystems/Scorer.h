@@ -20,7 +20,7 @@
 #include <unordered_map>
 #include "valkyrie/Gamepad.h"
 #include <ctre/phoenix6/core/CoreCANdi.hpp>
-#include "subsystems/CANdle.h"
+#include "valkyrie/sensors/CANdleSensor.h"
 #include <frc/Alert.h>
 #include <networktables/StructTopic.h>
 
@@ -28,7 +28,7 @@ class Scorer : public valor::BaseSubsystem
 {
 public:
 
-    Scorer(frc::TimedRobot *robot, Drivetrain *drivetrain, CANdle&);
+    Scorer(frc::TimedRobot *robot, Drivetrain *drivetrain, valor::CANdleSensor*);
     
     void resetState();
      
@@ -94,6 +94,7 @@ private:
     Constants::Scorer::ScoringSpeedMap scoringSpeedMap;
 
     Drivetrain *drivetrain;
+    valor::CANdleSensor *leds;
 
     frc::Alert elevatorStage{"Elevator going to stage", frc::Alert::AlertType::kInfo};
     frc::Alert elevatorPositionSuccess{"Elevator position within tolerance", frc::Alert::AlertType::kInfo};

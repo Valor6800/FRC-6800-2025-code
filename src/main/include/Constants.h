@@ -65,6 +65,15 @@ namespace LimelightConstants {
     constexpr static int TRACK_MODE_OFF = 1;
 }
 
+namespace LEDConstants {
+    constexpr static int LED_COUNT = 62;
+    constexpr static int LED_SEGMENTS = 4;
+
+    constexpr static int LED_POS_ELEVATOR = 4;
+    constexpr static int LED_POS_CANDI = 6;
+    constexpr static int LED_POS_CLIMBER = 5;
+}
+
 namespace DIOPorts {
     constexpr static int MAG_ENCODER_PORTS[4] = {1, 2, 3, 4};
     constexpr static int BEAM_BREAK_PORT = 0;

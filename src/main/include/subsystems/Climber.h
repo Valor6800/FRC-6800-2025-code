@@ -6,7 +6,7 @@
 #include "Constants.h"
 #include "valkyrie/controllers/PIDF.h"
 #include "valkyrie/sensors/CurrentSensor.h"
-#include "subsystems/CANdle.h"
+#include "valkyrie/sensors/CANdleSensor.h"
 
 #include <frc/smartdashboard/SendableChooser.h>
 #include <frc/smartdashboard/SmartDashboard.h>
@@ -18,7 +18,7 @@ class Climber : public valor::BaseSubsystem
 {
 public:
 
-    Climber(frc::TimedRobot *robot, CANdle& candle);
+    Climber(frc::TimedRobot *robot, valor::CANdleSensor* leds);
 
     ~Climber();
 
@@ -67,6 +67,8 @@ private:
     // valor::PhoenixController<> *stabbyMotor;
     valor::PhoenixController<> *climbMotors;
     valor::CurrentSensor currentSensor;
+    ctre::phoenix6::hardware::CANcoder* climbCancoder;
+    valor::CANdleSensor *leds;
 
     frc::Alert climberPosSuccess{"Climber position is within tolerance", frc::Alert::AlertType::kInfo};
     frc::Alert climberPosFail{"Climber position not within tolerance", frc::Alert::AlertType::kError};

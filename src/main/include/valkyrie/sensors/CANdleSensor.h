@@ -1,6 +1,7 @@
 #pragma once
 
 #include "valkyrie/sensors/BaseSensor.h"
+#include <ctre/phoenix6/CANcoder.hpp>
 #include <frc/TimedRobot.h>
 
 #include "ctre/phoenix/led/CANdle.h"
@@ -36,12 +37,13 @@ class CANdleSensor : public valor::BaseSensor<int>{
 public:
 
     static const int VALOR_GOLD = 0xEEA800;
-    static const int VALOR_PURPLE = 0xAC41FF;
+    static const int VALOR_PURPLE = 0xFF00FF;
     static const int RED = 0xFF0000;
     static const int ORANGE = 0xFFA500;
     static const int GREEN = 0x00FF00;
     static const int LIGHT_BLUE = 0x00FFF9;
-    static const int WHITE = 0x000000;
+    static const int WHITE = 0xFFFFFF;
+    static const int OFF = 0x000000;
 
     /**
      * @brief Declares the type of animation to apply.
@@ -93,6 +95,8 @@ public:
      * @return RGBColor struct containing red, green, blue values matching the hex code
      */
     static RGBColor toRGB(int color);
+
+    static int cancoderMagnetHealthGetter(ctre::phoenix6::hardware::CANcoder* cancoder);
 
     /**
      * @brief Construct a new Valor C A Ndle Sensor object

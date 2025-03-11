@@ -36,7 +36,7 @@
 
 using namespace Constants::Scorer;
 
-Scorer::Scorer(frc::TimedRobot *_robot, Drivetrain *_drivetrain, CANdle& candle) :
+Scorer::Scorer(frc::TimedRobot *_robot, Drivetrain *_drivetrain, valor::CANdleSensor* _leds) :
     valor::BaseSubsystem(_robot, "Scorer"),
     hallEffectDebounceSensor(_robot, "HallEffectDebounce"),
     candi(CANIDs::HALL_EFFECT, "baseCAN"),
@@ -46,7 +46,8 @@ Scorer::Scorer(frc::TimedRobot *_robot, Drivetrain *_drivetrain, CANdle& candle)
     currentSensor(_robot, "Algae Current Sensor"),
     positionMap{std::move(getPositionMap())},
     scoringSpeedMap{std::move(getScoringSpeedMap())},
-    drivetrain(_drivetrain)
+    drivetrain(_drivetrain),
+    leds(_leds)
 {
 
     frc2::CommandScheduler::GetInstance().RegisterSubsystem(this);
@@ -168,13 +169,6 @@ Scorer::Scorer(frc::TimedRobot *_robot, Drivetrain *_drivetrain, CANdle& candle)
         )
     ).ToPtr());
     init();
-    candle.getters[4] = [this] { return CANdle::cancoderMagnetHealthGetter(*elevatorMotor->getCANCoder()); };
-    // Climber is index 5
-    candle.getters[6] = [this] {
-        if (candi.GetS1State().GetValue() == ctre::phoenix6::signals::S1StateValue::Floating)
-            return valor::CANdleSensor::RED;
-        return valor::CANdleSensor::GREEN;
-    };
 
     visualizerStage1 = nt::NetworkTableInstance::GetDefault().GetStructTopic<frc::Pose3d>("LiveWindow/BaseSubsystem/Scorer/Stage1Height").Publish();
     visualizerStage2 = nt::NetworkTableInstance::GetDefault().GetStructTopic<frc::Pose3d>("LiveWindow/BaseSubsystem/Scorer/Stage2Height").Publish();
@@ -423,8 +417,20 @@ void Scorer::assessInputs()
 } 
 
 void Scorer::analyzeDashboard()
-
 {
+
+    auto cancoder = elevatorMotor->getCANCoder();
+    if (cancoder) {
+        int color = valor::CANdleSensor::cancoderMagnetHealthGetter(cancoder);
+        leds->setLED(LEDConstants::LED_POS_ELEVATOR, color);
+    } else {
+        leds->setLED(LEDConstants::LED_POS_ELEVATOR, valor::CANdleSensor::RED);
+    }
+    if (candi.GetS1State().GetValue() == ctre::phoenix6::signals::S1StateValue::Floating) {
+        leds->setLED(LEDConstants::LED_POS_CANDI, valor::CANdleSensor::RED);
+    } else {
+        leds->setLED(LEDConstants::LED_POS_CANDI, valor::CANdleSensor::GREEN);
+    }
 
     bool autoDunkEnabled = table->GetBoolean("Auto Dunk Enabled", true);
 
@@ -447,6 +453,14 @@ void Scorer::analyzeDashboard()
     ) {
         state.scoringState = SCORE_STATE::SCORING;
     }
+
+    int botColor = state.gamePiece == GAME_PIECE::CORAL ? valor::CANdleSensor::VALOR_GOLD : valor::CANdleSensor::VALOR_PURPLE;
+    int topColor = state.scoringState == SCORE_STATE::SCORING ? valor::CANdleSensor::GREEN :
+        (state.scopedState == SCOPED_STATE::SCOPED ? valor::CANdleSensor::RED : valor::CANdleSensor::OFF);
+    leds->setColor(0, botColor);
+    leds->setColor(1, topColor);
+    leds->setColor(2, topColor);
+    leds->setColor(3, botColor);
 
     state.algaeSpikeCurrent = table->GetNumber("Algae Spike Setpoint", 30);
     drivetrain->setGamePieceInRobot(state.gamePiece);

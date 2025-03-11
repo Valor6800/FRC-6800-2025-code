@@ -35,7 +35,7 @@
 #include <frc/trajectory/TrajectoryGenerator.h>
 #include <frc/smartdashboard/SendableChooser.h>
 #include <frc/smartdashboard/SmartDashboard.h>
-#include "subsystems/CANdle.h"
+#include "valkyrie/sensors/CANdleSensor.h"
 
 #include <frc2/command/SwerveControllerCommand.h>
 #include <frc2/command/Command.h>
@@ -88,7 +88,7 @@ public:
       * 
       * @param robot Top level robot object to parse out smart dashboard and table information
       */
-     Drivetrain(frc::TimedRobot *robot, CANdle& candle);
+     Drivetrain(frc::TimedRobot *robot, valor::CANdleSensor* leds);
 
      /**
       * @brief Destroy the Drivetrain object
@@ -182,7 +182,7 @@ private:
 
      bool hasReset;
 
-     std::vector<std::pair<SwerveAzimuthMotor*, SwerveDriveMotor*>> generateModules(CANdle&);
+     std::vector<std::pair<SwerveAzimuthMotor*, SwerveDriveMotor*>> generateModules();
      std::vector<SwerveAzimuthMotor *> azimuthControllers;
 
      valor::PIDF xPIDF;

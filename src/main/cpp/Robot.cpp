@@ -15,14 +15,14 @@
 #define TELE_DOUBTY 0.75f;
 
 Robot::Robot() :
-    candle{this},
-    drivetrain(this, candle),
-    scorer(this, &drivetrain, candle),
-    climber(this, candle),
+    leds{this, LEDConstants::LED_COUNT, LEDConstants::LED_SEGMENTS, CANIDs::CANDLE},
+    drivetrain(this, &leds),
+    scorer(this, &drivetrain, &leds),
+    climber(this, &leds),
     valorAuto()
 {
     frc::TimedRobot();
-
+    leds.setColor(0, valor::CANdleSensor::OFF);
     // pathplanner::NamedCommands::registerCommand("Reschedule", std::move(
     //     frc2::InstantCommand([this](){
     //         autoCommands.back().Schedule();
