@@ -251,7 +251,6 @@ void Scorer::resetState()
     currentSensor.reset();
     state.hasAlgae = false;
     state.protectChin = false;
-    state.autoDunkEnabled = true;
 }
 
 bool Scorer::hallEffectSensorActive()
@@ -347,8 +346,9 @@ void Scorer::init()
     });
 
      scorerStagingSensor.setFallingEdgeCallback([this] {
-        if (state.gamePiece == GAME_PIECE::CORAL && state.elevState != ELEVATOR_STATE::ONE) {
+        if (state.gamePiece == GAME_PIECE::CORAL) {
             state.protectChin = true;
+           
         }
     });
 
@@ -357,9 +357,8 @@ void Scorer::init()
     currentSensor.setSpikeCallback([this]() {state.hasAlgae = true;});
     currentSensor.setCacheSize(ALGAE_CACHE_SIZE);
 
-    resetState();
 
-    table->PutBoolean("Auto Dunk Enabled", state.autoDunkEnabled);
+    resetState();
     
     // Must be at the end of init() because the CANdi has to be setup before reading   
     if (cancoderSensorBad()){
@@ -429,9 +428,9 @@ void Scorer::analyzeDashboard()
         leds->setLED(LEDConstants::LED_POS_CANDI, valor::CANdleSensor::GREEN);
     }
 
-    state.autoDunkEnabled = table->GetBoolean("Auto Dunk Enabled", state.autoDunkEnabled);
+    bool autoDunkEnabled = table->GetBoolean("Auto Dunk Enabled", true);
 
-    if (state.elevState == ELEVATOR_STATE::HP || state.elevState == ELEVATOR_STATE::STOWED || state.elevState == ELEVATOR_STATE::MANUAL) {
+    if (state.scoringState != SCORE_STATE::SCORING || (state.elevState == ELEVATOR_STATE::ONE && state.gamePiece == GAME_PIECE::CORAL)){
         state.protectChin = false;
     }
 
@@ -439,14 +438,14 @@ void Scorer::analyzeDashboard()
     elevatorWithinThreshold = elevatorError.value() < table->GetNumber("Elevator Threshold (m)", VIABLE_ELEVATOR_THRESHOLD.value());
     
     if (
-        state.autoDunkEnabled &&
+        autoDunkEnabled &&
         drivetrain->isSpeedBelowThreshold() &&
         drivetrain->withinXRange() &&
         drivetrain->withinYRange() &&
         state.scopedState == SCOPED_STATE::SCOPED &&
         elevatorWithinThreshold &&
         state.gamePiece == GAME_PIECE::CORAL &&
-        (state.elevState == TWO || state.elevState == THREE || state.elevState == FOUR)
+        (state.elevState == TWO || state.elevState == THREE)
     ) {
         state.scoringState = SCORE_STATE::SCORING;
     }
@@ -506,19 +505,19 @@ void Scorer::assignOutputs()
     }
 
   // Scorer State Machine
-    if (state.scoringState == SCORE_STATE::SCORING) {
-        if (state.gamePiece == GAME_PIECE::ALGEE) {
-            scorerMotor->setSpeed(ALGEE_SCORE_SPEED);
-        } else if (!state.protectChin) {
-            auto it = scoringSpeedMap.find(state.elevState);
-            if (it != scoringSpeedMap.end()) {
-                scorerMotor->setSpeed(it->second);
-            } else {
-                scorerMotor->setSpeed(SCORE_SPEED);
-            }
+if (state.scoringState == SCORE_STATE::SCORING) {
+    if (state.gamePiece == GAME_PIECE::ALGEE) {
+        scorerMotor->setSpeed(ALGEE_SCORE_SPEED);
+    } else if (!state.protectChin) {
+        auto it = scoringSpeedMap.find(state.elevState);
+        if (it != scoringSpeedMap.end()) {
+            scorerMotor->setSpeed(it->second);
         } else {
-            scorerMotor->setSpeed(0_tps);
+            scorerMotor->setSpeed(SCORE_SPEED);
         }
+    } else {
+        scorerMotor->setSpeed(0_tps);
+    }
     } else if (state.hasAlgae && state.gamePiece == GAME_PIECE::ALGEE) {
         scorerMotor->setSpeed(ALGEE_HOLD_SPD);
     } else if (state.scoringState == SCORE_STATE::INTAKING || !scorerStagingSensor.isTriggered()) {
