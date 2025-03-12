@@ -5,6 +5,7 @@
 #include "units/acceleration.h"
 #include "units/angle.h"
 #include "units/length.h"
+#include "units/time.h"
 #include "valkyrie/sensors/AprilTagsSensor.h"
 #include "valkyrie/sensors/GrappleSensor.h"
 #include "valkyrie/BaseSubsystem.h"
@@ -166,7 +167,7 @@ public:
 
      void setTeleopStartTime();
 
-     double teleopStart;
+    units::second_t teleopStart;
 
      double doubtX, doubtY;
 
