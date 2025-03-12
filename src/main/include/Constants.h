@@ -67,7 +67,7 @@ namespace LimelightConstants {
 
 namespace LEDConstants {
     constexpr static int LED_COUNT = 62;
-    constexpr static int LED_SEGMENTS = 4;
+    constexpr static int LED_SEGMENTS = 6;
 
     constexpr static int LED_POS_ELEVATOR = 4;
     constexpr static int LED_POS_CANDI = 6;

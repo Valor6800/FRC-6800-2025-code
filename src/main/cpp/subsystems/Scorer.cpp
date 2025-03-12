@@ -451,12 +451,15 @@ void Scorer::analyzeDashboard()
     }
 
     int botColor = state.gamePiece == GAME_PIECE::CORAL ? valor::CANdleSensor::VALOR_GOLD : valor::CANdleSensor::VALOR_PURPLE;
-    int topColor = state.scoringState == SCORE_STATE::SCORING ? valor::CANdleSensor::GREEN :
-        (state.scopedState == SCOPED_STATE::SCOPED ? valor::CANdleSensor::RED : valor::CANdleSensor::VALOR_GOLD);
+    int midColor = scorerStagingSensor.isTriggered() && state.gamePiece == GAME_PIECE::CORAL ? valor::CANdleSensor::GREEN : valor::CANdleSensor::RED;
+    int topColor = state.scoringState == SCORE_STATE::SCORING ? valor::CANdleSensor::RED :
+        (state.scopedState == SCOPED_STATE::SCOPED && elevatorWithinThreshold ? valor::CANdleSensor::GREEN : valor::CANdleSensor::VALOR_GOLD);
     leds->setColor(0, botColor);
-    leds->setColor(1, topColor);
+    leds->setColor(1, midColor);
     leds->setColor(2, topColor);
-    leds->setColor(3, botColor);
+    leds->setColor(3, topColor);
+    leds->setColor(4, midColor);
+    leds->setColor(5, botColor);
 
     state.algaeSpikeCurrent = table->GetNumber("Algae Spike Setpoint", 30);
     drivetrain->setGamePieceInRobot(state.gamePiece);
