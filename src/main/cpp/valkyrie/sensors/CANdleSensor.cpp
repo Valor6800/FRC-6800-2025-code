@@ -128,6 +128,13 @@ void CANdleSensor::setColor(int segment, int color)
     setColor(segment, toRGB(color));
 }
 
+void CANdleSensor::setColorAll(int color)
+{
+    for (int i = 0; i <= segments; i++){
+        setColor(i, toRGB(color));
+    }
+}
+
 void CANdleSensor::setAnimation(AnimationType animation, RGBColor color, double speed) {
     clearAnimation(0);
     setAnimation(&allSegments, animation, color, speed);

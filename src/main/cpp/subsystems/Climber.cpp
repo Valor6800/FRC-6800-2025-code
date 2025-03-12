@@ -157,6 +157,7 @@ void Climber::assignOutputs()
     if(climbCancoder->GetAbsolutePosition().GetValue()<= LOCK_OUT_POS || state.hasClimbed){
         climbMotors->setPower(0_V);
         state.hasClimbed = true;
+        leds->setColorAll(valor::CANdleSensor::GREEN);
     } else{
         if (state.climbState == CLIMB_STATE::MANUAL) {
             climbMotors->setPower(state.manualSpeed);
