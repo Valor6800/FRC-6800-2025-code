@@ -7,43 +7,43 @@
         {
           "type": "path",
           "data": {
-            "pathName": "FBC6-EL4"
+            "pathName": "BC1-Push"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "FBE-HP"
+            "pathName": "BPC1-J4"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "FBHP-D4"
+            "pathName": "BJ-HP2"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "FBD-HP"
+            "pathName": "BHP2-K4"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "FBHP-C4"
+            "pathName": "BK-HP2"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "FBC-HP"
+            "pathName": "BHP2-A4"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "FBHP-B4"
+            "pathName": "BA-HP2"
           }
         }
       ]
