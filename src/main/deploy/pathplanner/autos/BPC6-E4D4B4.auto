@@ -7,7 +7,13 @@
         {
           "type": "path",
           "data": {
-            "pathName": "BC6-EL4"
+            "pathName": "BC6-Push"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "BPC6-E4"
           }
         },
         {
