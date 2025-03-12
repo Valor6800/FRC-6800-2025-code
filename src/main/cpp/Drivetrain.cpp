@@ -57,7 +57,9 @@ const units::meter_t WHEEL_DIAMETER(0.0973_m);
 
 #define VISION_ACCEPTANCE 3.5_m // meters
 
-#define TIME_TELEOP_VERT 100.0f
+// 135 - TELEOP_MAX_TIME - TIME_TO_RUMBLE = Time at which rumble starts
+#define TIME_TO_RUMBLE 30_s
+#define TELEOP_MAX_TIME 135_s
 
 #define MT2_POSE true
 
@@ -434,7 +436,7 @@ void Drivetrain::analyzeDashboard()
     if (!driverGamepad || !driverGamepad->IsConnected() || !operatorGamepad || !operatorGamepad->IsConnected())
         return;
 
-    if (frc::Timer::GetFPGATimestamp().to<double>() - teleopStart > TIME_TELEOP_VERT && frc::Timer::GetFPGATimestamp().to<double>() - teleopStart < TIME_TELEOP_VERT + 3) {
+    if (frc::Timer::GetFPGATimestamp() - teleopStart > TELEOP_MAX_TIME - TIME_TO_RUMBLE && frc::Timer::GetFPGATimestamp() - teleopStart < TELEOP_MAX_TIME - (TIME_TO_RUMBLE - 3_s)) {
         operatorGamepad->setRumble(true);
     } else {
         operatorGamepad->setRumble(false);
@@ -648,7 +650,7 @@ void Drivetrain::setGamePieceInRobot(Constants::Scorer::GAME_PIECE piece){
 }
 
 void Drivetrain::setTeleopStartTime(){
-    teleopStart = frc::Timer::GetFPGATimestamp().to<double>();
+    teleopStart = frc::Timer::GetFPGATimestamp();
 }
 // void Drivetrain::setDriveMotorNeutralMode(valor::NeutralMode mode) {
 //     for (int i = 0; i < SWERVE_COUNT; i++)
