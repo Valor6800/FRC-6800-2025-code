@@ -1,5 +1,6 @@
 #include "Constants.h"
 #include "subsystems/Scorer.h"
+#include "units/angular_velocity.h"
 #include "units/current.h"
 #include "units/time.h"
 #include "units/length.h"
@@ -198,10 +199,20 @@ frc2::CommandPtr Scorer::scorerPitSequenceStage(GAME_PIECE gamePiece, ELEVATOR_S
             [this] {
                 units::inch_t currentPos = convertToMechSpace(elevatorMotor->getPosition());
                 units::inch_t targetPos = positionMap[state.gamePiece][state.elevState];
+
+                units::turns_per_second_t currentSpeed = scorerMotor->getSpeed();
+                units::turns_per_second_t targetSpeed = scoringSpeedMap[state.elevState];
+
+                scorerSpeedSuccess.Set(units::math::abs(targetSpeed - currentSpeed) < 0.75_tps );
+                scorerSpeedFail.Set(!scorerSpeedSuccess.Get());
+
                 elevatorPositionSuccess.Set(units::math::abs(targetPos - currentPos) < 0.25_in);
                 elevatorPositionFail.Set(!elevatorPositionSuccess.Get());
             },
             [this](bool) {
+                scorerSpeedSuccess.Set(false);
+                scorerSpeedFail.Set(false);
+
                 elevatorPositionFail.Set(false);
                 elevatorPositionSuccess.Set(false);
             },
