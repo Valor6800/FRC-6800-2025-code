@@ -489,13 +489,18 @@ void Scorer::analyzeDashboard()
     int midColor = scorerStagingSensor.isTriggered() && state.gamePiece == GAME_PIECE::CORAL ? valor::CANdleSensor::GREEN : valor::CANdleSensor::RED;
     int topColor = state.scoringState == SCORE_STATE::SCORING ? valor::CANdleSensor::RED :
         (state.scopedState == SCOPED_STATE::SCOPED && elevatorWithinThreshold ? valor::CANdleSensor::GREEN : valor::CANdleSensor::VALOR_GOLD);
-    leds->setColor(0, botColor);
-    leds->setColor(1, midColor);
-    leds->setColor(2, topColor);
-    leds->setColor(3, topColor);
-    leds->setColor(4, midColor);
-    leds->setColor(5, botColor);
+    std::shared_ptr<nt::NetworkTable> climbLedTable = nt::NetworkTableInstance::GetDefault().GetTable("Climber");
+    bool climberOverride = !climbLedTable->GetBoolean("DEPLOYED CLIMBER OVERRIDE", false);
+    if (climberOverride){
+         leds->setColor(0, botColor);
+        leds->setColor(1, midColor);
+        leds->setColor(2, topColor);
+        leds->setColor(3, topColor);
+        leds->setColor(4, midColor);
+        leds->setColor(5, botColor);
 
+    }
+    
     state.algaeSpikeCurrent = table->GetNumber("Algae Spike Setpoint", 30);
     drivetrain->setGamePieceInRobot(state.gamePiece);
     drivetrain->state.elevState = state.elevState;
