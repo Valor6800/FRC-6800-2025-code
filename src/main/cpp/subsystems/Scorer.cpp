@@ -438,17 +438,22 @@ void Scorer::analyzeDashboard()
     units::meter_t elevatorError = units::math::fabs(convertToMechSpace(elevatorMotor->getPosition()) - positionMap[state.gamePiece][state.elevState]);
     elevatorWithinThreshold = elevatorError.value() < table->GetNumber("Elevator Threshold (m)", VIABLE_ELEVATOR_THRESHOLD.value());
     
+    bool systemsAligned = drivetrain->isSpeedBelowThreshold() && drivetrain->withinXRange() && drivetrain->withinYRange() && elevatorWithinThreshold;
+
     if (
         (state.autoDunkEnabled && !disableAutoDunk) &&
-        drivetrain->isSpeedBelowThreshold() &&
-        drivetrain->withinXRange() &&
-        drivetrain->withinYRange() &&
+        systemsAligned && 
         state.scopedState == SCOPED_STATE::SCOPED &&
-        elevatorWithinThreshold &&
         state.gamePiece == GAME_PIECE::CORAL &&
         (state.elevState == TWO || state.elevState == THREE || state.elevState == FOUR)
     ) {
         state.scoringState = SCORE_STATE::SCORING;
+    } else if (!disableAutoDunk) {
+        driverGamepad->setRumble(
+            systemsAligned &&
+            state.scopedState == SCOPED_STATE::SCOPED &&
+            state.gamePiece == GAME_PIECE::CORAL
+        );
     }
 
     int botColor = state.gamePiece == GAME_PIECE::CORAL ? valor::CANdleSensor::VALOR_GOLD : valor::CANdleSensor::VALOR_PURPLE;
