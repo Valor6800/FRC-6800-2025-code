@@ -240,7 +240,6 @@ std::vector<std::pair<SwerveAzimuthMotor*, SwerveDriveMotor*>> Drivetrain::gener
         azimuthMotor->setupCANCoder(CANIDs::CANCODER_CANS[i], Constants::swerveZeros()[i], false, PIGEON_CAN_BUS);
         azimuthMotor->setContinuousWrap(true);
         azimuthMotor->applyConfig();
-        azimuthControllers.push_back(azimuthMotor);
 
         SwerveAzimuthMotor* driveMotor = new SwerveDriveMotor(
             valor::PhoenixControllerType::KRAKEN_X60_FOC,
@@ -306,8 +305,8 @@ void Drivetrain::assessInputs()
 
 void Drivetrain::analyzeDashboard()
 {
-    for (size_t i = 0; i < azimuthControllers.size(); i++) {
-        auto cancoder = azimuthControllers[i]->getCANCoder();
+    for (size_t i = 0; i < swerveModules.size(); i++) {
+        auto cancoder = swerveModules.at(i)->azimuthMotor->getCANCoder();
         leds->setLED(i, valor::CANdleSensor::cancoderMagnetHealthGetter(cancoder));
     }
 

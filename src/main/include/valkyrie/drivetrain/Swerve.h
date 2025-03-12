@@ -156,6 +156,8 @@ protected:
     units::meters_per_second_t yControllerInitialVelocity;
     wpi::array<frc::SwerveModuleState, MODULE_COUNT> testModeDesiredStates{wpi::empty_array};
 
+    std::vector<valor::SwerveModule<AzimuthMotor, DriveMotor> *> swerveModules;
+
     units::degree_t getRotControllerError();
 
 private:
@@ -169,8 +171,6 @@ private:
     static constexpr size_t ACCEL_BUFFER_SIZE = 10; //need to adjust
     units::angular_velocity::radians_per_second_t lastYawRate = 0_rad_per_s;
     units::angular_acceleration::radians_per_second_squared_t angularAcceleration = 0_rad_per_s_sq;
-
-    std::vector<valor::SwerveModule<AzimuthMotor, DriveMotor> *> swerveModules;
 
     wpi::array<frc::SwerveModuleState, MODULE_COUNT> getModuleStates(units::velocity::meters_per_second_t,
                                                                     units::velocity::meters_per_second_t,
