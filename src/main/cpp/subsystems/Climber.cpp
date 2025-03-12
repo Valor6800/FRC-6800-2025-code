@@ -153,6 +153,8 @@ void Climber::analyzeDashboard()
         leds->setColor(1, valor::CANdleSensor::RED);
         leds->setColor(2, valor::CANdleSensor::RED);
         leds->setColor(3, valor::CANdleSensor::RED);
+        leds->setColor(4, valor::CANdleSensor::RED);
+        leds->setColor(5, valor::CANdleSensor::RED);
         table->PutBoolean("DEPLOYED CLIMBER OVERRIDE", true);
     }
 }

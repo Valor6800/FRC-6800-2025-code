@@ -603,6 +603,7 @@ void Scorer::analyzeDashboard()
     int midColor = scorerStagingSensor.isTriggered() && state.gamePiece == GAME_PIECE::CORAL ? valor::CANdleSensor::GREEN : valor::CANdleSensor::OFF;
     int topColor = state.scoringState == SCORE_STATE::SCORING ? valor::CANdleSensor::GREEN :
         (drivetrain->state.alignToTarget ? valor::CANdleSensor::RED : valor::CANdleSensor::OFF);
+        std::shared_ptr<nt::NetworkTable> climbLedTable = nt::NetworkTableInstance::GetDefault().GetTable("Climber");
 
     // Top color setpoints should override mid setpoints
     if (topColor != valor::CANdleSensor::OFF) {
