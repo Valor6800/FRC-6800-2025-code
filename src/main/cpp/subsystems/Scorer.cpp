@@ -357,7 +357,8 @@ void Scorer::init()
             elevatorMotor->setEncoderPosition(0_tr);
         }
         state.hasZeroed = true;
-        absSensorCorrect = elevatorMotor->getPosition();
+        absSensorCorrect = elevatorMotor->getAbsEncoderPosition();
+
     });
 
     // Beambreak debounce sensor (on scoring mechanism)
