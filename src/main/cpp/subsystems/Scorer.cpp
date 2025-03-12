@@ -174,8 +174,8 @@ Scorer::Scorer(frc::TimedRobot *_robot, Drivetrain *_drivetrain, valor::CANdleSe
                 [this](){
                     state.scopedState = SCOPED_STATE::SCOPED;
                     state.gamePiece = GAME_PIECE::ALGEE;
-                    state.elevState = ELEVATOR_STATE::ONE;
-                    // state.scoringState = SCORE_STATE::INTAKING;
+                    state.elevState = ELEVATOR_STATE::TWO;
+                    state.scoringState = SCORE_STATE::INTAKING;
                 }
             )
         )
