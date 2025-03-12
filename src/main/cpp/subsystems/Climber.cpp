@@ -38,6 +38,7 @@ Climber::Climber(frc::TimedRobot *_robot, valor::CANdleSensor* _leds) : valor::B
 {
     frc2::CommandScheduler::GetInstance().RegisterSubsystem(this);
     init();
+    table->PutBoolean("DEPLOYED CLIMBER OVERRIDE", false);
 }
 
 Climber::~Climber()
@@ -147,6 +148,13 @@ void Climber::assessInputs()
 void Climber::analyzeDashboard()
 {
     leds->setLED(LEDConstants::LED_POS_CLIMBER, valor::CANdleSensor::cancoderMagnetHealthGetter(climbCancoder));
+    if (state.climbState == CLIMB_STATE::DEPLOYED) {
+        leds->setColor(0, valor::CANdleSensor::RED);
+        leds->setColor(1, valor::CANdleSensor::RED);
+        leds->setColor(2, valor::CANdleSensor::RED);
+        leds->setColor(3, valor::CANdleSensor::RED);
+        table->PutBoolean("DEPLOYED CLIMBER OVERRIDE", true);
+    }
 }
 
 void Climber::assignOutputs()
