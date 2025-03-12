@@ -98,6 +98,9 @@ public:
 
     void InitSendable(wpi::SendableBuilder& builder) override;
 
+    AzimuthMotor* azimuthMotor;
+    DriveMotor* driveMotor;
+
 private:
 
     /**
@@ -110,9 +113,6 @@ private:
     void setDriveClosedLoop(units::meters_per_second_t mps);
 
     frc::SwerveModuleState desiredState;
-
-    AzimuthMotor* azimuthMotor;
-    DriveMotor* driveMotor;
 
     int wheelIdx;
     units::turn_t initialMagEncoderValue;
