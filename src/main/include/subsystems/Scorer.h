@@ -67,7 +67,7 @@ public:
         double algaeSpikeCurrent;
 
         bool hasZeroed;
-        bool autoDunkEnabled;
+
         bool protectChin;
     } state;
 
