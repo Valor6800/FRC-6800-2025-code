@@ -357,6 +357,7 @@ void Scorer::init()
             elevatorMotor->setEncoderPosition(0_tr);
         }
         state.hasZeroed = true;
+        absSensorCorrect = elevatorMotor->getPosition();
     });
 
     // Beambreak debounce sensor (on scoring mechanism)
@@ -630,6 +631,12 @@ void Scorer::InitSendable(wpi::SendableBuilder& builder)
     builder.AddBooleanProperty(
         "ZEROED?",
         [this] {return state.hasZeroed;},
+        nullptr
+    );
+
+    builder.AddBooleanProperty(
+        "ABSOLUTE POSITION NO OFFSET?",
+        [this] {return absSensorCorrect.value();},
         nullptr
     );
 }

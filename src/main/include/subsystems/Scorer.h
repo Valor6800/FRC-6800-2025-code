@@ -79,6 +79,7 @@ private:
 
     bool hallEffectSensorActive();
     bool cancoderSensorBad();
+    units::turn_t absSensorCorrect;
 
     valor::DebounceSensor hallEffectDebounceSensor;
 
