@@ -264,7 +264,7 @@ namespace Constants {
 
         static units::angle::turn_t getElevatorMagnetOffset() { switch (robot) {
             case Robot::Alpha: return 0.10327_tr; 
-            case Robot::Gold: return 0.315430_tr; //  0.989014_tr;
+            case Robot::Gold: return 0.478760_tr; //  0.989014_tr;
             default: return 0.480713_tr;
         }};
 
@@ -555,7 +555,7 @@ namespace Constants {
                                 { ELEVATOR_STATE::STOWED, 3.25_in },
                                 { ELEVATOR_STATE::HP, 3.25_in },
                                 { ELEVATOR_STATE::ONE, 10.2_in },
-                                { ELEVATOR_STATE::TWO, 13.6_in }, //Tomball: 14.1
+                                { ELEVATOR_STATE::TWO, 13.76_in }, //Tomball: 14.1
                                 { ELEVATOR_STATE::THREE, 19.0_in }, //Tomball: 19.5
                                 { ELEVATOR_STATE::FOUR, 26.75_in } //Tomball: 27.25
                             }
