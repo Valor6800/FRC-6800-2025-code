@@ -90,6 +90,11 @@ CANdleSensor::~CANdleSensor()
 }
 
 void CANdleSensor::setLED(int led, RGBColor rgb) {
+    if (led <= 8) {
+        rgb.red *= 0.4;
+        rgb.green *= 0.4;
+        rgb.blue *= 0.4;
+    }
     candle.SetLEDs(
         rgb.red,
         rgb.green,
