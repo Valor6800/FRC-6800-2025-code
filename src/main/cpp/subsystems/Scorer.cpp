@@ -251,6 +251,7 @@ void Scorer::resetState()
     currentSensor.reset();
     state.hasAlgae = false;
     state.protectChin = false;
+    state.autoDunkEnabled = true;
 }
 
 bool Scorer::hallEffectSensorActive()
@@ -357,8 +358,8 @@ void Scorer::init()
     currentSensor.setSpikeCallback([this]() {state.hasAlgae = true;});
     currentSensor.setCacheSize(ALGAE_CACHE_SIZE);
 
-
     resetState();
+    table->PutBoolean("Auto Dunk Disabled", false);
     
     // Must be at the end of init() because the CANdi has to be setup before reading   
     if (cancoderSensorBad()){
@@ -428,7 +429,7 @@ void Scorer::analyzeDashboard()
         leds->setLED(LEDConstants::LED_POS_CANDI, valor::CANdleSensor::GREEN);
     }
 
-    bool autoDunkEnabled = table->GetBoolean("Auto Dunk Enabled", true);
+    bool disableAutoDunk = table->GetBoolean("Auto Dunk Disabled", false);
 
     if (state.scoringState != SCORE_STATE::SCORING || (state.elevState == ELEVATOR_STATE::ONE && state.gamePiece == GAME_PIECE::CORAL)){
         state.protectChin = false;
@@ -438,7 +439,7 @@ void Scorer::analyzeDashboard()
     elevatorWithinThreshold = elevatorError.value() < table->GetNumber("Elevator Threshold (m)", VIABLE_ELEVATOR_THRESHOLD.value());
     
     if (
-        autoDunkEnabled &&
+        (state.autoDunkEnabled && !disableAutoDunk) &&
         drivetrain->isSpeedBelowThreshold() &&
         drivetrain->withinXRange() &&
         drivetrain->withinYRange() &&
