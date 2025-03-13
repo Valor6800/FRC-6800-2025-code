@@ -656,6 +656,12 @@ namespace Constants {
         }
 
         namespace Climber {
+
+            #define DEPLOYED_POS units::angle::turn_t (1.5) // (1.6
+            #define RETRACTED_POS units::angle::turn_t (3.646)// (0.36
+            #define LOCK_OUT_POS units::angle::turn_t (0.34) // (2.7)
+            #define STOW_POS units::angle::turn_t (0.5)
+
             static units::turn_t magnetOffset() { switch (robot) {
                 case Robot::Alpha: return 0_tr;
                 case Robot::Gold: return 0.0875_tr;
@@ -700,8 +706,8 @@ namespace Constants {
 
             static units::turn_t getForwardLimit() { switch (robot) {
                 case Robot::Alpha: return 0.25_tr;
-                case Robot::Gold: return 3.646_tr;
-                default: return 3.646_tr;
+                case Robot::Gold: return RETRACTED_POS;
+                default: return RETRACTED_POS;
             }}
 
             static units::turn_t getReverseLimit() { switch (robot) {

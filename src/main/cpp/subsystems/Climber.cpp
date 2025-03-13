@@ -16,14 +16,6 @@
 #define CLIMB_GEAR_RATIO 58.1432
 #define CRAB_GEAR_RATIO 0
 
-#define DEPLOYED_POS units::angle::turn_t (1.5) // (1.6
-#define RETRACTED_POS units::angle::turn_t (3.646)// (0.36
-#define LOCK_OUT_POS units::angle::turn_t (0.34) // (2.7)
-#define STOW_POS units::angle::turn_t (0.5)
-//enocder climb value at .3
-
-// soft limit of 3
-
 #define STABBY_SPEED 40_tps
 #define SPIKE_CURRENT 0
 #define CACHE_SIZE 0
