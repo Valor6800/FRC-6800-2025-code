@@ -16,11 +16,11 @@
     },
     {
       "anchor": {
-        "x": 5.843,
+        "x": 5.75,
         "y": 3.885
       },
       "prevControl": {
-        "x": 6.446178379219661,
+        "x": 6.353178379219661,
         "y": 3.888609788635766
       },
       "nextControl": null,
@@ -36,7 +36,7 @@
       "maxWaypointRelativePos": 1.0,
       "constraints": {
         "maxVelocity": 1.5,
-        "maxAcceleration": 2.5,
+        "maxAcceleration": 1.5,
         "maxAngularVelocity": 540.0,
         "maxAngularAcceleration": 720.0,
         "nominalVoltage": 12.0,
@@ -59,7 +59,7 @@
     },
     {
       "name": "Enable Scorer",
-      "waypointRelativePos": 0.96,
+      "waypointRelativePos": 0.99,
       "endWaypointRelativePos": null,
       "command": {
         "type": "named",
