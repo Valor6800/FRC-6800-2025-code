@@ -1,6 +1,7 @@
 #include "subsystems/Climber.h"
 #include <iostream>
 #include <math.h>
+#include <mutex>
 
 #include "units/voltage.h"
 #include "valkyrie/controllers/NeutralMode.h"
@@ -153,11 +154,21 @@ void Climber::analyzeDashboard()
 
 void Climber::assignOutputs()
 {
-
+    std::unique_lock<std::mutex> ledLock(ledMutex, std::defer_lock);
+    if (state.hasClimbed) {
+        if (!ledLock.owns_lock()) {
+            ledLock.lock();
+            leds->setColorAll(valor::CANdleSensor::GREEN);
+        }
+    } else {
+        if (ledLock.owns_lock()) {
+            ledLock.unlock();
+        }
+    }
+    
     if(climbCancoder->GetAbsolutePosition().GetValue()<= LOCK_OUT_POS || state.hasClimbed){
         climbMotors->setPower(0_V);
         state.hasClimbed = true;
-        leds->setColorAll(valor::CANdleSensor::GREEN);
     } else{
         if (state.climbState == CLIMB_STATE::MANUAL) {
             climbMotors->setPower(state.manualSpeed);

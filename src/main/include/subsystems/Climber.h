@@ -61,6 +61,7 @@ public:
     } state;
 
 private:
+    std::mutex ledMutex;
     frc2::CommandPtr pitSequenceStage(CLIMB_STATE);
 
     // valor::PhoenixController<> *stabbyMotor;
