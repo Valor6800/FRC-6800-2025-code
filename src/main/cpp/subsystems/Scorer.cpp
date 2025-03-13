@@ -446,7 +446,7 @@ void Scorer::analyzeDashboard()
         state.scopedState == SCOPED_STATE::SCOPED &&
         elevatorWithinThreshold &&
         state.gamePiece == GAME_PIECE::CORAL &&
-        (state.elevState == TWO || state.elevState == THREE)
+        (state.elevState == TWO || state.elevState == THREE || state.elevState == FOUR)
     ) {
         state.scoringState = SCORE_STATE::SCORING;
     }

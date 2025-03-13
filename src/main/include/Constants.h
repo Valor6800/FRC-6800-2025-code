@@ -264,7 +264,7 @@ namespace Constants {
 
         static units::angle::turn_t getElevatorMagnetOffset() { switch (robot) {
             case Robot::Alpha: return 0.10327_tr; 
-            case Robot::Gold: return 0.478760_tr; //  0.989014_tr;
+            case Robot::Gold: return -0.293701_tr; //  0.989014_tr;
             default: return 0.480713_tr;
         }};
 
@@ -563,11 +563,11 @@ namespace Constants {
                         {
                             GAME_PIECE::ALGEE,
                             {
-                                { ELEVATOR_STATE::STOWED, 6.39_in + 0_in},
+                                { ELEVATOR_STATE::STOWED, 6.39_in},
                                 { ELEVATOR_STATE::HP, 6.39_in + 1_in},
                                 { ELEVATOR_STATE::ONE, 4.09_in },
-                                { ELEVATOR_STATE::TWO, 10.71_in}, //Tomball: 11.21
-                                { ELEVATOR_STATE::THREE, 16.22_in}, //Tomball: 16.72
+                                { ELEVATOR_STATE::TWO, 10.38_in}, //Tomball: 11.21
+                                { ELEVATOR_STATE::THREE, 15.89_in}, //Tomball: 16.72
                                 { ELEVATOR_STATE::FOUR, 29.9_in }
                             }
                         }
@@ -612,7 +612,7 @@ namespace Constants {
 
             static units::angle::turn_t getElevatorAbsoluteRange() { switch (robot) {
                 case Robot::Alpha: return .75_tr;
-                case Robot::Gold: return 0.5_tr;
+                case Robot::Gold: return 1_tr;
                 default: return 0.5_tr;
             }};
 
