@@ -93,8 +93,8 @@ namespace CANIDs {
     constexpr static int PIGEON_CAN = 61;
     constexpr static int SCORER_WHEEL = 11;
     constexpr static int ELEV_WHEEL = 30;
-    constexpr static int CLIMBER_LEAD = 31;
-    constexpr static int CLIMBER_FOLLOW = 32;
+    constexpr static int CLIMBER_LEAD = 32;
+    constexpr static int CLIMBER_FOLLOW = 31;
     constexpr static int HALL_EFFECT = 46;
     constexpr static int CANDLE = 60;
     constexpr static int STAGING_LIDAR_SENSOR = 47;
@@ -658,7 +658,7 @@ namespace Constants {
         namespace Climber {
             static units::turn_t magnetOffset() { switch (robot) {
                 case Robot::Alpha: return 0_tr;
-                case Robot::Gold: return -0.572509_tr;
+                case Robot::Gold: return 0.0875_tr;
                 default: return 0.0875_tr;
             }}
 
@@ -700,7 +700,7 @@ namespace Constants {
 
             static units::turn_t getForwardLimit() { switch (robot) {
                 case Robot::Alpha: return 0.25_tr;
-                case Robot::Gold: return 3.1_tr;
+                case Robot::Gold: return 3.646_tr;
                 default: return 3.646_tr;
             }}
 
