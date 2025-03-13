@@ -3,24 +3,24 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 5.843,
-        "y": 4.058166019035292
+        "x": 5.8,
+        "y": 4.03
       },
       "prevControl": null,
       "nextControl": {
-        "x": 6.56175,
-        "y": 5.08775
+        "x": 6.51875,
+        "y": 5.059583980964708
       },
       "isLocked": false,
       "linkedName": "B-AGH"
     },
     {
       "anchor": {
-        "x": 7.75125,
+        "x": 7.55,
         "y": 5.6922500000000005
       },
       "prevControl": {
-        "x": 6.65925,
+        "x": 6.458,
         "y": 5.351
       },
       "nextControl": null,
@@ -51,17 +51,6 @@
   ],
   "pointTowardsZones": [],
   "eventMarkers": [
-    {
-      "name": "Barge",
-      "waypointRelativePos": 0.6,
-      "endWaypointRelativePos": null,
-      "command": {
-        "type": "named",
-        "data": {
-          "name": "Barge"
-        }
-      }
-    },
     {
       "name": "Enable Scorer",
       "waypointRelativePos": 0.98,
