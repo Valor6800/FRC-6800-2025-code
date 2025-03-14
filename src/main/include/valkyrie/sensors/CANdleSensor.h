@@ -61,6 +61,13 @@ public:
         TwinkleOff
     };
 
+    enum Priority {
+        PRIORITY_DEFAULT = 1,
+        PRIORITY_SCORER = 2,
+        PRIORITY_CLIMBER = 3
+    };
+
+
     /**
      * @brief Represents an RGB hex code in 3 separate integers
      * Example: Hex 0xFF00AA
@@ -122,7 +129,7 @@ public:
      * @param segment The segment that will be changed
      * @param color The color to change all the LEDs in the segment to.
      */
-    void setColor(int segment, int color);
+    void setColor(int segment, int color, Priority priority);
 
         /**
      * @brief Set the color of the CANdle LEDs and attached LEDs
@@ -166,7 +173,10 @@ public:
     /**
      * @brief Clears all active animations
     */
+
+    void resetPriority();
     void clearAnimation();
+
     
     /**
      * @brief Resets the CANdle and its' configuration
@@ -193,7 +203,8 @@ public:
 
 private:
     void setAnimation(SegmentSettings *segment, AnimationType animation, RGBColor color, double speed=1.0);
-
+    std::mutex mutex;
+    Priority currentPriority = PRIORITY_DEFAULT;
     ctre::phoenix::led::CANdle candle;
     int ledCount;
     int segments;

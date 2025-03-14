@@ -22,7 +22,7 @@ Robot::Robot() :
     valorAuto()
 {
     frc::TimedRobot();
-    leds.setColor(0, valor::CANdleSensor::OFF);
+    leds.setColor(0, valor::CANdleSensor::OFF, valor::CANdleSensor::PRIORITY_DEFAULT);
     // pathplanner::NamedCommands::registerCommand("Reschedule", std::move(
     //     frc2::InstantCommand([this](){
     //         autoCommands.back().Schedule();
