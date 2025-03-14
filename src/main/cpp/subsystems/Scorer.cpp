@@ -26,6 +26,7 @@
 #define ELEVATOR_OFFSET 3_in
 #define ELEVATOR_MAGNET_OFFSET 0.321_tr
 #define ELEVATOR_JERK 40_tr_per_s_cu
+#define ELEVATOR_HEALTH_LIMIT 0.05_tr
 
 #define ELEVATOR_MOTOR_TO_SENSOR 8.02f
 #define PULLEY_CIRCUMFERENCE 1.432_in
@@ -446,6 +447,8 @@ void Scorer::analyzeDashboard()
 
     auto cancoder = elevatorMotor->getCANCoder();
     leds->setLED(LEDConstants::LED_POS_ELEVATOR, valor::CANdleSensor::cancoderMagnetHealthGetter(cancoder));
+    int elevatorHealthLED = std::abs(absSensorCorrect.value()) < ELEVATOR_HEALTH_LIMIT.value() ? valor::CANdleSensor::GREEN : valor::CANdleSensor::RED;
+    leds->setLED(LEDConstants::LED_POS_ELEVATOR_NOT_ZERO, elevatorHealthLED);
 
     if (candi.GetS1State().GetValue() == ctre::phoenix6::signals::S1StateValue::Floating) {
         leds->setLED(LEDConstants::LED_POS_CANDI, valor::CANdleSensor::RED);
