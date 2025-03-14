@@ -123,9 +123,13 @@ void CANdleSensor::setColor(RGBColor rgb)
     allSegments.currentColor = rgb;
 }
 
-void CANdleSensor::setColor(int segment, int color)
+void CANdleSensor::setColor(int segment, int color, Priority priority)
 {
-    setColor(segment, toRGB(color));
+    std::lock_guard<std::mutex> lock(mutex);
+    if (priority >= currentPriority) {
+        currentPriority = priority;
+        setColor(segment, toRGB(color));
+    }
 }
 
 void CANdleSensor::setAnimation(AnimationType animation, RGBColor color, double speed) {
@@ -139,6 +143,11 @@ void CANdleSensor::setAnimation(int segment, AnimationType animation,RGBColor co
     if (segment >=  static_cast<int>(segmentMap.size())) return;
     clearAnimation(segment);
     setAnimation(&segmentMap[segment], animation, color, speed);
+}
+
+void CANdleSensor::resetPriority() {
+    std::lock_guard<std::mutex> lock(mutex);
+    currentPriority = PRIORITY_DEFAULT;
 }
 
 
