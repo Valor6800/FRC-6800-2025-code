@@ -72,6 +72,7 @@ namespace LEDConstants {
     constexpr static int LED_POS_ELEVATOR = 4;
     constexpr static int LED_POS_CANDI = 6;
     constexpr static int LED_POS_CLIMBER = 5;
+    constexpr static int LED_POS_ELEVATOR_NOT_ZERO = 7;
 }
 
 namespace DIOPorts {
