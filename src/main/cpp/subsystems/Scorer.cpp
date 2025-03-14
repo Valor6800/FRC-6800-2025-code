@@ -611,12 +611,12 @@ void Scorer::analyzeDashboard()
     }
 
     if (!frc::DriverStation::IsTestEnabled()) {
-        for (int i = 0; i < 3; i++) leds->setColor(0 + i, botColor);
-        for (int i = 0; i < 3; i++) leds->setColor(3 + i, midColor);
-        for (int i = 0; i < 3; i++) leds->setColor(6 + i, topColor);
-        for (int i = 0; i < 3; i++) leds->setColor(9 + i, topColor);
-        for (int i = 0; i < 3; i++) leds->setColor(12 + i, midColor);
-        for (int i = 0; i < 3; i++) leds->setColor(15 + i, botColor);
+        for (int i = 0; i < 3; i++) leds->setColor(0 + i, botColor, valor::CANdleSensor::PRIORITY_SCORER);
+        for (int i = 0; i < 3; i++) leds->setColor(3 + i, midColor, valor::CANdleSensor::PRIORITY_SCORER);
+        for (int i = 0; i < 3; i++) leds->setColor(6 + i, topColor, valor::CANdleSensor::PRIORITY_SCORER);
+        for (int i = 0; i < 3; i++) leds->setColor(9 + i, topColor, valor::CANdleSensor::PRIORITY_SCORER);
+        for (int i = 0; i < 3; i++) leds->setColor(12 + i, midColor, valor::CANdleSensor::PRIORITY_SCORER);
+        for (int i = 0; i < 3; i++) leds->setColor(15 + i, botColor, valor::CANdleSensor::PRIORITY_SCORER);
     }
 
     state.algaeSpikeCurrent = table->GetNumber("Algae Spike Setpoint", 30);
