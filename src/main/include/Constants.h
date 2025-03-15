@@ -442,7 +442,7 @@ namespace Constants {
             {22,
                 {
                     {LEFT, 0_cm},
-                    {RIGHT, 0_cm},
+                    {RIGHT, 1_in},
                     {NONE, 0_in}
                 }}
         };
@@ -450,38 +450,38 @@ namespace Constants {
         static std::unordered_map<AprilTag, DirectionalOffSet> redPoleOffsets {
             {6,
                 {
-                    {LEFT, 0_cm},
-                    {RIGHT, 0_cm},
+                    {LEFT, -1_cm},
+                    {RIGHT, -1_cm},
                     {NONE, 0_in}
                 }},
             {7,
                 {
-                    {LEFT, 0_cm},
-                    {RIGHT, 0_cm},
+                    {LEFT, -1_cm},
+                    {RIGHT, -1_cm},
                     {NONE, 0_in}
                 }},
             {8,
                 {
-                    {LEFT, 0_cm},
-                    {RIGHT, 0_cm},
+                    {LEFT, -1_cm},
+                    {RIGHT, -1_cm},
                     {NONE, 0_in}
                 }},
             {9,
                 {
-                    {LEFT, 0_cm},
-                    {RIGHT, 0_cm},
+                    {LEFT, -1_cm},
+                    {RIGHT, -1_cm},
                     {NONE, 0_in}
                 }},
             {10,
                 {
-                    {LEFT, 0_cm},
-                    {RIGHT, 0_cm},
+                    {LEFT, -1_cm},
+                    {RIGHT, -1_cm},
                     {NONE, 0_in}
                 }},
             {11,
                 {
-                    {LEFT, 0_cm},
-                    {RIGHT, 0_cm},
+                    {LEFT, -1_cm},
+                    {RIGHT, -1_cm},
                     {NONE, 0_in}
                 }},
         };
