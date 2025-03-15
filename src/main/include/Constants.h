@@ -404,7 +404,8 @@ namespace Constants {
             };
         }
         }
-    
+
+        // Negative is leftwards; Positive is rightwards
         typedef int AprilTag;
         typedef std::unordered_map<Direction, units::inch_t> DirectionalOffSet;
 
@@ -531,7 +532,7 @@ namespace Constants {
                                 { ELEVATOR_STATE::STOWED, 5_in },
                                 { ELEVATOR_STATE::HP, 7.5_in },
                                 { ELEVATOR_STATE::ONE, 10_in },
-                                { ELEVATOR_STATE::TWO, 12.5_in },
+                                { ELEVATOR_STATE::TWO, 12.5_in }, // raise by . an inch
                                 { ELEVATOR_STATE::THREE, 15_in },
                                 { ELEVATOR_STATE::FOUR, 17.5_in }
                             }
@@ -556,8 +557,8 @@ namespace Constants {
                                 { ELEVATOR_STATE::STOWED, 3.25_in },
                                 { ELEVATOR_STATE::HP, 3.25_in },
                                 { ELEVATOR_STATE::ONE, 10.2_in },
-                                { ELEVATOR_STATE::TWO, 13.76_in }, //Tomball: 14.1
-                                { ELEVATOR_STATE::THREE, 19.0_in }, //Tomball: 19.5
+                                { ELEVATOR_STATE::TWO, 14.06_in }, //Tomball: 14.1
+                                { ELEVATOR_STATE::THREE, 19.1_in }, //Tomball: 19.5
                                 { ELEVATOR_STATE::FOUR, 26.75_in } //Tomball: 27.25
                             }
                         },
