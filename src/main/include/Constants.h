@@ -431,7 +431,7 @@ namespace Constants {
             {20,
                 {
                     {LEFT, 0_cm},
-                    {RIGHT, 0_cm},
+                    {RIGHT, -1_in},
                     {NONE, 0_in}
                 }},
             {21,
