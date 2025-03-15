@@ -442,7 +442,7 @@ namespace Constants {
             {22,
                 {
                     {LEFT, 0_cm},
-                    {RIGHT, 1_in},
+                    {RIGHT, -1_in},
                     {NONE, 0_in}
                 }}
         };
