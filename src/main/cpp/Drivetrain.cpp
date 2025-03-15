@@ -202,6 +202,7 @@ Drivetrain::Drivetrain(frc::TimedRobot *_robot, valor::CANdleSensor* _leds) :
 
     poseErrorPPTopic = nt::NetworkTableInstance::GetDefault().GetStructTopic<frc::Transform2d>("LiveWindow/BaseSubsystem/SwerveDrive/Pose Error PP").Publish();
     table->PutNumber("Y Controller Activation Degree Threshold", Y_ACTIVATION_THRESHOLD.value());
+    table->PutBoolean("Reset Tag", false);
 
     resetState();
     init();
@@ -321,6 +322,11 @@ void Drivetrain::analyzeDashboard()
             state.dir = LEFT;
         } else{
             state.dir = NONE;
+        }
+
+        if (table->GetBoolean("Reset Tag", false)) {
+            state.reefTag = -1;
+            hasReset = false;
         }
     }
     poseErrorPP = currentPosePathPlanner.Get() - targetPosePathPlanner.Get();
