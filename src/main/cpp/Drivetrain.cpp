@@ -58,7 +58,7 @@ const units::meter_t WHEEL_DIAMETER(0.0973_m);
 #define VISION_ACCEPTANCE 3.5_m // meters
 
 // 135 - TELEOP_MAX_TIME - TIME_TO_RUMBLE = Time at which rumble starts
-#define TIME_TO_RUMBLE 30_s
+#define TIME_TO_RUMBLE 15_s
 #define TELEOP_MAX_TIME 135_s
 
 #define MT2_POSE true
