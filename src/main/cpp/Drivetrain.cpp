@@ -281,16 +281,16 @@ void Drivetrain::assessInputs()
     if (!driverGamepad || !driverGamepad->IsConnected() || !operatorGamepad || !operatorGamepad->IsConnected())
         return;
 
-    if(operatorGamepad->GetRightBumperButton()){
+    if(driverGamepad->rightTriggerActive()){
         state.dir = RIGHT;
-    } else if(operatorGamepad->GetLeftBumperButton()){
+    } else if(driverGamepad->leftTriggerActive()){
         state.dir = LEFT;
     }
     // state.lockingToReef = driverGamepad->GetAButtonPressed();
     state.getTag = false;
-    if (driverGamepad->leftTriggerActive() && state.reefTag == -1) {
+    if ((driverGamepad->leftTriggerActive() || driverGamepad->rightTriggerActive()) && state.reefTag == -1) {
         state.getTag = true;
-    } else if (!driverGamepad->leftTriggerActive()) {
+    } else if (!driverGamepad->leftTriggerActive() || !driverGamepad->rightTriggerActive()) {
         state.reefTag = -1;
         hasReset = false;
     }

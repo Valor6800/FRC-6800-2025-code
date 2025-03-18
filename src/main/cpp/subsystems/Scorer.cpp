@@ -434,11 +434,9 @@ void Scorer::assessInputs()
     }
 
 
-    if (driverGamepad->rightTriggerActive()) {
+    if (driverGamepad->GetRightBumperButton()) {
         state.scoringState = SCORE_STATE::SCORING;
         state.hasAlgae = false;
-    } else if (driverGamepad->GetRightBumperButton()) {
-        state.scoringState = SCORE_STATE::INTAKING;
     } else {
         state.scoringState = SCORE_STATE::HOLD;
     }
@@ -550,7 +548,7 @@ if (state.scoringState == SCORE_STATE::SCORING) {
     }
     } else if (state.hasAlgae && state.gamePiece == GAME_PIECE::ALGEE) {
         scorerMotor->setSpeed(ALGEE_HOLD_SPD);
-    } else if (state.scoringState == SCORE_STATE::INTAKING || !scorerStagingSensor.isTriggered()) {
+    } else if (!scorerStagingSensor.isTriggered()) {
         if (state.gamePiece == GAME_PIECE::ALGEE) {
             scorerMotor->setSpeed(ALGEE_INTAKE_SPEED);
         } else {
