@@ -136,8 +136,6 @@ void Climber::assessInputs()
 
     if(driverGamepad->GetYButton() && driverGamepad->GetBButton()){
         state.climbState = CLIMB_STATE::DEPLOYED;
-    } else if(driverGamepad->GetXButton()){
-        state.climbState = CLIMB_STATE::STOW;
     } else if(driverGamepad->GetAButton()){
         state.climbState = CLIMB_STATE::RETRACTED;
     } else if(operatorGamepad->DPadUp()) {
