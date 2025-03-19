@@ -90,7 +90,6 @@ const units::meter_t WHEEL_DIAMETER(0.0973_m);
 
 #define AA_LEFT_OFFSET 0.0_in // 0.5_in
 #define AA_RIGHT_OFFSET 0.0_in // 1.5_in
-#define VIABLE_DUNK_DISTANCE 0.28_m //0.3
 #define VIABLE_DUNK_SPEED 1.1_mps
 
 #define Y_ACTIVATION_THRESHOLD 30.0_deg
@@ -166,7 +165,6 @@ Drivetrain::Drivetrain(frc::TimedRobot *_robot, valor::CANdleSensor* _leds) :
         Constants::pigeonMountYaw()
     );
 
-    table->PutNumber("Viable Dunk Distance (m)", VIABLE_DUNK_DISTANCE.value());
     table->PutNumber("Viable Dunk speed", VIABLE_DUNK_SPEED.value());
     /*
      * 3.8m/s, 5m/s^2, ~125lbs Apr. 2
@@ -593,20 +591,20 @@ void Drivetrain::alignAngleZoning()
 }
 
 
-bool Drivetrain::withinXRange() {
+bool Drivetrain::withinXRange(units::meter_t distance) {
     if (state.dir == LEFT) {
-        units::meter_t measuredDistance = rightdistanceSensor.getLidarData();
-        if (measuredDistance < 0_m) {
+        units::meter_t measuredDistance = rightdistanceSensor.getFilteredDistance();
+        if (measuredDistance <= 0_m) {
             return false;
         }
-        return (measuredDistance < (units::meter_t) table->GetNumber("Viable Dunk Distance (m)", VIABLE_DUNK_DISTANCE.value()));
+        return (measuredDistance < distance);
     } 
     else if (state.dir == RIGHT) {
-        units::meter_t measuredDistance = leftDistanceSensor.getLidarData();
-        if (measuredDistance < 0_m) {
+        units::meter_t measuredDistance = leftDistanceSensor.getFilteredDistance();
+        if (measuredDistance <= 0_m) {
             return false;
         }
-        return (measuredDistance < (units::meter_t) table->GetNumber("Viable Dunk Distance (m)", VIABLE_DUNK_DISTANCE.value()));
+        return (measuredDistance < distance);
         
     }
     return false;
@@ -701,11 +699,6 @@ void Drivetrain::InitSendable(wpi::SendableBuilder& builder)
         builder.AddBooleanProperty(
             "Aligned",
             [this] {return state.aligned;},
-            nullptr
-        );
-        builder.AddBooleanProperty(
-            "Within X Range",
-            [this] {return withinXRange();},
             nullptr
         );
         builder.AddBooleanProperty(

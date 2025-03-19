@@ -43,12 +43,21 @@ T LidarSensor<T>::getMaxDistance()
 }
 
 template <class T>
+T LidarSensor<T>::getFilteredDistance()
+{
+    return this->filteredDistance;
+}
+
+template <class T>
 void LidarSensor<T>::calculate()
 {
     BaseSensor<T>::prevState = BaseSensor<T>::currState;
     T latestUpdate = BaseSensor<T>::getSensor();
     if (T{this->maxDistance} > latestUpdate && latestUpdate > T{0})
+    {
         BaseSensor<T>::currState = latestUpdate;
+        filteredDistance = filter.Calculate(latestUpdate);
+    }    
 }
 
 template <class T>
@@ -62,5 +71,9 @@ void LidarSensor<T>::InitSendable(wpi::SendableBuilder& builder)
     builder.AddDoubleProperty(
         "Current State", 
         [this] { return BaseSensor<T>::currState.template to<double>(); },
+        nullptr);
+    builder.AddDoubleProperty(
+        "Filtered State", 
+        [this] { return filteredDistance.template to<double>(); },
         nullptr);
 }

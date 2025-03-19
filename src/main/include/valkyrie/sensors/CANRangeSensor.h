@@ -16,7 +16,6 @@ public:
 
 private:
     ctre::phoenix6::hardware::CANrange *device;
-
     bool isFaulting();
 };
 

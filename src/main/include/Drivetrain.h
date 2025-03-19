@@ -170,7 +170,7 @@ public:
 
      double doubtX, doubtY;
 
-     bool withinXRange(), withinYRange(), isSpeedBelowThreshold();
+     bool withinXRange(units::meter_t), withinYRange(), isSpeedBelowThreshold();
 
 private:
 
