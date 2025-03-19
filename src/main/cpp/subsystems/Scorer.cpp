@@ -527,8 +527,12 @@ void Scorer::assignOutputs()
     if (state.elevState == ELEVATOR_STATE::MANUAL) {
         elevatorMotor->setPower(state.manualSpeed + units::volt_t{Constants::getElevKAFF()});
     } else {
-        units::meter_t maxRange = (units::meter_t)table->GetNumber("Viable Elevator Distance (m)", VIABLE_ELEVATOR_DISTANCE.value());
-        if(state.scopedState == SCOPED && drivetrain->withinXRange(maxRange)){
+        if (state.scopedState == SCOPED &&
+            (
+                state.gamePiece == GAME_PIECE::ALGEE ||
+                (state.gamePiece == GAME_PIECE::CORAL && drivetrain->withinXRange((units::meter_t)table->GetNumber("Viable Elevator Distance (m)", VIABLE_ELEVATOR_DISTANCE.value())))
+            )
+        ) {
             state.targetHeight = positionMap.at(state.gamePiece).at(state.elevState);
             if (state.elevState == ELEVATOR_STATE::ONE && state.gamePiece == GAME_PIECE::CORAL && state.scoringState == SCORE_STATE::SCORING) {
                 state.targetHeight += 4_in;
