@@ -427,7 +427,7 @@ void Scorer::assessInputs()
     if (driverGamepad == nullptr || !driverGamepad->IsConnected())
         return;
     
-    if (driverGamepad->leftTriggerActive() || driverGamepad->GetLeftBumperButton()) {
+    if (driverGamepad->leftTriggerActive() || driverGamepad->rightTriggerActive() || driverGamepad->GetLeftBumperButton()) {
         state.scopedState = SCOPED;
     } else {
         state.scopedState = UNSCOPED;

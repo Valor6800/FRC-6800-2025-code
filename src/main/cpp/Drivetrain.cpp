@@ -290,12 +290,12 @@ void Drivetrain::assessInputs()
     state.getTag = false;
     if ((driverGamepad->leftTriggerActive() || driverGamepad->rightTriggerActive()) && state.reefTag == -1) {
         state.getTag = true;
-    } else if (!driverGamepad->leftTriggerActive() || !driverGamepad->rightTriggerActive()) {
+    } else if (!driverGamepad->leftTriggerActive() && !driverGamepad->rightTriggerActive()) {
         state.reefTag = -1;
         hasReset = false;
     }
 
-    state.alignToTarget = driverGamepad->leftTriggerActive();
+    state.alignToTarget = driverGamepad->leftTriggerActive() || driverGamepad->rightTriggerActive();
     state.climberAlign = driverGamepad->GetBButton();
     if (driverGamepad->leftTriggerActive() && !hasReset) {
         Swerve::resetAlignControllers();
