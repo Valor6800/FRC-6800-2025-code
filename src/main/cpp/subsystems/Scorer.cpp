@@ -35,7 +35,7 @@
 
 #define VIABLE_ELEVATOR_THRESHOLD 0.02_m
 #define VIABLE_DUNK_DISTANCE 0.28_m
-#define VIABLE_ELEVATOR_DISTANCE 0.5588_m //consider the offset of the canrange from the front of robot which is 8 inches
+#define VIABLE_ELEVATOR_DISTANCE 0.8_m //consider the offset of the canrange from the front of robot which is 8 inches
 
 
 using namespace Constants::Scorer;
