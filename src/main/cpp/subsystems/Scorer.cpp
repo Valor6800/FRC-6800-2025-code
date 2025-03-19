@@ -227,7 +227,7 @@ frc2::CommandPtr Scorer::scorerPitSequenceStage(GAME_PIECE gamePiece, ELEVATOR_S
             },
             [this] {
                 units::inch_t currentPos = convertToMechSpace(elevatorMotor->getPosition());
-                units::inch_t targetPos = positionMap[state.gamePiece][state.elevState];
+                units::inch_t targetPos = positionMap[state.gamePiece][state.elevState][0_m];
                 elevatorPositionSuccess.Set(units::math::abs(targetPos - currentPos) < 0.25_in);
                 elevatorPositionFail.Set(!elevatorPositionSuccess.Get());
             },
@@ -469,7 +469,7 @@ void Scorer::analyzeDashboard()
         state.protectChin = false;
     }
 
-    units::meter_t elevatorError = units::math::fabs(convertToMechSpace(elevatorMotor->getPosition()) - positionMap[state.gamePiece][state.elevState]);
+    units::meter_t elevatorError = units::math::fabs(convertToMechSpace(elevatorMotor->getPosition()) - positionMap[state.gamePiece][state.elevState][0_m]);
     elevatorWithinThreshold = elevatorError.value() < table->GetNumber("Elevator Threshold (m)", VIABLE_ELEVATOR_THRESHOLD.value());
     
     if (
@@ -533,15 +533,15 @@ void Scorer::assignOutputs()
                 (state.gamePiece == GAME_PIECE::CORAL && drivetrain->withinXRange((units::meter_t)table->GetNumber("Viable Elevator Distance (m)", VIABLE_ELEVATOR_DISTANCE.value())))
             )
         ) {
-            state.targetHeight = positionMap.at(state.gamePiece).at(state.elevState);
+            state.targetHeight = positionMap.at(state.gamePiece).at(state.elevState)[0_m];
             if (state.elevState == ELEVATOR_STATE::ONE && state.gamePiece == GAME_PIECE::CORAL && state.scoringState == SCORE_STATE::SCORING) {
                 state.targetHeight += 4_in;
             }
         } else{
             if (scorerStagingSensor.isTriggered()) {
-                state.targetHeight = positionMap.at(state.gamePiece).at(STOWED);
+                state.targetHeight = positionMap.at(state.gamePiece).at(STOWED)[0_m];
             } else {
-                state.targetHeight = positionMap.at(state.gamePiece).at(HP);
+                state.targetHeight = positionMap.at(state.gamePiece).at(HP)[0_m];
             }
         }
         units::turn_t targetRotations = convertToMotorSpace(state.targetHeight);

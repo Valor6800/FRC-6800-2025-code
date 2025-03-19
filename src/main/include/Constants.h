@@ -26,7 +26,7 @@
 #include <frc/geometry/Pose3d.h>
 #include <networktables/NetworkTable.h>
 #include "valkyrie/controllers/PhoenixController.h"
-
+#include <wpi/interpolating_map.h>
 
 #define ALPHA_SERIAL_NUMBER "03260AF3"
 #define GOLD_SERIAL_NUMBER "033E1BEA"
@@ -506,7 +506,8 @@ namespace Constants {
             };
 
             typedef std::unordered_map<ELEVATOR_STATE, units::turns_per_second_t> ScoringSpeedMap;
-            typedef std::unordered_map<GAME_PIECE, std::unordered_map<ELEVATOR_STATE, units::meter_t>> PositionMap;
+            typedef wpi::interpolating_map<units::meter_t, units::meter_t> ScoringInterpolator;
+            typedef std::unordered_map<GAME_PIECE, std::unordered_map<ELEVATOR_STATE, ScoringInterpolator>> PositionMap;
 
             static ScoringSpeedMap getScoringSpeedMap() { switch (robot) {
                 case Robot::Alpha: return {
@@ -523,59 +524,157 @@ namespace Constants {
                 };
             }}
 
-            static PositionMap getPositionMap() { switch (robot) {
-                case Robot::Alpha: 
-                    return {
-                        {
-                            GAME_PIECE::CORAL,
+            static PositionMap getPositionMap() { 
+                switch (robot) {
+                    case Robot::Alpha: 
+                        return {
                             {
-                                { ELEVATOR_STATE::STOWED, 5_in },
-                                { ELEVATOR_STATE::HP, 7.5_in },
-                                { ELEVATOR_STATE::ONE, 10_in },
-                                { ELEVATOR_STATE::TWO, 12.5_in }, // raise by . an inch
-                                { ELEVATOR_STATE::THREE, 15_in },
-                                { ELEVATOR_STATE::FOUR, 17.5_in }
-                            }
-                        },
-                        {
-                            GAME_PIECE::ALGEE,
+                                GAME_PIECE::CORAL,
+                                {
+                                    { ELEVATOR_STATE::STOWED, []{
+                                        ScoringInterpolator interp;
+                                        interp.insert(8_in, 5_in);
+                                        return interp;
+                                    }()},
+                                    { ELEVATOR_STATE::HP, []{
+                                        ScoringInterpolator interp;
+                                        interp.insert(8_in, 7.5_in);
+                                        return interp;
+                                    }()},
+                                    { ELEVATOR_STATE::ONE, []{
+                                        ScoringInterpolator interp;
+                                        interp.insert(8_in, 10_in);
+                                        return interp;
+                                    }()},
+                                    { ELEVATOR_STATE::TWO, []{
+                                        ScoringInterpolator interp;
+                                        interp.insert(8_in, 12.5_in);
+                                        return interp;
+                                    }()},
+                                    { ELEVATOR_STATE::THREE, []{
+                                        ScoringInterpolator interp;
+                                        interp.insert(8_in, 15_in);
+                                        return interp;
+                                    }()},
+                                    { ELEVATOR_STATE::FOUR, []{
+                                        ScoringInterpolator interp;
+                                        interp.insert(8_in, 17.5_in);
+                                        return interp;
+                                    }()}
+                                }
+                            },
                             {
-                                { ELEVATOR_STATE::STOWED, 7.5_in },
-                                { ELEVATOR_STATE::HP, 5_in },
-                                { ELEVATOR_STATE::ONE, 5_in },
-                                { ELEVATOR_STATE::TWO, 13.7_in },
-                                { ELEVATOR_STATE::THREE, 14.5_in },
-                                { ELEVATOR_STATE::FOUR, 17.5_in }
+                                GAME_PIECE::ALGEE,
+                                {
+                                    { ELEVATOR_STATE::STOWED, []{
+                                        ScoringInterpolator interp;
+                                        interp.insert(8_in, 7.5_in);
+                                        return interp;
+                                    }()},
+                                    { ELEVATOR_STATE::HP, []{
+                                        ScoringInterpolator interp;
+                                        interp.insert(8_in, 5_in);
+                                        return interp;
+                                    }()},
+                                    { ELEVATOR_STATE::ONE, []{
+                                        ScoringInterpolator interp;
+                                        interp.insert(8_in, 5_in);
+                                        return interp;
+                                    }()},
+                                    { ELEVATOR_STATE::TWO, []{
+                                        ScoringInterpolator interp;
+                                        interp.insert(8_in, 13.7_in);
+                                        return interp;
+                                    }()},
+                                    { ELEVATOR_STATE::THREE, []{
+                                        ScoringInterpolator interp;
+                                        interp.insert(8_in, 14.5_in);
+                                        return interp;
+                                    }()},
+                                    { ELEVATOR_STATE::FOUR, []{
+                                        ScoringInterpolator interp;
+                                        interp.insert(8_in, 17.5_in);
+                                        return interp;
+                                    }()}
+                                }
                             }
-                        }
-                    };
-                default:
-                    return {
-                        {
-                            GAME_PIECE::CORAL,
+                        };
+                    default:
+                        return {
                             {
-                                { ELEVATOR_STATE::STOWED, 10_in },
-                                { ELEVATOR_STATE::HP, 3.25_in },
-                                { ELEVATOR_STATE::ONE, 10.2_in },
-                                { ELEVATOR_STATE::TWO, 14.06_in }, //Tomball: 14.1
-                                { ELEVATOR_STATE::THREE, 19.1_in }, //Tomball: 19.5
-                                { ELEVATOR_STATE::FOUR, 26.75_in } //Tomball: 27.25
-                            }
-                        },
-                        {
-                            GAME_PIECE::ALGEE,
+                                GAME_PIECE::CORAL,
+                                {
+                                    { ELEVATOR_STATE::STOWED, []{
+                                        ScoringInterpolator interp;
+                                        interp.insert(8_in, 10_in);
+                                        return interp;
+                                    }()},
+                                    { ELEVATOR_STATE::HP, []{
+                                        ScoringInterpolator interp;
+                                        interp.insert(8_in, 3.25_in);
+                                        return interp;
+                                    }()},
+                                    { ELEVATOR_STATE::ONE, []{
+                                        ScoringInterpolator interp;
+                                        interp.insert(8_in, 10.2_in);
+                                        return interp;
+                                    }()},
+                                    { ELEVATOR_STATE::TWO, []{
+                                        ScoringInterpolator interp;
+                                        interp.insert(8_in, 14.06_in);
+                                        return interp;
+                                    }()},
+                                    { ELEVATOR_STATE::THREE, []{
+                                        ScoringInterpolator interp;
+                                        interp.insert(8_in, 19.1_in);
+                                        return interp;
+                                    }()},
+                                    { ELEVATOR_STATE::FOUR, []{
+                                        ScoringInterpolator interp;
+                                        interp.insert(8_in, 26.75_in);
+                                        return interp;
+                                    }()}
+                                }
+                            },
                             {
-                                { ELEVATOR_STATE::STOWED, 6.39_in},
-                                { ELEVATOR_STATE::HP, 6.39_in + 1_in},
-                                { ELEVATOR_STATE::ONE, 4.09_in },
-                                { ELEVATOR_STATE::TWO, 10.38_in}, //Tomball: 11.21
-                                { ELEVATOR_STATE::THREE, 15.89_in}, //Tomball: 16.72
-                                { ELEVATOR_STATE::FOUR, 29.9_in }
+                                GAME_PIECE::ALGEE,
+                                {
+                                    { ELEVATOR_STATE::STOWED, []{
+                                        ScoringInterpolator interp;
+                                        interp.insert(8_in, 6.39_in);
+                                        return interp;
+                                    }()},
+                                    { ELEVATOR_STATE::HP, []{
+                                        ScoringInterpolator interp;
+                                        interp.insert(8_in, 6.39_in + 1_in);
+                                        return interp;
+                                    }()},
+                                    { ELEVATOR_STATE::ONE, []{
+                                        ScoringInterpolator interp;
+                                        interp.insert(8_in, 4.09_in);
+                                        return interp;
+                                    }()},
+                                    { ELEVATOR_STATE::TWO, []{
+                                        ScoringInterpolator interp;
+                                        interp.insert(8_in, 10.38_in);
+                                        return interp;
+                                    }()},
+                                    { ELEVATOR_STATE::THREE, []{
+                                        ScoringInterpolator interp;
+                                        interp.insert(8_in, 15.89_in);
+                                        return interp;
+                                    }()},
+                                    { ELEVATOR_STATE::FOUR, []{
+                                        ScoringInterpolator interp;
+                                        interp.insert(8_in, 29.9_in);
+                                        return interp;
+                                    }()}
+                                }
                             }
-                        }
-                    };
-            }}
-
+                        };
+                }
+            }
+            
             static bool elevatorMotorInverted() { switch (robot) {
                 case Robot::Alpha: return true;
                 case Robot::Gold: return false;
