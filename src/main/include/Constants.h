@@ -554,7 +554,7 @@ namespace Constants {
                         {
                             GAME_PIECE::CORAL,
                             {
-                                { ELEVATOR_STATE::STOWED, 3.25_in },
+                                { ELEVATOR_STATE::STOWED, 10_in },
                                 { ELEVATOR_STATE::HP, 3.25_in },
                                 { ELEVATOR_STATE::ONE, 10.2_in },
                                 { ELEVATOR_STATE::TWO, 14.06_in }, //Tomball: 14.1
