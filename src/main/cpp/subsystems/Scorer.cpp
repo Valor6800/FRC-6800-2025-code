@@ -266,7 +266,7 @@ frc2::CommandPtr Scorer::scorerPitSequence() {
 void Scorer::resetState()
 {
     state.scoringState = HOLD;
-    state.elevState = ELEVATOR_STATE::STOWED;
+    state.elevState = ELEVATOR_STATE::HP;
     state.gamePiece = CORAL;
     state.scopedState = UNSCOPED;
     state.manualSpeed = 0_V;
@@ -528,7 +528,11 @@ void Scorer::assignOutputs()
                 state.targetHeight += 4_in;
             }
         } else{
-            state.targetHeight = positionMap.at(state.gamePiece).at(HP);
+            if (scorerStagingSensor.isTriggered()) {
+                state.targetHeight = positionMap.at(state.gamePiece).at(STOWED);
+            } else {
+                state.targetHeight = positionMap.at(state.gamePiece).at(HP);
+            }
         }
         units::turn_t targetRotations = convertToMotorSpace(state.targetHeight);
         elevatorMotor->setPosition(targetRotations);
