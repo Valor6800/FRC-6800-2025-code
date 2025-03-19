@@ -3,6 +3,8 @@
 #include "valkyrie/sensors/BaseSensor.h"
 #include <frc/TimedRobot.h>
 #include <units/length.h>
+#include <frc/filter/LinearFilter.h>
+
 
 namespace valor {
 
@@ -34,11 +36,14 @@ public:
     void InitSendable(wpi::SendableBuilder& builder) override;
 
     T getMaxDistance();
+    T getFilteredDistance();
     void setMaxDistance(T);
 
 private:
     void calculate();
     T maxDistance;
+    T filteredDistance;
+    frc::LinearFilter<T> filter = frc::LinearFilter<T>::SinglePoleIIR(0.1, 0.02_s);
 
 };
 }

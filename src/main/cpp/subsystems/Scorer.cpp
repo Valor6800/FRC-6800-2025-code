@@ -34,6 +34,9 @@
 #define ALGAE_CACHE_SIZE 1000
 
 #define VIABLE_ELEVATOR_THRESHOLD 0.02_m
+#define VIABLE_DUNK_DISTANCE 0.28_m
+#define VIABLE_ELEVATOR_DISTANCE 0.5588_m //consider the offset of the canrange from the front of robot which is 8 inches
+
 
 using namespace Constants::Scorer;
 
@@ -191,6 +194,10 @@ Scorer::Scorer(frc::TimedRobot *_robot, Drivetrain *_drivetrain, valor::CANdleSe
             )
         )
     ).ToPtr());
+
+        table->PutNumber("Viable Dunk Distance (m)", VIABLE_DUNK_DISTANCE.value());
+        table->PutNumber("Viable Elevator Distance (m)", VIABLE_ELEVATOR_DISTANCE.value());
+
     init();
 
     visualizerStage1 = nt::NetworkTableInstance::GetDefault().GetStructTopic<frc::Pose3d>("LiveWindow/BaseSubsystem/Scorer/Stage1Height").Publish();
@@ -468,7 +475,7 @@ void Scorer::analyzeDashboard()
     if (
         (state.autoDunkEnabled && !disableAutoDunk) &&
         drivetrain->isSpeedBelowThreshold() &&
-        drivetrain->withinXRange() &&
+        drivetrain->withinXRange((units::meter_t) table->GetNumber("Viable Dunk Distance (m)", VIABLE_DUNK_DISTANCE.value())) &&
         drivetrain->withinYRange() &&
         state.scopedState == SCOPED_STATE::SCOPED &&
         elevatorWithinThreshold &&
@@ -520,7 +527,8 @@ void Scorer::assignOutputs()
     if (state.elevState == ELEVATOR_STATE::MANUAL) {
         elevatorMotor->setPower(state.manualSpeed + units::volt_t{Constants::getElevKAFF()});
     } else {
-        if(state.scopedState == SCOPED){
+        units::meter_t maxRange = (units::meter_t)table->GetNumber("Viable Elevator Distance (m)", VIABLE_ELEVATOR_DISTANCE.value());
+        if(state.scopedState == SCOPED && drivetrain->withinXRange(maxRange)){
             state.targetHeight = positionMap.at(state.gamePiece).at(state.elevState);
             if (state.elevState == ELEVATOR_STATE::ONE && state.gamePiece == GAME_PIECE::CORAL && state.scoringState == SCORE_STATE::SCORING) {
                 state.targetHeight += 4_in;

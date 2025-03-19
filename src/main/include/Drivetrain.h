@@ -171,7 +171,7 @@ public:
 
      double doubtX, doubtY;
 
-     bool withinXRange(), withinYRange(), isSpeedBelowThreshold();
+     bool withinXRange(units::meter_t), withinYRange(), isSpeedBelowThreshold();
 
      void worldFrameAlignment(frc::Pose2d reefTagPose);
      void tagFrameAlignment();
