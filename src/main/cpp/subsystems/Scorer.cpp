@@ -195,8 +195,10 @@ Scorer::Scorer(frc::TimedRobot *_robot, Drivetrain *_drivetrain, valor::CANdleSe
         )
     ).ToPtr());
 
-        table->PutNumber("Viable Dunk Distance (m)", VIABLE_DUNK_DISTANCE.value());
-        table->PutNumber("Viable Elevator Distance (m)", VIABLE_ELEVATOR_DISTANCE.value());
+    table->PutNumber("Viable Dunk Distance (m)", VIABLE_DUNK_DISTANCE.value());
+    table->PutNumber("Viable Elevator Distance (m)", VIABLE_ELEVATOR_DISTANCE.value());
+    table->PutBoolean("Tuning Elevator", false);
+    table->PutNumber("Tuned Elevator Height", 3);
 
     init();
 
@@ -523,9 +525,15 @@ void Scorer::assignOutputs()
         return;
     }
 
+    bool tuning = table->GetBoolean("Tuning Elevator", false);
+    double tuningHeight = table->GetNumber("Tuned Elevator Height", 3);
+
     //Elevator State Machine
     if (state.elevState == ELEVATOR_STATE::MANUAL) {
         elevatorMotor->setPower(state.manualSpeed + units::volt_t{Constants::getElevKAFF()});
+    } else if (tuning) {
+        units::turn_t targetRotations = convertToMotorSpace((units::inch_t)tuningHeight);
+        elevatorMotor->setPosition(targetRotations);
     } else {
         if (state.scopedState == SCOPED &&
             (
@@ -533,7 +541,7 @@ void Scorer::assignOutputs()
                 (state.gamePiece == GAME_PIECE::CORAL && drivetrain->withinXRange((units::meter_t)table->GetNumber("Viable Elevator Distance (m)", VIABLE_ELEVATOR_DISTANCE.value())))
             )
         ) {
-            state.targetHeight = positionMap.at(state.gamePiece).at(state.elevState)[0_m];
+            state.targetHeight = positionMap.at(state.gamePiece).at(state.elevState)[drivetrain->lidarDistance()];
             if (state.elevState == ELEVATOR_STATE::ONE && state.gamePiece == GAME_PIECE::CORAL && state.scoringState == SCORE_STATE::SCORING) {
                 state.targetHeight += 4_in;
             }

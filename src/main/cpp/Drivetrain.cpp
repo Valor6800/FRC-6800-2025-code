@@ -592,22 +592,17 @@ void Drivetrain::alignAngleZoning()
 
 
 bool Drivetrain::withinXRange(units::meter_t distance) {
-    if (state.dir == LEFT) {
+    auto measuredDistance = lidarDistance();
+    return (measuredDistance < distance);
+}
+
+units::meter_t Drivetrain::lidarDistance(){
+     if (state.dir == LEFT) {
         units::meter_t measuredDistance = rightdistanceSensor.getFilteredDistance();
-        if (measuredDistance <= 0_m) {
-            return false;
-        }
-        return (measuredDistance < distance);
+        return measuredDistance;
     } 
-    else if (state.dir == RIGHT) {
-        units::meter_t measuredDistance = leftDistanceSensor.getFilteredDistance();
-        if (measuredDistance <= 0_m) {
-            return false;
-        }
-        return (measuredDistance < distance);
-        
-    }
-    return false;
+    units::meter_t measuredDistance = leftDistanceSensor.getFilteredDistance();
+    return measuredDistance;
 }
 
 

@@ -622,16 +622,21 @@ namespace Constants {
                                     { ELEVATOR_STATE::TWO, []{
                                         ScoringInterpolator interp;
                                         interp.insert(8_in, 14.06_in);
+                                        interp.insert(13.46_in, 16.06_in);
+                                        //interp.insert(17.795_in, 17.7_in); TWO CORALS
                                         return interp;
                                     }()},
                                     { ELEVATOR_STATE::THREE, []{
                                         ScoringInterpolator interp;
+                                        interp.insert(13.46_in, 21.04_in);
+                                        // interp.insert(17.795_in, 23.34_in); TWO CORALS 
                                         interp.insert(8_in, 19.1_in);
                                         return interp;
                                     }()},
                                     { ELEVATOR_STATE::FOUR, []{
                                         ScoringInterpolator interp;
                                         interp.insert(8_in, 26.75_in);
+                                        interp.insert(13.45_in, 28.4_in);
                                         return interp;
                                     }()}
                                 }

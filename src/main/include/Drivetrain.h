@@ -171,6 +171,7 @@ public:
      double doubtX, doubtY;
 
      bool withinXRange(units::meter_t), withinYRange(), isSpeedBelowThreshold();
+     units::meter_t lidarDistance();
 
 private:
 
