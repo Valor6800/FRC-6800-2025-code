@@ -102,6 +102,8 @@ public:
     units::angular_acceleration::radians_per_second_squared_t getSmoothedAngularAcceleration();
     double rotationLerping(double);
 
+    bool xAlign = false;
+
     void InitSendable(wpi::SendableBuilder& builder) override;
 
 protected:
@@ -200,7 +202,7 @@ private:
     double calculated_y_controller_val;
     units::meters_per_second_t relativeToTagSpeed;
 
-    Eigen::Vector2d joystickVector, pidVector, powerVector;
+    Eigen::Vector2d joystickVector, yAlignVector, powerVector, xAlignVector;
     units::angle::degree_t rotAlignOffset;
 
     nt::StructPublisher<frc::Pose2d> rawPosePublisher, calculatedPosePublisher;

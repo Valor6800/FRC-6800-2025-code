@@ -195,6 +195,35 @@ Scorer::Scorer(frc::TimedRobot *_robot, Drivetrain *_drivetrain, valor::CANdleSe
         )
     ).ToPtr());
 
+    pathplanner::NamedCommands::registerCommand("Align", std::move(
+        frc2::SequentialCommandGroup(
+            frc2::FunctionalCommand(
+                [&]{ // on begin
+                    drivetrain->state.startTimestamp = frc::Timer::GetFPGATimestamp();
+                    state.gamePiece = GAME_PIECE::CORAL;
+                    state.scopedState = SCOPED_STATE::SCOPED;
+                    state.elevState = ELEVATOR_STATE::TWO;
+                    drivetrain->state.dir = RIGHT;
+                },
+                [&]{ // on execute
+                    drivetrain->state.alignToTarget = true;
+                    drivetrain->xAlign = true;
+                    // frc::ChassisSpeeds speeds = frc::ChassisSpeeds{0.5_mps, 0.0_mps, 0.0_rad_per_s};
+                    // drive(0.5_mps, 0.0_mps, 0.0_rad_per_s, true);
+                },
+                [&](bool){ // on end
+                    drivetrain->state.alignToTarget = false;
+                    drivetrain->xAlign = false;
+                },
+                [&]{ // is Finished
+                    return state.scoringState == SCORE_STATE::SCORING;
+                },
+                {}
+            )
+        )
+    ).ToPtr());
+
+
         table->PutNumber("Viable Dunk Distance (m)", VIABLE_DUNK_DISTANCE.value());
         table->PutNumber("Viable Elevator Distance (m)", VIABLE_ELEVATOR_DISTANCE.value());
 
@@ -504,6 +533,10 @@ void Scorer::analyzeDashboard()
     visualizerStage1.Set(frc::Pose3d{0_m, 0_m, convertToMechSpace(height), frc::Rotation3d()});
     visualizerStage2.Set(frc::Pose3d{0_m, 0_m, convertToMechSpace(height * 2), frc::Rotation3d()});
     visualizerStage3.Set(frc::Pose3d{0_m, 0_m, convertToMechSpace(height * 3), frc::Rotation3d()});
+}
+
+void Scorer::setScopedState(SCOPED_STATE st){
+    state.scopedState = st;
 }
 
 units::meter_t Scorer::convertToMechSpace(units::turn_t turns) 

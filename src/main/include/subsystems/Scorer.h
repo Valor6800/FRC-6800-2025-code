@@ -23,6 +23,7 @@
 #include "valkyrie/sensors/CANdleSensor.h"
 #include <frc/Alert.h>
 #include <networktables/StructTopic.h>
+#include <frc2/command/FunctionalCommand.h>
 
 class Scorer : public valor::BaseSubsystem
 {
@@ -52,6 +53,8 @@ public:
         UNSCOPED,
         SCOPED,
     };
+    
+    void setScopedState(SCOPED_STATE);
 
     struct x
     {
