@@ -138,22 +138,17 @@ void Climber::assessInputs()
         state.climbState = CLIMB_STATE::DEPLOYED;
     } else if(driverGamepad->GetAButton()){
         state.climbState = CLIMB_STATE::RETRACTED;
-    } else if(operatorGamepad->DPadUp()) {
         state.hasClimbed = true;
     }
-
 }
 
 void Climber::analyzeDashboard()
 {
     leds->setLED(LEDConstants::LED_POS_CLIMBER, valor::CANdleSensor::cancoderMagnetHealthGetter(climbCancoder));
-    if (state.climbState == CLIMB_STATE::DEPLOYED) {
-        leds->setColor(0, CANdleSensor::RED, CANdleSensor::Priority::PRIORITY_CLIMBER);
-        leds->setColor(1, CANdleSensor::RED, CANdleSensor::Priority::PRIORITY_CLIMBER);
-        leds->setColor(2, CANdleSensor::RED, CANdleSensor::Priority::PRIORITY_CLIMBER);
-        leds->setColor(3, CANdleSensor::RED, CANdleSensor::Priority::PRIORITY_CLIMBER);
-        leds->setColor(4, CANdleSensor::RED, CANdleSensor::Priority::PRIORITY_CLIMBER);
-        leds->setColor(5, CANdleSensor::RED, CANdleSensor::Priority::PRIORITY_CLIMBER);
+    if (state.hasClimbed == true) {
+        leds->setColorAll(CANdleSensor::GREEN, CANdleSensor::Priority::PRIORITY_CLIMBER);
+    } else if (state.climbState == CLIMB_STATE::DEPLOYED) {
+        leds->setColorAll(CANdleSensor::RED, CANdleSensor::Priority::PRIORITY_CLIMBER);
     } else {
         leds->resetPriority();
     }
