@@ -29,6 +29,11 @@ CANrangeSensor::CANrangeSensor(frc::TimedRobot *_robot, const char *name, int de
     reset();
 }
 
+bool valor::CANrangeSensor::isConnected() {
+    auto status = device->GetDistance().Refresh().GetStatus();
+    return status.IsOK();
+}
+
 bool CANrangeSensor::isFaulting(){
     return (device->GetFault_BootDuringEnable().GetValue() || 
             device->GetFault_Hardware().GetValue() || 

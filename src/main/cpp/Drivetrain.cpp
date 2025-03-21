@@ -589,27 +589,54 @@ void Drivetrain::alignAngleZoning()
 
     }
 }
-
-
 bool Drivetrain::withinXRange(units::meter_t distance) {
-    if (state.dir == LEFT) {
-        units::meter_t measuredDistance = rightdistanceSensor.getFilteredDistance();
-        if (measuredDistance <= 0_m) {
-            return false;
-        }
-        return (measuredDistance < distance);
-    } 
-    else if (state.dir == RIGHT) {
-        units::meter_t measuredDistance = leftDistanceSensor.getFilteredDistance();
-        if (measuredDistance <= 0_m) {
-            return false;
-        }
-        return (measuredDistance < distance);
-        
-    }
-    return false;
+    auto measuredDistance = lidarDistance();
+    return (measuredDistance < distance);
 }
 
+units::meter_t Drivetrain::lidarDistance(){
+     if (state.dir == LEFT) {
+        units::meter_t measuredDistance = rightdistanceSensor.getFilteredDistance();
+        return measuredDistance;
+    } 
+    units::meter_t measuredDistance = leftDistanceSensor.getFilteredDistance();
+    return measuredDistance;
+}
+
+units::meter_t Drivetrain::lidarDistance(){
+     if (state.dir == LEFT) {
+
+        if (rightdistanceSensor.getFilteredDistance() < 0_mm){
+            units::meter_t measuredDistance = leftDistanceSensor.getFilteredDistance();
+            return measuredDistance;
+        }
+        units::meter_t measuredDistance = rightdistanceSensor.getFilteredDistance();
+        return measuredDistance;
+    } 
+    if (leftDistanceSensor.getFilteredDistance() < 0_mm){
+        units::meter_t measuredDistance = rightdistanceSensor.getFilteredDistance();
+        return measuredDistance;
+    }
+    units::meter_t measuredDistance = leftDistanceSensor.getFilteredDistance();
+    return measuredDistance;
+}
+
+units::meter_t Drivetrain::lidarDistance() {
+    bool leftConnected = leftDistanceSensor.isConnected();
+    bool rightConnected = rightdistanceSensor.isConnected();
+
+    if (state.dir == LEFT) {
+        if (!rightConnected) {
+            return leftDistanceSensor.getFilteredDistance();
+        }
+        return rightdistanceSensor.getFilteredDistance();
+    } else {
+        if (!leftConnected) {
+            return rightdistanceSensor.getFilteredDistance();
+        }
+        return leftDistanceSensor.getFilteredDistance();
+    }
+}
 
 bool Drivetrain::withinYRange() {
     return yControllerAligned();
