@@ -3,6 +3,7 @@
 #include <cstddef>
 #include <frc/DriverStation.h>
 #include <iterator>
+#include <limits>
 #include <math.h>
 #include <pathplanner/lib/auto/AutoBuilder.h>
 #include <string>
@@ -166,6 +167,7 @@ Drivetrain::Drivetrain(frc::TimedRobot *_robot, valor::CANdleSensor* _leds) :
     );
 
     table->PutNumber("Viable Dunk speed", VIABLE_DUNK_SPEED.value());
+    table->PutNumber("Viable Camera Angle Distance (m)", 0.0);
     /*
      * 3.8m/s, 5m/s^2, ~125lbs Apr. 2
      */
@@ -382,6 +384,12 @@ void Drivetrain::analyzeDashboard()
 
     alignAngleTags(); 
 
+    units::degree_t avgAngle = averageCameraAngle();
+
+    if (avgAngle != std::numeric_limits<units::degree_t>::max() && getXDistance().value() < table->GetNumber("Viable Camera Angle Distance (m)", 0.0)) {
+        Swerve::targetAngle += (avgAngle - getCalculatedPose().Rotation().Degrees());
+    }
+
 
     if (state.climberAlign){
         Swerve::targetAngle = frc::DriverStation::GetAlliance() == frc::DriverStation::kRed ? 90_deg : -90_deg;
@@ -515,6 +523,18 @@ frc2::CommandPtr Drivetrain::pitSequence() {
     );
 }
 
+units::degree_t Drivetrain::averageCameraAngle() {
+    double count = 0;
+    units::degree_t sum = 0_deg;
+
+    for (valor::AprilTagsSensor* aprilLime : aprilTagSensors) {
+        if (aprilLime->getTagID() < 0) continue; 
+        count++;
+        sum += aprilLime->getSensor().Rotation().Z();
+    }
+    return count != 0 ? sum / count : std::numeric_limits<units::degree_t>::max();
+}
+
 void Drivetrain::alignAngleTags()
 {
     // set each id angle to the correct angle
@@ -590,24 +610,20 @@ void Drivetrain::alignAngleZoning()
     }
 }
 
-
-bool Drivetrain::withinXRange(units::meter_t distance) {
+units::meter_t Drivetrain::getXDistance() { //TODO: Use isDetected
+    units::meter_t measuredDistance = -1_m;
     if (state.dir == LEFT) {
         units::meter_t measuredDistance = rightdistanceSensor.getFilteredDistance();
-        if (measuredDistance <= 0_m) {
-            return false;
-        }
-        return (measuredDistance < distance);
     } 
     else if (state.dir == RIGHT) {
         units::meter_t measuredDistance = leftDistanceSensor.getFilteredDistance();
-        if (measuredDistance <= 0_m) {
-            return false;
-        }
-        return (measuredDistance < distance);
-        
     }
-    return false;
+    
+    return measuredDistance;
+}
+
+bool Drivetrain::withinXRange(units::meter_t distance) {
+    return getXDistance() < distance && getXDistance() > 0_m;
 }
 
 

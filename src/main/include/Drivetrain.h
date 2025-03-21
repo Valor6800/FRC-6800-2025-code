@@ -170,7 +170,10 @@ public:
 
      double doubtX, doubtY;
 
+     units::meter_t getXDistance();
      bool withinXRange(units::meter_t), withinYRange(), isSpeedBelowThreshold();
+     
+     units::degree_t averageCameraAngle();
 
 private:
 
