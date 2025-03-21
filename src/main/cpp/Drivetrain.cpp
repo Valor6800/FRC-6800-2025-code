@@ -654,19 +654,53 @@ void Drivetrain::alignAngleZoning()
 
     }
 }
-
 bool Drivetrain::withinXRange(units::meter_t distance) {
     auto measuredDistance = lidarDistance();
     return (measuredDistance < distance);
 }
 
-units::meter_t Drivetrain::lidarDistance() {
+units::meter_t Drivetrain::lidarDistance(){
      if (state.dir == LEFT) {
         units::meter_t measuredDistance = rightdistanceSensor.getFilteredDistance();
         return measuredDistance;
     } 
     units::meter_t measuredDistance = leftDistanceSensor.getFilteredDistance();
     return measuredDistance;
+}
+
+units::meter_t Drivetrain::lidarDistance(){
+     if (state.dir == LEFT) {
+
+        if (rightdistanceSensor.getFilteredDistance() < 0_mm){
+            units::meter_t measuredDistance = leftDistanceSensor.getFilteredDistance();
+            return measuredDistance;
+        }
+        units::meter_t measuredDistance = rightdistanceSensor.getFilteredDistance();
+        return measuredDistance;
+    } 
+    if (leftDistanceSensor.getFilteredDistance() < 0_mm){
+        units::meter_t measuredDistance = rightdistanceSensor.getFilteredDistance();
+        return measuredDistance;
+    }
+    units::meter_t measuredDistance = leftDistanceSensor.getFilteredDistance();
+    return measuredDistance;
+}
+
+units::meter_t Drivetrain::lidarDistance() {
+    bool leftConnected = leftDistanceSensor.isConnected();
+    bool rightConnected = rightdistanceSensor.isConnected();
+
+    if (state.dir == LEFT) {
+        if (!rightConnected) {
+            return leftDistanceSensor.getFilteredDistance();
+        }
+        return rightdistanceSensor.getFilteredDistance();
+    } else {
+        if (!leftConnected) {
+            return rightdistanceSensor.getFilteredDistance();
+        }
+        return leftDistanceSensor.getFilteredDistance();
+    }
 }
 
 bool Drivetrain::withinYRange() {
