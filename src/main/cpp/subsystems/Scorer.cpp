@@ -471,7 +471,7 @@ void Scorer::analyzeDashboard()
         state.protectChin = false;
     }
 
-    units::meter_t elevatorError = units::math::fabs(convertToMechSpace(elevatorMotor->getPosition()) - positionMap[state.gamePiece][state.elevState][0_m]);
+    units::meter_t elevatorError = units::math::fabs(convertToMechSpace(elevatorMotor->getPosition()) - positionMap[state.gamePiece][state.elevState][drivetrain->lidarDistance()]);
     elevatorWithinThreshold = elevatorError.value() < table->GetNumber("Elevator Threshold (m)", VIABLE_ELEVATOR_THRESHOLD.value());
     
     if (
@@ -594,6 +594,13 @@ void Scorer::InitSendable(wpi::SendableBuilder& builder)
         [this] { return units::inch_t{state.targetHeight}.value(); },
         nullptr
     );
+
+    builder.AddDoubleProperty(
+        "Interpolation distance",
+        [this] { return units::inch_t (positionMap[state.gamePiece][state.elevState][drivetrain->lidarDistance()]).value(); },
+        nullptr
+    );
+
     builder.AddDoubleProperty(
         "Actual Position: Elevator (in)",
         [this] { return units::inch_t{convertToMechSpace(elevatorMotor->getPosition())}.value(); },
@@ -665,6 +672,12 @@ void Scorer::InitSendable(wpi::SendableBuilder& builder)
     builder.AddBooleanProperty(
         "ABSOLUTE POSITION NO OFFSET?",
         [this] {return absSensorCorrect.value();},
+        nullptr
+    );
+
+    builder.AddBooleanProperty(
+        "ELEVATOR THRESHOLD", 
+        [this] {return elevatorWithinThreshold;},
         nullptr
     );
 }
