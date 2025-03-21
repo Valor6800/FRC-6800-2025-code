@@ -144,6 +144,14 @@ public:
      * @param rgb The RGB code to change all the LEDs in the strip to.
     */
     void setColor(RGBColor rgb);
+    
+    /**
+     * @brief Set the color for all segments
+     * 
+     * @param color Color of the segments
+     */
+    void setColorAll(int color, Priority priority);
+    
     /**
      * @brief Set the animation the LEDs should follow
      * 
