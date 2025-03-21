@@ -90,7 +90,7 @@ void Robot::AutonomousInit() {
     drivetrain.resetState();
     drivetrain.doubtX = AUTO_DOUBTX;
     drivetrain.doubtY = AUTO_DOUBTY;
-    scorer.state.autoDunkEnabled = false;
+    scorer.state.autoDunkEnabled = true;
     autoCommands = valorAuto.getSelectedAuto();
     autoCommands.Schedule();
     // autoCommands.clear();

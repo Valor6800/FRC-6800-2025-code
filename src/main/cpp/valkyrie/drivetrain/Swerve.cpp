@@ -228,8 +228,11 @@ void Swerve<AzimuthMotor, DriveMotor>::analyzeDashboard()
         
         relativeToTagSpeed = units::meters_per_second_t{calculated_y_controller_val} + (Y_KFF * y_controller.GetSetpoint().velocity);
 
-        pidVector = MAKE_VECTOR(targetAngle - 90_deg) * relativeToTagSpeed.value();
-        powerVector = joystickVector + pidVector;
+        yAlignVector = MAKE_VECTOR(targetAngle - 90_deg) * relativeToTagSpeed.value();
+        if(xAlign){
+            xAlignVector = MAKE_VECTOR(targetAngle) * 0.5;
+        }
+        powerVector = joystickVector + yAlignVector + xAlignVector;
         // powerVector *= dotProduct / fabs(dotProduct);
         xSpeedMPS = units::meters_per_second_t{powerVector[0]};
         ySpeedMPS = units::meters_per_second_t{powerVector[1]};
@@ -532,9 +535,10 @@ template <class AzimuthMotor, class DriveMotor>
 std::vector<frc::SwerveModuleState> valor::Swerve<AzimuthMotor, DriveMotor>::getAllModuleStatesAsVector()
 {
     std::vector<frc::SwerveModuleState> states;
-    for (size_t i = 0; i < swerveModules.size(); i++){
-        states.push_back(swerveModules[i]->getState());
-    }
+    states.push_back(swerveModules[0]->getState());
+    states.push_back(swerveModules[1]->getState());
+    states.push_back(swerveModules[3]->getState());
+    states.push_back(swerveModules[2]->getState());
     return states;
 }
 template<class AzimuthMotor, class DriveMotor>
@@ -726,7 +730,7 @@ void Swerve<AzimuthMotor, DriveMotor>::InitSendable(wpi::SendableBuilder& builde
     );
     builder.AddDoubleArrayProperty(
         "Y_Controller PID Vector",
-        [this] {return std::vector<double>{pidVector[0], pidVector[1]};},
+        [this] {return std::vector<double>{yAlignVector[0], yAlignVector[1]};},
         nullptr
     );
     builder.AddDoubleArrayProperty(
