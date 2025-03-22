@@ -104,6 +104,7 @@ public:
     void resetAlignControllers();
 
     bool xAlign = false;
+    bool dumbAutoAlign = false;
 
     void InitSendable(wpi::SendableBuilder& builder) override;
 
