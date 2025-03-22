@@ -14,8 +14,8 @@
 #include <vector>
 
 #define OUTLIER_EDGE 4.0f //meters
-#define DP 0.1f
-#define VP 0.2f
+#define DP 0.1f // 0.1
+#define VP 0.2f // 
 
 using namespace valor;
 
@@ -66,13 +66,12 @@ frc::Pose3d AprilTagsSensor::getPoseFromAprilTag() {
         )
     ); 
 }
-
 void AprilTagsSensor::applyVisionMeasurement(
     frc::SwerveDrivePoseEstimator<4> *estimator,
     units::velocity::meters_per_second_t speed,
     units::angular_velocity::radians_per_second_t angular_velocity,
     double doubtX,
-    double doubtY,
+    double doubtY, 
     double doubtRot
 ) {
     if (!hasTarget()) return;
@@ -87,7 +86,6 @@ void AprilTagsSensor::applyVisionMeasurement(
     double newDoubtX = doubtX + (distance.to<double>() * dp) + (vp * speed.to<double>());
     double newDoubtY = doubtY + (distance.to<double>() * dp) + (vp * speed.to<double>());
     double newDoubtRot = doubtRot + (distance.to<double>() * dp) + (vp * speed.to<double>()) + (avp * fabs(angular_velocity.value()));
-
 
     if (distance >= normalVisionOutlier) return;
 

@@ -403,11 +403,6 @@ void Drivetrain::analyzeDashboard()
         Swerve::yDistance = units::length::meter_t (state.yEstimate); //units::length::meter_t {filter.Calculate(unfilteredYDistance)};
         Swerve::xDistance = units::length::meter_t (state.xEstimate); 
     } else {
-        frc::Pose2d robotToCenter{
-            getCalculatedPose().Translation() + frc::Translation2d(-17.5482504_m / 2.0, -8.0519016_m / 2.0),
-            getCalculatedPose().Rotation()
-        };
-
         std::pair<int, frc::Pose2d> reefTagPose{ temp.first, temp.second.ToPose2d()};
 
         reefTagPose = std::pair<int, frc::Pose2d>{
@@ -424,6 +419,14 @@ void Drivetrain::analyzeDashboard()
 
         if (state.alignToTarget) {
             worldFrameAlignment(reefTagPose.second);
+        }
+
+        if (state.alignToTarget && state.alignControllersReset == false){
+            Swerve::resetLinearAlignControllers();
+            state.alignControllersReset = true;
+        }
+        else if (state.alignToTarget == false) {
+            state.alignControllersReset = false;
         }
     }
 

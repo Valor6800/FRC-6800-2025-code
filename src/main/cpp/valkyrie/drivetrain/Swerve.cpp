@@ -929,4 +929,9 @@ void Swerve<AzimuthMotor, DriveMotor>::InitSendable(wpi::SendableBuilder& builde
         [this] { return angularAcceleration.value();},  
         nullptr
     );
+    builder.AddBooleanProperty(
+        "Rotation Align",
+        [this] { return rotAlign;},  
+        nullptr
+    );
 }

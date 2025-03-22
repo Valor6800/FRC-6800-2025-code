@@ -138,6 +138,7 @@ public:
           bool right;
           bool left;
           bool alignToTarget, climberAlign;
+          bool alignControllersReset;
 
           Constants::Scorer::GAME_PIECE gamePiece;
           Constants::Scorer::ELEVATOR_STATE elevState;
