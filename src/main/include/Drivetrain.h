@@ -184,7 +184,7 @@ private:
      valor::CANrangeSensor rightdistanceSensor;
      units::meter_t averageXDistance;
 
-     frc2::CommandPtr pitSequenceCommand(const frc::ChassisSpeeds&);
+     frc2::CommandPtr pitSequenceCommand(const frc::ChassisSpeeds&, int, int);
      bool aprilTagOnReef(int id);
 
      std::vector<std::pair<SwerveAzimuthMotor*, SwerveDriveMotor*>> generateModules();

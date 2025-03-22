@@ -547,7 +547,7 @@ frc2::FunctionalCommand* Drivetrain::getResetOdom() {
     );
 }
 
-frc2::CommandPtr Drivetrain::pitSequenceCommand(const frc::ChassisSpeeds& speeds) {
+frc2::CommandPtr Drivetrain::pitSequenceCommand(const frc::ChassisSpeeds& speeds, int idx, int numSegments) {
     auto targetStates = getModuleStates(speeds);
     return frc2::cmd::Sequence(
         frc2::cmd::Deadline(
@@ -556,9 +556,12 @@ frc2::CommandPtr Drivetrain::pitSequenceCommand(const frc::ChassisSpeeds& speeds
                 testModeDesiredStates = targetStates;
             })
         ),
-        frc2::cmd::RunOnce([this] {
+        frc2::cmd::RunOnce([this, idx, numSegments] {
             for (int i = 0; i < MODULE_COUNT; i++)
                 testModeDesiredStates[i].speed = 0_mps;
+
+            for (int i = 0; i < numSegments; i++)
+                leds->setColor(idx + i, valor::CANdleSensor::GREEN);
         }),
         frc2::cmd::Wait(1_s)
     );
@@ -566,12 +569,10 @@ frc2::CommandPtr Drivetrain::pitSequenceCommand(const frc::ChassisSpeeds& speeds
 
 frc2::CommandPtr Drivetrain::pitSequence() {
     return frc2::cmd::Sequence(
-        pitSequenceCommand(frc::ChassisSpeeds{0_mps, 0.5_mps, 0_rad_per_s}),
-        pitSequenceCommand(frc::ChassisSpeeds{0_mps, -0.5_mps, 0_rad_per_s}),
-        pitSequenceCommand(frc::ChassisSpeeds(0_mps, 0_mps, 2_rad_per_s)),
-        pitSequenceCommand(frc::ChassisSpeeds{0_mps, 0_mps, -2_rad_per_s}),
-        pitSequenceCommand(frc::ChassisSpeeds{maxDriveSpeed / 2, 0_mps, 0_rad_per_s}),
-        pitSequenceCommand(frc::ChassisSpeeds{-maxDriveSpeed / 2, 0_mps, 0_rad_per_s}),
+        pitSequenceCommand(frc::ChassisSpeeds{0_mps, maxDriveSpeed / 2, 0_rad_per_s}, 0, 2),
+        pitSequenceCommand(frc::ChassisSpeeds(0_mps, 0_mps, maxRotationSpeed / 2), 2, 1),
+        pitSequenceCommand(frc::ChassisSpeeds{maxDriveSpeed / 2, 0_mps, 0_rad_per_s}, 3, 2),
+        pitSequenceCommand(frc::ChassisSpeeds{-maxDriveSpeed / 2, 0_mps, 0_rad_per_s}, 5, 1),
         frc2::cmd::RunOnce([this] {
             for (int i = 0; i < MODULE_COUNT; i++)
                 testModeDesiredStates[i].angle = 0_deg;
