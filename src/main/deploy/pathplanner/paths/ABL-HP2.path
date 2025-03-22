@@ -1,0 +1,77 @@
+{
+  "version": "2025.0",
+  "waypoints": [
+    {
+      "anchor": {
+        "x": 3.3752128137107102,
+        "y": 5.579537955560503
+      },
+      "prevControl": null,
+      "nextControl": {
+        "x": 2.685245901639344,
+        "y": 6.104866803278688
+      },
+      "isLocked": false,
+      "linkedName": "B-AL"
+    },
+    {
+      "anchor": {
+        "x": 1.2946721311475409,
+        "y": 7.027920081967213
+      },
+      "prevControl": {
+        "x": 1.8940573770491804,
+        "y": 6.740215163934426
+      },
+      "nextControl": null,
+      "isLocked": false,
+      "linkedName": "B-HP2"
+    }
+  ],
+  "rotationTargets": [],
+  "constraintZones": [],
+  "pointTowardsZones": [],
+  "eventMarkers": [
+    {
+      "name": "HP",
+      "waypointRelativePos": 0.02,
+      "endWaypointRelativePos": null,
+      "command": {
+        "type": "named",
+        "data": {
+          "name": "HP"
+        }
+      }
+    },
+    {
+      "name": "Intaking",
+      "waypointRelativePos": 0.2,
+      "endWaypointRelativePos": null,
+      "command": {
+        "type": "named",
+        "data": {
+          "name": "Intaking"
+        }
+      }
+    }
+  ],
+  "globalConstraints": {
+    "maxVelocity": 4.0,
+    "maxAcceleration": 4.0,
+    "maxAngularVelocity": 540.0,
+    "maxAngularAcceleration": 720.0,
+    "nominalVoltage": 12.0,
+    "unlimited": false
+  },
+  "goalEndState": {
+    "velocity": 0,
+    "rotation": -55.0
+  },
+  "reversed": false,
+  "folder": "R-H",
+  "idealStartingState": {
+    "velocity": 0,
+    "rotation": -59.99999999999999
+  },
+  "useDefaultConstraints": true
+}

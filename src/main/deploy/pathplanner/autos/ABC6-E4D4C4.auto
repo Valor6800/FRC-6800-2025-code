@@ -1,0 +1,67 @@
+{
+  "version": "2025.0",
+  "command": {
+    "type": "sequential",
+    "data": {
+      "commands": [
+        {
+          "type": "path",
+          "data": {
+            "pathName": "ABC6-E4"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "AlignLeft"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "ABE-HP"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "ABHP-D4"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "AlignRight"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "ABD-HP"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "ABHP-C4"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "AlignLeft"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "ABC-HP"
+          }
+        }
+      ]
+    }
+  },
+  "resetOdom": true,
+  "folder": "Blue Autos",
+  "choreoAuto": false
+}

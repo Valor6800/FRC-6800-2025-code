@@ -341,6 +341,9 @@ void Drivetrain::analyzeDashboard()
                     state.reefTag = aprilLime->getTagID();
                     leastSkew = currentSkew;
                     state.yEstimate = aprilLime->get_botpose_targetspace().X().to<double>();
+
+                    Swerve::yDistance = units::length::meter_t (state.yEstimate);
+                    Swerve::resetAlignControllers();
                 }
                 if (state.reefTag == aprilLime->getTagID()) {
                     //unfilteredYDistance = aprilLime->get_botpose_targetspace().X().to<double>();
