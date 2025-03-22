@@ -309,7 +309,6 @@ void Drivetrain::assessInputs()
     state.alignToTarget = driverGamepad->leftTriggerActive() || driverGamepad->rightTriggerActive();
     state.climberAlign = driverGamepad->GetBButton();
     if (driverGamepad->leftTriggerActive() && !hasReset) {
-        Swerve::resetAlignControllers();
         hasReset = true;
     }
 
