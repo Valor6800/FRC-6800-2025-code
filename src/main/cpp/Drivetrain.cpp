@@ -449,14 +449,21 @@ void Drivetrain::analyzeDashboard()
     visionAcceptanceRadius = (units::meter_t) table->GetNumber("Vision Acceptance", VISION_ACCEPTANCE.to<double>());
 
     for (valor::AprilTagsSensor* aprilLime : aprilTagSensors) {
-        aprilLime->applyVisionMeasurement(
-            calcEstimator.get(),
-            getRobotSpeeds(),
-            table->GetBoolean("Accepting Vision Measurements", true),
-            doubtX,
-            doubtY,
-            doubtRot
-        );
+        if (aprilLime->hasTarget() &&
+            (
+                (6 <= aprilLime->getTagID() && aprilLime->getTagID() <= 11) ||
+                (17 <= aprilLime->getTagID() && aprilLime->getTagID() <= 22)
+            )
+        ) {
+            aprilLime->applyVisionMeasurement(
+                calcEstimator.get(),
+                getRobotSpeeds(),
+                table->GetBoolean("Accepting Vision Measurements", true),
+                doubtX,
+                doubtY,
+                doubtRot
+            );
+        }
     }
 
     if (!driverGamepad || !driverGamepad->IsConnected() || !operatorGamepad || !operatorGamepad->IsConnected())
