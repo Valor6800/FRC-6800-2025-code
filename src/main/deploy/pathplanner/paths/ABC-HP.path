@@ -8,8 +8,8 @@
       },
       "prevControl": null,
       "nextControl": {
-        "x": 2.8770491803278686,
-        "y": 1.51357581967213
+        "x": 2.4574795081967213,
+        "y": 1.7413422131147547
       },
       "isLocked": false,
       "linkedName": "B-AC"
@@ -20,8 +20,8 @@
         "y": 0.9421440658284428
       },
       "prevControl": {
-        "x": 2.4212548222528496,
-        "y": 1.2304272625497543
+        "x": 2.2656762295081965,
+        "y": 1.573514344262295
       },
       "nextControl": null,
       "isLocked": false,
@@ -64,7 +64,7 @@
     "unlimited": false
   },
   "goalEndState": {
-    "velocity": 0.5,
+    "velocity": 0.0,
     "rotation": 55.0
   },
   "reversed": false,

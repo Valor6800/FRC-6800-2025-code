@@ -57,6 +57,18 @@
           "data": {
             "pathName": "ABC-HP"
           }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "ABHP-B4"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "AlignRight"
+          }
         }
       ]
     }
