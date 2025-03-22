@@ -31,6 +31,13 @@
 #define ELEVATOR_MOTOR_TO_SENSOR 8.02f
 #define PULLEY_CIRCUMFERENCE 1.432_in
 
+#define SECOND_SCORER_MOTOR_TO_SENSOR 0.0f
+#define SECOND_SCORER_SENSOR_TO_MECH 0.0f
+#define SECOND_SCORER_FORWARD_LIMIT 0_tr
+#define SECOND_SCORER_REVERSE_LIMIT 0_tr
+
+
+
 #define ALGAE_CACHE_SIZE 1000
 
 #define VIABLE_ELEVATOR_THRESHOLD 0.02_m
@@ -40,6 +47,9 @@
 #define MIN_DUNK_DISTANCE_OVER_CORAL 11_in
 #define MAX_DUNK_DISTANCE_OVER_CORAL 14.5_in
 #define DUNK_OFFSET_OVER_CORAL 2.5_in
+#define ALGAE_POS 0_tr
+#define CORAL_POS 0_tr
+#define IDLE_POS 0_tr
 
 using namespace Constants::Scorer;
 
@@ -49,6 +59,8 @@ Scorer::Scorer(frc::TimedRobot *_robot, Drivetrain *_drivetrain, valor::CANdleSe
     candi(CANIDs::HALL_EFFECT, "baseCAN"),
     elevatorMotor(new valor::PhoenixController(valor::PhoenixControllerType::KRAKEN_X60, CANIDs::ELEV_WHEEL, valor::NeutralMode::Brake, elevatorMotorInverted(), "baseCAN")),
     scorerMotor(new valor::PhoenixController(Constants::getScorerMotorType(), CANIDs::SCORER_WHEEL, valor::NeutralMode::Brake, scorerMotorInverted(), "baseCAN")),
+    secondScorerMotor(new valor::PhoenixController(Constants::getSecondScorerMotorType(), CANIDs::SECOND_SCORER_MOTOR, valor::NeutralMode::Brake, secondScorerMotorInverted(), "baseCAN")),
+    secondScorerCancoder(new ctre::phoenix6::hardware::CANcoder(CANIDs::SECOND_SCORER_CAN, "baseCAN")),
     scorerStagingSensor(_robot, "Scorer Staging Sensor", CANIDs::STAGING_LIDAR_SENSOR, "baseCAN"),
     currentSensor(_robot, "Algae Current Sensor"),
     positionMap{std::move(getPositionMap())},
@@ -444,6 +456,40 @@ void Scorer::init()
 
     scorerMotor->applyConfig();
 
+    // Elevator init sequence
+    secondScorerMotor->setGearRatios(SECOND_SCORER_MOTOR_TO_SENSOR, SECOND_SCORER_SENSOR_TO_MECH);
+    secondScorerMotor->enableFOC(true);
+    secondScorerMotor->setForwardLimit(SECOND_SCORER_FORWARD_LIMIT);
+    secondScorerMotor->setReverseLimit(SECOND_SCORER_REVERSE_LIMIT);
+
+     ctre::phoenix6::configs::MagnetSensorConfigs encoderConfig;
+    encoderConfig.AbsoluteSensorDiscontinuityPoint = 0_tr;
+    encoderConfig.SensorDirection = ctre::phoenix6::signals::SensorDirectionValue::CounterClockwise_Positive;
+    encoderConfig.MagnetOffset = 0_tr;
+    secondScorerCancoder->GetConfigurator().Apply(encoderConfig);
+
+    valor::PIDF secondScorerPID = Constants::Scorer::getElevatorPIDF();
+    secondScorerPID.maxVelocity = secondScorerMotor->getMaxMechSpeed();
+    secondScorerPID.maxAcceleration = secondScorerMotor->getMaxMechSpeed() / 0.5;
+    secondScorerMotor->setPIDF(secondScorerPID);
+
+   
+    // secondScorerMotor->setupCANCoder(
+    //     CANIDs::SECOND_SCORER_CAN,
+    //     0.1_tr, 
+    //     false,
+    //     "baseCAN",
+    //     0.5_tr
+    // );
+    elevatorMotor->applyConfig();
+    elevatorMotor->setCurrentLimits(
+        units::ampere_t{100},
+        units::ampere_t{60},
+        units::ampere_t{45},
+        units::second_t{0.5},
+        true
+    );
+
     // Zeroing debounce sensor (utilizes CANdi configured hall effect sensor)
     hallEffectDebounceSensor.setGetter([this] { return hallEffectSensorActive();});
     hallEffectDebounceSensor.setRisingEdgeCallback([this] {
@@ -630,6 +676,15 @@ void Scorer::assignOutputs()
     if (!state.hasZeroed) {
         elevatorMotor->setPower(-3.0_V);
         return;
+    }
+
+
+    if (state.gamePiece == GAME_PIECE::CORAL){
+        secondScorerMotor->setPosition(ALGAE_POS);
+    } else if (state.gamePiece == GAME_PIECE::ALGEE ) {
+        secondScorerMotor->setPosition(CORAL_POS);
+    } else{
+        secondScorerMotor->setPosition(IDLE_POS);
     }
 
     //Elevator State Machine

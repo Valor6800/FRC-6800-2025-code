@@ -104,6 +104,8 @@ namespace CANIDs {
     constexpr static int CRABB = 33;
     constexpr static int ELEVATOR_CAN = 24;
     constexpr static int CLIMBER_CAN = 25;
+    constexpr static int SECOND_SCORER_MOTOR = 1000;
+    constexpr static int SECOND_SCORER_CAN = 10001;
 }
 
 #pragma GCC diagnostic push
@@ -252,6 +254,12 @@ namespace Constants {
         }};
 
         static valor::PhoenixControllerType getScorerMotorType() { switch (robot) {
+            case Robot::Alpha: return valor::PhoenixControllerType::FALCON_FOC;
+            case Robot::Gold: return valor::PhoenixControllerType::KRAKEN_X44;
+            default: return valor::PhoenixControllerType::KRAKEN_X44;
+        }};
+
+         static valor::PhoenixControllerType getSecondScorerMotorType() { switch (robot) {
             case Robot::Alpha: return valor::PhoenixControllerType::FALCON_FOC;
             case Robot::Gold: return valor::PhoenixControllerType::KRAKEN_X44;
             default: return valor::PhoenixControllerType::KRAKEN_X44;
@@ -592,6 +600,12 @@ namespace Constants {
                 case Robot::Alpha: return true;
                 case Robot::Gold: return false;
                 default: return true;
+            }}
+
+            static bool secondScorerMotorInverted() { switch (robot) {
+                case Robot::Alpha: return true;
+                case Robot::Gold: return false;
+                default: return false;
             }}
 
             /// Amount of rotations needed for after detecting coral intake
