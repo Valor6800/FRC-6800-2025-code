@@ -77,23 +77,30 @@ void AprilTagsSensor::applyVisionMeasurement(frc::SwerveDrivePoseEstimator<4> *e
     //else distance = 0_m; return;
     double newDoubtX = doubtX + (distance.to<double>() * dp) + (vp * speed.to<double>());
     double newDoubtY = doubtY + (distance.to<double>() * dp) + (vp * speed.to<double>());
+    double newDoubtRot = doubtRot + (distance.to<double>() * dp) + (vp * speed.to<double>());
     if (distance >= normalVisionOutlier) return;
     units::millisecond_t totalLatency = getTotalLatency();
+
+    frc::Rotation2d newAngle = estimator->GetEstimatedPosition().Rotation();
+    if (distance < 1.5_m) {
+        newAngle = currState.ToPose2d().Rotation();
+    }
 
     frc::Pose2d tGone = frc::Pose2d{
         currState.ToPose2d().X(),
         currState.ToPose2d().Y(),
-        estimator->GetEstimatedPosition().Rotation()
+        newAngle
     };
     limeTable->PutNumber("new doubt x", newDoubtX);
     limeTable->PutNumber("new doubt y", newDoubtY);
+    limeTable->PutNumber("new doubt rot", newDoubtRot);
 
     if (tGone.X() == 0.0_m || tGone.Y() == 0.0_m)
         return;
     estimator->AddVisionMeasurement(
         tGone,  
         frc::Timer::GetFPGATimestamp() - totalLatency,
-        {newDoubtX, newDoubtY, std::numeric_limits<double>::max()}
+        {newDoubtX, newDoubtY, newDoubtRot}
     );
 }
 
