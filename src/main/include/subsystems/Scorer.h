@@ -51,6 +51,7 @@ public:
     enum SCOPED_STATE
     {
         UNSCOPED,
+        MANUAL_SCOPE,
         SCOPED,
     };
     

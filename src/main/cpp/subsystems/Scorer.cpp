@@ -514,7 +514,9 @@ void Scorer::assessInputs()
     if (driverGamepad == nullptr || !driverGamepad->IsConnected())
         return;
     
-    if (driverGamepad->leftTriggerActive() || driverGamepad->rightTriggerActive() || driverGamepad->GetLeftBumperButton()) {
+    if (driverGamepad->GetLeftBumperButton()) {
+        state.scopedState = MANUAL_SCOPE;
+    } else if (driverGamepad->leftTriggerActive() || driverGamepad->rightTriggerActive()) {
         state.scopedState = SCOPED;
     } else {
         state.scopedState = UNSCOPED;
@@ -568,7 +570,7 @@ void Scorer::analyzeDashboard()
     int botColor = state.gamePiece == GAME_PIECE::CORAL ? valor::CANdleSensor::VALOR_GOLD : valor::CANdleSensor::VALOR_PURPLE;
     int midColor = scorerStagingSensor.isTriggered() && state.gamePiece == GAME_PIECE::CORAL ? valor::CANdleSensor::GREEN : valor::CANdleSensor::RED;
     int topColor = state.scoringState == SCORE_STATE::SCORING ? valor::CANdleSensor::RED :
-        (state.scopedState == SCOPED_STATE::SCOPED && elevatorWithinThreshold ? valor::CANdleSensor::GREEN : valor::CANdleSensor::VALOR_GOLD);
+        (state.scopedState != SCOPED_STATE::UNSCOPED && elevatorWithinThreshold ? valor::CANdleSensor::GREEN : valor::CANdleSensor::VALOR_GOLD);
     leds->setColor(0, botColor);
     leds->setColor(1, midColor);
     leds->setColor(2, topColor);
@@ -611,11 +613,11 @@ void Scorer::assignOutputs()
     if (state.elevState == ELEVATOR_STATE::MANUAL) {
         elevatorMotor->setPower(state.manualSpeed + units::volt_t{Constants::getElevKAFF()});
     } else {
-        if (state.scopedState == SCOPED &&
+        if ((state.scopedState == SCOPED &&
             (
                 state.gamePiece == GAME_PIECE::ALGEE ||
                 (state.gamePiece == GAME_PIECE::CORAL && drivetrain->withinXRange((units::meter_t)table->GetNumber("Viable Elevator Distance (m)", VIABLE_ELEVATOR_DISTANCE.value())))
-            )
+            )) || state.scopedState == MANUAL_SCOPE
         ) {
             state.targetHeight = positionMap.at(state.gamePiece).at(state.elevState);
             if (state.elevState == ELEVATOR_STATE::ONE && state.gamePiece == GAME_PIECE::CORAL && state.scoringState == SCORE_STATE::SCORING) {
