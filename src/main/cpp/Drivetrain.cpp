@@ -455,7 +455,8 @@ void Drivetrain::analyzeDashboard()
             getRobotSpeeds(),
             table->GetBoolean("Accepting Vision Measurements", true),
             doubtX,
-            doubtY
+            doubtY,
+            doubtRot
         );
     }
 

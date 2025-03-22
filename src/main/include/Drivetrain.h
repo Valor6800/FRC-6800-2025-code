@@ -169,7 +169,7 @@ public:
 
     units::second_t teleopStart;
 
-     double doubtX, doubtY;
+     double doubtX, doubtY, doubtRot;
 
      bool hasReset;
 
