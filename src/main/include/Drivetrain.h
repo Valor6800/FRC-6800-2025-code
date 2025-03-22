@@ -133,6 +133,7 @@ public:
           Direction dir;
           bool aligned;
           double yEstimate;
+          double xEstimate;
 
           bool right;
           bool left;

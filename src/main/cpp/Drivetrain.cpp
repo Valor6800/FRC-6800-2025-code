@@ -70,6 +70,11 @@ const units::meter_t WHEEL_DIAMETER(0.0973_m);
 #define Y_ALIGN_KI 0
 #define Y_ALIGN_KD 0.65
 
+#define X_FILTER_CONST 0.95 // .99
+#define X_ALIGN_KP 3
+#define X_ALIGN_KI 0
+#define X_ALIGN_KD 0.65
+
 
 // fix these
 #define BLUE_REEF_17_ANGLE 60_deg // -120_deg + 180_deg
@@ -137,9 +142,17 @@ Drivetrain::Drivetrain(frc::TimedRobot *_robot, valor::CANdleSensor* _leds) :
     Swerve::Y_KI = Y_ALIGN_KI;
     Swerve::Y_KD = Y_ALIGN_KD;
 
+    Swerve::X_KP = X_ALIGN_KP;
+    Swerve::X_KI = X_ALIGN_KI;
+    Swerve::X_KD = X_ALIGN_KD;
+
     table->PutNumber("Y_KP", Swerve::Y_KP);
     table->PutNumber("Y_KI", Swerve::Y_KI);
     table->PutNumber("Y_KD", Swerve::Y_KD);
+
+    table->PutNumber("X_KP", Swerve::X_KP);
+    table->PutNumber("X_KI", Swerve::X_KI);
+    table->PutNumber("X_KD", Swerve::X_KD);
 
     table->PutNumber("Rot_KP", Swerve::ROT_KP);
     table->PutNumber("Rot_KD", Swerve::ROT_KD);
@@ -337,7 +350,6 @@ void Drivetrain::analyzeDashboard()
 
     
     if (!table->GetBoolean("Use World Align", false)){
-        
         state.yEstimate += Swerve::yControllerInitialVelocity.value() * LOOP_TIME;
         units::radian_t leastSkew{90_rad};
         unfilteredYDistance = Swerve::goalAlign.to<double>();
@@ -356,18 +368,20 @@ void Drivetrain::analyzeDashboard()
                         state.reefTag = aprilLime->getTagID();
                         leastSkew = currentSkew;
                         state.yEstimate = aprilLime->get_botpose_targetspace().X().to<double>();
-
+                        state.xEstimate = -aprilLime->get_botpose_targetspace().Z().to<double>();
                         Swerve::yDistance = units::length::meter_t (state.yEstimate);
+                        Swerve::xDistance = units::length::meter_t (state.xEstimate);
                         Swerve::resetAlignControllers();
                     }
                     if (state.reefTag == aprilLime->getTagID()) {
                         //unfilteredYDistance = aprilLime->get_botpose_targetspace().X().to<double>();
                         state.yEstimate = Y_FILTER_CONST * state.yEstimate + ((1 - Y_FILTER_CONST) * aprilLime->get_botpose_targetspace().X().to<double>());
+                        state.xEstimate = -aprilLime->get_botpose_targetspace().Z().to<double>();
                     }
-                } 
-            }
+                }
 
-            Swerve::yDistance = units::length::meter_t (state.yEstimate); //units::length::meter_t {filter.Calculate(unfilteredYDistance)};
+                Swerve::yDistance = units::length::meter_t (state.yEstimate); //units::length::meter_t {filter.Calculate(unfilteredYDistance)};
+            }
         }
     } else {
         frc::Pose2d robotToCenter{
@@ -401,6 +415,9 @@ void Drivetrain::analyzeDashboard()
 
     poseErrorPP = currentPosePathPlanner.Get() - targetPosePathPlanner.Get();
 
+    Swerve::yDistance = units::length::meter_t (state.yEstimate); //units::length::meter_t {filter.Calculate(unfilteredYDistance)};
+    Swerve::xDistance = units::length::meter_t (state.xEstimate);
+    //
     poseErrorPPTopic.Set(poseErrorPP);
     //
     Swerve::ROT_KP = table->GetNumber("Rot_KP", Swerve::ROT_KP);
@@ -410,10 +427,15 @@ void Drivetrain::analyzeDashboard()
     Swerve::Y_KI = table->GetNumber("Y_KI", Swerve::Y_KI);
     Swerve::Y_KD = table->GetNumber("Y_KD", Swerve::Y_KD);
 
+    Swerve::X_KP = table->GetNumber("X_KP", Swerve::X_KP);
+    Swerve::X_KI = table->GetNumber("X_KI", Swerve::X_KI);
+    Swerve::X_KD = table->GetNumber("X_KD", Swerve::X_KD);
+
     // Swerve::rotPosTolerance = table->GetNumber("Rot_Pos_Tol", Swerve::rotPosTolerance.to<double>()) * 1_deg;
     // Swerve::rotVelTolerance = table->GetNumber("Rot_Vel_Tol", Swerve::rotVelTolerance.to<double>()) * 1_deg_per_s;
 
     Swerve::yPosTolerance = table->GetNumber("Y_Pos_Tol", Swerve::yPosTolerance.to<double>()) * 1_mm;
+    Swerve::xPosTolerance = table->GetNumber("X_Pos_Tol", Swerve::xPosTolerance.to<double>()) * 1_mm;
     // Swerve::yVelTolerance = table->GetNumber("Y_Vel_Tol", Swerve::yVelTolerance.to<double>()) * 1_mps;
 
     // Swerve::goalAlign = units::meter_t{table->GetNumber("Pole Offset", Swerve::goalAlign.to<double>())};
@@ -435,6 +457,7 @@ void Drivetrain::analyzeDashboard()
     if (state.climberAlign){
         Swerve::targetAngle = frc::DriverStation::GetAlliance() == frc::DriverStation::kRed ? 90_deg : -90_deg;
         Swerve::yAlign = false;
+        Swerve::xAlign = false;
         Swerve::rotAlign = true;
     } else if (
         state.alignToTarget &&
@@ -443,6 +466,7 @@ void Drivetrain::analyzeDashboard()
     ) {
         Swerve::targetAngle = frc::DriverStation::GetAlliance() == frc::DriverStation::kRed ? 90_deg : -90_deg;
         Swerve::yAlign = false;
+        Swerve::xAlign = false;
         Swerve::rotAlign = true;
     } else if (
         state.alignToTarget &&
@@ -453,6 +477,7 @@ void Drivetrain::analyzeDashboard()
         if (units::math::abs((frc::Rotation2d(state.netAngle) - (calcEstimator.get()->GetEstimatedPosition().Rotation())).Degrees()) < 60_deg) {
             Swerve::targetAngle = state.netAngle;
             Swerve::yAlign = false;
+            Swerve::xAlign = false;
             Swerve::rotAlign = true;
         }
     } else if (state.alignToTarget) {
@@ -463,6 +488,7 @@ void Drivetrain::analyzeDashboard()
         Swerve::rotAlign = true;
     } else {
         Swerve::yAlign = false;
+        Swerve::xAlign = false;
         Swerve::rotAlign = false;
     }
 
