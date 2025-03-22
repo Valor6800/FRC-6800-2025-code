@@ -211,7 +211,6 @@ public:
 
 private:
     void setAnimation(SegmentSettings *segment, AnimationType animation, RGBColor color, double speed=1.0);
-    std::mutex mutex;
     Priority currentPriority = PRIORITY_DEFAULT;
     ctre::phoenix::led::CANdle candle;
     int ledCount;
