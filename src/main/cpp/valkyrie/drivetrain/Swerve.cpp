@@ -241,7 +241,7 @@ void Swerve<AzimuthMotor, DriveMotor>::analyzeDashboard()
 
         yAlignVector = MAKE_VECTOR(targetAngle - 90_deg) * relativeToTagSpeed.value();
         if(xAlign){
-            xAlignVector = MAKE_VECTOR(targetAngle) * 0.5;
+            xAlignVector = MAKE_VECTOR(targetAngle) * 0.75;
         }
         powerVector = joystickVector + yAlignVector + xAlignVector;
         // powerVector *= dotProduct / fabs(dotProduct);
