@@ -8,20 +8,20 @@
       },
       "prevControl": null,
       "nextControl": {
-        "x": 2.0121460178947372,
-        "y": 6.66758501166981
+        "x": 2.125465920004791,
+        "y": 7.00847050371554
       },
       "isLocked": false,
       "linkedName": "B-HP2"
     },
     {
       "anchor": {
-        "x": 3.3752128137107102,
-        "y": 5.579537955560503
+        "x": 3.375,
+        "y": 5.58
       },
       "prevControl": {
-        "x": 2.9450001760485263,
-        "y": 6.240331807846742
+        "x": 2.8530737704918034,
+        "y": 6.248719262295082
       },
       "nextControl": null,
       "isLocked": false,
@@ -41,7 +41,7 @@
     "unlimited": false
   },
   "goalEndState": {
-    "velocity": 0.5,
+    "velocity": 1.0,
     "rotation": -59.99999999999999
   },
   "reversed": false,
