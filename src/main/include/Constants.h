@@ -515,11 +515,17 @@ namespace Constants {
                     {ELEVATOR_STATE::THREE, 15_tps},
                     {ELEVATOR_STATE::FOUR, 20_tps}
                 };
-                default: return {
+                case Robot::Gold: return {
                     {ELEVATOR_STATE::ONE, 12_tps},
                     {ELEVATOR_STATE::TWO, 16_tps},
                     {ELEVATOR_STATE::THREE, 16_tps},
                     {ELEVATOR_STATE::FOUR, 28_tps} // 25
+                };
+                default: return {
+                    {ELEVATOR_STATE::ONE, 6_tps},
+                    {ELEVATOR_STATE::TWO, 8_tps},
+                    {ELEVATOR_STATE::THREE, 8_tps},
+                    {ELEVATOR_STATE::FOUR, 11.5_tps} // 25
                 };
             }}
 
@@ -585,7 +591,7 @@ namespace Constants {
             static bool scorerMotorInverted() { switch (robot) {
                 case Robot::Alpha: return true;
                 case Robot::Gold: return false;
-                default: return false;
+                default: return true;
             }}
 
             /// Amount of rotations needed for after detecting coral intake
@@ -603,7 +609,8 @@ namespace Constants {
 
             static double getScorerSensorToMech() { switch (robot) {
                 case Robot::Alpha: return 2;
-                default: return 5 / 3;
+                case Robot::Gold: return 5 / 3;
+                default: return 5;
             }}
 
             static bool isElevatorClockwise() { switch (robot) {
@@ -642,18 +649,25 @@ namespace Constants {
                     pidf.S = 0.58;
                     return pidf;
                 }
-                default: {
+                case Robot::Gold: {
                     valor::PIDF pidf;
                     pidf.P = 0.5;
                     pidf.S = 0.58;
                     pidf.kV = 0.11;
                     return pidf;
                 }
+                default: {
+                    valor::PIDF pidf;
+                    pidf.P = 0.5;
+                    pidf.S = 0.45;
+                    return pidf;
+                }
             }}
 
             static units::second_t getScorerMaxVelRampTime() { switch (robot) {
                 case Robot::Alpha: return 1.0_s / 2;
-                default: return 1.0_s / 2;
+                case Robot::Gold: return 1.0_s / 2;
+                default: return 1.0_s / 5;
             }}
         }
 

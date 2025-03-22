@@ -17,9 +17,9 @@
 #define ELEVATOR_SENSOR_TO_MECH 1.0f
 
 #define CORAL_INTAKE_SPEED 20_tps //5
-#define ALGEE_INTAKE_SPEED 35_tps
+#define ALGEE_INTAKE_SPEED 11.5_tps
 #define SCORE_SPEED 20_tps
-#define ALGEE_SCORE_SPEED -40_tps
+#define ALGEE_SCORE_SPEED -11.5_tps
 #define ALGEE_HOLD_SPD 0.25_tps
 
 #define ELEVATOR_FORWARD_LIMIT 6_tr
@@ -388,8 +388,8 @@ void Scorer::init()
     table->PutBoolean("Scope Button", false);
      table->PutBoolean("Auto Dunk Enabled", true);
 
-    scorerStagingSensor.setMaxDistance(12_in);
-    scorerStagingSensor.setThresholdDistance(7.7_cm);
+    scorerStagingSensor.setMaxDistance(0.175_m);
+    scorerStagingSensor.setThresholdDistance(8_cm);
     
     table->PutNumber("Elevator Threshold (m)", VIABLE_ELEVATOR_THRESHOLD.value());
     // CANdi init sequence (for reverse hard limit sensor of elevator)
