@@ -265,7 +265,7 @@ namespace Constants {
 
         static units::angle::turn_t getElevatorMagnetOffset() { switch (robot) {
             case Robot::Alpha: return 0.10327_tr; 
-            case Robot::Gold: return 0.487061_tr; //  0.989014_tr;
+            case Robot::Gold: return -0.635499_tr; //  0.989014_tr;
             default: return -0.07860_tr;
         }};
 
@@ -598,7 +598,7 @@ namespace Constants {
             /// Time to reach max velocity
             static units::second_t getElevMaxVelRampTime() { switch (robot) {
                 case Robot::Alpha: return 1.0_s / 5;
-                default: return 12.6_s/32.0; // should be 42.0 but the elevator slips
+                default: return 12.6_s/60.0;
             }}
 
             static double getScorerSensorToMech() { switch (robot) {
@@ -608,7 +608,7 @@ namespace Constants {
 
             static bool isElevatorClockwise() { switch (robot) {
                 case Robot::Alpha: return false;
-                case Robot::Gold: return true;
+                case Robot::Gold: return false;
                 default: return true;
             }};
 
@@ -629,8 +629,8 @@ namespace Constants {
                 default: {
                     valor::PIDF pidf;
                     pidf.P = 10;
-                    pidf.aFF = 0.72;
-                    pidf.maxJerk = 100_tr_per_s_cu;
+                    pidf.aFF = 0.65;
+                    pidf.maxJerk = 150_tr_per_s_cu;
                     return pidf;
                 }
             }}
