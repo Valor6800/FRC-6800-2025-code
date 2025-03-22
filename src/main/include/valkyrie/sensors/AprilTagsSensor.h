@@ -29,7 +29,7 @@ namespace valor
 
             void InitSendable(wpi::SendableBuilder& builder) override;
 
-            units::meter_t normalVisionOutlier = 5.5_m;
+            units::meter_t normalVisionOutlier = 2.2_m;
             void applyVisionMeasurement(
                 frc::SwerveDrivePoseEstimator<4> *estimator,
                 units::velocity::meters_per_second_t speed,
