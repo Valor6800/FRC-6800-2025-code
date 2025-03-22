@@ -73,6 +73,7 @@ public:
         bool hasZeroed;
         bool autoDunkEnabled;
         bool protectChin;
+        bool shootOverCoral;
     } state;
 
 private:

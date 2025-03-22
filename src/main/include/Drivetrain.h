@@ -172,8 +172,11 @@ public:
      double doubtX, doubtY, doubtRot;
 
      bool hasReset;
-
-     bool withinXRange(units::meter_t), withinYRange(), isSpeedBelowThreshold();
+     units::meter_t lidarDistance();
+     bool withinXRange(units::meter_t);
+     bool withinYRange();
+     bool isSpeedBelowThreshold();
+     bool isSpeedStopped();
 
 private:
 

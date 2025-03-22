@@ -37,6 +37,9 @@
 #define VIABLE_DUNK_DISTANCE 0.28_m
 #define VIABLE_ELEVATOR_DISTANCE 1.2_m //consider the offset of the canrange from the front of robot which is 8 inches
 
+#define MIN_DUNK_DISTANCE_OVER_CORAL 11_in
+#define MAX_DUNK_DISTANCE_OVER_CORAL 14.5_in
+#define DUNK_OFFSET_OVER_CORAL 2.5_in
 
 using namespace Constants::Scorer;
 
@@ -551,20 +554,36 @@ void Scorer::analyzeDashboard()
         state.protectChin = false;
     }
 
-    units::meter_t elevatorError = units::math::fabs(convertToMechSpace(elevatorMotor->getPosition()) - positionMap[state.gamePiece][state.elevState]);
+    units::meter_t elevatorSetpoint = positionMap[state.gamePiece][state.elevState];
+
+    bool isStopped = drivetrain->isSpeedStopped();
+    units::meter_t distanceFromReef = drivetrain->lidarDistance();
+    state.shootOverCoral = isStopped && (MIN_DUNK_DISTANCE_OVER_CORAL<= distanceFromReef && distanceFromReef <= MAX_DUNK_DISTANCE_OVER_CORAL);
+    if (state.shootOverCoral) {
+        elevatorSetpoint += DUNK_OFFSET_OVER_CORAL;
+    }
+
+    units::meter_t elevatorError = units::math::fabs(convertToMechSpace(elevatorMotor->getPosition()) - elevatorSetpoint);
     elevatorWithinThreshold = elevatorError.value() < table->GetNumber("Elevator Threshold (m)", VIABLE_ELEVATOR_THRESHOLD.value());
     
     if (
         (state.autoDunkEnabled && !disableAutoDunk) &&
         drivetrain->isSpeedBelowThreshold() &&
-        drivetrain->withinXRange((units::meter_t) table->GetNumber("Viable Dunk Distance (m)", VIABLE_DUNK_DISTANCE.value())) &&
         drivetrain->withinYRange() &&
         state.scopedState == SCOPED_STATE::SCOPED &&
         elevatorWithinThreshold &&
         state.gamePiece == GAME_PIECE::CORAL &&
         (state.elevState == TWO || state.elevState == THREE || state.elevState == FOUR)
     ) {
-        state.scoringState = SCORE_STATE::SCORING;
+        bool shouldAutoDunk = drivetrain->withinXRange((units::meter_t) table->GetNumber("Viable Dunk Distance (m)", VIABLE_DUNK_DISTANCE.value()));
+        if (shouldAutoDunk) {
+            state.scoringState = SCORE_STATE::SCORING;
+            return;
+        }
+
+        if (state.shootOverCoral) {
+            state.scoringState = SCORE_STATE::SCORING;
+        }
     }
 
     int botColor = state.gamePiece == GAME_PIECE::CORAL ? valor::CANdleSensor::VALOR_GOLD : valor::CANdleSensor::VALOR_PURPLE;
@@ -622,6 +641,9 @@ void Scorer::assignOutputs()
             state.targetHeight = positionMap.at(state.gamePiece).at(state.elevState);
             if (state.elevState == ELEVATOR_STATE::ONE && state.gamePiece == GAME_PIECE::CORAL && state.scoringState == SCORE_STATE::SCORING) {
                 state.targetHeight += 4_in;
+            }
+            if (state.shootOverCoral) {
+                state.targetHeight += DUNK_OFFSET_OVER_CORAL;
             }
         } else{
             if (scorerStagingSensor.isTriggered()) {

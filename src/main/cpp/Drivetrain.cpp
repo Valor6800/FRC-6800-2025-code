@@ -99,6 +99,8 @@ const units::meter_t WHEEL_DIAMETER(0.0973_m);
 
 #define Y_ACTIVATION_THRESHOLD 30.0_deg
 
+#define ROBOT_STOPPED_THRESHOLD 0.2_mps
+
 Drivetrain::Drivetrain(frc::TimedRobot *_robot, valor::CANdleSensor* _leds) : 
     valor::Swerve<SwerveAzimuthMotor, SwerveDriveMotor>(
         _robot,
@@ -625,26 +627,19 @@ void Drivetrain::alignAngleZoning()
     }
 }
 
-
 bool Drivetrain::withinXRange(units::meter_t distance) {
-    if (state.dir == LEFT) {
-        units::meter_t measuredDistance = rightdistanceSensor.getFilteredDistance();
-        if (measuredDistance <= 0_m) {
-            return false;
-        }
-        return (measuredDistance < distance);
-    } 
-    else if (state.dir == RIGHT) {
-        units::meter_t measuredDistance = leftDistanceSensor.getFilteredDistance();
-        if (measuredDistance <= 0_m) {
-            return false;
-        }
-        return (measuredDistance < distance);
-        
-    }
-    return false;
+    auto measuredDistance = lidarDistance();
+    return (measuredDistance < distance);
 }
 
+units::meter_t Drivetrain::lidarDistance() {
+     if (state.dir == LEFT) {
+        units::meter_t measuredDistance = rightdistanceSensor.getFilteredDistance();
+        return measuredDistance;
+    } 
+    units::meter_t measuredDistance = leftDistanceSensor.getFilteredDistance();
+    return measuredDistance;
+}
 
 bool Drivetrain::withinYRange() {
     return yControllerAligned();
@@ -658,6 +653,16 @@ bool Drivetrain::isSpeedBelowThreshold() {
         speeds.vy
     );
     return (totalSpeed < (units::meters_per_second_t) table->GetNumber("Viable Dunk speed", VIABLE_DUNK_SPEED.value()));
+}
+
+bool Drivetrain::isSpeedStopped() {
+    frc::ChassisSpeeds speeds = getRobotRelativeSpeeds();
+    
+    units::meters_per_second_t totalSpeed = units::math::hypot(
+        speeds.vx, 
+        speeds.vy
+    );
+    return (totalSpeed < ROBOT_STOPPED_THRESHOLD);
 }
 
 void Drivetrain::choosePoleDirection(Direction dir, Constants::AprilTag tag){
