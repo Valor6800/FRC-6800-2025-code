@@ -134,6 +134,7 @@ protected:
 
     bool yAlign, rotAlign = false;
     units::meter_t yDistance = 0.0_m;
+    units::meter_t xDistance = 0.0_m;
 
     void enableCarpetGrain(double grainMultiplier, bool roughTowardsRed);
     
@@ -145,17 +146,24 @@ protected:
     double Y_KP = 0.0;
     double Y_KI = 0.0;
     double Y_KD = 0;
+    double X_KP = 0.0;
+    double X_KI = 0.0;
+    double X_KD = 0;
 
     units::degree_t rotPosTolerance = 0.0_deg; //1.0_deg;
     units::degrees_per_second_t rotVelTolerance = 0_deg_per_s; //1_deg_per_s;
 
     units::millimeter_t yPosTolerance = 50_mm;  //20_mm;
+    units::millimeter_t xPosTolerance = 50_mm;  //20_mm;
     units::meters_per_second_t yVelTolerance = 0.0_mps; //0.01_mps;
+    units::meters_per_second_t xVelTolerance = 0.0_mps; //0.01_mps;
     units::radian_t angularPosition = 0_rad;
     units::meter_t goalAlign = 0.0_m;
+    units::meter_t xGoalAlign = 18.5_in;
 
     bool yControllerAligned();
     units::meters_per_second_t yControllerInitialVelocity;
+    units::meters_per_second_t xControllerInitialVelocity;
     wpi::array<frc::SwerveModuleState, MODULE_COUNT> testModeDesiredStates{wpi::empty_array};
 
     std::vector<valor::SwerveModule<AzimuthMotor, DriveMotor> *> swerveModules;
@@ -167,6 +175,8 @@ private:
     const units::radians_per_second_squared_t MAX_ROTATION_ACCEL = 12_rad_per_s_sq;
     const units::meters_per_second_t MAX_Y_VEL = 5.5_mps;
     const units::meters_per_second_squared_t MAX_Y_ACCEL = 4_mps_sq;
+    const units::meters_per_second_t MAX_X_VEL = 3_mps;
+    const units::meters_per_second_squared_t MAX_X_ACCEL = 2.5_mps_sq;
 
     std::deque<units::angular_acceleration::radians_per_second_squared_t> yawRateBuffer;
 
@@ -198,9 +208,13 @@ private:
     frc::ProfiledPIDController<units::radian> rot_controller{ROT_KP, 0.0, ROT_KD, rot_constraints};
 
     frc::TrapezoidProfile<units::meter>::Constraints y_constraints{MAX_Y_VEL, MAX_Y_ACCEL};
+    frc::TrapezoidProfile<units::meter>::Constraints x_constraints{MAX_X_VEL, MAX_X_ACCEL};
     frc::ProfiledPIDController<units::meter> y_controller{Y_KP, 0.0, Y_KD, y_constraints};
+    frc::ProfiledPIDController<units::meter> x_controller{X_KP, 0.0, X_KD, x_constraints};
     double calculated_y_controller_val;
+    double calculated_x_controller_val;
     units::meters_per_second_t relativeToTagSpeed;
+    units::meters_per_second_t relativeToTagXSpeed;
 
     Eigen::Vector2d joystickVector, yAlignVector, powerVector, xAlignVector;
     units::angle::degree_t rotAlignOffset;
