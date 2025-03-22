@@ -1,0 +1,71 @@
+{
+  "version": "2025.0",
+  "waypoints": [
+    {
+      "anchor": {
+        "x": 7.1,
+        "y": 0.5
+      },
+      "prevControl": null,
+      "nextControl": {
+        "x": 6.294849317522765,
+        "y": 1.2551523089143537
+      },
+      "isLocked": false,
+      "linkedName": "B-C6"
+    },
+    {
+      "anchor": {
+        "x": 5.280906039560808,
+        "y": 2.29057448833427
+      },
+      "prevControl": {
+        "x": 5.630255324999594,
+        "y": 1.8561149617278567
+      },
+      "nextControl": null,
+      "isLocked": false,
+      "linkedName": "B-AE"
+    }
+  ],
+  "rotationTargets": [
+    {
+      "waypointRelativePos": 0.5,
+      "rotationDegrees": 119.99999999999999
+    }
+  ],
+  "constraintZones": [],
+  "pointTowardsZones": [],
+  "eventMarkers": [
+    {
+      "name": "LEVEL FOUR POSITION",
+      "waypointRelativePos": 0.97,
+      "endWaypointRelativePos": null,
+      "command": {
+        "type": "named",
+        "data": {
+          "name": "LEVEL FOUR POSITION"
+        }
+      }
+    }
+  ],
+  "globalConstraints": {
+    "maxVelocity": 4.0,
+    "maxAcceleration": 4.0,
+    "maxAngularVelocity": 540.0,
+    "maxAngularAcceleration": 720.0,
+    "nominalVoltage": 12.0,
+    "unlimited": false
+  },
+  "goalEndState": {
+    "velocity": 0.5,
+    "rotation": 119.99999999999999
+  },
+  "reversed": false,
+  "folder": "C-R",
+  "idealStartingState": {
+    "velocity": 0,
+    "rotation": 180.0
+  },
+  "useDefaultConstraints": true
+}

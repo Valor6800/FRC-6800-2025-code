@@ -154,7 +154,7 @@ Scorer::Scorer(frc::TimedRobot *_robot, Drivetrain *_drivetrain, valor::CANdleSe
         frc2::SequentialCommandGroup(
             frc2::InstantCommand(
                 [this]() {
-                    state.scopedState = SCOPED_STATE::SCOPED;
+                    state.scopedState = SCOPED_STATE::UNSCOPED;
                     state.elevState = ELEVATOR_STATE::STOWED;
                     state.gamePiece = GAME_PIECE::CORAL;
                 }
@@ -165,7 +165,7 @@ Scorer::Scorer(frc::TimedRobot *_robot, Drivetrain *_drivetrain, valor::CANdleSe
         frc2::SequentialCommandGroup(
             frc2::InstantCommand(
                 [this]() {
-                    state.scopedState = SCOPED_STATE::SCOPED;
+                    state.scopedState = SCOPED_STATE::UNSCOPED;
                     state.elevState = ELEVATOR_STATE::HP;
                     state.gamePiece = GAME_PIECE::CORAL;
                 }
@@ -195,15 +195,21 @@ Scorer::Scorer(frc::TimedRobot *_robot, Drivetrain *_drivetrain, valor::CANdleSe
         )
     ).ToPtr());
 
-    pathplanner::NamedCommands::registerCommand("Align", std::move(
+    pathplanner::NamedCommands::registerCommand("AlignLeft", std::move(
         frc2::SequentialCommandGroup(
             frc2::FunctionalCommand(
                 [&]{ // on begin
                     drivetrain->state.startTimestamp = frc::Timer::GetFPGATimestamp();
+                    drivetrain->state.reefTag = -1;
+
+                    drivetrain->state.dir = LEFT;
+                    // drivetrain->resetAlignControllers();
+                    drivetrain->hasReset = true;
+
                     state.gamePiece = GAME_PIECE::CORAL;
                     state.scopedState = SCOPED_STATE::SCOPED;
-                    state.elevState = ELEVATOR_STATE::TWO;
-                    drivetrain->state.dir = RIGHT;
+                    state.elevState = ELEVATOR_STATE::FOUR;
+                    
                 },
                 [&]{ // on execute
                     drivetrain->state.alignToTarget = true;
@@ -214,6 +220,10 @@ Scorer::Scorer(frc::TimedRobot *_robot, Drivetrain *_drivetrain, valor::CANdleSe
                 [&](bool){ // on end
                     drivetrain->state.alignToTarget = false;
                     drivetrain->xAlign = false;
+                    state.scopedState = SCOPED_STATE::UNSCOPED;
+
+                    drivetrain->state.reefTag = -1;
+                    drivetrain->hasReset = false;
                 },
                 [&]{ // is Finished
                     return state.scoringState == SCORE_STATE::SCORING;
@@ -223,9 +233,50 @@ Scorer::Scorer(frc::TimedRobot *_robot, Drivetrain *_drivetrain, valor::CANdleSe
         )
     ).ToPtr());
 
+    pathplanner::NamedCommands::registerCommand("AlignRight", std::move(
+        frc2::SequentialCommandGroup(
+            frc2::FunctionalCommand(
+                [&]{ // on begin
+                    drivetrain->state.startTimestamp = frc::Timer::GetFPGATimestamp();
+                    drivetrain->state.reefTag = -1;
+                    
+                    drivetrain->state.dir = RIGHT;
+                    drivetrain->hasReset = true;
+                    // drivetrain->resetAlignControllers();
 
-        table->PutNumber("Viable Dunk Distance (m)", VIABLE_DUNK_DISTANCE.value());
-        table->PutNumber("Viable Elevator Distance (m)", VIABLE_ELEVATOR_DISTANCE.value());
+                    state.gamePiece = GAME_PIECE::CORAL;
+                    state.scopedState = SCOPED_STATE::SCOPED;
+                    state.elevState = ELEVATOR_STATE::FOUR;
+                },
+                [&]{ // on execute
+                    drivetrain->state.alignToTarget = true;
+                    drivetrain->xAlign = true;
+                    // frc::ChassisSpeeds speeds = frc::ChassisSpeeds{0.5_mps, 0.0_mps, 0.0_rad_per_s};
+                    // drive(0.5_mps, 0.0_mps, 0.0_rad_per_s, true);
+                },
+                [&](bool){ // on end
+                    drivetrain->state.alignToTarget = false;
+                    drivetrain->xAlign = false;
+                    state.scopedState = SCOPED_STATE::UNSCOPED;
+
+                    drivetrain->state.reefTag = -1;
+                    drivetrain->hasReset = false;
+                },
+                [&]{ // is Finished
+                    return state.scoringState == SCORE_STATE::SCORING;
+                },
+                {}
+            )
+        )
+    ).ToPtr());
+
+    /*pathplanner::NamedCommands::registerCommand("SetReefTag", std::move(
+
+    ).ToPtr());*/
+
+
+    table->PutNumber("Viable Dunk Distance (m)", VIABLE_DUNK_DISTANCE.value());
+    table->PutNumber("Viable Elevator Distance (m)", VIABLE_ELEVATOR_DISTANCE.value());
 
     init();
 

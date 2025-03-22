@@ -337,6 +337,7 @@ void Drivetrain::analyzeDashboard()
 
     
     if (!table->GetBoolean("Use World Align", false)){
+        
         state.yEstimate += Swerve::yControllerInitialVelocity.value() * LOOP_TIME;
         units::radian_t leastSkew{90_rad};
         unfilteredYDistance = Swerve::goalAlign.to<double>();
@@ -355,16 +356,19 @@ void Drivetrain::analyzeDashboard()
                         state.reefTag = aprilLime->getTagID();
                         leastSkew = currentSkew;
                         state.yEstimate = aprilLime->get_botpose_targetspace().X().to<double>();
+
+                        Swerve::yDistance = units::length::meter_t (state.yEstimate);
+                        Swerve::resetAlignControllers();
                     }
                     if (state.reefTag == aprilLime->getTagID()) {
                         //unfilteredYDistance = aprilLime->get_botpose_targetspace().X().to<double>();
                         state.yEstimate = Y_FILTER_CONST * state.yEstimate + ((1 - Y_FILTER_CONST) * aprilLime->get_botpose_targetspace().X().to<double>());
                     }
-                }
-            } 
-        }
+                } 
+            }
 
-        Swerve::yDistance = units::length::meter_t (state.yEstimate); //units::length::meter_t {filter.Calculate(unfilteredYDistance)};
+            Swerve::yDistance = units::length::meter_t (state.yEstimate); //units::length::meter_t {filter.Calculate(unfilteredYDistance)};
+        }
     } else {
         frc::Pose2d robotToCenter{
             getCalculatedPose().Translation() + frc::Translation2d(-17.5482504_m / 2.0, -8.0519016_m / 2.0),

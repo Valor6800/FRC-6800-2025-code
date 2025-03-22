@@ -101,6 +101,7 @@ public:
     void updateAngularAcceleration();
     units::angular_acceleration::radians_per_second_squared_t getSmoothedAngularAcceleration();
     double rotationLerping(double);
+    void resetAlignControllers();
 
     bool xAlign = false;
 
@@ -130,7 +131,6 @@ protected:
     bool lockingToTarget;
     units::degree_t targetAngle;
     void setRotAlignOffset(units::degree_t angle);
-    void resetAlignControllers();
 
     bool yAlign, rotAlign = false;
     units::meter_t yDistance = 0.0_m;

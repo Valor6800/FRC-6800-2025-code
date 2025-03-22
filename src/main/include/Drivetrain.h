@@ -171,6 +171,8 @@ public:
 
      double doubtX, doubtY;
 
+     bool hasReset;
+
      bool withinXRange(units::meter_t), withinYRange(), isSpeedBelowThreshold();
 
      void worldFrameAlignment(frc::Pose2d reefTagPose);
@@ -185,8 +187,6 @@ private:
 
      frc2::CommandPtr pitSequenceCommand(const frc::ChassisSpeeds&);
      bool aprilTagOnReef(int id);
-
-     bool hasReset;
 
      std::vector<std::pair<SwerveAzimuthMotor*, SwerveDriveMotor*>> generateModules();
 

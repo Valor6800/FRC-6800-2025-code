@@ -3,13 +3,13 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 1.2946,
-        "y": 0.9256
+        "x": 1.270363018974161,
+        "y": 0.9421440658284428
       },
       "prevControl": null,
       "nextControl": {
-        "x": 2.4451000000000005,
-        "y": 1.2278500000000006
+        "x": 2.4208630189741616,
+        "y": 1.2443940658284434
       },
       "isLocked": false,
       "linkedName": "B-HP1"
@@ -56,8 +56,8 @@
     }
   ],
   "globalConstraints": {
-    "maxVelocity": 3.5,
-    "maxAcceleration": 3.5,
+    "maxVelocity": 4.0,
+    "maxAcceleration": 4.0,
     "maxAngularVelocity": 540.0,
     "maxAngularAcceleration": 720.0,
     "nominalVoltage": 12.0,
