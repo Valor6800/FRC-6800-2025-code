@@ -438,7 +438,6 @@ void Drivetrain::analyzeDashboard()
             Y_ACTIVATION_THRESHOLD.value()
         );
         Swerve::rotAlign = true;
-        Swerve::xAlign = state.gamePiece == Constants::Scorer::GAME_PIECE::CORAL;
     } else {
         Swerve::yAlign = false;
         Swerve::xAlign = false;
