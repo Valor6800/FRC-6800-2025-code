@@ -526,6 +526,7 @@ void Scorer::init()
     currentSensor.setCacheSize(ALGAE_CACHE_SIZE);
 
     resetState();
+    secondScorerMotor->setEncoderPosition(secondScorerCancoder->GetAbsolutePosition().GetValue());
     table->PutBoolean("Auto Dunk Disabled", false);
     
     // Must be at the end of init() because the CANdi has to be setup before reading   
