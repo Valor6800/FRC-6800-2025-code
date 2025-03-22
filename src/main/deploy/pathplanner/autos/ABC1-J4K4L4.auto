@@ -57,6 +57,18 @@
           "data": {
             "pathName": "ABL-HP2"
           }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "ABHP2-A4"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "AlignLeft"
+          }
         }
       ]
     }

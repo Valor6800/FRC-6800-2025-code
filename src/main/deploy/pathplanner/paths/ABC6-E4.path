@@ -9,7 +9,7 @@
       "prevControl": null,
       "nextControl": {
         "x": 6.294849317522765,
-        "y": 1.2551523089143537
+        "y": 1.255152308914354
       },
       "isLocked": false,
       "linkedName": "B-C6"
@@ -39,7 +39,7 @@
   "eventMarkers": [
     {
       "name": "LEVEL FOUR POSITION",
-      "waypointRelativePos": 0.97,
+      "waypointRelativePos": 0.7,
       "endWaypointRelativePos": null,
       "command": {
         "type": "named",

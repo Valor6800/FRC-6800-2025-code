@@ -3,52 +3,40 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 1.270363018974161,
-        "y": 0.9421440658284428
+        "x": 1.2946721311475409,
+        "y": 7.027920081967213
       },
       "prevControl": null,
       "nextControl": {
-        "x": 1.793698240476386,
-        "y": 2.0844078265825177
+        "x": 1.7247788808742883,
+        "y": 6.394410802056381
       },
       "isLocked": false,
-      "linkedName": "B-HP1"
+      "linkedName": "B-HP2"
     },
     {
       "anchor": {
-        "x": 2.6990788233649288,
-        "y": 3.8489883888323093
+        "x": 2.663107642434411,
+        "y": 4.199172847672461
       },
       "prevControl": {
-        "x": 2.2414222697022654,
-        "y": 3.0621377000063426
+        "x": 2.1277773657021672,
+        "y": 5.065222817010042
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "B-ABR"
+      "linkedName": "B-AA"
     }
   ],
   "rotationTargets": [
     {
-      "waypointRelativePos": 0.5819765240439224,
+      "waypointRelativePos": 0.75,
       "rotationDegrees": 0.0
     }
   ],
   "constraintZones": [],
   "pointTowardsZones": [],
-  "eventMarkers": [
-    {
-      "name": "LEVEL FOUR POSITION",
-      "waypointRelativePos": 0.97,
-      "endWaypointRelativePos": null,
-      "command": {
-        "type": "named",
-        "data": {
-          "name": "LEVEL FOUR POSITION"
-        }
-      }
-    }
-  ],
+  "eventMarkers": [],
   "globalConstraints": {
     "maxVelocity": 4.0,
     "maxAcceleration": 4.0,
@@ -64,8 +52,8 @@
   "reversed": false,
   "folder": "H-R",
   "idealStartingState": {
-    "velocity": 0.5,
-    "rotation": 55.0
+    "velocity": 0,
+    "rotation": -55.0
   },
   "useDefaultConstraints": true
 }

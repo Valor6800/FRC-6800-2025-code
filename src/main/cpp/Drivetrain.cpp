@@ -204,10 +204,10 @@ Drivetrain::Drivetrain(frc::TimedRobot *_robot, valor::CANdleSensor* _leds) :
             // This will flip the path being followed to the red side of the field.
             // THE ORIGIN WILL REMAIN ON THE BLUE SIDE
 
-            // auto alliance = frc::DriverStation::GetAlliance();
-            /*if (alliance) {
+            auto alliance = frc::DriverStation::GetAlliance();
+            if (alliance) {
                 return alliance.value() == frc::DriverStation::Alliance::kRed;
-            }*/
+            }
             return false;
         },
         this // Reference to this subsystem to set requirements

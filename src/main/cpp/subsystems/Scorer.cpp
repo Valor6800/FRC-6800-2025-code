@@ -229,7 +229,9 @@ Scorer::Scorer(frc::TimedRobot *_robot, Drivetrain *_drivetrain, valor::CANdleSe
                     drivetrain->hasReset = false;
                 },
                 [&]{ // is Finished
-                    return state.scoringState == SCORE_STATE::SCORING;
+                    // return state.scoringState == SCORE_STATE::SCORING;
+                    return (state.protectChin || !scorerStagingSensor.isTriggered())
+                    && drivetrain->withinXRange((units::meter_t)table->GetNumber("Viable Elevator Distance (m)", VIABLE_ELEVATOR_DISTANCE.value()));
                 },
                 {}
             )
@@ -266,7 +268,9 @@ Scorer::Scorer(frc::TimedRobot *_robot, Drivetrain *_drivetrain, valor::CANdleSe
                     drivetrain->hasReset = false;
                 },
                 [&]{ // is Finished
-                    return state.scoringState == SCORE_STATE::SCORING;
+                    // return state.scoringState == SCORE_STATE::SCORING;
+                    return (state.protectChin || !scorerStagingSensor.isTriggered())
+                        && drivetrain->withinXRange((units::meter_t)table->GetNumber("Viable Elevator Distance (m)", VIABLE_ELEVATOR_DISTANCE.value()));
                 },
                 {}
             )
