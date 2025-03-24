@@ -460,7 +460,7 @@ void Drivetrain::analyzeDashboard()
             aprilLime->applyVisionMeasurement(
                 calcEstimator.get(),
                 getRobotSpeeds(),
-                table->GetBoolean("Accepting Vision Measurements", true),
+                pigeon->GetAngularVelocityZWorld().GetValue(),
                 doubtX,
                 doubtY,
                 doubtRot

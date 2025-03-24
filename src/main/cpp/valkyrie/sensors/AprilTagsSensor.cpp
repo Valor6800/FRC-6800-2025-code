@@ -67,23 +67,37 @@ frc::Pose3d AprilTagsSensor::getPoseFromAprilTag() {
     ); 
 }
 
-void AprilTagsSensor::applyVisionMeasurement(frc::SwerveDrivePoseEstimator<4> *estimator, units::velocity::meters_per_second_t speed, bool accept, double doubtX, double doubtY, double doubtRot) {
-    if (!hasTarget() || !accept) return;
+void AprilTagsSensor::applyVisionMeasurement(
+    frc::SwerveDrivePoseEstimator<4> *estimator,
+    units::velocity::meters_per_second_t speed,
+    units::angular_velocity::radians_per_second_t angular_velocity,
+    double doubtX,
+    double doubtY,
+    double doubtRot
+) {
+    if (!hasTarget()) return;
     dp = DP;
     vp = VP;
+    double avp = .2;
  
     //std::vector<double> botToTargetPose = limeTable->GetNumberArray("botpose_targetspace", std::span<const double>());
     //if (botToTargetPose.size() == 6) distance = units::meter_t(sqrtf(powf(botToTargetPose[0], 2) + powf(botToTargetPose[1], 2)));
     //else distance = 0_m; return;
     double newDoubtX = doubtX + (distance.to<double>() * dp) + (vp * speed.to<double>());
     double newDoubtY = doubtY + (distance.to<double>() * dp) + (vp * speed.to<double>());
-    double newDoubtRot = doubtRot + (distance.to<double>() * dp) + (vp * speed.to<double>());
+    double newDoubtRot = doubtRot + (distance.to<double>() * dp) + (vp * speed.to<double>()) + (avp * angular_velocity.value());
+
+
     if (distance >= normalVisionOutlier) return;
     units::millisecond_t totalLatency = getTotalLatency();
 
     frc::Rotation2d newAngle = estimator->GetEstimatedPosition().Rotation();
-    if (distance < 1.5_m) {
+    if (distance < 1_m) {
         newAngle = currState.ToPose2d().Rotation();
+    }
+
+    if (angular_velocity > 1_tps/3.0) {
+        newDoubtRot = std::numeric_limits<double>::max();
     }
 
     frc::Pose2d tGone = frc::Pose2d{
