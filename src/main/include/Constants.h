@@ -523,9 +523,9 @@ namespace Constants {
                 };
                 default: return {
                     {ELEVATOR_STATE::ONE, 6_tps},
-                    {ELEVATOR_STATE::TWO, 8_tps},
-                    {ELEVATOR_STATE::THREE, 8_tps},
-                    {ELEVATOR_STATE::FOUR, 11.5_tps} // 25
+                    {ELEVATOR_STATE::TWO, 12_tps},
+                    {ELEVATOR_STATE::THREE, 12_tps},
+                    {ELEVATOR_STATE::FOUR, 12_tps} // 25
                 };
             }}
 
@@ -555,7 +555,7 @@ namespace Constants {
                             }
                         }
                     };
-                default:
+                case Robot::Gold:
                     return {
                         {
                             GAME_PIECE::CORAL,
@@ -566,6 +566,31 @@ namespace Constants {
                                 { ELEVATOR_STATE::TWO, 14.06_in }, //Tomball: 14.1
                                 { ELEVATOR_STATE::THREE, 19.1_in }, //Tomball: 19.5
                                 { ELEVATOR_STATE::FOUR, 26.75_in } //Tomball: 27.25
+                            }
+                        },
+                        {
+                            GAME_PIECE::ALGEE,
+                            {
+                                { ELEVATOR_STATE::STOWED, 6.39_in},
+                                { ELEVATOR_STATE::HP, 6.39_in + 1_in},
+                                { ELEVATOR_STATE::ONE, 4.09_in },
+                                { ELEVATOR_STATE::TWO, 10.38_in}, //Tomball: 11.21
+                                { ELEVATOR_STATE::THREE, 15.89_in}, //Tomball: 16.72
+                                { ELEVATOR_STATE::FOUR, 29.9_in }
+                            }
+                        }
+                    };
+                default:
+                    return {
+                        {
+                            GAME_PIECE::CORAL,
+                            {
+                                { ELEVATOR_STATE::STOWED, 10_in },
+                                { ELEVATOR_STATE::HP, 3.25_in },
+                                { ELEVATOR_STATE::ONE, 10.2_in },
+                                { ELEVATOR_STATE::TWO, 14.2_in },
+                                { ELEVATOR_STATE::THREE, 19.25_in },
+                                { ELEVATOR_STATE::FOUR, 27_in }
                             }
                         },
                         {
