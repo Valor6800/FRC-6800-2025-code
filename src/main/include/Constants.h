@@ -265,13 +265,8 @@ namespace Constants {
 
         static units::angle::turn_t getElevatorMagnetOffset() { switch (robot) {
             case Robot::Alpha: return 0.10327_tr; 
-<<<<<<< HEAD
             case Robot::Gold: return -0.4335937032_tr; //  0.989014_tr;
-            default: return 0.278809_tr;
-=======
-            case Robot::Gold: return 0.3962402969_tr; //  0.989014_tr;
-            default: return -0.07860_tr;
->>>>>>> 2c261d59 (fixed auto to teleop aligning issue and switched first pole to I)
+            default: return 0.102051_tr;
         }};
 
         static double getElevKAFF() { switch (robot) {
