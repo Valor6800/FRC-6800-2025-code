@@ -104,8 +104,8 @@ namespace CANIDs {
     constexpr static int CRABB = 33;
     constexpr static int ELEVATOR_CAN = 24;
     constexpr static int CLIMBER_CAN = 25;
-    constexpr static int SECOND_SCORER_MOTOR = 1000;
-    constexpr static int SECOND_SCORER_CAN = 10001;
+    constexpr static int SCORER_PIVOT_MOTOR = 33;
+    constexpr static int SCORER_PIVOT_CAN = 26;
 }
 
 #pragma GCC diagnostic push
@@ -259,7 +259,7 @@ namespace Constants {
             default: return valor::PhoenixControllerType::KRAKEN_X44;
         }};
 
-         static valor::PhoenixControllerType getSecondScorerMotorType() { switch (robot) {
+         static valor::PhoenixControllerType getScorerPivotMotorType() { switch (robot) {
             case Robot::Alpha: return valor::PhoenixControllerType::FALCON_FOC;
             case Robot::Gold: return valor::PhoenixControllerType::KRAKEN_X44;
             default: return valor::PhoenixControllerType::KRAKEN_X44;
@@ -602,7 +602,7 @@ namespace Constants {
                 default: return true;
             }}
 
-            static bool secondScorerMotorInverted() { switch (robot) {
+            static bool scorerPivotInverted() { switch (robot) {
                 case Robot::Alpha: return true;
                 case Robot::Gold: return false;
                 default: return false;
@@ -660,6 +660,19 @@ namespace Constants {
                     pidf.P = 10;
                     pidf.aFF = 0.72;
                     pidf.maxJerk = 100_tr_per_s_cu;
+                    return pidf;
+                }
+            }}
+
+            static valor::PIDF getScorerPivotPIDF() { switch (robot) {
+                case Robot::Alpha: {
+                    valor::PIDF pidf;
+                    pidf.P = 1;
+                    return pidf;
+                }
+                default: {
+                    valor::PIDF pidf;
+                    pidf.P = 1;
                     return pidf;
                 }
             }}

@@ -31,12 +31,13 @@
 #define ELEVATOR_MOTOR_TO_SENSOR 8.02f
 #define PULLEY_CIRCUMFERENCE 1.432_in
 
-#define SECOND_SCORER_MOTOR_TO_SENSOR 0.0f
-#define SECOND_SCORER_SENSOR_TO_MECH 0.0f
+#define PIVOT_MOTOR_TO_SENSOR 1.0f
+#define PIVOT_SENSOR_TO_MECH 0.02f
 #define SECOND_SCORER_FORWARD_LIMIT 0_tr
 #define SECOND_SCORER_REVERSE_LIMIT 0_tr
 
-
+//1-50 motor - sensor
+//21-9 gear to encoder
 
 #define ALGAE_CACHE_SIZE 1000
 
@@ -59,8 +60,8 @@ Scorer::Scorer(frc::TimedRobot *_robot, Drivetrain *_drivetrain, valor::CANdleSe
     candi(CANIDs::HALL_EFFECT, "baseCAN"),
     elevatorMotor(new valor::PhoenixController(valor::PhoenixControllerType::KRAKEN_X60, CANIDs::ELEV_WHEEL, valor::NeutralMode::Brake, elevatorMotorInverted(), "baseCAN")),
     scorerMotor(new valor::PhoenixController(Constants::getScorerMotorType(), CANIDs::SCORER_WHEEL, valor::NeutralMode::Brake, scorerMotorInverted(), "baseCAN")),
-    secondScorerMotor(new valor::PhoenixController(Constants::getSecondScorerMotorType(), CANIDs::SECOND_SCORER_MOTOR, valor::NeutralMode::Brake, secondScorerMotorInverted(), "baseCAN")),
-    secondScorerCancoder(new ctre::phoenix6::hardware::CANcoder(CANIDs::SECOND_SCORER_CAN, "baseCAN")),
+    scorerPivotMotor(new valor::PhoenixController(Constants::getScorerPivotMotorType(), CANIDs::SCORER_PIVOT_MOTOR, valor::NeutralMode::Brake, scorerPivotInverted(), "baseCAN")),
+    scorerPivotCan(new ctre::phoenix6::hardware::CANcoder(CANIDs::SCORER_PIVOT_CAN, "baseCAN")),
     scorerStagingSensor(_robot, "Scorer Staging Sensor", CANIDs::STAGING_LIDAR_SENSOR, "baseCAN"),
     currentSensor(_robot, "Algae Current Sensor"),
     positionMap{std::move(getPositionMap())},
@@ -457,22 +458,22 @@ void Scorer::init()
     scorerMotor->applyConfig();
 
     // Elevator init sequence
-    secondScorerMotor->setGearRatios(SECOND_SCORER_MOTOR_TO_SENSOR, SECOND_SCORER_SENSOR_TO_MECH);
-    secondScorerMotor->enableFOC(true);
-    secondScorerMotor->setForwardLimit(SECOND_SCORER_FORWARD_LIMIT);
-    secondScorerMotor->setReverseLimit(SECOND_SCORER_REVERSE_LIMIT);
+    scorerPivotMotor->setGearRatios(PIVOT_MOTOR_TO_SENSOR, PIVOT_SENSOR_TO_MECH);
+    scorerPivotMotor->enableFOC(true);
+    scorerPivotMotor->setForwardLimit(SECOND_SCORER_FORWARD_LIMIT);
+    scorerPivotMotor->setReverseLimit(SECOND_SCORER_REVERSE_LIMIT);
 
      ctre::phoenix6::configs::MagnetSensorConfigs encoderConfig;
     encoderConfig.AbsoluteSensorDiscontinuityPoint = 0_tr;
     encoderConfig.SensorDirection = ctre::phoenix6::signals::SensorDirectionValue::CounterClockwise_Positive;
     encoderConfig.MagnetOffset = 0_tr;
-    secondScorerCancoder->GetConfigurator().Apply(encoderConfig);
+    scorerPivotCan->GetConfigurator().Apply(encoderConfig);
 
-    valor::PIDF secondScorerPID = Constants::Scorer::getElevatorPIDF();
-    secondScorerPID.maxVelocity = secondScorerMotor->getMaxMechSpeed();
-    secondScorerPID.maxAcceleration = secondScorerMotor->getMaxMechSpeed() / 0.5;
-    secondScorerMotor->setPIDF(secondScorerPID);
-
+    valor::PIDF pivotPID = Constants::Scorer::getScorerPivotPIDF();
+    pivotPID.maxVelocity = scorerPivotMotor->getMaxMechSpeed();
+    pivotPID.maxAcceleration = scorerPivotMotor->getMaxMechSpeed() / 0.5_s;
+    
+    scorerPivotMotor->setPIDF(pivotPID);
    
     // secondScorerMotor->setupCANCoder(
     //     CANIDs::SECOND_SCORER_CAN,
@@ -526,7 +527,7 @@ void Scorer::init()
     currentSensor.setCacheSize(ALGAE_CACHE_SIZE);
 
     resetState();
-    secondScorerMotor->setEncoderPosition(secondScorerCancoder->GetAbsolutePosition().GetValue());
+    scorerPivotMotor->setEncoderPosition(scorerPivotCan->GetAbsolutePosition().GetValue() * (9.0/21.0));
     table->PutBoolean("Auto Dunk Disabled", false);
     
     // Must be at the end of init() because the CANdi has to be setup before reading   
@@ -681,11 +682,11 @@ void Scorer::assignOutputs()
 
 
     if (state.gamePiece == GAME_PIECE::CORAL){
-        secondScorerMotor->setPosition(ALGAE_POS);
+        scorerPivotMotor->setPosition(CORAL_POS);
     } else if (state.gamePiece == GAME_PIECE::ALGEE ) {
-        secondScorerMotor->setPosition(CORAL_POS);
+        scorerPivotMotor->setPosition(ALGAE_POS);
     } else{
-        secondScorerMotor->setPosition(IDLE_POS);
+        scorerPivotMotor->setPosition(CORAL_POS);
     }
 
     //Elevator State Machine
