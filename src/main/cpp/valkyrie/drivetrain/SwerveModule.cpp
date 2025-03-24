@@ -164,7 +164,6 @@ template<class AzimuthMotor, class DriveMotor>
 void SwerveModule<AzimuthMotor, DriveMotor>::setDriveClosedLoop(units::meters_per_second_t speed)
 {
     auto outSpeed = units::turns_per_second_t{speed.value() / wheelConversion.value()};
-    std::cout << "SETTING SPEED TO: " << outSpeed.value() << '\n';
     driveMotor->setSpeed(outSpeed);
 }
 
