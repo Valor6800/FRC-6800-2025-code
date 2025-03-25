@@ -10,6 +10,7 @@
 #include "units/length.h"
 #include "units/math.h"
 #include "units/velocity.h"
+#include "valkyrie/controllers/PIDF.h"
 #include "valkyrie/controllers/PhoenixController.h"
 #include "wpi/sendable/SendableRegistry.h"
 #include <cmath>
@@ -227,8 +228,13 @@ void Swerve<AzimuthMotor, DriveMotor>::analyzeDashboard()
     calculated_y_controller_val = y_controller.Calculate(yDistance, goalAlign);
     calculated_x_controller_val = x_controller.Calculate(xDistance, xGoalAlign);
     if (yAlign){
-        
-        relativeToTagSpeed = units::meters_per_second_t{calculated_y_controller_val} + (Y_KFF * y_controller.GetSetpoint().velocity);
+        valor::PIDF yAlignPID;
+        yAlignPID.P = table->GetNumber("Y_KP", Y_KP);
+        yAlignPID.D = table->GetNumber("Y_KD", Y_KD);
+
+        relativeToTagSpeed = (units::meters_per_second_t) (
+            - yAlignPID.P * (yDistance - y_controller.GetSetpoint().position).value() - yAlignPID.D * (yControllerInitialVelocity - y_controller.GetSetpoint().velocity).value() + y_controller.GetSetpoint().velocity.value()
+        );
         relativeToTagXSpeed = units::meters_per_second_t{calculated_x_controller_val} + (X_KFF * x_controller.GetSetpoint().velocity);
 
         yAlignVector = MAKE_VECTOR(targetAngle - 90_deg) * relativeToTagSpeed.value();
