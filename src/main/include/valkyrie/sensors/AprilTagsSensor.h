@@ -33,7 +33,7 @@ namespace valor
             void applyVisionMeasurement(
                 frc::SwerveDrivePoseEstimator<4> *estimator,
                 units::velocity::meters_per_second_t speed,
-                bool accept = true,
+                units::angular_velocity::radians_per_second_t angular_velocity,
                 double doubtX = 1, double doubtY = 1, double doubtRot = 1
             );
             frc::Pose3d getPoseFromAprilTag();
