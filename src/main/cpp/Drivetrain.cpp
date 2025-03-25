@@ -216,6 +216,8 @@ Drivetrain::Drivetrain(frc::TimedRobot *_robot, valor::CANdleSensor* _leds) :
     poseErrorPPTopic = nt::NetworkTableInstance::GetDefault().GetStructTopic<frc::Transform2d>("LiveWindow/BaseSubsystem/SwerveDrive/Pose Error PP").Publish();
     table->PutNumber("Y Controller Activation Degree Threshold", Y_ACTIVATION_THRESHOLD.value());
 
+    doubtRot = 1;
+
     resetState();
     init();
 }
