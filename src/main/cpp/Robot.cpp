@@ -99,6 +99,7 @@ void Robot::AutonomousInit() {
 }
 
 void Robot::AutonomousExit() {
+    autoCommands.Cancel();
 }
 
 void Robot::AutonomousPeriodic() {

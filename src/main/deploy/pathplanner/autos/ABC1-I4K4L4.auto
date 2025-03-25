@@ -7,19 +7,19 @@
         {
           "type": "path",
           "data": {
-            "pathName": "ABC1-J4"
+            "pathName": "ABC1-I4"
           }
         },
         {
           "type": "named",
           "data": {
-            "name": "AlignRight"
+            "name": "AlignLeft"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "ABJ-HP2"
+            "pathName": "ABI-HP2"
           }
         },
         {
@@ -56,18 +56,6 @@
           "type": "path",
           "data": {
             "pathName": "ABL-HP2"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "ABHP2-A4"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "AlignLeft"
           }
         }
       ]

@@ -767,4 +767,10 @@ void Drivetrain::InitSendable(wpi::SendableBuilder& builder)
             [this] {return averageXDistance.value();},
             nullptr
         );
+        
+        builder.AddBooleanProperty(
+            "State: Align To Target",
+            [this] {return state.alignToTarget;},
+            nullptr
+        );
     }

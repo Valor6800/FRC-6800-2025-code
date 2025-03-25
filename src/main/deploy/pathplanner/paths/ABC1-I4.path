@@ -8,59 +8,30 @@
       },
       "prevControl": null,
       "nextControl": {
-        "x": 5.702073030340999,
-        "y": 7.5
+        "x": 6.479405224409344,
+        "y": 6.796726979620904
       },
       "isLocked": false,
       "linkedName": "B-C1"
     },
     {
       "anchor": {
-        "x": 4.998872950819672,
-        "y": 5.241752049180327
+        "x": 5.675643938264817,
+        "y": 5.747933669576025
       },
       "prevControl": {
-        "x": 5.310872950819671,
-        "y": 6.694502049180326
+        "x": 6.131110233601813,
+        "y": 6.461693359958988
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "B-J"
+      "linkedName": "B-HI"
     }
   ],
   "rotationTargets": [],
   "constraintZones": [],
   "pointTowardsZones": [],
-  "eventMarkers": [
-    {
-      "name": "Hold",
-      "waypointRelativePos": 0,
-      "endWaypointRelativePos": null,
-      "command": null
-    },
-    {
-      "name": "TROUGH POSITION",
-      "waypointRelativePos": 0.7,
-      "endWaypointRelativePos": null,
-      "command": {
-        "type": "named",
-        "data": {
-          "name": "TROUGH POSITION"
-        }
-      }
-    },
-    {
-      "name": "Enable Scorer",
-      "waypointRelativePos": 0.95,
-      "endWaypointRelativePos": null,
-      "command": {
-        "type": "named",
-        "data": {
-          "name": "Enable Scorer"
-        }
-      }
-    }
-  ],
+  "eventMarkers": [],
   "globalConstraints": {
     "maxVelocity": 4.0,
     "maxAcceleration": 4.0,

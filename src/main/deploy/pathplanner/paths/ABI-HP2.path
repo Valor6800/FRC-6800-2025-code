@@ -3,16 +3,16 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 4.998872950819672,
-        "y": 5.241752049180327
+        "x": 5.29725,
+        "y": 5.1049
       },
       "prevControl": null,
       "nextControl": {
-        "x": 4.072622950819672,
-        "y": 6.051002049180328
+        "x": 4.783094262295082,
+        "y": 6.356608606557376
       },
       "isLocked": false,
-      "linkedName": "B-J"
+      "linkedName": "B-I"
     },
     {
       "anchor": {
@@ -20,25 +20,20 @@
         "y": 7.027920081967213
       },
       "prevControl": {
-        "x": 2.8254221311475414,
-        "y": 6.091920081967213
+        "x": 1.6423155737704918,
+        "y": 6.944006147540984
       },
       "nextControl": null,
       "isLocked": false,
       "linkedName": "B-HP2"
     }
   ],
-  "rotationTargets": [
-    {
-      "waypointRelativePos": 0.5,
-      "rotationDegrees": -55.0
-    }
-  ],
+  "rotationTargets": [],
   "constraintZones": [],
   "pointTowardsZones": [],
   "eventMarkers": [
     {
-      "name": "HP Position",
+      "name": "HP",
       "waypointRelativePos": 0.02,
       "endWaypointRelativePos": null,
       "command": {
@@ -49,13 +44,13 @@
       }
     },
     {
-      "name": "Disable Scorer",
+      "name": "Intaking",
       "waypointRelativePos": 0.2,
       "endWaypointRelativePos": null,
       "command": {
         "type": "named",
         "data": {
-          "name": "DISABLE Scorer"
+          "name": "Intaking"
         }
       }
     }
@@ -75,7 +70,7 @@
   "reversed": false,
   "folder": "R-H",
   "idealStartingState": {
-    "velocity": 0,
+    "velocity": 0.0,
     "rotation": -119.99999999999999
   },
   "useDefaultConstraints": true
