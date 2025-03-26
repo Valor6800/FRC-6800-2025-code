@@ -92,6 +92,9 @@ private:
 
     valor::PhoenixController<> *elevatorMotor;
     valor::PhoenixController<> *scorerMotor;
+    valor::PhoenixController<> *scorerPivotMotor;
+    ctre::phoenix6::hardware::CANcoder* scorerPivotCan;
+
 
     valor::CANrangeSensor scorerStagingSensor;
     valor::CurrentSensor currentSensor;
