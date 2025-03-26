@@ -91,6 +91,7 @@ void Robot::AutonomousInit() {
     drivetrain.doubtX = AUTO_DOUBTX;
     drivetrain.doubtY = AUTO_DOUBTY;
     scorer.state.autoDunkEnabled = true;
+    drivetrain.dumbAutoAlign = true;
     autoCommands = valorAuto.getSelectedAuto();
     autoCommands.Schedule();
     // autoCommands.clear();
@@ -107,6 +108,7 @@ void Robot::AutonomousPeriodic() {
 
 void Robot::TeleopInit() {
     scorer.resetState();
+    drivetrain.dumbAutoAlign = false;
     drivetrain.setTeleopStartTime();
 }
 /**
