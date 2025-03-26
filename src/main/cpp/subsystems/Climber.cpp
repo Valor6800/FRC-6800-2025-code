@@ -145,7 +145,7 @@ void Climber::assessInputs()
 void Climber::analyzeDashboard()
 {
     leds->setLED(LEDConstants::LED_POS_CLIMBER, valor::CANdleSensor::cancoderMagnetHealthGetter(climbCancoder));
-    if (state.hasClimbed == true) {
+    if (state.hasClimbed == true || state.climbState == CLIMB_STATE::RETRACTED || state.climbState == CLIMB_STATE::MANUAL) {
         leds->setColorAll(CANdleSensor::GREEN, CANdleSensor::Priority::PRIORITY_CLIMBER);
     } else if (state.climbState == CLIMB_STATE::DEPLOYED) {
         leds->setColorAll(CANdleSensor::RED, CANdleSensor::Priority::PRIORITY_CLIMBER);
