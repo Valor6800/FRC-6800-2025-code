@@ -27,6 +27,7 @@
 #include <ctre/phoenix6/TalonFX.hpp>
 #include <units/math.h>
 #include <frc/Alert.h>
+#include <AprilTagPositions.h>
 
 using namespace pathplanner;
 
@@ -100,6 +101,9 @@ const units::meter_t WHEEL_DIAMETER(0.0973_m);
 #define Y_ACTIVATION_THRESHOLD 30.0_deg
 
 #define ROBOT_STOPPED_THRESHOLD 0.2_mps
+
+#define FIELD_LENGTH 17.5482504_m
+#define FIELD_WIDTH 8.0519016_m 
 
 Drivetrain::Drivetrain(frc::TimedRobot *_robot, valor::CANdleSensor* _leds) : 
     valor::Swerve<SwerveAzimuthMotor, SwerveDriveMotor>(
@@ -341,33 +345,42 @@ void Drivetrain::analyzeDashboard()
     poseErrorPP = currentPosePathPlanner.Get() - targetPosePathPlanner.Get();
 
     state.yEstimate += Swerve::yControllerInitialVelocity.value() * LOOP_TIME;
-    units::radian_t leastSkew{90_rad};
     unfilteredYDistance = Swerve::goalAlign.to<double>();
+
+    frc::Pose2d robotToCenter{
+        getCalculatedPose().Translation() + frc::Translation2d(-FIELD_LENGTH / 2.0, -FIELD_WIDTH / 2.0),
+        getCalculatedPose().Rotation()
+    };
+
+
+    std::pair<int, frc::Pose3d> temp = valor::getNearestTag(
+        robotToCenter,
+        frc::DriverStation::kRed == frc::DriverStation::GetAlliance() ? valor::redReefAprilTagPoses : valor::blueReefAprilTagPoses
+    );
+
+    if (state.reefTag == -1) {
+        state.reefTag = temp.first;
+    }
+    reefPublisher.Set(
+        frc::Pose2d(
+            temp.second.ToPose2d().Translation() + frc::Translation2d(FIELD_LENGTH / 2.0, FIELD_WIDTH / 2.0),
+            temp.second.ToPose2d().Rotation()
+        )
+    );
+
     for(valor::AprilTagsSensor* aprilLime : aprilTagSensors) {
-        if (aprilLime->hasTarget()) {
-            if(
-                (frc::DriverStation::GetAlliance() == frc::DriverStation::kRed && 
-                aprilLime->getTagID() >= 6 &&
-                aprilLime->getTagID() <= 11) || 
-                (frc::DriverStation::GetAlliance() == frc::DriverStation::kBlue &&
-                aprilLime->getTagID() >= 17 &&
-                aprilLime->getTagID() <= 22)
-            ){ 
-                units::degree_t currentSkew = aprilLime->getTargetToBotPose().Rotation().Y() + 00_deg;
-                if (leastSkew > units::math::abs(currentSkew) && state.reefTag == -1) {
-                    state.reefTag = aprilLime->getTagID();
-                    leastSkew = currentSkew;
-                    state.yEstimate = aprilLime->get_botpose_targetspace().X().to<double>();
-                    state.xEstimate = -aprilLime->get_botpose_targetspace().Z().to<double>();
-                    Swerve::yDistance = units::length::meter_t (state.yEstimate);
-                    Swerve::xDistance = units::length::meter_t (state.xEstimate);
-                    Swerve::resetAlignControllers();
-                }
-                if (state.reefTag == aprilLime->getTagID()) {
-                    //unfilteredYDistance = aprilLime->get_botpose_targetspace().X().to<double>();
-                    state.yEstimate = Y_FILTER_CONST * state.yEstimate + ((1 - Y_FILTER_CONST) * aprilLime->get_botpose_targetspace().X().to<double>());
-                    state.xEstimate = -aprilLime->get_botpose_targetspace().Z().to<double>();
-                }
+        if (aprilLime->hasTarget() && valor::isReefTag(aprilLime->getTagID())) {
+            if (state.reefTag == -1) {
+                state.reefTag = aprilLime->getTagID();
+                state.yEstimate = aprilLime->get_botpose_targetspace().X().to<double>();
+                state.xEstimate = -aprilLime->get_botpose_targetspace().Z().to<double>();
+                Swerve::yDistance = units::length::meter_t (state.yEstimate);
+                Swerve::xDistance = units::length::meter_t (state.xEstimate);
+                Swerve::resetAlignControllers();
+            } else if (state.reefTag == aprilLime->getTagID()) {
+                //unfilteredYDistance = aprilLime->get_botpose_targetspace().X().to<double>();
+                state.yEstimate = Y_FILTER_CONST * state.yEstimate + ((1 - Y_FILTER_CONST) * aprilLime->get_botpose_targetspace().X().to<double>());
+                state.xEstimate = -aprilLime->get_botpose_targetspace().Z().to<double>();
             }
         } 
     }
