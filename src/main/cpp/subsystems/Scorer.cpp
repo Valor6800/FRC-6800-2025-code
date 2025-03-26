@@ -17,7 +17,7 @@
 #define ELEVATOR_SENSOR_TO_MECH 1.0f
 
 #define CORAL_INTAKE_SPEED 20_tps //5
-#define ALGEE_INTAKE_SPEED 11.5_tps
+#define ALGEE_INTAKE_SPEED 15_tps
 #define SCORE_SPEED 20_tps
 #define ALGEE_SCORE_SPEED -11.5_tps
 #define ALGEE_HOLD_SPD 0.25_tps
@@ -454,8 +454,8 @@ void Scorer::init()
         state.hasZeroed = true;
         absSensorCorrect = elevatorMotor->getAbsEncoderPosition();
 
-        std::cout << "\nZeored absEncoderPosition: " << absSensorCorrect.value() << std::endl;
-        std::cout << "\nZeroed elevator position(in): " << convertToMechSpace(elevatorMotor->getPosition()).value() << std::endl;
+        /*std::cout << "\nZeored absEncoderPosition: " << absSensorCorrect.value() << std::endl;
+        std::cout << "\nZeroed elevator position(in): " << convertToMechSpace(elevatorMotor->getPosition()).value() << std::endl;*/
     });
 
     // Beambreak debounce sensor (on scoring mechanism)
@@ -562,7 +562,11 @@ void Scorer::analyzeDashboard()
 
     bool isStopped = drivetrain->isSpeedStopped();
     units::meter_t distanceFromReef = drivetrain->lidarDistance();
+<<<<<<< HEAD
     state.shootOverCoral = state.gamePiece == GAME_PIECE::CORAL && isStopped && (MIN_DUNK_DISTANCE_OVER_CORAL<= distanceFromReef && distanceFromReef <= MAX_DUNK_DISTANCE_OVER_CORAL);
+=======
+    state.shootOverCoral = false; // isStopped && (MIN_DUNK_DISTANCE_OVER_CORAL<= distanceFromReef && distanceFromReef <= MAX_DUNK_DISTANCE_OVER_CORAL);
+>>>>>>> 1b5e421f (44444)
     if (state.shootOverCoral) {
         elevatorSetpoint += DUNK_OFFSET_OVER_CORAL;
     }
