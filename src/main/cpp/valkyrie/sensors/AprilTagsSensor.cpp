@@ -78,14 +78,14 @@ void AprilTagsSensor::applyVisionMeasurement(
     if (!hasTarget()) return;
     dp = DP;
     vp = VP;
-    double avp = .2;
+    double avp = 2;
  
     //std::vector<double> botToTargetPose = limeTable->GetNumberArray("botpose_targetspace", std::span<const double>());
     //if (botToTargetPose.size() == 6) distance = units::meter_t(sqrtf(powf(botToTargetPose[0], 2) + powf(botToTargetPose[1], 2)));
     //else distance = 0_m; return;
     double newDoubtX = doubtX + (distance.to<double>() * dp) + (vp * speed.to<double>());
     double newDoubtY = doubtY + (distance.to<double>() * dp) + (vp * speed.to<double>());
-    double newDoubtRot = doubtRot + (distance.to<double>() * dp) + (vp * speed.to<double>()) + (avp * angular_velocity.value());
+    double newDoubtRot = doubtRot + (distance.to<double>() * dp) + (vp * speed.to<double>()) + (avp * fabs(angular_velocity.value()));
 
 
     if (distance >= normalVisionOutlier) return;
