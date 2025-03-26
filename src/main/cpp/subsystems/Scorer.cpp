@@ -22,10 +22,12 @@
 #define ELEVATOR_SENSOR_TO_MECH 1.0f
 
 #define CORAL_INTAKE_SPEED 20_tps //5
-#define ALGEE_INTAKE_SPEED 35_tps
+#define CORAL_GROUND_INTAKE_SPEED -20_tps //5
+#define ALGEE_INTAKE_SPEED -16_tps
 #define SCORE_SPEED 20_tps
-#define ALGEE_SCORE_SPEED -20_tps
-#define ALGEE_HOLD_SPD 0.45_tps
+#define ALGEE_SCORE_SPEED 11.5_tps
+#define ALGEE_HOLD_SPD -1_tps
+#define CORAL_HOLD_SPD -0.25_tps
 
 #define ELEVATOR_FORWARD_LIMIT 6_tr
 #define ELEVATOR_OFFSET 3_in
@@ -36,7 +38,19 @@
 #define ELEVATOR_MOTOR_TO_SENSOR 8.02f
 #define PULLEY_CIRCUMFERENCE 1.432_in
 
-#define ALGAE_CACHE_SIZE 1000
+#define PIVOT_MOTOR_TO_SENSOR 60.75f
+#define PIVOT_SENSOR_TO_MECH 1.0f
+#define SECOND_SCORER_FORWARD_LIMIT 0.65_tr
+#define SECOND_SCORER_REVERSE_LIMIT 0.15_tr
+#define PIVOT_CANCODER_RATIO 9.0f/21.0f
+
+#define MINIMUM_PIVOT_SPEED 0.25_tps
+
+//1-50 motor - sensor
+//21-9 gear to encoder
+
+#define ALGAE_CACHE_SIZE 2000
+#define CORAL_CACHE_SIZE 500
 
 #define VIABLE_ELEVATOR_THRESHOLD 0.02_m
 #define VIABLE_DUNK_DISTANCE 0.28_m
@@ -56,8 +70,10 @@ Scorer::Scorer(frc::TimedRobot *_robot, Drivetrain *_drivetrain, valor::CANdleSe
     candi(CANIDs::HALL_EFFECT, "baseCAN"),
     elevatorMotor(new valor::PhoenixController(valor::PhoenixControllerType::KRAKEN_X60, CANIDs::ELEV_WHEEL, valor::NeutralMode::Brake, elevatorMotorInverted(), "baseCAN")),
     scorerMotor(new valor::PhoenixController(Constants::getScorerMotorType(), CANIDs::SCORER_WHEEL, valor::NeutralMode::Brake, scorerMotorInverted(), "baseCAN")),
+    scorerPivotMotor(new valor::PhoenixController(Constants::getScorerPivotMotorType(), CANIDs::SCORER_PIVOT_MOTOR, valor::NeutralMode::Brake, scorerPivotInverted(), "baseCAN")),
     scorerStagingSensor(_robot, "Scorer Staging Sensor", CANIDs::STAGING_LIDAR_SENSOR, "baseCAN", -1_mm),
     currentSensor(_robot, "Algae Current Sensor"),
+    coralCurrentSensor(_robot, "Coral Current Sensor"),
     positionMap{std::move(getPositionMap())},
     scoringSpeedMap{std::move(getScoringSpeedMap())},
     drivetrain(_drivetrain),
@@ -419,8 +435,10 @@ void Scorer::resetState()
     state.manualSpeed = 0_V;
     state.algaeSpikeCurrent = 30;
     currentSensor.reset();
+    coralCurrentSensor.reset();
+    state.intaking = false;
     state.hasAlgae = false;
-    state.protectChin = false;
+    state.hasCoral = false;
     state.autoDunkEnabled = true;
 }
 
@@ -469,7 +487,6 @@ void Scorer::init()
         "baseCAN",
         Constants::Scorer::getElevatorAbsoluteRange()
     );
-    elevatorMotor->applyConfig();
     elevatorMotor->setCurrentLimits(
         units::ampere_t{100},
         units::ampere_t{60},
@@ -477,6 +494,7 @@ void Scorer::init()
         units::second_t{0.5},
         true
     );
+    elevatorMotor->applyConfig();
 
     // Scorer init sequence
     scorerMotor->setGearRatios(1, Constants::Scorer::getScorerSensorToMech());
@@ -494,8 +512,19 @@ void Scorer::init()
     scorerPID.maxAcceleration = scorerMotor->getMaxMechSpeed() / Constants::Scorer::getScorerMaxVelRampTime();
     
     scorerMotor->setPIDF(scorerPID);
-
     scorerMotor->applyConfig();
+
+    scorerPivotMotor->setGearRatios(PIVOT_MOTOR_TO_SENSOR, PIVOT_SENSOR_TO_MECH);
+    scorerPivotMotor->enableFOC(true);
+    scorerPivotMotor->setForwardLimit(SECOND_SCORER_FORWARD_LIMIT);
+    scorerPivotMotor->setReverseLimit(SECOND_SCORER_REVERSE_LIMIT);
+
+    valor::PIDF pivotPID = Constants::Scorer::getScorerPivotPIDF();
+    pivotPID.maxVelocity = scorerPivotMotor->getMaxMechSpeed();
+    pivotPID.maxAcceleration = scorerPivotMotor->getMaxMechSpeed() / 0.333_s;
+    scorerPivotMotor->setPIDF(pivotPID);
+    scorerPivotMotor->setupCANCoder(CANIDs::SCORER_PIVOT_CAN, scorerPivotMagnetOffset(), ctre::phoenix6::signals::SensorDirectionValue::CounterClockwise_Positive, "baseCAN");
+    scorerPivotMotor->applyConfig();
 
     // Zeroing debounce sensor (utilizes CANdi configured hall effect sensor)
     hallEffectDebounceSensor.setGetter([this] { return hallEffectSensorActive();});
@@ -521,17 +550,25 @@ void Scorer::init()
         }
     });
 
-     scorerStagingSensor.setFallingEdgeCallback([this] {
-        if (state.gamePiece == GAME_PIECE::CORAL) {
-            state.protectChin = true;
-           
+    currentSensor.setSpikeSetpoint(25);
+    currentSensor.setGetter([this]() {return scorerMotor->getCurrent().to<double>(); });
+    currentSensor.setSpikeCallback([this]() {
+        if (scorerPivotMotor->getSpeed() < MINIMUM_PIVOT_SPEED && state.gamePiece == GAME_PIECE::ALGEE) {
+            state.hasAlgae = true;
+            currentSensor.reset();
         }
     });
-
-    currentSensor.setSpikeSetpoint(45);
-    currentSensor.setGetter([this]() {return scorerMotor->getCurrent().to<double>(); });
-    currentSensor.setSpikeCallback([this]() {state.hasAlgae = true;});
     currentSensor.setCacheSize(ALGAE_CACHE_SIZE);
+
+    coralCurrentSensor.setSpikeSetpoint(25);
+    coralCurrentSensor.setGetter([this]() {return scorerMotor->getCurrent().to<double>(); });
+    coralCurrentSensor.setSpikeCallback([this]() {
+        if (scorerPivotMotor->getSpeed() < MINIMUM_PIVOT_SPEED && state.gamePiece == GAME_PIECE::CORAL) {
+            state.hasCoral = true;
+            coralCurrentSensor.reset();
+        }
+    });
+    coralCurrentSensor.setCacheSize(CORAL_CACHE_SIZE);
 
     resetState();
     table->PutBoolean("Auto Dunk Disabled", false);
@@ -586,6 +623,7 @@ void Scorer::assessInputs()
     if (driverGamepad->GetRightBumperButton()) {
         state.scoringState = SCORE_STATE::SCORING;
         state.hasAlgae = false;
+        state.hasCoral = false;
     } else {
         state.scoringState = SCORE_STATE::HOLD;
     }
@@ -606,10 +644,6 @@ void Scorer::analyzeDashboard()
     }
 
     bool disableAutoDunk = table->GetBoolean("Auto Dunk Disabled", false);
-
-    if (state.scoringState != SCORE_STATE::SCORING || (state.elevState == ELEVATOR_STATE::ONE && state.gamePiece == GAME_PIECE::CORAL)){
-        state.protectChin = false;
-    }
 
     if (state.elevState == ELEVATOR_STATE::FOUR && drivetrain->getXConstraints().maxVelocity != drivetrain->x_constraints_l4.maxVelocity) {
         drivetrain->setXConstraints(drivetrain->x_constraints_l4);
@@ -709,20 +743,54 @@ void Scorer::assignOutputs()
         return;
     }
 
+    // Pivot State Machine
+    if (state.gamePiece == GAME_PIECE::ALGEE) {
+        if (state.intaking) {
+            if (state.hasAlgae && !state.intaking) {
+                scorerPivotMotor->setPosition(getPivotPositionMap()[PIVOT_STATE::CARRY]);
+            } else {
+                scorerPivotMotor->setPosition(getPivotPositionMap()[PIVOT_STATE::GROUND]);
+            }
+        } else if (state.scopedState == SCOPED_STATE::SCOPED || state.scopedState == SCOPED_STATE::MANUAL_SCOPE)  {
+            if (state.elevState == ELEVATOR_STATE::TWO || state.elevState == ELEVATOR_STATE::THREE || state.elevState == ELEVATOR_STATE::FOUR) {
+                scorerPivotMotor->setPosition(getPivotPositionMap()[PIVOT_STATE::PICK]);
+            } else {
+                scorerPivotMotor->setPosition(getPivotPositionMap()[PIVOT_STATE::PRESCORE]);
+            }
+        } else if (state.hasAlgae) {
+            scorerPivotMotor->setPosition(getPivotPositionMap()[PIVOT_STATE::CARRY]);
+        } else {
+            scorerPivotMotor->setPosition(getPivotPositionMap()[PIVOT_STATE::CARRY]);
+        }
+    } else {
+        if (state.intaking) {
+            scorerPivotMotor->setPosition(getPivotPositionMap()[PIVOT_STATE::CORAL_GROUND]);
+        } else {
+            if (state.elevState == ELEVATOR_STATE::ONE) {
+                scorerPivotMotor->setPosition(getPivotPositionMap()[PIVOT_STATE::PICK]);
+            } else {
+                scorerPivotMotor->setPosition(getPivotPositionMap()[PIVOT_STATE::CORAL_STOW]);
+            }
+        }
+    }
+
     //Elevator State Machine
     if (state.elevState == ELEVATOR_STATE::MANUAL) {
         elevatorMotor->setPower(state.manualSpeed + units::volt_t{Constants::Scorer::getElevatorPIDF().aFF});
     } else {
-        if ((state.scopedState == SCOPED &&
+        if (state.intaking) {
+            if (state.hasAlgae) {
+                state.targetHeight = positionMap.at(state.gamePiece).at(ELEVATOR_STATE::STOWED);
+            } else {
+                state.targetHeight = positionMap.at(state.gamePiece).at(ELEVATOR_STATE::FLOOR);
+            }
+        } else if ((state.scopedState == SCOPED &&
             (
                 state.gamePiece == GAME_PIECE::ALGEE ||
                 (state.gamePiece == GAME_PIECE::CORAL && drivetrain->withinXRange((units::meter_t)table->GetNumber("Viable Elevator Distance (m)", VIABLE_ELEVATOR_DISTANCE.value())))
             )) || state.scopedState == MANUAL_SCOPE
         ) {
             state.targetHeight = positionMap.at(state.gamePiece).at(state.elevState);
-            if (state.elevState == ELEVATOR_STATE::ONE && state.gamePiece == GAME_PIECE::CORAL && state.scoringState == SCORE_STATE::SCORING) {
-                state.targetHeight += 4_in;
-            }
             if (state.shootOverCoral) {
                 state.targetHeight += DUNK_OFFSET_OVER_CORAL;
             }
@@ -737,22 +805,30 @@ void Scorer::assignOutputs()
         elevatorMotor->setPosition(targetRotations);
     }
 
-  // Scorer State Machine
+    // Scorer State Machine
     if (state.scoringState == SCORE_STATE::SCORING) {
+        currentSensor.reset();
+        coralCurrentSensor.reset();
         if (state.gamePiece == GAME_PIECE::ALGEE) {
             scorerMotor->setSpeed(ALGEE_SCORE_SPEED);
-        } else if (!state.protectChin) {
+        } else {
             auto it = scoringSpeedMap.find(state.elevState);
             if (it != scoringSpeedMap.end()) {
                 scorerMotor->setSpeed(it->second);
             } else {
                 scorerMotor->setSpeed(SCORE_SPEED);
             }
-        } else {
-            scorerMotor->setSpeed(0_tps);
         }
     } else if (state.hasAlgae && state.gamePiece == GAME_PIECE::ALGEE) {
         scorerMotor->setSpeed(ALGEE_HOLD_SPD);
+    } else if (state.hasCoral && state.gamePiece == GAME_PIECE::CORAL && state.elevState == ELEVATOR_STATE::ONE) {
+        scorerMotor->setSpeed(CORAL_HOLD_SPD);
+    } else if (state.intaking) {
+        if (state.gamePiece == GAME_PIECE::ALGEE) {
+            scorerMotor->setSpeed(ALGEE_INTAKE_SPEED);
+        } else {
+            scorerMotor->setSpeed(CORAL_GROUND_INTAKE_SPEED);
+        }
     } else if (!scorerStagingSensor.isTriggered()) {
         if (state.gamePiece == GAME_PIECE::ALGEE) {
             scorerMotor->setSpeed(ALGEE_INTAKE_SPEED);
@@ -821,6 +897,11 @@ void Scorer::InitSendable(wpi::SendableBuilder& builder)
         nullptr
     );
     builder.AddBooleanProperty(
+        "Has Coral",
+        [this] {return state.hasCoral;},
+        nullptr
+    );
+    builder.AddBooleanProperty(
         "CORAL",
         [this] {return state.gamePiece == GAME_PIECE::CORAL;},
         nullptr
@@ -828,12 +909,6 @@ void Scorer::InitSendable(wpi::SendableBuilder& builder)
     builder.AddBooleanProperty(
         "ALGAE",
         [this] {return state.gamePiece == GAME_PIECE::ALGEE;},
-        nullptr
-    );
-
-    builder.AddBooleanProperty(
-        "CHIN PROTECTED?",
-        [this] {return state.protectChin;},
         nullptr
     );
 
