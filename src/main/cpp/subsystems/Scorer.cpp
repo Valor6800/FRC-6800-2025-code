@@ -562,7 +562,7 @@ void Scorer::analyzeDashboard()
 
     bool isStopped = drivetrain->isSpeedStopped();
     units::meter_t distanceFromReef = drivetrain->lidarDistance();
-    state.shootOverCoral = isStopped && (MIN_DUNK_DISTANCE_OVER_CORAL<= distanceFromReef && distanceFromReef <= MAX_DUNK_DISTANCE_OVER_CORAL);
+    state.shootOverCoral = state.gamePiece == GAME_PIECE::CORAL && isStopped && (MIN_DUNK_DISTANCE_OVER_CORAL<= distanceFromReef && distanceFromReef <= MAX_DUNK_DISTANCE_OVER_CORAL);
     if (state.shootOverCoral) {
         elevatorSetpoint += DUNK_OFFSET_OVER_CORAL;
     }
