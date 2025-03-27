@@ -231,9 +231,10 @@ void Swerve<AzimuthMotor, DriveMotor>::analyzeDashboard()
         valor::PIDF yAlignPID;
         yAlignPID.P = table->GetNumber("Y_KP", Y_KP);
         yAlignPID.D = table->GetNumber("Y_KD", Y_KD);
+        yAlignPID.aFF = .9;
 
         relativeToTagSpeed = (units::meters_per_second_t) (
-            - yAlignPID.P * (yDistance - y_controller.GetSetpoint().position).value() - yAlignPID.D * (yControllerInitialVelocity - y_controller.GetSetpoint().velocity).value() + y_controller.GetSetpoint().velocity.value()
+            - yAlignPID.P * (yDistance - y_controller.GetSetpoint().position).value() - yAlignPID.D * (yControllerInitialVelocity - y_controller.GetSetpoint().velocity).value() + yAlignPID.aFF * y_controller.GetSetpoint().velocity.value()
         );
         relativeToTagXSpeed = units::meters_per_second_t{calculated_x_controller_val} + (X_KFF * x_controller.GetSetpoint().velocity);
 
