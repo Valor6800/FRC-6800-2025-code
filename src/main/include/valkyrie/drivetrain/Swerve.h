@@ -101,7 +101,8 @@ public:
     void updateAngularAcceleration();
     units::angular_acceleration::radians_per_second_squared_t getSmoothedAngularAcceleration();
     double rotationLerping(double);
-    void resetAlignControllers();
+    void resetLinearAlignControllers();
+    void resetRotationAlignControllers();
 
     bool xAlign = false;
     bool dumbAutoAlign = false;

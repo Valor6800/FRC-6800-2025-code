@@ -96,7 +96,7 @@ void AprilTagsSensor::applyVisionMeasurement(
         newAngle = currState.ToPose2d().Rotation();
     }
 
-    if (angular_velocity > 1_tps/3.0) {
+    if (units::math::fabs(angular_velocity) > 1_tps/30.0) {
         newDoubtRot = std::numeric_limits<double>::max();
     }
 

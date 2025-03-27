@@ -3,6 +3,7 @@
 #include <cstddef>
 #include <frc/DriverStation.h>
 #include <iterator>
+#include <limits>
 #include <math.h>
 #include <pathplanner/lib/auto/AutoBuilder.h>
 #include <string>
@@ -312,14 +313,10 @@ void Drivetrain::assessInputs()
         state.getTag = true;
     } else if (!driverGamepad->leftTriggerActive() && !driverGamepad->rightTriggerActive()) {
         state.reefTag = -1;
-        hasReset = false;
     }
 
     state.alignToTarget = driverGamepad->leftTriggerActive() || driverGamepad->rightTriggerActive();
     state.climberAlign = driverGamepad->GetBButton();
-    if (driverGamepad->leftTriggerActive() && !hasReset) {
-        hasReset = true;
-    }
 
     Swerve::assessInputs();
 }
@@ -347,6 +344,11 @@ void Drivetrain::analyzeDashboard()
     state.yEstimate += Swerve::yControllerInitialVelocity.value() * LOOP_TIME;
     unfilteredYDistance = Swerve::goalAlign.to<double>();
 
+    if (!state.alignToTarget) {
+        Swerve::resetRotationAlignControllers();
+        hasReset = false;
+    }
+
     frc::Pose2d robotToCenter{
         getCalculatedPose().Translation() + frc::Translation2d(-FIELD_LENGTH / 2.0, -FIELD_WIDTH / 2.0),
         getCalculatedPose().Rotation()
@@ -358,7 +360,7 @@ void Drivetrain::analyzeDashboard()
         frc::DriverStation::kRed == frc::DriverStation::GetAlliance() ? valor::redReefAprilTagPoses : valor::blueReefAprilTagPoses
     );
 
-    if (state.reefTag == -1) {
+    if (state.alignToTarget && state.reefTag == -1) {
         state.reefTag = temp.first;
     }
     reefPublisher.Set(
@@ -370,19 +372,20 @@ void Drivetrain::analyzeDashboard()
 
     for(valor::AprilTagsSensor* aprilLime : aprilTagSensors) {
         if (aprilLime->hasTarget() && valor::isReefTag(aprilLime->getTagID())) {
-            if (state.reefTag == -1) {
-                state.reefTag = aprilLime->getTagID();
+            if (state.reefTag == aprilLime->getTagID() && !hasReset) {
                 state.yEstimate = aprilLime->get_botpose_targetspace().X().to<double>();
                 state.xEstimate = -aprilLime->get_botpose_targetspace().Z().to<double>();
                 Swerve::yDistance = units::length::meter_t (state.yEstimate);
                 Swerve::xDistance = units::length::meter_t (state.xEstimate);
-                Swerve::resetAlignControllers();
-            } else if (state.reefTag == aprilLime->getTagID()) {
+                Swerve::resetLinearAlignControllers();
+                hasReset = true;
+            }
+            if (state.reefTag == aprilLime->getTagID()) {
                 //unfilteredYDistance = aprilLime->get_botpose_targetspace().X().to<double>();
                 state.yEstimate = Y_FILTER_CONST * state.yEstimate + ((1 - Y_FILTER_CONST) * aprilLime->get_botpose_targetspace().X().to<double>());
                 state.xEstimate = -aprilLime->get_botpose_targetspace().Z().to<double>();
             }
-        } 
+        }
     }
 
     Swerve::yDistance = units::length::meter_t (state.yEstimate); //units::length::meter_t {filter.Calculate(unfilteredYDistance)};
@@ -451,7 +454,7 @@ void Drivetrain::analyzeDashboard()
             Swerve::rotAlign = true;
         }
     } else if (state.alignToTarget) {
-        Swerve::yAlign = units::math::abs(getRotControllerError()) < (units::degree_t) table->GetNumber(
+        Swerve::yAlign = hasReset && units::math::abs(getRotControllerError()) < (units::degree_t) table->GetNumber(
             "Y Controller Activation Degree Threshold",
             Y_ACTIVATION_THRESHOLD.value()
         );
