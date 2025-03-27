@@ -85,11 +85,7 @@ void AprilTagsSensor::applyVisionMeasurement(
     //else distance = 0_m; return;
     double newDoubtX = doubtX + (distance.to<double>() * dp) + (vp * speed.to<double>());
     double newDoubtY = doubtY + (distance.to<double>() * dp) + (vp * speed.to<double>());
-<<<<<<< HEAD
     double newDoubtRot = doubtRot + (distance.to<double>() * dp) + (vp * speed.to<double>()) + (avp * fabs(angular_velocity.value()));
-=======
-    double newDoubtRot = doubtRot + (distance.to<double>() * dp) + (vp * speed.to<double>()) + (avp * std::abs(angular_velocity.value()));
->>>>>>> 252cd3bb (changing to final l2)
 
 
     if (distance >= normalVisionOutlier) return;
@@ -100,11 +96,7 @@ void AprilTagsSensor::applyVisionMeasurement(
         newAngle = currState.ToPose2d().Rotation();
     }
 
-<<<<<<< HEAD
     if (units::math::fabs(angular_velocity) > 1_tps/30.0) {
-=======
-    if (units::math::fabs(angular_velocity) > 1_tps/3.0) {
->>>>>>> 252cd3bb (changing to final l2)
         newDoubtRot = std::numeric_limits<double>::max();
     }
 
