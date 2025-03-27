@@ -329,6 +329,10 @@ public:
             [this] { return getPosition().template to<double>(); },
             nullptr);
         builder.AddDoubleProperty(
+            "Absolute Position",
+            [this] { return getAbsEncoderPosition().template to<double>(); },
+            nullptr);
+        builder.AddDoubleProperty(
             "Speed", 
             [this] { return getSpeed().template to<double>(); },
             nullptr);
