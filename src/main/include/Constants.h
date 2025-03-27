@@ -264,9 +264,9 @@ namespace Constants {
         }}
 
         static units::angle::turn_t getElevatorMagnetOffset() { switch (robot) {
-            case Robot::Alpha: return 0.10327_tr; 
-            case Robot::Gold: return -0.4335937032_tr; //  0.989014_tr;
-            default: return 0.102051_tr;
+            case Robot::Alpha: return 0.10327_tr;
+            case Robot::Gold: return 0.3852538906_tr; //  0.989014_tr;
+            default: return 0.278809_tr;
         }};
 
         static double getElevKAFF() { switch (robot) {
@@ -431,7 +431,7 @@ namespace Constants {
             {20,
                 {
                     {LEFT, 0_cm},
-                    {RIGHT, -1_in},
+                    {RIGHT, 0_in},
                     {NONE, 0_in}
                 }},
             {21,
@@ -443,7 +443,7 @@ namespace Constants {
             {22,
                 {
                     {LEFT, 0_cm},
-                    {RIGHT, -1_in},
+                    {RIGHT, 0_in},
                     {NONE, 0_in}
                 }}
         };
@@ -561,7 +561,7 @@ namespace Constants {
                             GAME_PIECE::CORAL,
                             {
                                 { ELEVATOR_STATE::STOWED, 10_in },
-                                { ELEVATOR_STATE::HP, 3.25_in },
+                                { ELEVATOR_STATE::HP, 3.1_in },
                                 { ELEVATOR_STATE::ONE, 10.2_in },
                                 { ELEVATOR_STATE::TWO, 14.06_in }, //Tomball: 14.1
                                 { ELEVATOR_STATE::THREE, 19.1_in }, //Tomball: 19.5
