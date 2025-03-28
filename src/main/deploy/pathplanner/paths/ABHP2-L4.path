@@ -3,25 +3,25 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 1.2946721311475409,
-        "y": 7.027920081967213
+        "x": 1.6710999517741052,
+        "y": 7.296401620844105
       },
       "prevControl": null,
       "nextControl": {
-        "x": 2.125465920004791,
-        "y": 7.00847050371554
+        "x": 2.2896516393442625,
+        "y": 6.979969262295082
       },
       "isLocked": false,
       "linkedName": "B-HP2"
     },
     {
       "anchor": {
-        "x": 3.375,
-        "y": 5.58
+        "x": 3.4347,
+        "y": 5.58126
       },
       "prevControl": {
-        "x": 2.8530737704918034,
-        "y": 6.248719262295082
+        "x": 2.9127737704918033,
+        "y": 6.249979262295082
       },
       "nextControl": null,
       "isLocked": false,
@@ -31,7 +31,19 @@
   "rotationTargets": [],
   "constraintZones": [],
   "pointTowardsZones": [],
-  "eventMarkers": [],
+  "eventMarkers": [
+    {
+      "name": "LEVEL FOUR POSITION",
+      "waypointRelativePos": 0.9,
+      "endWaypointRelativePos": null,
+      "command": {
+        "type": "named",
+        "data": {
+          "name": "LEVEL FOUR POSITION"
+        }
+      }
+    }
+  ],
   "globalConstraints": {
     "maxVelocity": 4.0,
     "maxAcceleration": 4.0,
@@ -41,7 +53,7 @@
     "unlimited": false
   },
   "goalEndState": {
-    "velocity": 1.0,
+    "velocity": 0.5,
     "rotation": -59.99999999999999
   },
   "reversed": false,

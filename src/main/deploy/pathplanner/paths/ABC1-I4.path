@@ -8,30 +8,47 @@
       },
       "prevControl": null,
       "nextControl": {
-        "x": 6.479405224409344,
-        "y": 6.796726979620904
+        "x": 6.617213114754098,
+        "y": 6.788165983606557
       },
       "isLocked": false,
       "linkedName": "B-C1"
     },
     {
       "anchor": {
-        "x": 5.675643938264817,
-        "y": 5.747933669576025
+        "x": 5.5722,
+        "y": 5.58126
       },
       "prevControl": {
-        "x": 6.131110233601813,
-        "y": 6.461693359958988
+        "x": 5.8053967213114746,
+        "y": 5.8204800819672124
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "B-HI"
+      "linkedName": "B-AI"
     }
   ],
-  "rotationTargets": [],
+  "rotationTargets": [
+    {
+      "waypointRelativePos": 0.5,
+      "rotationDegrees": -119.99999999999999
+    }
+  ],
   "constraintZones": [],
   "pointTowardsZones": [],
-  "eventMarkers": [],
+  "eventMarkers": [
+    {
+      "name": "LEVEL FOUR POSITION",
+      "waypointRelativePos": 0.9,
+      "endWaypointRelativePos": null,
+      "command": {
+        "type": "named",
+        "data": {
+          "name": "LEVEL FOUR POSITION"
+        }
+      }
+    }
+  ],
   "globalConstraints": {
     "maxVelocity": 4.0,
     "maxAcceleration": 4.0,
@@ -41,7 +58,7 @@
     "unlimited": false
   },
   "goalEndState": {
-    "velocity": 0,
+    "velocity": 0.5,
     "rotation": -119.99999999999999
   },
   "reversed": false,

@@ -3,54 +3,48 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 3.709749555,
-        "y": 2.987050938
+        "x": 1.6710999517741052,
+        "y": 7.296401620844105
       },
       "prevControl": null,
       "nextControl": {
-        "x": 3.153999555,
-        "y": 2.1778009380000003
+        "x": 3.104815573770492,
+        "y": 7.23171106557377
       },
       "isLocked": false,
-      "linkedName": "B-C"
+      "linkedName": "B-HP2"
     },
     {
       "anchor": {
-        "x": 1.5656886676574044,
-        "y": 0.747153855250657
+        "x": 5.28025,
+        "y": 5.72626
       },
       "prevControl": {
-        "x": 2.4724386676574044,
-        "y": 1.0104038552506567
+        "x": 6.173538595221547,
+        "y": 6.698386509902813
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "B-HP1"
+      "linkedName": "B-AJ"
     }
   ],
-  "rotationTargets": [],
+  "rotationTargets": [
+    {
+      "waypointRelativePos": 0.5,
+      "rotationDegrees": -119.99999999999999
+    }
+  ],
   "constraintZones": [],
   "pointTowardsZones": [],
   "eventMarkers": [
     {
-      "name": "HP",
-      "waypointRelativePos": 0.02,
+      "name": "LEVEL FOUR POSITION",
+      "waypointRelativePos": 0.8739237392373855,
       "endWaypointRelativePos": null,
       "command": {
         "type": "named",
         "data": {
-          "name": "HP"
-        }
-      }
-    },
-    {
-      "name": "Disable Scorer",
-      "waypointRelativePos": 0.05,
-      "endWaypointRelativePos": null,
-      "command": {
-        "type": "named",
-        "data": {
-          "name": "DISABLE Scorer"
+          "name": "LEVEL FOUR POSITION"
         }
       }
     }
@@ -64,14 +58,14 @@
     "unlimited": false
   },
   "goalEndState": {
-    "velocity": 0,
-    "rotation": 55.0
+    "velocity": 1.0,
+    "rotation": -119.99999999999999
   },
   "reversed": false,
-  "folder": "R-H",
+  "folder": "H-R",
   "idealStartingState": {
     "velocity": 0,
-    "rotation": 59.99999999999999
+    "rotation": -55.0
   },
   "useDefaultConstraints": true
 }

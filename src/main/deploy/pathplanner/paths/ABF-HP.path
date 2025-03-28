@@ -3,16 +3,16 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 3.709749555,
+        "x": 5.297250445,
         "y": 2.987050938
       },
       "prevControl": null,
       "nextControl": {
-        "x": 3.153999555,
-        "y": 2.1778009380000003
+        "x": 4.60605498571419,
+        "y": 2.0838717537605307
       },
       "isLocked": false,
-      "linkedName": "B-C"
+      "linkedName": "B-F"
     },
     {
       "anchor": {
@@ -20,8 +20,8 @@
         "y": 0.747153855250657
       },
       "prevControl": {
-        "x": 2.4724386676574044,
-        "y": 1.0104038552506567
+        "x": 2.6086911266737984,
+        "y": 0.9994739372178701
       },
       "nextControl": null,
       "isLocked": false,
@@ -44,13 +44,13 @@
       }
     },
     {
-      "name": "Disable Scorer",
-      "waypointRelativePos": 0.05,
+      "name": "Intaking",
+      "waypointRelativePos": 0.2,
       "endWaypointRelativePos": null,
       "command": {
         "type": "named",
         "data": {
-          "name": "DISABLE Scorer"
+          "name": "Intaking"
         }
       }
     }
@@ -64,14 +64,14 @@
     "unlimited": false
   },
   "goalEndState": {
-    "velocity": 0,
+    "velocity": 0.0,
     "rotation": 55.0
   },
   "reversed": false,
   "folder": "R-H",
   "idealStartingState": {
-    "velocity": 0,
-    "rotation": 59.99999999999999
+    "velocity": 0.0,
+    "rotation": 119.99999999999999
   },
   "useDefaultConstraints": true
 }

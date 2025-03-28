@@ -3,25 +3,25 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 1.270363018974161,
-        "y": 0.9421440658284428
+        "x": 1.5656886676574044,
+        "y": 0.747153855250657
       },
       "prevControl": null,
       "nextControl": {
-        "x": 2.481454918032787,
-        "y": 1.6094774590163934
+        "x": 2.772669573888388,
+        "y": 1.2753146954085084
       },
       "isLocked": false,
       "linkedName": "B-HP1"
     },
     {
       "anchor": {
-        "x": 3.6599999999999997,
-        "y": 2.3304
+        "x": 3.71574,
+        "y": 2.349736966
       },
       "prevControl": {
-        "x": 2.2656762295081965,
-        "y": 1.477612704918033
+        "x": 3.038423751946232,
+        "y": 1.1765908115789492
       },
       "nextControl": null,
       "isLocked": false,
@@ -34,7 +34,7 @@
   "eventMarkers": [
     {
       "name": "LEVEL FOUR POSITION",
-      "waypointRelativePos": 0.97,
+      "waypointRelativePos": 0.9,
       "endWaypointRelativePos": null,
       "command": {
         "type": "named",
@@ -53,7 +53,7 @@
     "unlimited": false
   },
   "goalEndState": {
-    "velocity": 1.0,
+    "velocity": 0.5,
     "rotation": 59.99999999999999
   },
   "reversed": false,
