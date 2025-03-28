@@ -666,14 +666,15 @@ bool Drivetrain::withinYRange() {
     return yControllerAligned();
 }
 
-bool Drivetrain::isSpeedBelowThreshold() {
+bool Drivetrain::isSpeedBelowThreshold(units::meters_per_second_t m) {
     frc::ChassisSpeeds speeds = getRobotRelativeSpeeds();
     
     units::meters_per_second_t totalSpeed = units::math::hypot(
         speeds.vx, 
         speeds.vy
     );
-    return (totalSpeed < (units::meters_per_second_t) table->GetNumber("Viable Dunk speed", VIABLE_DUNK_SPEED.value()));
+    return (totalSpeed < m);
+    // (units::meters_per_second_t) table->GetNumber("Viable Dunk speed", VIABLE_DUNK_SPEED.value())
 }
 
 bool Drivetrain::isSpeedStopped() {

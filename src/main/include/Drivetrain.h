@@ -175,7 +175,7 @@ public:
      units::meter_t lidarDistance();
      bool withinXRange(units::meter_t);
      bool withinYRange();
-     bool isSpeedBelowThreshold();
+     bool isSpeedBelowThreshold(units::meters_per_second_t m);
      bool isSpeedStopped();
 
 private:
