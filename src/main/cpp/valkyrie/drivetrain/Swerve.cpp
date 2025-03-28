@@ -818,7 +818,7 @@ void Swerve<AzimuthMotor, DriveMotor>::InitSendable(wpi::SendableBuilder& builde
         nullptr
     );
     builder.AddBooleanProperty(
-        "Align: Y Align",
+        "Align: X Align",
         [this] {return xAlign;},
         nullptr
     );

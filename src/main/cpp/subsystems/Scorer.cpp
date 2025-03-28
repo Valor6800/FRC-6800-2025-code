@@ -37,7 +37,6 @@
 #define VIABLE_DUNK_DISTANCE 0.28_m
 #define VIABLE_ELEVATOR_DISTANCE 1.8_m //consider the offset of the canrange from the front of robot which is 8 inches
 #define VIABLE_DUNK_SPEED_L4 1.1_mps
-#define VIABLE_DUNK_SPEED_L3_L2 0.25_mps
 
 #define MIN_DUNK_DISTANCE_OVER_CORAL 11_in
 #define MAX_DUNK_DISTANCE_OVER_CORAL 14.5_in
@@ -582,11 +581,12 @@ void Scorer::analyzeDashboard()
         (state.elevState == TWO || state.elevState == THREE || state.elevState == FOUR)
     ) {
         bool shouldAutoDunk = drivetrain->withinXRange((units::meter_t) table->GetNumber("Viable Dunk Distance (m)", VIABLE_DUNK_DISTANCE.value()));
+        auto autoDunkSpeedThreshold = Constants::Scorer::getAutoDunkSpeedLimitation(drivetrain->xAlign);
         if (shouldAutoDunk) {
             if (state.elevState == FOUR && drivetrain->isSpeedBelowThreshold(VIABLE_DUNK_SPEED_L4)) {
                 state.scoringState = SCORE_STATE::SCORING;
                 return;
-            } else if ((state.elevState == TWO || state.elevState == THREE) && drivetrain->isSpeedBelowThreshold(VIABLE_DUNK_SPEED_L3_L2)) {
+            } else if ((state.elevState == TWO || state.elevState == THREE) && drivetrain->isSpeedBelowThreshold(autoDunkSpeedThreshold)) {
                 state.scoringState = SCORE_STATE::SCORING;
                 return;
             }

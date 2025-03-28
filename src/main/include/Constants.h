@@ -508,6 +508,12 @@ namespace Constants {
             typedef std::unordered_map<ELEVATOR_STATE, units::turns_per_second_t> ScoringSpeedMap;
             typedef std::unordered_map<GAME_PIECE, std::unordered_map<ELEVATOR_STATE, units::meter_t>> PositionMap;
 
+            static units::meters_per_second_t getAutoDunkSpeedLimitation(bool autoDunking) { switch (robot) {
+                case Robot::Alpha: return autoDunking ? 0.25_mps : 0.6_mps ;
+                case Robot::Gold: return autoDunking ? 0.25_mps : 0.6_mps ;
+                default: return autoDunking ? 0.25_mps : 0.6_mps;
+            }}
+
             static ScoringSpeedMap getScoringSpeedMap() { switch (robot) {
                 case Robot::Alpha: return {
                     {ELEVATOR_STATE::ONE, 5_tps},
