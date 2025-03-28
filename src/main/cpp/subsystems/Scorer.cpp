@@ -456,8 +456,8 @@ void Scorer::init()
         state.hasZeroed = true;
         absSensorCorrect = elevatorMotor->getAbsEncoderPosition();
 
-        std::cout << "\nZeored absEncoderPosition: " << absSensorCorrect.value() << std::endl;
-        std::cout << "\nZeroed elevator position(in): " << convertToMechSpace(elevatorMotor->getPosition()).value() << std::endl;
+        /*std::cout << "\nZeored absEncoderPosition: " << absSensorCorrect.value() << std::endl;
+        std::cout << "\nZeroed elevator position(in): " << convertToMechSpace(elevatorMotor->getPosition()).value() << std::endl;*/
     });
 
     // Beambreak debounce sensor (on scoring mechanism)
