@@ -380,7 +380,7 @@ void Drivetrain::analyzeDashboard()
     );
 
     if (!table->GetBoolean("Use World Align", false)){
-       state.yEstimate += Swerve::yControllerInitialVelocity.value() * LOOP_TIME;
+        state.yEstimate += Swerve::yControllerInitialVelocity.value() * LOOP_TIME;
         unfilteredYDistance = Swerve::goalAlign.to<double>(); 
         for(valor::AprilTagsSensor* aprilLime : aprilTagSensors) {
             if (aprilLime->hasTarget() && valor::isReefTag(aprilLime->getTagID())) {
@@ -403,30 +403,16 @@ void Drivetrain::analyzeDashboard()
         Swerve::yDistance = units::length::meter_t (state.yEstimate); //units::length::meter_t {filter.Calculate(unfilteredYDistance)};
         Swerve::xDistance = units::length::meter_t (state.xEstimate); 
     } else {
-        std::pair<int, frc::Pose2d> reefTagPose{ temp.first, temp.second.ToPose2d()};
+        frc::Pose2d reefTagPose{temp.second.ToPose2d()};
 
-        reefTagPose = std::pair<int, frc::Pose2d>{
-            reefTagPose.first,
-            frc::Pose2d{
-                reefTagPose.second.Translation() + frc::Translation2d(17.5482504_m / 2.0, 8.0519016_m / 2.0),
-                reefTagPose.second.Rotation()
-            }
-        };
+        frc::Transform2d reefSpace = reefTransformConversion(reefTagPose);
 
-        state.reefTag = reefTagPose.first;
+        Swerve::yDistance = reefSpace.Y();
+        Swerve::xDistance = reefSpace.X();
 
-        reefPublisher.Set(reefTagPose.second);
-
-        if (state.alignToTarget) {
-            worldFrameAlignment(reefTagPose.second);
-        }
-
-        if (state.alignToTarget && state.alignControllersReset == false){
+        if (!hasReset){
+            Swerve::resetRotationAlignControllers();
             Swerve::resetLinearAlignControllers();
-            state.alignControllersReset = true;
-        }
-        else if (state.alignToTarget == false) {
-            state.alignControllersReset = false;
         }
     }
 
@@ -552,7 +538,7 @@ void Drivetrain::assignOutputs()
     Swerve::assignOutputs();
 }
 
-void Drivetrain::worldFrameAlignment(frc::Pose2d reefTagPose) {
+frc::Transform2d Drivetrain::reefTransformConversion(frc::Pose2d reefTagPose) {
             frc::Transform2d reefTagTransform{
                 reefTagPose.Translation(),
                 reefTagPose.Rotation()
@@ -567,7 +553,7 @@ void Drivetrain::worldFrameAlignment(frc::Pose2d reefTagPose) {
 
             robotInTagSpacePublisher.Set(robotInTagSpaceTransform);
 
-            Swerve::yDistance = robotInTagSpaceTransform.Y();
+            return robotInTagSpaceTransform;
 }
 
 units::meters_per_second_t Drivetrain::getRobotSpeeds(){

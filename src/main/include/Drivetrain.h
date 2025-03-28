@@ -138,7 +138,6 @@ public:
           bool right;
           bool left;
           bool alignToTarget, climberAlign;
-          bool alignControllersReset;
 
           Constants::Scorer::GAME_PIECE gamePiece;
           Constants::Scorer::ELEVATOR_STATE elevState;
@@ -180,7 +179,7 @@ public:
      bool isSpeedBelowThreshold();
      bool isSpeedStopped();
 
-     void worldFrameAlignment(frc::Pose2d reefTagPose);
+    frc::Transform2d reefTransformConversion(frc::Pose2d reefTagPose);
 
 private:
 
