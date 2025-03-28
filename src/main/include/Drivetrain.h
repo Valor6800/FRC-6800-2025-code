@@ -141,7 +141,6 @@ public:
           bool right;
           bool left;
           bool alignToTarget, climberAlign;
-          bool alignControllersReset;
 
           Constants::Scorer::GAME_PIECE gamePiece;
           Constants::Scorer::ELEVATOR_STATE elevState;
@@ -186,7 +185,7 @@ public:
      units::degrees_per_second_t getYawVelocity();
 
      std::bitset<5> getAutoDunkAcceptance();
-     void worldFrameAlignment(frc::Pose2d reefTagPose);
+     frc::Transform2d reefTransformConversion(frc::Pose2d reefTagPose);
 
 private:
 

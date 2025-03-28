@@ -507,8 +507,19 @@ void Drivetrain::analyzeDashboard()
         }
 
     } else {
-        if (state.alignToTarget) {
-            worldFrameAlignment(reefTagPose);
+        frc::Pose2d reefTagPose{temp.second.ToPose2d()};
+
+        frc::Transform2d reefSpace = reefTransformConversion(reefTagPose);
+
+        Swerve::yDistance = reefSpace.Y();
+        Swerve::xDistance = reefSpace.X();
+
+        if (!hasXReset || !hasYReset){
+            Swerve::resetRotationAlignControllers();
+            Swerve::resetXAlignControllers();
+            Swerve::resetYAlignControllers();
+            hasXReset = true;
+            hasYReset = true;
         }
     }
 
@@ -564,7 +575,7 @@ void Drivetrain::assignOutputs()
     };
 }
 
-void Drivetrain::worldFrameAlignment(frc::Pose2d reefTagPose) {
+frc::Transform2d Drivetrain::reefTransformConversion(frc::Pose2d reefTagPose) {
             frc::Transform2d reefTagTransform{
                 reefTagPose.Translation(),
                 reefTagPose.Rotation()
@@ -579,8 +590,7 @@ void Drivetrain::worldFrameAlignment(frc::Pose2d reefTagPose) {
 
             robotInTagSpacePublisher.Set(robotInTagSpaceTransform);
 
-            Swerve::yDistance = robotInTagSpaceTransform.Y();
-            Swerve::xDistance = robotInTagSpaceTransform.X();
+            return robotInTagSpaceTransform;
 }
 
 units::meters_per_second_t Drivetrain::getRobotSpeeds(){
