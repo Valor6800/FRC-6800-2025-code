@@ -17,9 +17,9 @@
 #define ELEVATOR_SENSOR_TO_MECH 1.0f
 
 #define CORAL_INTAKE_SPEED 20_tps //5
-#define ALGEE_INTAKE_SPEED 15_tps
+#define ALGEE_INTAKE_SPEED 35_tps
 #define SCORE_SPEED 20_tps
-#define ALGEE_SCORE_SPEED -11.5_tps
+#define ALGEE_SCORE_SPEED -20_tps
 #define ALGEE_HOLD_SPD 0.25_tps
 
 #define ELEVATOR_FORWARD_LIMIT 6_tr
