@@ -61,7 +61,7 @@ public:
     frc::Pose2d getRawPose();
     frc::Pose2d getCalculatedPose();
 
-    void setupGyro(int, const char*, units::degree_t, units::degree_t, units::degree_t);
+    void setupGyro(int, std::string, units::degree_t, units::degree_t, units::degree_t);
     void resetGyro();
     frc::Rotation2d getGyro();
 
