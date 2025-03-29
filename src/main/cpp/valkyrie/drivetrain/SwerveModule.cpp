@@ -1,5 +1,6 @@
 #include "valkyrie/drivetrain/SwerveModule.h"
 #include "valkyrie/controllers/PhoenixController.h"
+#include "valkyrie/controllers/NeoController.h"
 #include "Constants.h"
 #include <fstream>
 #include <stdio.h>
@@ -18,6 +19,8 @@ using namespace valor;
 // Explicit template instantiation
 // This is needed for linking
 template class valor::SwerveModule<valor::PhoenixController<>, valor::PhoenixController<>>;
+// Uncomment for Sideswipe
+// template class valor::SwerveModule<valor::NeoController, valor::NeoController>;
 
 template<class AzimuthMotor, class DriveMotor>
 SwerveModule<AzimuthMotor, DriveMotor>::SwerveModule(AzimuthMotor* _azimuthMotor,
@@ -170,6 +173,7 @@ void SwerveModule<AzimuthMotor, DriveMotor>::setDriveClosedLoop(units::meters_pe
 template<class AzimuthMotor, class DriveMotor>
 void SwerveModule<AzimuthMotor, DriveMotor>::setUpdateFrequency(units::frequency::hertz_t freq)
 {
+    // Comment out for Sideswipe
     azimuthMotor->setPositionUpdateFrequency(freq);
     azimuthMotor->setSpeedUpdateFrequency(freq);
     driveMotor->setPositionUpdateFrequency(freq);

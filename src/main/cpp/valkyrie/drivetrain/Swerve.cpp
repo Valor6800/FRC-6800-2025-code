@@ -12,6 +12,7 @@
 #include "units/velocity.h"
 #include "valkyrie/controllers/PIDF.h"
 #include "valkyrie/controllers/PhoenixController.h"
+#include "valkyrie/controllers/NeoController.h"
 #include "wpi/sendable/SendableRegistry.h"
 #include <cmath>
 #include <iostream>
@@ -53,6 +54,8 @@ using namespace valor;
 // Explicit template instantiation
 // This is needed for linking
 template class valor::Swerve<valor::PhoenixController<>, valor::PhoenixController<>>;
+// Uncomment for Sideswipe
+// template class valor::Swerve<valor::NeoController, valor::NeoController>;
 
 template<class AzimuthMotor, class DriveMotor>
 Swerve<AzimuthMotor, DriveMotor>::Swerve(frc::TimedRobot *_robot,
@@ -80,7 +83,6 @@ Swerve<AzimuthMotor, DriveMotor>::Swerve(frc::TimedRobot *_robot,
             _wheelDiameter
         ));
     }
-
 
     rot_controller.SetTolerance(rotPosTolerance, rotVelTolerance);
     y_controller.SetTolerance(yPosTolerance, yVelTolerance);
@@ -512,7 +514,7 @@ void  Swerve<AzimuthMotor, DriveMotor>::calculateCarpetPose()
 template<class AzimuthMotor, class DriveMotor>
 void Swerve<AzimuthMotor, DriveMotor>::setupGyro(
     int _pigeonCanID,
-    const char* _pigeonCanBus,
+    std::string _pigeonCanBus,
     units::degree_t mountRoll,
     units::degree_t mountPitch,
     units::degree_t mountYaw
