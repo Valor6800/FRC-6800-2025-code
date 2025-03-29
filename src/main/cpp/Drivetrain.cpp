@@ -55,8 +55,6 @@ const units::meter_t WHEEL_DIAMETER(0.0973_m);
 
 #define X_TIME 214.85f
 
-#define PIGEON_CAN_BUS "baseCAN" //phoenix
-
 #define VISION_ACCEPTANCE 3.5_m // meters
 
 // 135 - TELEOP_MAX_TIME - TIME_TO_RUMBLE = Time at which rumble starts
@@ -180,7 +178,7 @@ Drivetrain::Drivetrain(frc::TimedRobot *_robot, valor::CANdleSensor* _leds) :
 
     setupGyro(
         CANIDs::PIGEON_CAN,
-        PIGEON_CAN_BUS,
+        Constants::drivesCANBus(),
         Constants::pigeonMountRoll(),
         Constants::pigeonMountPitch(),
         Constants::pigeonMountYaw()
@@ -235,47 +233,59 @@ std::vector<std::pair<SwerveAzimuthMotor*, SwerveDriveMotor*>> Drivetrain::gener
 {
     std::vector<std::pair<SwerveAzimuthMotor*, SwerveDriveMotor*>> modules;
 
-    valor::PIDF azimuthPID;
-    azimuthPID.maxVelocity = Constants::azimuthKVel();
-    azimuthPID.maxAcceleration = Constants::azimuthKAcc();
-    azimuthPID.P = Constants::azimuthKP();
-    azimuthPID.error = 0.0027_tr;
+    valor::PIDF azimuthPID = Constants::azimuthPIDF();
 
-    valor::PIDF drivePID;
+    valor::PIDF drivePID = Constants::drivePIDF();
     drivePID.setMaxVelocity(Constants::driveKVel(), WHEEL_DIAMETER);
     drivePID.setMaxAcceleration(Constants::driveKAcc(), WHEEL_DIAMETER);
-    drivePID.P = Constants::driveKP();
-    drivePID.D = Constants::driveKD();
-    drivePID.kV = 0.90;
-    drivePID.error = 0.0027_tr;
 
     for (size_t i = 0; i < 4; i++) {
+        // Comment out below for Sideswipe
         SwerveAzimuthMotor* azimuthMotor = new SwerveAzimuthMotor(
             Constants::getAzimuthMotorType(),
             CANIDs::AZIMUTH_CANS[i],
             valor::NeutralMode::Brake,
             Constants::swerveAzimuthsReversals()[i],
-            PIGEON_CAN_BUS
-            
+            Constants::drivesCANBus()
         );
-        azimuthMotor->setGearRatios(Constants::azimuthGearRatio(), 1.0);
-        azimuthMotor->setPIDF(azimuthPID, 0);
         azimuthMotor->enableFOC(true);
-        azimuthMotor->setupCANCoder(CANIDs::CANCODER_CANS[i], Constants::swerveZeros()[i], false, PIGEON_CAN_BUS);
+        // Uncomment out below for Sideswipe
+        // SwerveAzimuthMotor *azimuthMotor = new SwerveAzimuthMotor(
+        //     valor::NeoControllerType::NEO,
+        //     CANIDs::AZIMUTH_CANS[i],
+        //     valor::NeutralMode::Brake,
+        //     Constants::swerveAzimuthsReversals()[i]
+        // );
+        // azimuthMotor->setCurrentLimits(20_A, 0_A, 0_A, 0_s);
+        // =================================
+        azimuthMotor->setGearRatios(Constants::azimuthGearRatio(), 1.0);
+        azimuthMotor->setPIDF(azimuthPID);
+        azimuthMotor->setupCANCoder(CANIDs::CANCODER_CANS[i], Constants::swerveZeros()[i], false, Constants::drivesCANBus());
         azimuthMotor->setContinuousWrap(true);
         azimuthMotor->applyConfig();
 
-        SwerveAzimuthMotor* driveMotor = new SwerveDriveMotor(
+        // Comment out below for Sideswipe
+        SwerveDriveMotor* driveMotor = new SwerveDriveMotor(
             valor::PhoenixControllerType::KRAKEN_X60_FOC,
             CANIDs::DRIVE_CANS[i],
             valor::NeutralMode::Coast,
             Constants::swerveDrivesReversals()[i],
-            PIGEON_CAN_BUS
+            Constants::drivesCANBus()
         );
-        driveMotor->setGearRatios(1.0, Constants::driveGearRatio());
-        driveMotor->setPIDF(drivePID, 0);
         driveMotor->enableFOC(true);
         driveMotor->setOpenLoopRamp(1_s);
+
+        // Uncomment below for Sideswipe
+        // SwerveDriveMotor *driveMotor = new SwerveDriveMotor(
+        //     valor::NeoControllerType::NEO,
+        //     CANIDs::DRIVE_CANS[i],
+        //     valor::NeutralMode::Coast,
+        //     Constants::swerveDrivesReversals()[i]
+        // );
+        // driveMotor->setCurrentLimits(40_A, 0_A, 0_A, 0_s);
+        // =============================
+        driveMotor->setGearRatios(1.0, Constants::driveGearRatio());
+        driveMotor->setPIDF(drivePID, 0);
         driveMotor->applyConfig();
 
         modules.push_back(std::make_pair(azimuthMotor, driveMotor));

@@ -1,11 +1,7 @@
 #pragma once
-
-#include "valkyrie/controllers/BaseController.h"
-#include <string>
+#include <valkyrie/controllers/BaseController.h>
 #include <rev/SparkMax.h>
-#include <rev/AbsoluteEncoder.h>
-#include <rev/RelativeEncoder.h>
-#include <rev/config/ClosedLoopConfig.h>
+#include <units/angular_velocity.h>
 
 const units::revolutions_per_minute_t FREE_SPD_NEO_550(11000);
 const units::revolutions_per_minute_t FREE_SPD_NEO(5676);
@@ -20,7 +16,7 @@ enum NeoControllerType {
 class NeoController : public BaseController<rev::spark::SparkMax>
 {
 public:
-    NeoController(valor::NeoControllerType, int _canID, valor::NeutralMode _mode, bool _inverted, std::string _canbus = "");
+    NeoController(valor::NeoControllerType, int _canID, valor::NeutralMode _mode, bool _inverted);
 
     static units::revolutions_per_minute_t getNeoControllerMotorSpeed(NeoControllerType controllerType)
     {
@@ -32,45 +28,53 @@ public:
         }
     }
 
-    void init() override;
+    void applyConfig();
 
-    void applyConfig() override;
+    void init();
 
-    void reset() override;
-    void setNeutralMode(valor::NeutralMode mode, bool saveImmediately = false) override;
-    
-    void setCurrentLimits(units::ampere_t statorCurrentLimit, units::ampere_t supplyCurrentLimit, units::ampere_t supplyCurrentThreshold, units::second_t supplyTimeThreshold, bool saveImmediately = false) override;
+    void reset();
 
-    units::turn_t getPosition() override;
-    units::turns_per_second_t getSpeed() override;
-    units::ampere_t getCurrent() override;
+    units::turn_t getPosition();
 
-    void setEncoderPosition(units::turn_t position) override;
-    
-    void setPosition(units::turn_t, int) override;
-    void setSpeed(units::turns_per_second_t, int) override;
+    units::ampere_t getCurrent();
+
+    units::turns_per_second_t getSpeed();
+
+    void setEncoderPosition(units::turn_t);
+
+    void setPosition(units::turn_t position, int slot = 0);
+
+    void setSpeed(units::turns_per_second_t speed, int slot = 0);
+
+    void setupFollower(int canID, bool followerInverted = false);
+
+    void setPIDF(valor::PIDF pidf, int slot = 0, bool saveImmediately = false);
+
+    void setForwardLimit(units::turn_t, bool saveImmediately = false);
+
+    void setReverseLimit(units::turn_t, bool saveImmediately = false);
+
+    void setGearRatios(double rotorToSensor, double sensorToMech, bool saveImmediately = false);
+
+    void setCurrentLimits(units::ampere_t statorCurrentLimit, units::ampere_t supplyCurrentLimit, units::ampere_t supplyCurrentThreshold, units::second_t supplyTimeThreshold, bool saveImmediately = false);
+
+    void setNeutralMode(valor::NeutralMode mode, bool saveImmediately = false);
+
+    void setOpenLoopRamp(units::second_t time, bool saveImmediately = false);
+
+    void InitSendable(wpi::SendableBuilder&);
+
+    units::turn_t getAbsEncoderPosition();
+
+    void setupCANCoder(int, units::turn_t, bool, std::string = "", units::turn_t = 1_tr, bool = false);
+    ctre::phoenix6::hardware::CANcoder *getCANCoder() { return nullptr; }
+
+    void setContinuousWrap(bool continuousWrap, bool saveImmediately = false);
+
     void setPower(units::volt_t);
 
-    void setupFollower(int, bool = false) override;
-    
-    void setPIDF(valor::PIDF pidf, int slot, bool saveImmediately = false) override;
-
-    void setForwardLimit(units::turn_t forward, bool saveImmediately = false) override;
-    void setReverseLimit(units::turn_t reverse, bool saveImmediately = false) override;
-    
-    void setGearRatios(double, double, bool saveImmediately = false) override;
-
-    void setupCANCoder(int deviceId, units::turn_t offset, bool clockwise, std::string canbus = "", units::turn_t absoluteRange=1_tr, bool saveImmediately = false) override;
-    ctre::phoenix6::hardware::CANcoder *getCANCoder() override;
-    
-    void setOpenLoopRamp(units::second_t time, bool saveImmediately = false) override;
-
-    void InitSendable(wpi::SendableBuilder& builder) override;
-
 private:
+    rev::spark::SparkBaseConfig config;
     valor::PIDF pidf;
-    int currentProfile;
-    ctre::phoenix6::hardware::CANcoder *cancoder;
-    rev::spark::SparkClosedLoopController pidController;
 };
 }

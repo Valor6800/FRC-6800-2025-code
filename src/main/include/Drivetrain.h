@@ -15,6 +15,7 @@
 #include <vector>
 
 #include "valkyrie/controllers/PhoenixController.h"
+#include "valkyrie/controllers/NeoController.h"
 #include "valkyrie/controllers/PIDF.h"
 #include "valkyrie/drivetrain/Swerve.h"
 
@@ -64,7 +65,10 @@
  * * valor::PhoenixController
  * * valor::NeoController
  */
+// Comment for Sideswipe
 typedef valor::PhoenixController<> SwerveDriveMotor;
+// Uncomment below for Sideswipe
+// typedef valor::NeoController SwerveDriveMotor;
 
 /**
  * @brief Quick way to select the azimuth motor controller
@@ -72,7 +76,10 @@ typedef valor::PhoenixController<> SwerveDriveMotor;
  * * valor::PhoenixController
  * * valor::NeoController
  */
+// Comment for Sideswipe
 typedef valor::PhoenixController<> SwerveAzimuthMotor;
+// Uncomment for Sideswipe
+// typedef valor::NeoController SwerveAzimuthMotor;
 
 /**
  * @brief Subsystem - Drivetrain
