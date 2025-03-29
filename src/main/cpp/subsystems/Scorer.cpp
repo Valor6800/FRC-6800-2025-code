@@ -603,9 +603,9 @@ void Scorer::analyzeDashboard()
     }
 
     int botColor = state.gamePiece == GAME_PIECE::CORAL ? valor::CANdleSensor::VALOR_GOLD : valor::CANdleSensor::VALOR_PURPLE;
-    int midTopColor = state.scoringState == SCORE_STATE::SCORING ? valor::CANdleSensor::GREEN :
+    int midTopColor = state.scoringState == SCORE_STATE::SCORING ? valor::CANdleSensor::BLUE :
         (drivetrain->state.alignToTarget ? valor::CANdleSensor::RED : 
-        (scorerStagingSensor.isTriggered() && state.gamePiece == GAME_PIECE::CORAL ? valor::CANdleSensor::BLUE : valor::CANdleSensor::OFF));
+        (scorerStagingSensor.isTriggered() && state.gamePiece == GAME_PIECE::CORAL ? valor::CANdleSensor::GREEN : valor::CANdleSensor::OFF));
 
     if (!frc::DriverStation::IsTestEnabled()) {
         leds->setColor(0, botColor, valor::CANdleSensor::Priority::PRIORITY_SCORER);
