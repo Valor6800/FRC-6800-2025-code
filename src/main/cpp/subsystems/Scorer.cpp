@@ -44,8 +44,9 @@
 
 using namespace Constants::Scorer;
 
-Scorer::Scorer(frc::TimedRobot *_robot, Drivetrain *_drivetrain, valor::CANdleSensor* _leds) :
+Scorer::Scorer(frc::TimedRobot* _robot, Drivetrain* _drivetrain, valor::CANdleSensor* _leds, Climber* _climber) :
     valor::BaseSubsystem(_robot, "Scorer"),
+    climber(_climber),
     hallEffectDebounceSensor(_robot, "HallEffectDebounce"),
     candi(CANIDs::HALL_EFFECT, "baseCAN"),
     elevatorMotor(new valor::PhoenixController(valor::PhoenixControllerType::KRAKEN_X60, CANIDs::ELEV_WHEEL, valor::NeutralMode::Brake, elevatorMotorInverted(), "baseCAN")),
@@ -528,8 +529,7 @@ void Scorer::assessInputs()
         state.scopedState = SCOPED;
     } else {
         state.scopedState = UNSCOPED;
-    }
-
+    } 
 
     if (driverGamepad->GetRightBumperButton()) {
         state.scoringState = SCORE_STATE::SCORING;
@@ -673,20 +673,24 @@ void Scorer::assignOutputs()
         elevatorMotor->setPosition(targetRotations);
     }
 
-  // Scorer State Machine
-if (state.scoringState == SCORE_STATE::SCORING) {
-    if (state.gamePiece == GAME_PIECE::ALGEE) {
-        scorerMotor->setSpeed(ALGEE_SCORE_SPEED);
-    } else if (!state.protectChin) {
-        auto it = scoringSpeedMap.find(state.elevState);
-        if (it != scoringSpeedMap.end()) {
-            scorerMotor->setSpeed(it->second);
+
+// Scorer State Machine
+
+    if (climber && climber->state.climbState == Climber::CLIMB_STATE::DEPLOYED) {
+        scorerMotor->setSpeed(0_tps);  // Disable scoring entirely
+    } else if (state.scoringState == SCORE_STATE::SCORING) {
+        if (state.gamePiece == GAME_PIECE::ALGEE) {
+            scorerMotor->setSpeed(ALGEE_SCORE_SPEED);
+        } else if (!state.protectChin) {
+            auto it = scoringSpeedMap.find(state.elevState);
+            if (it != scoringSpeedMap.end()) {
+                scorerMotor->setSpeed(it->second);
+            } else {
+                scorerMotor->setSpeed(SCORE_SPEED);
+            }
         } else {
-            scorerMotor->setSpeed(SCORE_SPEED);
+            scorerMotor->setSpeed(0_tps);
         }
-    } else {
-        scorerMotor->setSpeed(0_tps);
-    }
     } else if (state.hasAlgae && state.gamePiece == GAME_PIECE::ALGEE) {
         scorerMotor->setSpeed(ALGEE_HOLD_SPD);
     } else if (!scorerStagingSensor.isTriggered()) {
@@ -698,8 +702,8 @@ if (state.scoringState == SCORE_STATE::SCORING) {
     } else {
         scorerMotor->setPosition(getIntakeTurns());
     }
-}
 
+}
 
 
 void Scorer::InitSendable(wpi::SendableBuilder& builder)

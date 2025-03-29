@@ -17,7 +17,7 @@
 Robot::Robot() :
     leds{this, LEDConstants::LED_COUNT, LEDConstants::LED_SEGMENTS, CANIDs::CANDLE},
     drivetrain(this, &leds),
-    scorer(this, &drivetrain, &leds),
+    scorer(this, &drivetrain, &leds, &climber),
     climber(this, &leds),
     valorAuto()
 {

@@ -3,6 +3,7 @@
 #include "valkyrie/BaseSubsystem.h"
 #include "valkyrie/controllers/PhoenixController.h"
 #include "Constants.h"
+#include "Climber.h"
 #include <vector>
 #include "valkyrie/sensors/GrappleSensor.h"
 #include "valkyrie/sensors/CANRangeSensor.h"
@@ -25,11 +26,13 @@
 #include <networktables/StructTopic.h>
 #include <frc2/command/FunctionalCommand.h>
 
+
 class Scorer : public valor::BaseSubsystem
 {
 public:
 
-    Scorer(frc::TimedRobot *robot, Drivetrain *drivetrain, valor::CANdleSensor*);
+    Scorer(frc::TimedRobot *_robot, Drivetrain *_drivetrain, valor::CANdleSensor* _leds, Climber* _climber);
+
     
     void resetState();
      
@@ -77,6 +80,8 @@ public:
     } state;
 
 private:
+    Climber* climber;
+
     frc2::CommandPtr scorerPitSequenceStage(Constants::Scorer::GAME_PIECE, Constants::Scorer::ELEVATOR_STATE);
     
     units::meter_t convertToMechSpace(units::turn_t turns);
