@@ -607,12 +607,12 @@ void Scorer::analyzeDashboard()
         midColor = topColor;
     }
 
-    leds->setColor(0, botColor);
-    leds->setColor(1, midColor);
-    leds->setColor(2, topColor);
-    leds->setColor(3, topColor);
-    leds->setColor(4, midColor);
-    leds->setColor(5, botColor);
+    leds->setColor(0, botColor, valor::CANdleSensor::Priority::PRIORITY_SCORER);
+    leds->setColor(1, midColor, valor::CANdleSensor::Priority::PRIORITY_SCORER);
+    leds->setColor(2, topColor, valor::CANdleSensor::Priority::PRIORITY_SCORER);
+    leds->setColor(3, topColor, valor::CANdleSensor::Priority::PRIORITY_SCORER);
+    leds->setColor(4, midColor, valor::CANdleSensor::Priority::PRIORITY_SCORER);
+    leds->setColor(5, botColor, valor::CANdleSensor::Priority::PRIORITY_SCORER);
 
     state.algaeSpikeCurrent = table->GetNumber("Algae Spike Setpoint", 30);
     drivetrain->setGamePieceInRobot(state.gamePiece);
