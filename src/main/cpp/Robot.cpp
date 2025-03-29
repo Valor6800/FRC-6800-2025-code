@@ -68,6 +68,13 @@ void Robot::RobotInit() {
 void Robot::RobotPeriodic() {
     frc::SmartDashboard::PutNumber("Battery Voltage", frc::RobotController::GetBatteryVoltage().value());
     frc2::CommandScheduler::GetInstance().Run(); 
+
+    if (frc::DriverStation::IsDSAttached()) {
+        leds.setColorAll(valor::CANdleSensor::GREEN, valor::CANdleSensor::PRIORITY_DS);
+    } else {
+        leds.setColorAll(valor::CANdleSensor::RED, valor::CANdleSensor::PRIORITY_DS);
+        
+    }
 }
 
 /**
