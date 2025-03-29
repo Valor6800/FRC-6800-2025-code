@@ -1,8 +1,7 @@
 #include "valkyrie/sensors/CANRangeSensor.h"
-
 using namespace valor;
 
-CANrangeSensor::CANrangeSensor(frc::TimedRobot *_robot, const char *name, int deviceId, std::string canbus) :
+CANrangeSensor::CANrangeSensor(frc::TimedRobot *_robot, const char *name, int deviceId, std::string canbus, units::millimeter_t defaultDistance) :
     LaserProximitySensor<units::millimeter_t>(_robot, name),
     device(new ctre::phoenix6::hardware::CANrange(deviceId, canbus))
 {
@@ -15,18 +14,23 @@ CANrangeSensor::CANrangeSensor(frc::TimedRobot *_robot, const char *name, int de
     config.FovParams.FOVRangeX = 15_deg;
     config.FovParams.FOVRangeY = 15_deg;
     device->GetConfigurator().Apply(config);
+    this->defaultDistance = defaultDistance;
 
     LaserProximitySensor<units::millimeter_t>::setGetter(
         [this] () {
             units::millimeter_t measurement = device->GetDistance().GetValue();
-            if(!isFaulting()){
+            if(!isFaulting() && isConnected()){
                 return measurement;
             }
-            return -1_mm;
+            return this->defaultDistance;
         }
     );
 
     reset();
+}
+
+units::millimeter_t valor::CANrangeSensor::getDefaultDistance(){
+    return this->defaultDistance;
 }
 
 bool valor::CANrangeSensor::isConnected() {

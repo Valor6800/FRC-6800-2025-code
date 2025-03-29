@@ -106,6 +106,9 @@ const units::meter_t WHEEL_DIAMETER(0.0973_m);
 #define FIELD_LENGTH 17.5482504_m
 #define FIELD_WIDTH 8.0519016_m 
 
+#define VIABLE_DUNK_DISTANCE 0.28_m
+#define VIABLE_ELEVATOR_DISTANCE 1.2_m
+
 Drivetrain::Drivetrain(frc::TimedRobot *_robot, valor::CANdleSensor* _leds) : 
     valor::Swerve<SwerveAzimuthMotor, SwerveDriveMotor>(
         _robot,
@@ -115,8 +118,8 @@ Drivetrain::Drivetrain(frc::TimedRobot *_robot, valor::CANdleSensor* _leds) :
         WHEEL_DIAMETER
     ),
     teleopStart(999999999999),
-    leftDistanceSensor(_robot, "LEFT Front Distance Sensor", CANIDs::LEFT_CAN_RANGE_DRIVETRAIN_SENSOR, ""),
-    rightdistanceSensor(_robot, "RIGHT FRONT Distance Sensor", CANIDs::RIGHT_CAN_RANGE_DRIVETRAIN_SENSOR, ""),
+    leftDistanceSensor(_robot, "LEFT Front Distance Sensor", CANIDs::LEFT_CAN_RANGE_DRIVETRAIN_SENSOR, "", VIABLE_ELEVATOR_DISTANCE - 1_mm ),
+    rightdistanceSensor(_robot, "RIGHT FRONT Distance Sensor", CANIDs::RIGHT_CAN_RANGE_DRIVETRAIN_SENSOR, "", VIABLE_ELEVATOR_DISTANCE - 1_mm),
     leds(_leds)
 {
     xPIDF.P = KPX;
@@ -663,6 +666,10 @@ units::meter_t Drivetrain::lidarDistance() {
     bool leftConnected = leftDistanceSensor.isConnected();
     bool rightConnected = rightdistanceSensor.isConnected();
 
+    if (!rightConnected && !leftConnected){
+        return leftDistanceSensor.getDefaultDistance();
+    }
+
     if (state.dir == LEFT) {
         if (!rightConnected) {
             return leftDistanceSensor.getFilteredDistance();
@@ -775,6 +782,12 @@ void Drivetrain::InitSendable(wpi::SendableBuilder& builder)
         builder.AddBooleanProperty(
             "Aligned",
             [this] {return state.aligned;},
+            nullptr
+        );
+
+        builder.AddDoubleProperty(
+            "Lidar Distance",
+            [this] {return lidarDistance().value();},
             nullptr
         );
         builder.AddBooleanProperty(
