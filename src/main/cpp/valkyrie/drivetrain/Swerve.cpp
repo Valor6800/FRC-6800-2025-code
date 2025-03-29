@@ -95,6 +95,7 @@ Swerve<AzimuthMotor, DriveMotor>::Swerve(frc::TimedRobot *_robot,
     robotVelocitiesPublisher = nt::NetworkTableInstance::GetDefault().GetStructTopic<frc::ChassisSpeeds>("LiveWindow/BaseSubsystem/SwerveDrive/Robot Velocities").Publish();
     table->PutBoolean("Toast", false);
     table->PutNumber("Y_KAFF", Y_KAFF);
+    table->PutNumber("X_KAFF", X_KFF);
     RobotConfig config = RobotConfig::fromGUISettings();
 
     /*setpointGenerator = SwerveSetpointGenerator(config, 9.4_rad_per_s);
@@ -236,10 +237,17 @@ void Swerve<AzimuthMotor, DriveMotor>::analyzeDashboard()
         yAlignPID.D = table->GetNumber("Y_KD", Y_KD);
         yAlignPID.aFF = table->GetNumber("Y_KAFF", Y_KAFF);
 
+        valor::PIDF xAlignPID;
+        xAlignPID.P = table->GetNumber("X_KP", X_KP);
+        xAlignPID.D = table->GetNumber("X_KD", X_KD);
+        xAlignPID.aFF = table->GetNumber("X_KAFF", X_KFF);
+
         relativeToTagSpeed = (units::meters_per_second_t) (
             - yAlignPID.P * (yDistance - y_controller.GetSetpoint().position).value() - yAlignPID.D * (yControllerInitialVelocity - y_controller.GetSetpoint().velocity).value() + yAlignPID.aFF * y_controller.GetSetpoint().velocity.value()
         );
-        relativeToTagXSpeed = units::meters_per_second_t{calculated_x_controller_val} + (X_KFF * x_controller.GetSetpoint().velocity);
+        relativeToTagXSpeed = (units::meters_per_second_t) (
+            - xAlignPID.P * (xDistance - x_controller.GetSetpoint().position).value() - xAlignPID.D * (xControllerInitialVelocity - x_controller.GetSetpoint().velocity).value() + xAlignPID.aFF * x_controller.GetSetpoint().velocity.value()
+        );
 
         yAlignVector = MAKE_VECTOR(targetAngle - 90_deg) * relativeToTagSpeed.value();
         if (dumbAutoAlign) {
