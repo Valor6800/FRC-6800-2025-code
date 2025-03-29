@@ -265,14 +265,8 @@ namespace Constants {
 
         static units::angle::turn_t getElevatorMagnetOffset() { switch (robot) {
             case Robot::Alpha: return 0.10327_tr;
-            case Robot::Gold: return 0.6389155469_tr; //  0.989014_tr;
+            case Robot::Gold: return 0.6523442188_tr; //  0.989014_tr;
             default: return -0.303710_tr;
-        }};
-
-        static double getElevKAFF() { switch (robot) {
-            case Robot::Alpha: return 0.5;
-            case Robot::Gold: return 0.72;
-            default: return 0.72;
         }};
 
         static frc::Pose3d mintCameraPosition(){ switch (robot) {
