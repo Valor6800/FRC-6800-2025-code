@@ -564,9 +564,8 @@ frc2::CommandPtr Drivetrain::pitSequenceCommand(const frc::ChassisSpeeds& speeds
                 testModeDesiredStates[i].speed = 0_mps;
 
             for (int i = 0; i < numLeds; i++) {
-                // RED -> GREEN
-                leds->setLED(8 + offset + i, valor::CANdleSensor::RED);
-                leds->setLED(LEDConstants::LED_COUNT - offset - i, valor::CANdleSensor::RED);
+                leds->setLED(8 + offset + i, valor::CANdleSensor::GREEN);
+                leds->setLED(LEDConstants::LED_COUNT - offset - i, valor::CANdleSensor::GREEN);
             }
         }),
         frc2::cmd::Wait(1_s)

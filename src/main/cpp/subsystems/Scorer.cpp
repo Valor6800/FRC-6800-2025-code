@@ -320,7 +320,7 @@ frc2::CommandPtr Scorer::scorerPitSequenceStage(GAME_PIECE gamePiece, ELEVATOR_S
                 elevatorPositionFail.Set(!elevatorPositionSuccess.Get());
             },
             [this, offset, numLeds](bool) {
-                int color = elevatorPositionSuccess.Get() ? valor::CANdleSensor::RED : valor::CANdleSensor::GREEN;
+                int color = elevatorPositionSuccess.Get() ? valor::CANdleSensor::GREEN : valor::CANdleSensor::RED;
                 for (int i = 0; i < numLeds; i++) {
                     leds->setLED(8 + offset + i, color);
                     leds->setLED(LEDConstants::LED_COUNT - offset - i, color);

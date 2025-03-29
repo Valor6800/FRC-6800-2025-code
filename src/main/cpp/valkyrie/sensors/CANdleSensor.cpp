@@ -94,15 +94,24 @@ void CANdleSensor::setLED(int led, RGBColor rgb) {
         rgb.red *= 0.4;
         rgb.green *= 0.4;
         rgb.blue *= 0.4;
+        candle.SetLEDs(
+            rgb.red,
+            rgb.green,
+            rgb.blue,
+            0,
+            led,
+            1
+        );
+    } else {
+        candle.SetLEDs(
+            rgb.green,
+            rgb.red,
+            rgb.blue,
+            0,
+            led,
+            1
+        );
     }
-    candle.SetLEDs(
-        rgb.red,
-        rgb.green,
-        rgb.blue,
-        0,
-        led,
-        1
-    );
 }
 
 void CANdleSensor::setLED(int led, int color) {
