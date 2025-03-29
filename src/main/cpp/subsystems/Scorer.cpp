@@ -293,7 +293,7 @@ Scorer::Scorer(frc::TimedRobot *_robot, Drivetrain *_drivetrain, valor::CANdleSe
     visualizerStage3 = nt::NetworkTableInstance::GetDefault().GetStructTopic<frc::Pose3d>("LiveWindow/BaseSubsystem/Scorer/Stage3Height").Publish();
 }
 
-frc2::CommandPtr Scorer::scorerPitSequenceStage(GAME_PIECE gamePiece, ELEVATOR_STATE elevState) {
+frc2::CommandPtr Scorer::scorerPitSequenceStage(GAME_PIECE gamePiece, ELEVATOR_STATE elevState, int offset, int numLeds) {
     return frc2::cmd::Deadline(
         frc2::cmd::Wait(3_s),
         frc2::FunctionalCommand{
@@ -319,7 +319,12 @@ frc2::CommandPtr Scorer::scorerPitSequenceStage(GAME_PIECE gamePiece, ELEVATOR_S
                 elevatorPositionSuccess.Set(units::math::abs(targetPos - currentPos) < 0.25_in);
                 elevatorPositionFail.Set(!elevatorPositionSuccess.Get());
             },
-            [this](bool) {
+            [this, offset, numLeds](bool) {
+                int color = elevatorPositionSuccess.Get() ? valor::CANdleSensor::RED : valor::CANdleSensor::GREEN;
+                for (int i = 0; i < numLeds; i++) {
+                    leds->setLED(8 + offset + i, color);
+                    leds->setLED(LEDConstants::LED_COUNT - offset - i, color);
+                }
                 elevatorPositionFail.Set(false);
                 elevatorPositionSuccess.Set(false);
             },
@@ -331,26 +336,26 @@ frc2::CommandPtr Scorer::scorerPitSequenceStage(GAME_PIECE gamePiece, ELEVATOR_S
 frc2::CommandPtr Scorer::scorerPitSequence() {
     return frc2::cmd::Sequence(
         frc2::cmd::RunOnce([this] { state.scopedState = SCOPED; }),
-        scorerPitSequenceStage(GAME_PIECE::CORAL, ELEVATOR_STATE::HP),
-        scorerPitSequenceStage(GAME_PIECE::CORAL, ELEVATOR_STATE::ONE),
+        scorerPitSequenceStage(GAME_PIECE::CORAL, ELEVATOR_STATE::STOWED, 8, 2),
+        scorerPitSequenceStage(GAME_PIECE::CORAL, ELEVATOR_STATE::ONE, 10, 2),
         frc2::cmd::RunOnce([this] { elevatorBButtonWait.Set(true); }),
         frc2::cmd::WaitUntil([this] { return driverGamepad->GetBButton(); }),
         frc2::cmd::RunOnce([this] { state.scoringState = SCORING; }),
         frc2::cmd::RunOnce([this] { elevatorBButtonWait.Set(true); }),
         frc2::cmd::WaitUntil([this] { return driverGamepad->GetBButton(); }),
-        scorerPitSequenceStage(GAME_PIECE::CORAL, ELEVATOR_STATE::TWO),
-        scorerPitSequenceStage(GAME_PIECE::CORAL, ELEVATOR_STATE::THREE),
-        scorerPitSequenceStage(GAME_PIECE::CORAL, ELEVATOR_STATE::FOUR),
-        scorerPitSequenceStage(GAME_PIECE::CORAL, ELEVATOR_STATE::STOWED),
+        scorerPitSequenceStage(GAME_PIECE::CORAL, ELEVATOR_STATE::TWO, 12, 2),
+        scorerPitSequenceStage(GAME_PIECE::CORAL, ELEVATOR_STATE::THREE, 14, 2),
+        scorerPitSequenceStage(GAME_PIECE::CORAL, ELEVATOR_STATE::FOUR, 16, 2),
+        scorerPitSequenceStage(GAME_PIECE::CORAL, ELEVATOR_STATE::STOWED, 18, 3),
         frc2::cmd::RunOnce([this] {
             state.scoringState = HOLD;
             elevatorBButtonWait.Set(true);
         }),
         frc2::cmd::WaitUntil([this] { return driverGamepad->GetBButton(); }),
-        scorerPitSequenceStage(GAME_PIECE::ALGEE, ELEVATOR_STATE::STOWED),
+        scorerPitSequenceStage(GAME_PIECE::ALGEE, ELEVATOR_STATE::STOWED, 21, 3),
         frc2::cmd::RunOnce([this] { state.scoringState = SCORING; }),
         frc2::cmd::Wait(3_s),
-        scorerPitSequenceStage(GAME_PIECE::ALGEE, ELEVATOR_STATE::FOUR),
+        scorerPitSequenceStage(GAME_PIECE::ALGEE, ELEVATOR_STATE::FOUR, 24, 3),
         frc2::cmd::RunOnce([this] {
             resetState();
             elevatorStage.Set(false);
@@ -607,12 +612,14 @@ void Scorer::analyzeDashboard()
         midColor = topColor;
     }
 
-    leds->setColor(0, botColor, valor::CANdleSensor::Priority::PRIORITY_SCORER);
-    leds->setColor(1, midColor, valor::CANdleSensor::Priority::PRIORITY_SCORER);
-    leds->setColor(2, topColor, valor::CANdleSensor::Priority::PRIORITY_SCORER);
-    leds->setColor(3, topColor, valor::CANdleSensor::Priority::PRIORITY_SCORER);
-    leds->setColor(4, midColor, valor::CANdleSensor::Priority::PRIORITY_SCORER);
-    leds->setColor(5, botColor, valor::CANdleSensor::Priority::PRIORITY_SCORER);
+    if (!frc::DriverStation::IsTestEnabled()) {
+        leds->setColor(0, botColor, valor::CANdleSensor::Priority::PRIORITY_SCORER);
+        leds->setColor(1, midColor, valor::CANdleSensor::Priority::PRIORITY_SCORER);
+        leds->setColor(2, topColor, valor::CANdleSensor::Priority::PRIORITY_SCORER);
+        leds->setColor(3, topColor, valor::CANdleSensor::Priority::PRIORITY_SCORER);
+        leds->setColor(4, midColor, valor::CANdleSensor::Priority::PRIORITY_SCORER);
+        leds->setColor(5, botColor, valor::CANdleSensor::Priority::PRIORITY_SCORER);
+    }
 
     state.algaeSpikeCurrent = table->GetNumber("Algae Spike Setpoint", 30);
     drivetrain->setGamePieceInRobot(state.gamePiece);
