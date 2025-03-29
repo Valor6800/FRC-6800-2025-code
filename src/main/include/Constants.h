@@ -269,12 +269,6 @@ namespace Constants {
             default: return 0.278809_tr;
         }};
 
-        static double getElevKAFF() { switch (robot) {
-            case Robot::Alpha: return 0.5;
-            case Robot::Gold: return 0.72;
-            default: return 0.72;
-        }};
-
         static frc::Pose3d mintCameraPosition(){ switch (robot) {
             case Robot::Alpha: return frc::Pose3d(
                 (6_in + 1.5625_in) - 14_in,

@@ -505,7 +505,7 @@ void Scorer::assessInputs()
 
     if (operatorGamepad->leftStickYActive()) {
         state.elevState = MANUAL;
-        state.manualSpeed = operatorGamepad->leftStickY(2) * 12_V;
+        state.manualSpeed = operatorGamepad->leftStickY(3) * 12_V * 0.75;
     } else if (operatorGamepad->GetYButton()) {
          state.elevState = ELEVATOR_STATE::FOUR;
     } else if (operatorGamepad->GetBButton()) {
@@ -647,7 +647,7 @@ void Scorer::assignOutputs()
 
     //Elevator State Machine
     if (state.elevState == ELEVATOR_STATE::MANUAL) {
-        elevatorMotor->setPower(state.manualSpeed + units::volt_t{Constants::getElevKAFF()});
+        elevatorMotor->setPower(state.manualSpeed + units::volt_t{Constants::Scorer::getElevatorPIDF().aFF});
     } else {
         if ((state.scopedState == SCOPED &&
             (
