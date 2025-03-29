@@ -419,7 +419,7 @@ namespace Constants {
             {19,
                 {
                     {LEFT, 0_cm},
-                    {RIGHT, 0_cm},
+                    {RIGHT, .5_in},
                     {NONE, 0_in}
                 }},
             {20,
