@@ -1,5 +1,6 @@
 #include "valkyrie/drivetrain/SwerveModule.h"
 #include "valkyrie/controllers/PhoenixController.h"
+#include "valkyrie/controllers/NeoController.h"
 #include "Constants.h"
 #include <fstream>
 #include <stdio.h>

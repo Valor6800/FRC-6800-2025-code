@@ -27,10 +27,12 @@
 #include <frc/geometry/Pose3d.h>
 #include <networktables/NetworkTable.h>
 #include "valkyrie/controllers/PhoenixController.h"
+#include <valkyrie/controllers/NeoController.h>
 
 
 #define ALPHA_SERIAL_NUMBER "03260AF3"
 #define GOLD_SERIAL_NUMBER "033E1BEA"
+#define SIDESWIPE_SERIAL_NUMBER "0329F2C9"
 // When trying to compile against other targets for simulation, cmath doesn't include M_PI
 //   Therefore if not defined, define M_PI for use on other targets
 #ifndef M_PI
@@ -125,7 +127,8 @@ namespace Constants {
         enum Robot {
             Alpha,
             Gold,
-            Black
+            Black,
+            Sideswipe
         };
 
         static std::string getSerialNumber() {
@@ -139,6 +142,7 @@ namespace Constants {
         static Robot getRobot() {
             if (serialNumber == ALPHA_SERIAL_NUMBER) return Robot::Alpha;
             else if (serialNumber == GOLD_SERIAL_NUMBER) return Robot::Gold;
+            else if (serialNumber == SIDESWIPE_SERIAL_NUMBER) return Robot::Sideswipe;
             else return Robot::Black;
         }
         static Robot robot = getRobot();
@@ -149,82 +153,123 @@ namespace Constants {
         static units::degree_t pigeonMountPitch(){ switch (robot){ 
             case Robot::Alpha: return 0.037622284_deg; 
             case Robot::Gold: return 1.0285918_deg;  
+            case Robot::Sideswipe: return 0.03762232884764671_deg;
             default: return 0.037622284_deg;
         }};
         static units::degree_t pigeonMountRoll(){ switch (robot){ 
             case Robot::Alpha: return -0.784180343_deg;
             case Robot::Gold: return -179.45845_deg;
+            case Robot::Sideswipe: return -0.7841805815696716_deg;
             default: return -0.784180343_deg;
         }};
         static units::degree_t pigeonMountYaw(){ switch (robot){ 
             case Robot::Alpha: return -90.230049133_deg; 
             case Robot::Gold: return 88.945129_deg;
+            case Robot::Sideswipe: return -90.23007202148438_deg;
             default: return -90.230049133_deg; 
         }};
 
         static std::vector<units::turn_t> swerveZeros(){ switch (robot){
             case Robot::Alpha: return {0.4240722_tr, 0.85498046875_tr, 0.471924_tr, 0.081299_tr};
             case Robot::Gold: return {0.4111328_tr, 0.8432617_tr, 0.09814453_tr, 0.134521484_tr};
+            case Robot::Sideswipe: return {0.3128095_tr, 0.9409406_tr - 0.5_tr, 0.4784689_tr, 0.7379234_tr};
             default: return {0.88134765625_tr, 0.684326171875_tr, 0.183349609375_tr, 0.9716796875_tr};
         }};
         static double driveGearRatio(){ switch (robot){
             case Robot::Alpha: return 5.51f;
             case Robot::Gold: return 6.48;
+            case Robot::Sideswipe: return 5.51;
             default: return 6.48f;
         }};
         static double azimuthGearRatio(){ switch (robot){
             case Robot::Alpha: return 13.37f;
             case Robot::Gold: return 12.1f;
+            case Robot::Sideswipe: return 13.37f;
             default: return 12.1f;
         }};
         static units::meter_t moduleDiff(){ switch (robot){
             case Robot::Alpha: return 0.295_m;
             case Robot::Gold: return 0.295_m;
+            case Robot::Sideswipe: return 0.206375_m;
             default: return 0.295_m;
         }};
         static units::meter_t driveBaseRadius(){ switch (robot){
             case Robot::Alpha: return 0.4175_m; 
-            case Robot::Gold: return 0.413_m; 
+            case Robot::Gold: return 0.413_m;
+            case Robot::Sideswipe: return 0.291858_m;
             default: return 0.413_m;
         }};
 
         static std::vector<bool> swerveDrivesReversals(){ switch (robot){
             case Robot::Alpha: return {true, false, true, false};
             case Robot::Gold: return {true, true, true, true};
+            case Robot::Sideswipe: return {false, false, false, false};
             default: return {false, false, false, false};
         }};
         static std::vector<bool> swerveAzimuthsReversals(){ switch (robot){
             case Robot::Alpha: return {true, false, true, false};
             case Robot::Gold: return {false, false, false, false};
+            case Robot::Sideswipe: return {true, true, true, true};
             default: return {false, false, false, false};
         }};
 
-        static double azimuthKP(){ switch (robot) {
-            case Robot::Alpha: return 100.0;
-            case Robot::Gold: return 100.0;
-            default: return 100.0;
-        }};
-        static units::turns_per_second_t azimuthKVel(){ switch (robot) {
-            case Robot::Alpha: return 7.9_tps;
-            case Robot::Gold: return 8.26_tps;
-            default: return 8.26_tps;
-        }};
-        static units::turns_per_second_squared_t azimuthKAcc() { switch (robot) {
-            case Robot::Alpha: return 1000_tr_per_s_sq;
-            case Robot::Gold: return 1000_tr_per_s_sq;
-            default: return 1000_tr_per_s_sq;
-        }};
+        static valor::PIDF azimuthPIDF() { switch (robot) {
+            case Robot::Alpha: {
+                valor::PIDF pidf;
+                pidf.P = 100;
+                pidf.maxVelocity = 7.9_tps;
+                pidf.maxAcceleration = 1000_tr_per_s_sq;
+                pidf.error = 0.0027_tr;
+                return pidf;
+            } case Robot::Gold: {
+                valor::PIDF pidf;
+                pidf.P = 100;
+                pidf.maxVelocity = 8.26_tps;
+                pidf.maxAcceleration = 1000_tr_per_s_sq;
+                pidf.error = 0.0027_tr;
+                return pidf;
+            } case Robot::Sideswipe: {
+                valor::PIDF pidf;
+                pidf.P = 5;
+                pidf.S = 0.15;
+                pidf.kV = 0;
+                pidf.maxVelocity = 7.9_tps;
+                pidf.maxAcceleration = 1000_tr_per_s_sq;
+                return pidf;
+            } default: {
+                valor::PIDF pidf;
+                pidf.P = 100;
+                pidf.maxVelocity = 8.26_tps;
+                pidf.maxAcceleration = 1000_tr_per_s_sq;
+                return pidf;
+            }
+        }}
 
-        static double driveKP(){ switch (robot) {
-            case Robot::Alpha: return 5.0;
-            case Robot::Gold: return 3.0; // 4
-            default: return 3.0;
-        }};
-        static double driveKD(){ switch(robot){
-            case Robot::Alpha: return 0.01;
-            case Robot::Gold: return 0; // 0.001
-            default: return 0.0;
-        }};
+        static valor::PIDF drivePIDF() { switch (robot) {
+            case Robot::Alpha: {
+                valor::PIDF pidf;
+                pidf.P = 5;
+                pidf.D = 0.01;
+                pidf.error = 0.0027_tr;
+                return pidf;
+            } case Robot::Gold: {
+                valor::PIDF pidf;
+                pidf.P = 3;
+                pidf.error = 0.0027_tr;
+                return pidf;
+            } case Robot::Sideswipe: {
+                valor::PIDF pidf;
+                pidf.P = 5;
+                return pidf;
+            } default: {
+                valor::PIDF pidf;
+                pidf.P = 5;
+                pidf.D = 0.001;
+                pidf.error = 0.0027_tr;
+                return pidf;
+            }
+        }}
+
         static units::meters_per_second_t driveKVel(){ switch (robot) {
             case Robot::Alpha: return 5.36_mps;
             case Robot::Gold: return 4.717_mps;
@@ -245,12 +290,14 @@ namespace Constants {
         static std::vector<int> getModuleCoordsX(){switch(robot){
             case Robot::Alpha: return {1, 1, -1, -1}; // {1, -1, -1, 1}
             case Robot::Gold: return {-1, 1, 1, -1};
+            case Robot::Sideswipe: return {1, 1, -1, -1};
             default: return {-1, 1, 1, -1};
         }};
 
         static std::vector<int> getModuleCoordsY(){switch(robot){
             case Robot::Alpha: return {1, -1, -1, 1}; // {-1, -1, 1, 1}
             case Robot::Gold: return {1, 1, -1, -1};
+            case Robot::Sideswipe: return {1, -1, -1, 1};
             default: return {1, 1, -1, -1}; 
         }};
 
@@ -272,43 +319,83 @@ namespace Constants {
             default: return valor::PhoenixControllerType::KRAKEN_X44;
         }};
 
-        static valor::BaseController *getAzimuthMotor(int i, valor::PIDF pidf) {
-            valor::PhoenixControllerType motorType = valor::PhoenixControllerType::KRAKEN_X60_FOC;
-            if (robot == Robot::Alpha) motorType = valor::PhoenixControllerType::FALCON_FOC;
+        static std::string drivesCANBus() { switch (robot) {
+            case Robot::Alpha: return "rio";
+            case Robot::Gold: return "baseCAN";
+            case Robot::Sideswipe: return "rio";
+            default: return "baseCAN";
+        }}
 
-            valor::PhoenixController<> *motor = new valor::PhoenixController<>{
-                motorType,
-                CANIDs::AZIMUTH_CANS[i],
-                valor::NeutralMode::Brake,
-                swerveAzimuthsReversals()[i],
-                azimuthGearRatio(),
-                1.0,
-                "baseCAN"
-            };
-            motor->setPIDF(pidf);
-            motor->enableFOC();
-            motor->setupCANCoder(CANIDs::CANCODER_CANS[i], swerveZeros()[i], false, "baseCAN");
-            motor->config.ClosedLoopGeneral.ContinuousWrap = true;
-            ctre::phoenix6::BaseStatusSignal::SetUpdateFrequencyForAll(250_Hz, motor->position_res, motor->velocity_res);
-            motor->applyConfig();
-            return motor;
+        static valor::BaseController *getAzimuthMotor(int i, valor::PIDF pidf) {
+            if (robot == Robot::Sideswipe) {
+                valor::NeoController *motor = new valor::NeoController{
+                    valor::NeoControllerType::NEO,
+                    CANIDs::AZIMUTH_CANS[i],
+                    valor::NeutralMode::Brake,
+                    swerveAzimuthsReversals()[i],
+                    azimuthGearRatio(),
+                    1.0
+                };
+                motor->setPIDF(pidf);
+                motor->config.closedLoop.PositionWrappingInputRange(-0.5, 0.5).PositionWrappingEnabled(true);
+                motor->config.closedLoop.SetFeedbackSensor(rev::spark::ClosedLoopConfig::FeedbackSensor::kAbsoluteEncoder);
+                motor->config.SmartCurrentLimit(20, 20, 0);
+                motor->applyConfig();
+                return motor;
+            } else {
+                valor::PhoenixControllerType motorType = valor::PhoenixControllerType::KRAKEN_X60_FOC;
+                if (robot == Robot::Alpha) motorType = valor::PhoenixControllerType::FALCON_FOC;
+
+                valor::PhoenixController<> *motor = new valor::PhoenixController<>{
+                    motorType,
+                    CANIDs::AZIMUTH_CANS[i],
+                    valor::NeutralMode::Brake,
+                    swerveAzimuthsReversals()[i],
+                    azimuthGearRatio(),
+                    1.0,
+                    "baseCAN"
+                };
+                motor->setPIDF(pidf);
+                motor->enableFOC();
+                motor->setupCANCoder(CANIDs::CANCODER_CANS[i], swerveZeros()[i], false, "baseCAN");
+                motor->config.ClosedLoopGeneral.ContinuousWrap = true;
+                ctre::phoenix6::BaseStatusSignal::SetUpdateFrequencyForAll(250_Hz, motor->position_res, motor->velocity_res);
+                motor->applyConfig();
+                return motor;
+            }
         }
 
         static valor::BaseController *getDriveMotor(int i, valor::PIDF pidf) {
-            valor::PhoenixController<> *motor = new valor::PhoenixController<>{
-                valor::PhoenixControllerType::KRAKEN_X60_FOC,
-                CANIDs::DRIVE_CANS[i],
-                valor::NeutralMode::Coast,
-                swerveDrivesReversals()[i],
-                1.0,
-                driveGearRatio(),
-                "baseCAN"
-            };
-            motor->setPIDF(pidf);
-            motor->enableFOC();
-            ctre::phoenix6::BaseStatusSignal::SetUpdateFrequencyForAll(250_Hz, motor->position_res, motor->velocity_res);
-            motor->applyConfig();
-            return motor;
+            if (robot == Robot::Sideswipe) {
+                valor::NeoController *motor = new valor::NeoController{
+                    valor::NeoControllerType::NEO,
+                    CANIDs::DRIVE_CANS[i],
+                    valor::NeutralMode::Coast,
+                    swerveDrivesReversals()[i],
+                    1.0,
+                    driveGearRatio()
+                };
+                motor->setPIDF(pidf);
+                motor->config.OpenLoopRampRate(1);
+                motor->config.SmartCurrentLimit(40, 40, 0);
+                motor->applyConfig();
+                return motor;
+            } else {
+                valor::PhoenixController<> *motor = new valor::PhoenixController<>{
+                    valor::PhoenixControllerType::KRAKEN_X60_FOC,
+                    CANIDs::DRIVE_CANS[i],
+                    valor::NeutralMode::Coast,
+                    swerveDrivesReversals()[i],
+                    1.0,
+                    driveGearRatio(),
+                    "baseCAN"
+                };
+                motor->setPIDF(pidf);
+                motor->enableFOC();
+                ctre::phoenix6::BaseStatusSignal::SetUpdateFrequencyForAll(250_Hz, motor->position_res, motor->velocity_res);
+                motor->applyConfig();
+                return motor;
+            }
         }
 
         /** Process for ReZeroing:

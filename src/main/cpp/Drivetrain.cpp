@@ -59,8 +59,6 @@ const units::meter_t WHEEL_DIAMETER(0.0973_m);
 
 #define X_TIME 214.85f
 
-#define PIGEON_CAN_BUS "baseCAN" //phoenix
-
 #define VISION_ACCEPTANCE 3.5_m // meters
 
 // 135 - TELEOP_MAX_TIME - TIME_TO_RUMBLE = Time at which rumble starts
@@ -220,7 +218,7 @@ Drivetrain::Drivetrain(frc::TimedRobot *_robot, valor::CANdleSensor* _leds) :
 
     setupGyro(
         CANIDs::PIGEON_CAN,
-        PIGEON_CAN_BUS,
+        Constants::drivesCANBus(),
         Constants::pigeonMountRoll(),
         Constants::pigeonMountPitch(),
         Constants::pigeonMountYaw()
@@ -278,19 +276,11 @@ std::vector<std::pair<valor::BaseController*, valor::BaseController*>> Drivetrai
 {
     std::vector<std::pair<valor::BaseController*, valor::BaseController*>> modules;
 
-    valor::PIDF azimuthPID;
-    azimuthPID.maxVelocity = Constants::azimuthKVel();
-    azimuthPID.maxAcceleration = Constants::azimuthKAcc();
-    azimuthPID.P = Constants::azimuthKP();
-    azimuthPID.error = 0.0027_tr;
+    valor::PIDF azimuthPID = Constants::azimuthPIDF();
 
-    valor::PIDF drivePID;
+    valor::PIDF drivePID = Constants::drivePIDF();
     drivePID.setMaxVelocity(Constants::driveKVel(), WHEEL_DIAMETER);
     drivePID.setMaxAcceleration(Constants::driveKAcc(), WHEEL_DIAMETER);
-    drivePID.P = Constants::driveKP();
-    drivePID.D = Constants::driveKD();
-    drivePID.kV = 0.90;
-    drivePID.error = 0.0027_tr;
 
     for (size_t i = 0; i < 4; i++) {
         modules.push_back(std::make_pair(

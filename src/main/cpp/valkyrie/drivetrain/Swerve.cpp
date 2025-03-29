@@ -12,6 +12,7 @@
 #include "units/velocity.h"
 #include "valkyrie/controllers/PIDF.h"
 #include "valkyrie/controllers/PhoenixController.h"
+#include "valkyrie/controllers/NeoController.h"
 #include "wpi/sendable/SendableRegistry.h"
 #include <cmath>
 #include <iostream>
@@ -75,7 +76,6 @@ Swerve::Swerve(frc::TimedRobot *_robot,
             _wheelDiameter
         ));
     }
-
 
     rot_controller.SetTolerance(rotPosTolerance, rotVelTolerance);
     y_controller.SetTolerance(yPosTolerance, yVelTolerance);
@@ -500,7 +500,7 @@ void Swerve::setPIDx(valor::PIDF pid) {
 
 void Swerve::setupGyro(
     int _pigeonCanID,
-    const char* _pigeonCanBus,
+    std::string _pigeonCanBus,
     units::degree_t mountRoll,
     units::degree_t mountPitch,
     units::degree_t mountYaw

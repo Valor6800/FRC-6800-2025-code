@@ -18,6 +18,7 @@
 #include <vector>
 
 #include "valkyrie/controllers/PhoenixController.h"
+#include "valkyrie/controllers/NeoController.h"
 #include "valkyrie/controllers/PIDF.h"
 #include "valkyrie/drivetrain/Swerve.h"
 
