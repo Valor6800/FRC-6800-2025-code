@@ -20,7 +20,7 @@
 #define ALGEE_INTAKE_SPEED 35_tps
 #define SCORE_SPEED 20_tps
 #define ALGEE_SCORE_SPEED -20_tps
-#define ALGEE_HOLD_SPD 0.25_tps
+#define ALGEE_HOLD_SPD 0.45_tps
 
 #define ELEVATOR_FORWARD_LIMIT 6_tr
 #define ELEVATOR_OFFSET 3_in
