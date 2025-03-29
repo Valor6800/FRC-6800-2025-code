@@ -33,6 +33,8 @@
 #define X_KFF 1
 #define I_ZONE 0.05
 
+#define Y_KAFF 1.1
+
 const units::hertz_t KP_ROTATE(-90);
 const units::hertz_t KD_ROTATE(-30);
 
@@ -92,6 +94,7 @@ Swerve<AzimuthMotor, DriveMotor>::Swerve(frc::TimedRobot *_robot,
     calculatedPosePublisher = nt::NetworkTableInstance::GetDefault().GetStructTopic<frc::Pose2d>("LiveWindow/BaseSubsystem/SwerveDrive/Actual Calculated Pose").Publish();
     robotVelocitiesPublisher = nt::NetworkTableInstance::GetDefault().GetStructTopic<frc::ChassisSpeeds>("LiveWindow/BaseSubsystem/SwerveDrive/Robot Velocities").Publish();
     table->PutBoolean("Toast", false);
+    table->PutNumber("Y_KAFF", Y_KAFF);
     RobotConfig config = RobotConfig::fromGUISettings();
 
     /*setpointGenerator = SwerveSetpointGenerator(config, 9.4_rad_per_s);
@@ -231,7 +234,7 @@ void Swerve<AzimuthMotor, DriveMotor>::analyzeDashboard()
         valor::PIDF yAlignPID;
         yAlignPID.P = table->GetNumber("Y_KP", Y_KP);
         yAlignPID.D = table->GetNumber("Y_KD", Y_KD);
-        yAlignPID.aFF = .9;
+        yAlignPID.aFF = table->GetNumber("Y_KAFF", Y_KAFF);
 
         relativeToTagSpeed = (units::meters_per_second_t) (
             - yAlignPID.P * (yDistance - y_controller.GetSetpoint().position).value() - yAlignPID.D * (yControllerInitialVelocity - y_controller.GetSetpoint().velocity).value() + yAlignPID.aFF * y_controller.GetSetpoint().velocity.value()
