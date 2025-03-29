@@ -215,12 +215,12 @@ namespace Constants {
         static double driveKP(){ switch (robot) {
             case Robot::Alpha: return 5.0;
             case Robot::Gold: return 3.0; // 4
-            default: return 5.0;
+            default: return 15;
         }};
         static double driveKD(){ switch(robot){
             case Robot::Alpha: return 0.01;
             case Robot::Gold: return 0; // 0.001
-            default: return 0.001;
+            default: return 0.01;
         }};
         static units::meters_per_second_t driveKVel(){ switch (robot) {
             case Robot::Alpha: return 5.36_mps;
@@ -266,7 +266,13 @@ namespace Constants {
         static units::angle::turn_t getElevatorMagnetOffset() { switch (robot) {
             case Robot::Alpha: return 0.10327_tr;
             case Robot::Gold: return 0.6389155469_tr; //  0.989014_tr;
-            default: return 0.278809_tr;
+            default: return -0.303710_tr;
+        }};
+
+        static double getElevKAFF() { switch (robot) {
+            case Robot::Alpha: return 0.5;
+            case Robot::Gold: return 0.72;
+            default: return 0.72;
         }};
 
         static frc::Pose3d mintCameraPosition(){ switch (robot) {
@@ -630,7 +636,7 @@ namespace Constants {
             static units::second_t getElevMaxVelRampTime() { switch (robot) {
                 case Robot::Alpha: return 1.0_s / 5;
                 case Robot::Gold: return 12.6_s/60.0;
-                default: return 12.6_s/32.0;
+                default: return 12.6_s/16.0;
             }}
 
             static double getScorerSensorToMech() { switch (robot) {

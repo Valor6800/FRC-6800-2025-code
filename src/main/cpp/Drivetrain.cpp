@@ -66,14 +66,14 @@ const units::meter_t WHEEL_DIAMETER(0.0973_m);
 #define MT2_POSE true
 
 #define Y_FILTER_CONST 0.95 // .99
-#define Y_ALIGN_KP 10 
-#define Y_ALIGN_KI 0
-#define Y_ALIGN_KD 0.5
+#define Y_ALIGN_KP 20
+#define Y_ALIGN_KI 10
+#define Y_ALIGN_KD 0.1
 
 #define X_FILTER_CONST 0.95 // .99
-#define X_ALIGN_KP 3
+#define X_ALIGN_KP 1
 #define X_ALIGN_KI 0
-#define X_ALIGN_KD 0.65
+#define X_ALIGN_KD 0
 
 
 // fix these
@@ -706,6 +706,8 @@ bool Drivetrain::isSpeedStopped() {
     );
     return (totalSpeed < ROBOT_STOPPED_THRESHOLD);
 }
+
+#define SCORER_OFFSET 2_in
 
 void Drivetrain::choosePoleDirection(Direction dir, Constants::AprilTag tag){
     

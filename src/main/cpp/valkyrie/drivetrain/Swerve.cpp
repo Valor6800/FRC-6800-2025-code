@@ -31,9 +31,9 @@
 
 #define Y_KFF 1
 #define X_KFF 1
-#define I_ZONE 0.05
+#define I_ZONE 0.1
 
-#define Y_KAFF 1.1
+#define Y_KAFF 1
 
 const units::hertz_t KP_ROTATE(-90);
 const units::hertz_t KD_ROTATE(-30);
