@@ -138,7 +138,6 @@ void Climber::assessInputs()
         state.climbState = CLIMB_STATE::DEPLOYED;
     } else if(driverGamepad->GetAButton()){
         state.climbState = CLIMB_STATE::RETRACTED;
-        state.hasClimbed = true;
     }
 }
 
