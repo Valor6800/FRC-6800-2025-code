@@ -41,6 +41,7 @@ public:
     static const int RED = 0xFF0000;
     static const int ORANGE = 0xFFA500;
     static const int GREEN = 0x00FF00;
+    static const int BLUE = 0x0000FF;
     static const int LIGHT_BLUE = 0x00FFF9;
     static const int WHITE = 0xFFFFFF;
     static const int OFF = 0x000000;

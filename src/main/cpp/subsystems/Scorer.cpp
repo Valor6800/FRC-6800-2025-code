@@ -603,21 +603,16 @@ void Scorer::analyzeDashboard()
     }
 
     int botColor = state.gamePiece == GAME_PIECE::CORAL ? valor::CANdleSensor::VALOR_GOLD : valor::CANdleSensor::VALOR_PURPLE;
-    int midColor = scorerStagingSensor.isTriggered() && state.gamePiece == GAME_PIECE::CORAL ? valor::CANdleSensor::GREEN : valor::CANdleSensor::OFF;
-    int topColor = state.scoringState == SCORE_STATE::SCORING ? valor::CANdleSensor::GREEN :
-        (drivetrain->state.alignToTarget ? valor::CANdleSensor::RED : valor::CANdleSensor::OFF);
-
-    // Top color setpoints should override mid setpoints
-    if (topColor != valor::CANdleSensor::OFF) {
-        midColor = topColor;
-    }
+    int midTopColor = state.scoringState == SCORE_STATE::SCORING ? valor::CANdleSensor::GREEN :
+        (drivetrain->state.alignToTarget ? valor::CANdleSensor::RED : 
+        (scorerStagingSensor.isTriggered() && state.gamePiece == GAME_PIECE::CORAL ? valor::CANdleSensor::BLUE : valor::CANdleSensor::OFF));
 
     if (!frc::DriverStation::IsTestEnabled()) {
         leds->setColor(0, botColor, valor::CANdleSensor::Priority::PRIORITY_SCORER);
-        leds->setColor(1, midColor, valor::CANdleSensor::Priority::PRIORITY_SCORER);
-        leds->setColor(2, topColor, valor::CANdleSensor::Priority::PRIORITY_SCORER);
-        leds->setColor(3, topColor, valor::CANdleSensor::Priority::PRIORITY_SCORER);
-        leds->setColor(4, midColor, valor::CANdleSensor::Priority::PRIORITY_SCORER);
+        leds->setColor(1, midTopColor, valor::CANdleSensor::Priority::PRIORITY_SCORER);
+        leds->setColor(2, midTopColor, valor::CANdleSensor::Priority::PRIORITY_SCORER);
+        leds->setColor(3, midTopColor, valor::CANdleSensor::Priority::PRIORITY_SCORER);
+        leds->setColor(4, midTopColor, valor::CANdleSensor::Priority::PRIORITY_SCORER);
         leds->setColor(5, botColor, valor::CANdleSensor::Priority::PRIORITY_SCORER);
     }
 
