@@ -208,11 +208,18 @@ void Swerve<AzimuthMotor, DriveMotor>::analyzeDashboard()
     joystickVector *= maxDriveSpeed.value();
     // joystickVector = Eigen::Vector2d{joystickVector[0], joystickVector[1]};
 
-    
+    frc::ChassisSpeeds fieldSpaceSpeeds = frc::ChassisSpeeds::FromRobotRelativeSpeeds(
+        getRobotRelativeSpeeds(),
+        getCalculatedPose().Rotation()
+    );
 
-     // meters_per_second_t
+    Eigen::Vector2d currVelocitiesFieldSpace{
+        fieldSpaceSpeeds.vx.value(),
+        fieldSpaceSpeeds.vy.value()
+    }; // meters_per_second_t
     
-    
+    yControllerInitialVelocity = units::meters_per_second_t{currVelocitiesFieldSpace.dot(MAKE_VECTOR(targetAngle - 90_deg))};
+    xControllerInitialVelocity = units::meters_per_second_t{currVelocitiesFieldSpace.dot(MAKE_VECTOR(targetAngle))};
 
     getSkiddingRatio();
 
@@ -300,24 +307,6 @@ void Swerve<AzimuthMotor, DriveMotor>::setRotAlignOffset(units::degree_t angle) 
 template<class AzimuthMotor, class DriveMotor>
 units::degree_t Swerve<AzimuthMotor, DriveMotor>::getRotControllerError() {
     return rot_controller.GetPositionError();
-}
-
-
-template<class AzimuthMotor, class DriveMotor>
-void Swerve<AzimuthMotor, DriveMotor>::transformControllerSpeeds() {
-
-    frc::ChassisSpeeds fieldSpaceSpeeds = frc::ChassisSpeeds::FromRobotRelativeSpeeds(
-        getRobotRelativeSpeeds(),
-        getCalculatedPose().Rotation()
-    );
-
-    Eigen::Vector2d currVelocitiesFieldSpace{
-        fieldSpaceSpeeds.vx.value(),
-        fieldSpaceSpeeds.vy.value()
-    };
-
-    yControllerInitialVelocity = units::meters_per_second_t{currVelocitiesFieldSpace.dot(MAKE_VECTOR(targetAngle - 90_deg))};
-    xControllerInitialVelocity = units::meters_per_second_t{currVelocitiesFieldSpace.dot(MAKE_VECTOR(targetAngle))};
 }
 
 template<class AzimuthMotor, class DriveMotor>

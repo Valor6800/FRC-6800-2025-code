@@ -171,7 +171,6 @@ protected:
     std::vector<valor::SwerveModule<AzimuthMotor, DriveMotor> *> swerveModules;
 
     units::degree_t getRotControllerError();
-    void transformControllerSpeeds();
 
 private:
     const units::radians_per_second_t MAX_ROTATION_VEL = 16_rad_per_s;

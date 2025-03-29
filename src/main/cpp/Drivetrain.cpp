@@ -340,10 +340,10 @@ void Drivetrain::analyzeDashboard()
             state.dir = NONE;
         }
     }
-
-
     poseErrorPP = currentPosePathPlanner.Get() - targetPosePathPlanner.Get();
 
+    state.yEstimate += Swerve::yControllerInitialVelocity.value() * LOOP_TIME;
+    unfilteredYDistance = Swerve::goalAlign.to<double>();
 
     if (!state.alignToTarget) {
         Swerve::resetRotationAlignControllers();
@@ -371,12 +371,6 @@ void Drivetrain::analyzeDashboard()
         )
     );
 
-    alignAngleTags(); 
-    transformControllerSpeeds();
-
-    state.yEstimate += Swerve::yControllerInitialVelocity.value() * LOOP_TIME;
-    unfilteredYDistance = Swerve::goalAlign.to<double>();
-    
     for(valor::AprilTagsSensor* aprilLime : aprilTagSensors) {
         if (aprilLime->hasTarget() && valor::isReefTag(aprilLime->getTagID())) {
             if (state.reefTag == aprilLime->getTagID() && !hasReset) {
@@ -384,7 +378,6 @@ void Drivetrain::analyzeDashboard()
                 state.xEstimate = -aprilLime->get_botpose_targetspace().Z().to<double>();
                 Swerve::yDistance = units::length::meter_t (state.yEstimate);
                 Swerve::xDistance = units::length::meter_t (state.xEstimate);
-
                 Swerve::resetLinearAlignControllers();
                 hasReset = true;
             }
@@ -432,6 +425,7 @@ void Drivetrain::analyzeDashboard()
         state.aligned = false;
     }
 
+    alignAngleTags(); 
 
 
     if (state.climberAlign){
