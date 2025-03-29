@@ -7,43 +7,61 @@
         {
           "type": "path",
           "data": {
-            "pathName": "BC1-Push"
+            "pathName": "BC6-Push"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "BPC1-J4"
+            "pathName": "ABPC6-F4"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "AlignRight"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "BJ-HP2"
+            "pathName": "ABF-HP"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "BHP2-K4"
+            "pathName": "ABHP-D4"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "AlignRight"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "BK-HP2"
+            "pathName": "ABD-HP"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "BHP2-A4"
+            "pathName": "ABHP-C4"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "AlignLeft"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "BA-HP2"
+            "pathName": "ABC-HP"
           }
         }
       ]
