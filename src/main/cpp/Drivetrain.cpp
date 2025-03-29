@@ -167,7 +167,7 @@ Drivetrain::Drivetrain(frc::TimedRobot *_robot, valor::CANdleSensor* _leds) :
 
     table->PutBoolean("Align Right", false);
     table->PutBoolean("Align Left", false);
-    table->PutBoolean("Use xController", false);
+    table->PutBoolean("Use xController", true);
 
     setRotAlignOffset(00_deg);
 
@@ -466,7 +466,7 @@ void Drivetrain::analyzeDashboard()
             Y_ACTIVATION_THRESHOLD.value()
         );
         Swerve::rotAlign = true;
-        Swerve::xAlign = table->GetBoolean("Use xController", false) && state.gamePiece == Constants::Scorer::GAME_PIECE::CORAL;
+        Swerve::xAlign = table->GetBoolean("Use xController", true) && state.gamePiece == Constants::Scorer::GAME_PIECE::CORAL;
     } else {
         Swerve::yAlign = false;
         Swerve::xAlign = false;
