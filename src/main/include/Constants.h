@@ -574,8 +574,8 @@ namespace Constants {
                                 { ELEVATOR_STATE::STOWED, 6.39_in},
                                 { ELEVATOR_STATE::HP, 6.39_in + 1_in},
                                 { ELEVATOR_STATE::ONE, 3.5_in },
-                                { ELEVATOR_STATE::TWO, 10.38_in}, //Tomball: 11.21
-                                { ELEVATOR_STATE::THREE, 15.89_in}, //Tomball: 16.72
+                                { ELEVATOR_STATE::TWO, 10.5_in}, //Tomball: 11.21
+                                { ELEVATOR_STATE::THREE, 16_in}, //Tomball: 16.72
                                 { ELEVATOR_STATE::FOUR, 29.9_in }
                             }
                         }
