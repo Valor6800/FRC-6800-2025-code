@@ -63,10 +63,10 @@ public:
     };
 
     enum Priority {
-        PRIORITY_DS = 1,
-        PRIORITY_DEFAULT = 2,
-        PRIORITY_SCORER = 3,
-        PRIORITY_CLIMBER = 4
+        PRIORITY_DEFAULT = 1,
+        PRIORITY_SCORER = 2,
+        PRIORITY_CLIMBER = 3,
+        PRIORITY_DS = 4
     };
 
 
