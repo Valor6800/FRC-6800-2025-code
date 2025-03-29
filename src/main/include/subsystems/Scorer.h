@@ -82,6 +82,8 @@ private:
     units::meter_t convertToMechSpace(units::turn_t turns);
     units::turn_t convertToMotorSpace(units::meter_t meters);
 
+    frc2::FunctionalCommand getAutoAlignCommand(Direction dir, Constants::Scorer::ELEVATOR_STATE elevState, Constants::Scorer::GAME_PIECE gamePiece);
+
     bool hallEffectSensorActive();
     bool cancoderSensorBad();
     units::turn_t absSensorCorrect;

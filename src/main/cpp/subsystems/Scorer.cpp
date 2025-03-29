@@ -201,80 +201,13 @@ Scorer::Scorer(frc::TimedRobot *_robot, Drivetrain *_drivetrain, valor::CANdleSe
 
     pathplanner::NamedCommands::registerCommand("AlignLeft", std::move(
         frc2::SequentialCommandGroup(
-            frc2::FunctionalCommand(
-                [&]{ // on begin
-                    drivetrain->state.startTimestamp = frc::Timer::GetFPGATimestamp();
-                    drivetrain->state.reefTag = -1;
-
-                    drivetrain->state.dir = LEFT;
-                    // drivetrain->resetAlignControllers();
-                    drivetrain->hasReset = true;
-
-                    state.gamePiece = GAME_PIECE::CORAL;
-                    state.scopedState = SCOPED_STATE::SCOPED;
-                    state.elevState = ELEVATOR_STATE::FOUR;
-                    
-                },
-                [&]{ // on execute
-                    drivetrain->state.alignToTarget = true;
-                    drivetrain->xAlign = true;
-                    // frc::ChassisSpeeds speeds = frc::ChassisSpeeds{0.5_mps, 0.0_mps, 0.0_rad_per_s};
-                    // drive(0.5_mps, 0.0_mps, 0.0_rad_per_s, true);
-                },
-                [&](bool){ // on end
-                    drivetrain->state.alignToTarget = false;
-                    drivetrain->xAlign = false;
-                    state.scopedState = SCOPED_STATE::UNSCOPED;
-
-                    drivetrain->state.reefTag = -1;
-                    drivetrain->hasReset = false;
-                },
-                [&]{ // is Finished
-                    // return state.scoringState == SCORE_STATE::SCORING;
-                    return (state.protectChin || !scorerStagingSensor.isTriggered())
-                    && drivetrain->withinXRange((units::meter_t)table->GetNumber("Viable Elevator Distance (m)", VIABLE_ELEVATOR_DISTANCE.value()));
-                },
-                {}
-            )
+            getAutoAlignCommand(LEFT, ELEVATOR_STATE::FOUR, GAME_PIECE::CORAL)
         )
     ).ToPtr());
 
     pathplanner::NamedCommands::registerCommand("AlignRight", std::move(
         frc2::SequentialCommandGroup(
-            frc2::FunctionalCommand(
-                [&]{ // on begin
-                    drivetrain->state.startTimestamp = frc::Timer::GetFPGATimestamp();
-                    drivetrain->state.reefTag = -1;
-                    
-                    drivetrain->state.dir = RIGHT;
-                    drivetrain->hasReset = true;
-                    // drivetrain->resetAlignControllers();
-
-                    state.gamePiece = GAME_PIECE::CORAL;
-                    state.scopedState = SCOPED_STATE::SCOPED;
-                    state.elevState = ELEVATOR_STATE::FOUR;
-                },
-                [&]{ // on execute
-                    drivetrain->state.alignToTarget = true;
-                    drivetrain->xAlign = true;
-                    // frc::ChassisSpeeds speeds = frc::ChassisSpeeds{0.5_mps, 0.0_mps, 0.0_rad_per_s};
-                    // drive(0.5_mps, 0.0_mps, 0.0_rad_per_s, true);
-                },
-                [&](bool){ // on end
-                    drivetrain->state.alignToTarget = false;
-                    drivetrain->xAlign = false;
-                    state.scopedState = SCOPED_STATE::UNSCOPED;
-
-                    drivetrain->state.reefTag = -1;
-                    drivetrain->hasReset = false;
-                },
-                [&]{ // is Finished
-                    // return state.scoringState == SCORE_STATE::SCORING;
-                    return (state.protectChin || !scorerStagingSensor.isTriggered())
-                        && drivetrain->withinXRange((units::meter_t)table->GetNumber("Viable Elevator Distance (m)", VIABLE_ELEVATOR_DISTANCE.value()));
-                },
-                {}
-            )
+            getAutoAlignCommand(RIGHT, ELEVATOR_STATE::FOUR, GAME_PIECE::CORAL)
         )
     ).ToPtr());
 
@@ -387,7 +320,7 @@ bool Scorer::cancoderSensorBad()
 void Scorer::init()
 {
     table->PutBoolean("Scope Button", false);
-     table->PutBoolean("Auto Dunk Enabled", true);
+    table->PutBoolean("Auto Dunk Enabled", true);
 
     scorerStagingSensor.setMaxDistance(0.175_m);
     scorerStagingSensor.setThresholdDistance(8_cm);
@@ -632,6 +565,44 @@ units::turn_t Scorer::convertToMotorSpace(units::meter_t meters)
     return (meters - ELEVATOR_OFFSET) / units::meter_t {PULLEY_CIRCUMFERENCE * M_PI} * 1_tr;
 }
 
+frc2::FunctionalCommand Scorer::getAutoAlignCommand(Direction dir, Constants::Scorer::ELEVATOR_STATE elevState, Constants::Scorer::GAME_PIECE gamePiece)
+{
+    return  frc2::FunctionalCommand(
+                [&]{ // on begin
+                    drivetrain->state.startTimestamp = frc::Timer::GetFPGATimestamp();
+                    drivetrain->state.reefTag = -1;
+
+                    drivetrain->state.dir = dir;
+                    // drivetrain->resetAlignControllers();
+                    drivetrain->hasReset = true;
+
+                    state.gamePiece = gamePiece;
+                    state.scopedState = SCOPED_STATE::SCOPED;
+                    state.elevState = elevState;
+                    
+                },
+                [&]{ // on execute
+                    drivetrain->state.alignToTarget = true;
+                    drivetrain->xAlign = true;
+                    // frc::ChassisSpeeds speeds = frc::ChassisSpeeds{0.5_mps, 0.0_mps, 0.0_rad_per_s};
+                    // drive(0.5_mps, 0.0_mps, 0.0_rad_per_s, true);
+                },
+                [&](bool){ // on end
+                    drivetrain->state.alignToTarget = false;
+                    drivetrain->xAlign = false;
+                    state.scopedState = SCOPED_STATE::UNSCOPED;
+
+                    drivetrain->state.reefTag = -1;
+                    drivetrain->hasReset = false;
+                },
+                [&]{ // is Finished
+                    // return state.scoringState == SCORE_STATE::SCORING;
+                    return (state.protectChin || !scorerStagingSensor.isTriggered())
+                    && drivetrain->withinXRange((units::meter_t)table->GetNumber("Viable Elevator Distance (m)", VIABLE_ELEVATOR_DISTANCE.value()));
+                },
+                {}
+            );
+}
 void Scorer::assignOutputs()
 {
     if (!state.hasZeroed) {
