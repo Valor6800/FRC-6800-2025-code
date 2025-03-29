@@ -128,6 +128,10 @@ void Robot::TestInit() {
         }.ToPtr();
     };
     pitSequenceCommand = frc2::cmd::Sequence(
+        frc2::cmd::RunOnce([this] {
+            for (int i = 8; i < LEDConstants::LED_COUNT; i++)
+                leds.setLED(i, valor::CANdleSensor::OFF);
+        }),
         drivetrain.pitSequence(),
         subsystemGateCommand(),
         scorer.scorerPitSequence()
