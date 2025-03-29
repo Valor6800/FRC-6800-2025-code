@@ -143,7 +143,7 @@ protected:
     frc::ChassisSpeeds getRobotRelativeSpeeds();
     void setSwerveDesiredState(wpi::array<frc::SwerveModuleState, MODULE_COUNT> desiredStates, bool isDriveOpenLoop);
 
-    double ROT_KP = 3;
+    double ROT_KP = 4;
     double ROT_KD = 0.1;
     double Y_KP = 0.0;
     double Y_KI = 0.0;
@@ -161,7 +161,7 @@ protected:
     units::meters_per_second_t xVelTolerance = 0.0_mps; //0.01_mps;
     units::radian_t angularPosition = 0_rad;
     units::meter_t goalAlign = 0.0_m;
-    units::meter_t xGoalAlign = 18.5_in;
+    units::meter_t xGoalAlign = 20_in;
 
     bool yControllerAligned();
     units::meters_per_second_t yControllerInitialVelocity;
@@ -178,8 +178,8 @@ private:
     const units::radians_per_second_squared_t MAX_ROTATION_ACCEL = 12_rad_per_s_sq;
     const units::meters_per_second_t MAX_Y_VEL = 5.5_mps;
     const units::meters_per_second_squared_t MAX_Y_ACCEL = 2_mps_sq;
-    const units::meters_per_second_t MAX_X_VEL = 1.0_mps;
-    const units::meters_per_second_squared_t MAX_X_ACCEL = 1.0_mps_sq;
+    const units::meters_per_second_t MAX_X_VEL = 1.5_mps;
+    const units::meters_per_second_squared_t MAX_X_ACCEL = 2.0_mps_sq;
 
     std::deque<units::angular_acceleration::radians_per_second_squared_t> yawRateBuffer;
 
