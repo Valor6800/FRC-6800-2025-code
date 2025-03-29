@@ -77,7 +77,7 @@ public:
     } state;
 
 private:
-    frc2::CommandPtr scorerPitSequenceStage(Constants::Scorer::GAME_PIECE, Constants::Scorer::ELEVATOR_STATE, int, int);
+    frc2::CommandPtr scorerPitSequenceStage(Constants::Scorer::GAME_PIECE, Constants::Scorer::ELEVATOR_STATE);
     
     units::meter_t convertToMechSpace(units::turn_t turns);
     units::turn_t convertToMotorSpace(units::meter_t meters);
