@@ -8,8 +8,8 @@
       },
       "prevControl": null,
       "nextControl": {
-        "x": 2.5333239344262295,
-        "y": 1.3229027880983606
+        "x": 2.53332393442623,
+        "y": 1.3229027880983608
       },
       "isLocked": false,
       "linkedName": "B-D"
@@ -100,7 +100,7 @@
     "rotation": 59.99999999999999
   },
   "reversed": false,
-  "folder": null,
+  "folder": "TNoStopping",
   "idealStartingState": {
     "velocity": 0,
     "rotation": 59.99999999999999

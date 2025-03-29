@@ -7,43 +7,61 @@
         {
           "type": "path",
           "data": {
-            "pathName": "BC1-J4"
+            "pathName": "ABC1-I4"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "AlignLeft"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "BJ-HP2"
+            "pathName": "ABI-HP2"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "BHP2-K4"
+            "pathName": "ABHP2-K4"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "AlignLeft"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "BK-HP2"
+            "pathName": "ABK-HP2"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "BHP2-A4"
+            "pathName": "ABHP2-L4"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "AlignRight"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "BA-HP2"
+            "pathName": "ABL-HP2"
           }
         }
       ]
     }
   },
   "resetOdom": true,
-  "folder": "Blue Autos",
+  "folder": "autos",
   "choreoAuto": false
 }

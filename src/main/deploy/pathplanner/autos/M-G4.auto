@@ -7,25 +7,25 @@
         {
           "type": "path",
           "data": {
-            "pathName": "RCM-G4"
+            "pathName": "BCM-G4"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "AlignLeft"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "RG-AGH"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "RAGH-AB"
+            "pathName": "G-Back"
           }
         }
       ]
     }
   },
   "resetOdom": true,
-  "folder": "Red Autos",
+  "folder": "autos",
   "choreoAuto": false
 }

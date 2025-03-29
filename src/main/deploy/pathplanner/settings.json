@@ -3,17 +3,16 @@
   "robotLength": 0.889,
   "holonomicMode": true,
   "pathFolders": [
+    "A-B",
     "C-R",
     "H-R",
-    "A-B",
-    "Push Paths",
+    "TNoStopping",
     "R-A",
     "R-H",
     "tests"
   ],
   "autoFolders": [
-    "Blue Autos",
-    "Red Autos",
+    "autos",
     "tests"
   ],
   "defaultMaxVel": 4.0,

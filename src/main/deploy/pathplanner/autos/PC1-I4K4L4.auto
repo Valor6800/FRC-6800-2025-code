@@ -7,49 +7,13 @@
         {
           "type": "path",
           "data": {
-            "pathName": "BC6-Push"
+            "pathName": "BC1-Push"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "ABPC6-F4"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "AlignRight"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "ABF-HP"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "ABHP-D4"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "AlignRight"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "ABD-HP"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "ABHP-C4"
+            "pathName": "ABPC1-I4"
           }
         },
         {
@@ -61,13 +25,49 @@
         {
           "type": "path",
           "data": {
-            "pathName": "ABC-HP"
+            "pathName": "ABI-HP2"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "ABHP2-K4"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "AlignLeft"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "ABK-HP2"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "ABHP2-L4"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "AlignRight"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "ABL-HP2"
           }
         }
       ]
     }
   },
   "resetOdom": true,
-  "folder": "Blue Autos",
+  "folder": "autos",
   "choreoAuto": false
 }
