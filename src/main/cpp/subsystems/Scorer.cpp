@@ -466,9 +466,9 @@ void Scorer::init()
 
     valor::PIDF pivotPID = Constants::Scorer::getScorerPivotPIDF();
     pivotPID.maxVelocity = scorerPivotMotor->getMaxMechSpeed();
-    pivotPID.maxAcceleration = scorerPivotMotor->getMaxMechSpeed() / 0.4_s;
+    pivotPID.maxAcceleration = scorerPivotMotor->getMaxMechSpeed() / 1_s;
     scorerPivotMotor->setPIDF(pivotPID);
-    scorerPivotMotor->setupCANCoder(CANIDs::SCORER_PIVOT_CAN, scorerPivotMagnetOffset(), ctre::phoenix6::signals::SensorDirectionValue::Clockwise_Positive, "baseCAN");
+    scorerPivotMotor->setupCANCoder(CANIDs::SCORER_PIVOT_CAN, scorerPivotMagnetOffset(), ctre::phoenix6::signals::SensorDirectionValue::CounterClockwise_Positive, "baseCAN");
     scorerPivotMotor->applyConfig();
 
     // Zeroing debounce sensor (utilizes CANdi configured hall effect sensor)
@@ -532,6 +532,8 @@ void Scorer::assessInputs()
     if (operatorGamepad->leftStickYActive()) {
         state.elevState = MANUAL;
         state.manualSpeed = operatorGamepad->leftStickY(3) * 12_V * 0.75;
+    } else if (driverGamepad->GetXButton()) {
+        state.elevState = ELEVATOR_STATE::FLOOR;
     } else if (operatorGamepad->GetYButton()) {
          state.elevState = ELEVATOR_STATE::FOUR;
     } else if (operatorGamepad->GetBButton()) {
@@ -670,20 +672,16 @@ void Scorer::assignOutputs()
 
     // Pivot State Machine
     if (state.gamePiece == GAME_PIECE::ALGEE) {
-        if (state.hasAlgae) {
+        if (state.elevState == ELEVATOR_STATE::FLOOR) {
+            scorerPivotMotor->setPosition(getPivotPositionMap()[PIVOT_STATE::GROUND]);
+        } else if (state.scopedState == SCOPED_STATE::SCOPED || state.scopedState == SCOPED_STATE::MANUAL_SCOPE)  {
+            scorerPivotMotor->setPosition(getPivotPositionMap()[PIVOT_STATE::PICK]);
+        } else if (state.hasAlgae) {
             scorerPivotMotor->setPosition(getPivotPositionMap()[PIVOT_STATE::CARRY]);
         } else {
-            if (state.elevState == ELEVATOR_STATE::TWO || state.elevState == ELEVATOR_STATE::THREE) {
-                scorerPivotMotor->setPosition(getPivotPositionMap()[PIVOT_STATE::PICK]);
-            } else {
-                if (state.scopedState == SCOPED_STATE::MANUAL_SCOPE) {
-                    scorerPivotMotor->setPosition(getPivotPositionMap()[PIVOT_STATE::FLOOR]);
-                } else {
-                    scorerPivotMotor->setPosition(getPivotPositionMap()[PIVOT_STATE::CARRY]);
-                }
-            }
+            scorerPivotMotor->setPosition(getPivotPositionMap()[PIVOT_STATE::PICK]);
         }
-    } else{
+    } else {
         scorerPivotMotor->setPosition(getPivotPositionMap()[PIVOT_STATE::CORAL_STOW]);
     }
 
@@ -691,9 +689,7 @@ void Scorer::assignOutputs()
     if (state.elevState == ELEVATOR_STATE::MANUAL) {
         elevatorMotor->setPower(state.manualSpeed + units::volt_t{Constants::Scorer::getElevatorPIDF().aFF});
     } else {
-        if (state.gamePiece == GAME_PIECE::ALGEE && state.scopedState == SCOPED_STATE::MANUAL_SCOPE) {
-            state.targetHeight = positionMap.at(state.gamePiece).at(ONE);
-        } else if ((state.scopedState == SCOPED &&
+        if ((state.scopedState == SCOPED &&
             (
                 state.gamePiece == GAME_PIECE::ALGEE ||
                 (state.gamePiece == GAME_PIECE::CORAL && drivetrain->withinXRange((units::meter_t)table->GetNumber("Viable Elevator Distance (m)", VIABLE_ELEVATOR_DISTANCE.value())))
@@ -717,7 +713,7 @@ void Scorer::assignOutputs()
         elevatorMotor->setPosition(targetRotations);
     }
 
-  // Scorer State Machine
+    // Scorer State Machine
     if (state.scoringState == SCORE_STATE::SCORING) {
         if (state.gamePiece == GAME_PIECE::ALGEE) {
             scorerMotor->setSpeed(ALGEE_SCORE_SPEED);

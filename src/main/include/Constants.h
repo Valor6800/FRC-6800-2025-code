@@ -499,12 +499,13 @@ namespace Constants {
                 TWO,
                 THREE,
                 FOUR,
+                FLOOR,
             };
 
             enum PIVOT_STATE
             {
                 CORAL_STOW,
-                FLOOR,
+                GROUND,
                 PICK,
                 PRESCORE,
                 CARRY,
@@ -528,18 +529,21 @@ namespace Constants {
 
             static ScoringSpeedMap getScoringSpeedMap() { switch (robot) {
                 case Robot::Alpha: return {
+                    {ELEVATOR_STATE::FLOOR, 5_tps},
                     {ELEVATOR_STATE::ONE, 5_tps},
                     {ELEVATOR_STATE::TWO, 10_tps},
                     {ELEVATOR_STATE::THREE, 15_tps},
                     {ELEVATOR_STATE::FOUR, 20_tps}
                 };
                 case Robot::Gold: return {
+                    {ELEVATOR_STATE::FLOOR, 5_tps},
                     {ELEVATOR_STATE::ONE, 12_tps},
                     {ELEVATOR_STATE::TWO, 16_tps},
                     {ELEVATOR_STATE::THREE, 16_tps},
                     {ELEVATOR_STATE::FOUR, 28_tps} // 25
                 };
                 default: return {
+                    {ELEVATOR_STATE::FLOOR, 5_tps},
                     {ELEVATOR_STATE::ONE, 6_tps},
                     {ELEVATOR_STATE::TWO, 12_tps},
                     {ELEVATOR_STATE::THREE, 12_tps},
@@ -553,6 +557,7 @@ namespace Constants {
                         {
                             GAME_PIECE::CORAL,
                             {
+                                { ELEVATOR_STATE::FLOOR, 5_in },
                                 { ELEVATOR_STATE::STOWED, 5_in },
                                 { ELEVATOR_STATE::HP, 7.5_in },
                                 { ELEVATOR_STATE::ONE, 10_in },
@@ -564,6 +569,7 @@ namespace Constants {
                         {
                             GAME_PIECE::ALGEE,
                             {
+                                { ELEVATOR_STATE::FLOOR, 5_in },
                                 { ELEVATOR_STATE::STOWED, 7.5_in },
                                 { ELEVATOR_STATE::HP, 5_in },
                                 { ELEVATOR_STATE::ONE, 5_in },
@@ -578,6 +584,7 @@ namespace Constants {
                         {
                             GAME_PIECE::CORAL,
                             {
+                                { ELEVATOR_STATE::FLOOR, 3.5_in },
                                 { ELEVATOR_STATE::STOWED, 10_in },
                                 { ELEVATOR_STATE::HP, 3.1_in },
                                 { ELEVATOR_STATE::ONE, 10.2_in },
@@ -589,6 +596,7 @@ namespace Constants {
                         {
                             GAME_PIECE::ALGEE,
                             {
+                                { ELEVATOR_STATE::FLOOR, 3.5_in },
                                 { ELEVATOR_STATE::STOWED, 6.39_in},
                                 { ELEVATOR_STATE::HP, 6.39_in + 1_in},
                                 { ELEVATOR_STATE::ONE, 3.5_in },
@@ -603,6 +611,7 @@ namespace Constants {
                         {
                             GAME_PIECE::CORAL,
                             {
+                                { ELEVATOR_STATE::FLOOR, 3.25_in },
                                 { ELEVATOR_STATE::STOWED, 10_in },
                                 { ELEVATOR_STATE::HP, 3.25_in },
                                 { ELEVATOR_STATE::ONE, 10.2_in },
@@ -614,6 +623,7 @@ namespace Constants {
                         {
                             GAME_PIECE::ALGEE,
                             {
+                                { ELEVATOR_STATE::FLOOR, 4.5_in },
                                 { ELEVATOR_STATE::STOWED, 3.15_in},
                                 { ELEVATOR_STATE::HP, 4.5_in},
                                 { ELEVATOR_STATE::ONE, 3.15_in },
@@ -629,7 +639,7 @@ namespace Constants {
                 case Robot::Gold:
                     return {
                         { PIVOT_STATE::CORAL_STOW, 0_tr },
-                        { PIVOT_STATE::FLOOR, 0_tr },
+                        { PIVOT_STATE::GROUND, 0_tr },
                         { PIVOT_STATE::PICK, 0_tr },
                         { PIVOT_STATE::PRESCORE, 0_tr },
                         { PIVOT_STATE::CARRY, 0_tr },
@@ -637,7 +647,7 @@ namespace Constants {
                 default:
                     return {
                         { PIVOT_STATE::CORAL_STOW, 0_tr },
-                        { PIVOT_STATE::FLOOR, 0.3_tr },
+                        { PIVOT_STATE::GROUND, 0.3_tr },
                         { PIVOT_STATE::PICK, 0.2_tr },
                         { PIVOT_STATE::PRESCORE, 0.25_tr },
                         { PIVOT_STATE::CARRY, 0.08_tr },
@@ -659,13 +669,13 @@ namespace Constants {
             static bool scorerPivotInverted() { switch (robot) {
                 case Robot::Alpha: return true;
                 case Robot::Gold: return false;
-                default: return true;
+                default: return false;
             }}
 
             static units::angle::turn_t scorerPivotMagnetOffset() { switch (robot) {
                 case Robot::Alpha: return 1.37_tr;
                 case Robot::Gold: return 0.5_tr;
-                default: return -0.934082_tr;
+                default: return 0.2717_tr;
             }}
 
             /// Amount of rotations needed for after detecting coral intake
