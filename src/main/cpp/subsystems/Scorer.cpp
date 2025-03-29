@@ -31,8 +31,8 @@
 #define ELEVATOR_MOTOR_TO_SENSOR 8.02f
 #define PULLEY_CIRCUMFERENCE 1.432_in
 
-#define PIVOT_MOTOR_TO_SENSOR 1.0f
-#define PIVOT_SENSOR_TO_MECH 50.0f
+#define PIVOT_MOTOR_TO_SENSOR 60.75f
+#define PIVOT_SENSOR_TO_MECH 1.0f
 #define SECOND_SCORER_FORWARD_LIMIT 0.32_tr
 #define SECOND_SCORER_REVERSE_LIMIT 0.02_tr
 #define PIVOT_CANCODER_RATIO 9.0f/21.0f
@@ -60,7 +60,6 @@ Scorer::Scorer(frc::TimedRobot *_robot, Drivetrain *_drivetrain, valor::CANdleSe
     elevatorMotor(new valor::PhoenixController(valor::PhoenixControllerType::KRAKEN_X60, CANIDs::ELEV_WHEEL, valor::NeutralMode::Brake, elevatorMotorInverted(), "baseCAN")),
     scorerMotor(new valor::PhoenixController(Constants::getScorerMotorType(), CANIDs::SCORER_WHEEL, valor::NeutralMode::Brake, scorerMotorInverted(), "baseCAN")),
     scorerPivotMotor(new valor::PhoenixController(Constants::getScorerPivotMotorType(), CANIDs::SCORER_PIVOT_MOTOR, valor::NeutralMode::Brake, scorerPivotInverted(), "baseCAN")),
-    scorerPivotCan(new ctre::phoenix6::hardware::CANcoder(CANIDs::SCORER_PIVOT_CAN, "baseCAN")),
     scorerStagingSensor(_robot, "Scorer Staging Sensor", CANIDs::STAGING_LIDAR_SENSOR, "baseCAN", -1_mm),
     currentSensor(_robot, "Algae Current Sensor"),
     positionMap{std::move(getPositionMap())},
@@ -465,16 +464,11 @@ void Scorer::init()
     scorerPivotMotor->setForwardLimit(SECOND_SCORER_FORWARD_LIMIT);
     scorerPivotMotor->setReverseLimit(SECOND_SCORER_REVERSE_LIMIT);
 
-    ctre::phoenix6::configs::MagnetSensorConfigs encoderConfig;
-    encoderConfig.AbsoluteSensorDiscontinuityPoint = 1_tr;
-    encoderConfig.SensorDirection = ctre::phoenix6::signals::SensorDirectionValue::Clockwise_Positive;
-    encoderConfig.MagnetOffset = scorerPivotMagnetOffset();
-    scorerPivotCan->GetConfigurator().Apply(encoderConfig);
-
     valor::PIDF pivotPID = Constants::Scorer::getScorerPivotPIDF();
     pivotPID.maxVelocity = scorerPivotMotor->getMaxMechSpeed();
     pivotPID.maxAcceleration = scorerPivotMotor->getMaxMechSpeed() / 0.4_s;
     scorerPivotMotor->setPIDF(pivotPID);
+    scorerPivotMotor->setupCANCoder(CANIDs::SCORER_PIVOT_CAN, scorerPivotMagnetOffset(), ctre::phoenix6::signals::SensorDirectionValue::Clockwise_Positive, "baseCAN");
     scorerPivotMotor->applyConfig();
 
     // Zeroing debounce sensor (utilizes CANdi configured hall effect sensor)
@@ -513,7 +507,6 @@ void Scorer::init()
     currentSensor.setCacheSize(ALGAE_CACHE_SIZE);
 
     resetState();
-    // scorerPivotMotor->setEncoderPosition(scorerPivotCan->GetAbsolutePosition().GetValue() * PIVOT_CANCODER_RATIO);
     table->PutBoolean("Auto Dunk Disabled", false);
     
     // Must be at the end of init() because the CANdi has to be setup before reading   

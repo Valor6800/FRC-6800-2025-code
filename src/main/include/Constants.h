@@ -685,7 +685,7 @@ namespace Constants {
             static double getScorerSensorToMech() { switch (robot) {
                 case Robot::Alpha: return 2;
                 case Robot::Gold: return 5 / 3;
-                default: return 5;
+                default: return 2.75;
             }}
 
             static bool isElevatorClockwise() { switch (robot) {
