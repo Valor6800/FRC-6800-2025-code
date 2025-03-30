@@ -161,7 +161,7 @@ public:
      * @param color Color of the animation
      * @param speed The speed that the animation will go at
      */
-    void setAnimation(int segment, AnimationType animation, RGBColor color, double speed=1.0);
+    void setAnimation(int segment, AnimationType animation, int color, Priority priority, double speed=1.0);
 
     /**
      * @brief Sets the animation for all segments

@@ -277,6 +277,26 @@ Scorer::Scorer(frc::TimedRobot *_robot, Drivetrain *_drivetrain, valor::CANdleSe
             )
         )
     ).ToPtr());
+    pathplanner::NamedCommands::registerCommand("FlashingLEDs", std::move(
+        frc2::SequentialCommandGroup(
+            frc2::InstantCommand(
+                [this](){
+                    for (int i = 0; i < LEDConstants::LED_SEGMENTS; i++) {
+                        leds->setAnimation(i, valor::CANdleSensor::Strobe, valor::CANdleSensor::ORANGE, valor::CANdleSensor::PRIORITY_CLIMBER);
+                    }
+                }
+            )
+        )
+    ).ToPtr());
+    pathplanner::NamedCommands::registerCommand("ResetPriorityLEDs", std::move(
+        frc2::SequentialCommandGroup(
+            frc2::InstantCommand(
+                [this](){
+                    leds->resetPriority();
+                }
+            )
+        )
+    ).ToPtr());
 
     /*pathplanner::NamedCommands::registerCommand("SetReefTag", std::move(
 

@@ -155,12 +155,15 @@ void CANdleSensor::setAnimation(AnimationType animation, RGBColor color, double 
     setAnimation(&allSegments, animation, color, speed);
 }
 
-void CANdleSensor::setAnimation(int segment, AnimationType animation,RGBColor color, double speed)
+void CANdleSensor::setAnimation(int segment, AnimationType animation, int color, Priority priority, double speed)
 {
-    segment++;
-    if (segment >=  static_cast<int>(segmentMap.size())) return;
-    clearAnimation(segment);
-    setAnimation(&segmentMap[segment], animation, color, speed);
+    if (priority >= currentPriority) {
+        currentPriority = priority;
+        segment++; 
+        if (segment >=  static_cast<int>(segmentMap.size())) return;
+        clearAnimation(segment);
+        setAnimation(&segmentMap[segment], animation, toRGB(color), speed);
+    }
 }
 
 void CANdleSensor::resetPriority() {
