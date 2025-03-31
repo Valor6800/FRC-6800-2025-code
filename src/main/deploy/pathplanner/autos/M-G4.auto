@@ -21,6 +21,18 @@
           "data": {
             "pathName": "G-Back"
           }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "AlignAlgae"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "GAlgae-Barge"
+          }
         }
       ]
     }

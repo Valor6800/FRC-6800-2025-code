@@ -3,40 +3,45 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 5.75,
-        "y": 3.867
+        "x": 5.8,
+        "y": 4.02
       },
       "prevControl": null,
       "nextControl": {
-        "x": 6.2340870165924605,
-        "y": 3.9585560519710086
+        "x": 6.637181684146738,
+        "y": 4.509828780091603
       },
       "isLocked": false,
-      "linkedName": "B-G"
+      "linkedName": "B-GA"
     },
     {
       "anchor": {
-        "x": 6.341,
-        "y": 4.02
+        "x": 7.576229508196722,
+        "y": 5.0379610655737705
       },
       "prevControl": {
-        "x": 6.091127157614438,
-        "y": 4.012027381975775
+        "x": 6.881517610096386,
+        "y": 4.640141273931415
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "B-AGA"
+      "linkedName": "B-Barge"
     }
   ],
-  "rotationTargets": [],
+  "rotationTargets": [
+    {
+      "waypointRelativePos": 0.75,
+      "rotationDegrees": 0.0
+    }
+  ],
   "constraintZones": [
     {
       "name": "Constraints Zone",
       "minWaypointRelativePos": 0,
-      "maxWaypointRelativePos": 1.0,
+      "maxWaypointRelativePos": 0,
       "constraints": {
-        "maxVelocity": 1.0,
-        "maxAcceleration": 2.5,
+        "maxVelocity": 4.0,
+        "maxAcceleration": 4.0,
         "maxAngularVelocity": 540.0,
         "maxAngularAcceleration": 720.0,
         "nominalVoltage": 12.0,
@@ -68,10 +73,10 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 180.0
+    "rotation": 0.0
   },
   "reversed": false,
-  "folder": "R-H",
+  "folder": "Algae",
   "idealStartingState": {
     "velocity": 0,
     "rotation": 180.0
