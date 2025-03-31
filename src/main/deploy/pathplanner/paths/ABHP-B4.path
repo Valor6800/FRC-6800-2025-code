@@ -8,8 +8,8 @@
       },
       "prevControl": null,
       "nextControl": {
-        "x": 2.0890238891596296,
-        "y": 1.889417616004732
+        "x": 2.361577868852459,
+        "y": 1.777305327868853
       },
       "isLocked": false,
       "linkedName": "B-HP1"
@@ -20,8 +20,8 @@
         "y": 3.8489883888323093
       },
       "prevControl": {
-        "x": 2.2414222697022654,
-        "y": 3.0621377000063426
+        "x": 1.7022540983606556,
+        "y": 3.8511782786885242
       },
       "nextControl": null,
       "isLocked": false,
@@ -58,7 +58,7 @@
     "unlimited": false
   },
   "goalEndState": {
-    "velocity": 0,
+    "velocity": 0.5,
     "rotation": 0.0
   },
   "reversed": false,

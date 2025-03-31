@@ -1,0 +1,67 @@
+{
+  "version": "2025.0",
+  "command": {
+    "type": "sequential",
+    "data": {
+      "commands": [
+        {
+          "type": "path",
+          "data": {
+            "pathName": "ABC6-E4"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "AlignLeft"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "ABE-HP"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "ABHP-C4"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "AlignLeft"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "ABC-HP"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "ABHP-B4"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "AlignRight"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "ABB-HP"
+          }
+        }
+      ]
+    }
+  },
+  "resetOdom": true,
+  "folder": "autos",
+  "choreoAuto": false
+}

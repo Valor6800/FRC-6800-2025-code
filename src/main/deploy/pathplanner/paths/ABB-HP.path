@@ -3,40 +3,45 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 7.45,
-        "y": 5.0331158328716565
+        "x": 3.164754098360655,
+        "y": 3.87515368852459
       },
       "prevControl": null,
       "nextControl": {
-        "x": 6.399200740286158,
-        "y": 5.001997950819672
+        "x": 2.19375,
+        "y": 2.041034836065575
       },
       "isLocked": false,
-      "linkedName": "B-Barge"
+      "linkedName": "B-B"
     },
     {
       "anchor": {
-        "x": 6.125717213114753,
-        "y": 5.0331158328716565
+        "x": 1.5656886676574044,
+        "y": 0.747153855250657
       },
       "prevControl": {
-        "x": 6.79702868852459,
-        "y": 5.001997950819672
+        "x": 2.0259221311475404,
+        "y": 1.573514344262295
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": null
+      "linkedName": "B-HP1"
     }
   ],
-  "rotationTargets": [],
+  "rotationTargets": [
+    {
+      "waypointRelativePos": 0.35,
+      "rotationDegrees": 55.0
+    }
+  ],
   "constraintZones": [
     {
       "name": "Constraints Zone",
-      "minWaypointRelativePos": 0,
+      "minWaypointRelativePos": 0.4,
       "maxWaypointRelativePos": 1.0,
       "constraints": {
         "maxVelocity": 1.0,
-        "maxAcceleration": 1.0,
+        "maxAcceleration": 2.5,
         "maxAngularVelocity": 540.0,
         "maxAngularAcceleration": 720.0,
         "nominalVoltage": 12.0,
@@ -48,7 +53,7 @@
   "eventMarkers": [
     {
       "name": "HP",
-      "waypointRelativePos": 0.01,
+      "waypointRelativePos": 0.02,
       "endWaypointRelativePos": null,
       "command": {
         "type": "named",
@@ -68,10 +73,10 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 0.0
+    "rotation": 55.0
   },
   "reversed": false,
-  "folder": "Algae",
+  "folder": "R-H",
   "idealStartingState": {
     "velocity": 0,
     "rotation": 0.0
