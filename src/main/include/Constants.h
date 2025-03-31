@@ -274,7 +274,7 @@ namespace Constants {
         static units::angle::turn_t getElevatorMagnetOffset() { switch (robot) {
             case Robot::Alpha: return 0.10327_tr;
             case Robot::Gold: return 0.6523442188_tr; //  0.989014_tr;
-            default: return -0.303710_tr;
+            default: return 0.195801_tr;
         }};
 
         static frc::Pose3d mintCameraPosition(){ switch (robot) {
@@ -623,12 +623,12 @@ namespace Constants {
                         {
                             GAME_PIECE::ALGEE,
                             {
-                                { ELEVATOR_STATE::FLOOR, 8.18_in },
+                                { ELEVATOR_STATE::FLOOR, 6.4_in },
                                 { ELEVATOR_STATE::STOWED, 3.15_in},
                                 { ELEVATOR_STATE::HP, 4.5_in},
                                 { ELEVATOR_STATE::ONE, 3.15_in },
-                                { ELEVATOR_STATE::TWO, 9.24_in},
-                                { ELEVATOR_STATE::THREE, 14.43_in},
+                                { ELEVATOR_STATE::TWO, 7.24_in},
+                                { ELEVATOR_STATE::THREE, 12.43_in},
                                 { ELEVATOR_STATE::FOUR, 29.9_in }
                             }
                         }
@@ -649,7 +649,7 @@ namespace Constants {
                         { PIVOT_STATE::CORAL_STOW, 0.11_tr },
                         { PIVOT_STATE::GROUND, 0.6_tr },
                         { PIVOT_STATE::PICK, 0.4_tr },
-                        { PIVOT_STATE::PRESCORE, 0.5_tr },
+                        { PIVOT_STATE::PRESCORE, 0.42_tr },
                         { PIVOT_STATE::CARRY, 0.27_tr },
                     };
             }}

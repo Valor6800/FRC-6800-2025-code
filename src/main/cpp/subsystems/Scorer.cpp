@@ -673,13 +673,21 @@ void Scorer::assignOutputs()
     // Pivot State Machine
     if (state.gamePiece == GAME_PIECE::ALGEE) {
         if (state.elevState == ELEVATOR_STATE::FLOOR) {
-            scorerPivotMotor->setPosition(getPivotPositionMap()[PIVOT_STATE::GROUND]);
+            if (state.hasAlgae) {
+                scorerPivotMotor->setPosition(getPivotPositionMap()[PIVOT_STATE::CARRY]);
+            } else {
+                scorerPivotMotor->setPosition(getPivotPositionMap()[PIVOT_STATE::GROUND]);
+            }
         } else if (state.scopedState == SCOPED_STATE::SCOPED || state.scopedState == SCOPED_STATE::MANUAL_SCOPE)  {
-            scorerPivotMotor->setPosition(getPivotPositionMap()[PIVOT_STATE::PICK]);
+            if (state.elevState == ELEVATOR_STATE::TWO || state.elevState == ELEVATOR_STATE::THREE || state.elevState == ELEVATOR_STATE::FOUR) {
+                scorerPivotMotor->setPosition(getPivotPositionMap()[PIVOT_STATE::PICK]);
+            } else {
+                scorerPivotMotor->setPosition(getPivotPositionMap()[PIVOT_STATE::PRESCORE]);
+            }
         } else if (state.hasAlgae) {
             scorerPivotMotor->setPosition(getPivotPositionMap()[PIVOT_STATE::CARRY]);
         } else {
-            scorerPivotMotor->setPosition(getPivotPositionMap()[PIVOT_STATE::PICK]);
+            scorerPivotMotor->setPosition(getPivotPositionMap()[PIVOT_STATE::CARRY]);
         }
     } else {
         scorerPivotMotor->setPosition(getPivotPositionMap()[PIVOT_STATE::CORAL_STOW]);
@@ -689,11 +697,17 @@ void Scorer::assignOutputs()
     if (state.elevState == ELEVATOR_STATE::MANUAL) {
         elevatorMotor->setPower(state.manualSpeed + units::volt_t{Constants::Scorer::getElevatorPIDF().aFF});
     } else {
-        if ((state.scopedState == SCOPED &&
+        if (state.elevState == ELEVATOR_STATE::FLOOR) {
+            if (state.hasAlgae) {
+                state.targetHeight = positionMap.at(state.gamePiece).at(ELEVATOR_STATE::STOWED);
+            } else {
+                state.targetHeight = positionMap.at(state.gamePiece).at(ELEVATOR_STATE::FLOOR);
+            }
+        } else if ((state.scopedState == SCOPED &&
             (
                 state.gamePiece == GAME_PIECE::ALGEE ||
                 (state.gamePiece == GAME_PIECE::CORAL && drivetrain->withinXRange((units::meter_t)table->GetNumber("Viable Elevator Distance (m)", VIABLE_ELEVATOR_DISTANCE.value())))
-            )) || state.scopedState == MANUAL_SCOPE || state.elevState == ELEVATOR_STATE::FLOOR
+            )) || state.scopedState == MANUAL_SCOPE
         ) {
             state.targetHeight = positionMap.at(state.gamePiece).at(state.elevState);
             if (state.elevState == ELEVATOR_STATE::ONE && state.gamePiece == GAME_PIECE::CORAL && state.scoringState == SCORE_STATE::SCORING) {
