@@ -3,41 +3,36 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 5.8,
-        "y": 4.02
-      },
-      "prevControl": null,
-      "nextControl": {
-        "x": 6.4409088260985685,
-        "y": 4.620677087538316
-      },
-      "isLocked": false,
-      "linkedName": "B-GA"
-    },
-    {
-      "anchor": {
         "x": 7.344344341681055,
         "y": 5.0331158328716565
       },
-      "prevControl": {
-        "x": 5.844344341681055,
+      "prevControl": null,
+      "nextControl": {
+        "x": 6.293545081967213,
+        "y": 5.001997950819672
+      },
+      "isLocked": false,
+      "linkedName": "B-Barge"
+    },
+    {
+      "anchor": {
+        "x": 6.125717213114753,
         "y": 5.0331158328716565
+      },
+      "prevControl": {
+        "x": 6.79702868852459,
+        "y": 5.001997950819672
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "B-Barge"
+      "linkedName": null
     }
   ],
-  "rotationTargets": [
-    {
-      "waypointRelativePos": 0.5,
-      "rotationDegrees": 0.0
-    }
-  ],
+  "rotationTargets": [],
   "constraintZones": [
     {
       "name": "Constraints Zone",
-      "minWaypointRelativePos": 0.5,
+      "minWaypointRelativePos": 0,
       "maxWaypointRelativePos": 1.0,
       "constraints": {
         "maxVelocity": 1.0,
@@ -53,34 +48,12 @@
   "eventMarkers": [
     {
       "name": "HP",
-      "waypointRelativePos": 0.02,
+      "waypointRelativePos": 0.01,
       "endWaypointRelativePos": null,
       "command": {
         "type": "named",
         "data": {
           "name": "HP"
-        }
-      }
-    },
-    {
-      "name": "Barge",
-      "waypointRelativePos": 0.8,
-      "endWaypointRelativePos": null,
-      "command": {
-        "type": "named",
-        "data": {
-          "name": "Barge"
-        }
-      }
-    },
-    {
-      "name": "Enable Scorer",
-      "waypointRelativePos": 0.98,
-      "endWaypointRelativePos": null,
-      "command": {
-        "type": "named",
-        "data": {
-          "name": "Enable Scorer"
         }
       }
     }
@@ -101,7 +74,7 @@
   "folder": "Algae",
   "idealStartingState": {
     "velocity": 0,
-    "rotation": 180.0
+    "rotation": 0.0
   },
   "useDefaultConstraints": true
 }

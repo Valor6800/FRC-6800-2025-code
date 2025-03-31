@@ -37,7 +37,7 @@
 #define VIABLE_DUNK_DISTANCE 0.28_m
 #define VIABLE_ELEVATOR_DISTANCE 1.8_m //consider the offset of the canrange from the front of robot which is 8 inches
 #define TELEOP_VIABLE_DUNK_SPEED_L4 0.25_mps
-#define AUTO_VIABLE_DUNK_SPEED_L4 0.75_mps
+#define AUTO_VIABLE_DUNK_SPEED_L4 1.1_mps
 
 #define MIN_DUNK_DISTANCE_OVER_CORAL 11_in
 #define MAX_DUNK_DISTANCE_OVER_CORAL 14.5_in
@@ -195,6 +195,7 @@ Scorer::Scorer(frc::TimedRobot *_robot, Drivetrain *_drivetrain, valor::CANdleSe
                 [this](){
                     state.gamePiece = GAME_PIECE::ALGEE;
                     state.elevState = ELEVATOR_STATE::FOUR;
+                    state.scopedState = SCOPED_STATE::MANUAL_SCOPE;
                 }
             )
         )
@@ -293,6 +294,8 @@ Scorer::Scorer(frc::TimedRobot *_robot, Drivetrain *_drivetrain, valor::CANdleSe
 
                     state.scopedState = SCOPED_STATE::SCOPED;
                     state.elevState = ELEVATOR_STATE::TWO;
+                    // state.scoringState = SCORE_STATE::SCORING;
+                    state.scoringState = SCORE_STATE::INTAKING;
                 },
                 [&]{ // on execute
                     drivetrain->state.alignToTarget = true;
@@ -626,7 +629,7 @@ void Scorer::analyzeDashboard()
         bool shouldAutoDunk = drivetrain->withinXRange((units::meter_t) table->GetNumber("Viable Dunk Distance (m)", VIABLE_DUNK_DISTANCE.value()));
         auto autoDunkSpeedThreshold = Constants::Scorer::getAutoDunkSpeedLimitation(drivetrain->xAlign);
         if (shouldAutoDunk) {
-            if (state.elevState == FOUR && drivetrain->isSpeedBelowThreshold(autoDunkSpeedThreshold)) {
+            if (state.elevState == FOUR && drivetrain->isSpeedBelowThreshold(frc::DriverStation::IsAutonomous() ? AUTO_VIABLE_DUNK_SPEED_L4 : autoDunkSpeedThreshold)) {
                 state.scoringState = SCORE_STATE::SCORING;
                 return;
             } else if ((state.elevState == TWO || state.elevState == THREE) && drivetrain->isSpeedBelowThreshold(autoDunkSpeedThreshold)) {

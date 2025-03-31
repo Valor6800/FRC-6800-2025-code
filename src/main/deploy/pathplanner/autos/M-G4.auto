@@ -33,6 +33,12 @@
           "data": {
             "pathName": "GAlgae-Barge"
           }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Barge-Back"
+          }
         }
       ]
     }
