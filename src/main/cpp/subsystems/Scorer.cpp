@@ -17,10 +17,10 @@
 #define ELEVATOR_SENSOR_TO_MECH 1.0f
 
 #define CORAL_INTAKE_SPEED 20_tps //5
-#define ALGEE_INTAKE_SPEED -11.5_tps
+#define ALGEE_INTAKE_SPEED -16_tps
 #define SCORE_SPEED 20_tps
 #define ALGEE_SCORE_SPEED 11.5_tps
-#define ALGEE_HOLD_SPD -0.4_tps
+#define ALGEE_HOLD_SPD -1_tps
 
 #define ELEVATOR_FORWARD_LIMIT 6_tr
 #define ELEVATOR_OFFSET 3_in
@@ -33,14 +33,14 @@
 
 #define PIVOT_MOTOR_TO_SENSOR 60.75f
 #define PIVOT_SENSOR_TO_MECH 1.0f
-#define SECOND_SCORER_FORWARD_LIMIT 0.32_tr
-#define SECOND_SCORER_REVERSE_LIMIT 0.02_tr
+#define SECOND_SCORER_FORWARD_LIMIT 0.6_tr
+#define SECOND_SCORER_REVERSE_LIMIT 0.10_tr
 #define PIVOT_CANCODER_RATIO 9.0f/21.0f
 
 //1-50 motor - sensor
 //21-9 gear to encoder
 
-#define ALGAE_CACHE_SIZE 1000
+#define ALGAE_CACHE_SIZE 2000
 
 #define VIABLE_ELEVATOR_THRESHOLD 0.02_m
 #define VIABLE_DUNK_DISTANCE 0.28_m
@@ -466,7 +466,7 @@ void Scorer::init()
 
     valor::PIDF pivotPID = Constants::Scorer::getScorerPivotPIDF();
     pivotPID.maxVelocity = scorerPivotMotor->getMaxMechSpeed();
-    pivotPID.maxAcceleration = scorerPivotMotor->getMaxMechSpeed() / 1_s;
+    pivotPID.maxAcceleration = scorerPivotMotor->getMaxMechSpeed() / 0.333_s;
     scorerPivotMotor->setPIDF(pivotPID);
     scorerPivotMotor->setupCANCoder(CANIDs::SCORER_PIVOT_CAN, scorerPivotMagnetOffset(), ctre::phoenix6::signals::SensorDirectionValue::CounterClockwise_Positive, "baseCAN");
     scorerPivotMotor->applyConfig();
@@ -501,7 +501,7 @@ void Scorer::init()
         }
     });
 
-    currentSensor.setSpikeSetpoint(15);
+    currentSensor.setSpikeSetpoint(25);
     currentSensor.setGetter([this]() {return scorerMotor->getCurrent().to<double>(); });
     currentSensor.setSpikeCallback([this]() {state.hasAlgae = true;});
     currentSensor.setCacheSize(ALGAE_CACHE_SIZE);
@@ -693,7 +693,7 @@ void Scorer::assignOutputs()
             (
                 state.gamePiece == GAME_PIECE::ALGEE ||
                 (state.gamePiece == GAME_PIECE::CORAL && drivetrain->withinXRange((units::meter_t)table->GetNumber("Viable Elevator Distance (m)", VIABLE_ELEVATOR_DISTANCE.value())))
-            )) || state.scopedState == MANUAL_SCOPE
+            )) || state.scopedState == MANUAL_SCOPE || state.elevState == ELEVATOR_STATE::FLOOR
         ) {
             state.targetHeight = positionMap.at(state.gamePiece).at(state.elevState);
             if (state.elevState == ELEVATOR_STATE::ONE && state.gamePiece == GAME_PIECE::CORAL && state.scoringState == SCORE_STATE::SCORING) {

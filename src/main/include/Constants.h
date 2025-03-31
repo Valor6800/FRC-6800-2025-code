@@ -623,7 +623,7 @@ namespace Constants {
                         {
                             GAME_PIECE::ALGEE,
                             {
-                                { ELEVATOR_STATE::FLOOR, 4.5_in },
+                                { ELEVATOR_STATE::FLOOR, 8.18_in },
                                 { ELEVATOR_STATE::STOWED, 3.15_in},
                                 { ELEVATOR_STATE::HP, 4.5_in},
                                 { ELEVATOR_STATE::ONE, 3.15_in },
@@ -638,19 +638,19 @@ namespace Constants {
             static PositionAngleMap getPivotPositionMap() { switch (robot) {
                 case Robot::Gold:
                     return {
-                        { PIVOT_STATE::CORAL_STOW, 0_tr },
-                        { PIVOT_STATE::GROUND, 0_tr },
-                        { PIVOT_STATE::PICK, 0_tr },
-                        { PIVOT_STATE::PRESCORE, 0_tr },
-                        { PIVOT_STATE::CARRY, 0_tr },
+                        { PIVOT_STATE::CORAL_STOW, 0.11_tr },
+                        { PIVOT_STATE::GROUND, 0.6_tr },
+                        { PIVOT_STATE::PICK, 0.4_tr },
+                        { PIVOT_STATE::PRESCORE, 0.5_tr },
+                        { PIVOT_STATE::CARRY, 0.27_tr },
                     };
                 default:
                     return {
-                        { PIVOT_STATE::CORAL_STOW, 0_tr },
-                        { PIVOT_STATE::GROUND, 0.3_tr },
-                        { PIVOT_STATE::PICK, 0.2_tr },
-                        { PIVOT_STATE::PRESCORE, 0.25_tr },
-                        { PIVOT_STATE::CARRY, 0.08_tr },
+                        { PIVOT_STATE::CORAL_STOW, 0.11_tr },
+                        { PIVOT_STATE::GROUND, 0.6_tr },
+                        { PIVOT_STATE::PICK, 0.4_tr },
+                        { PIVOT_STATE::PRESCORE, 0.5_tr },
+                        { PIVOT_STATE::CARRY, 0.27_tr },
                     };
             }}
 
@@ -742,7 +742,9 @@ namespace Constants {
                 }
                 default: {
                     valor::PIDF pidf;
-                    pidf.P = 20;
+                    pidf.P = 200;
+                    pidf.aFF = 0.46;
+                    pidf.aFFType = valor::FeedForwardType::CIRCULAR;
                     return pidf;
                 }
             }}
@@ -763,8 +765,9 @@ namespace Constants {
                 }
                 default: {
                     valor::PIDF pidf;
-                    pidf.P = 0.5;
-                    pidf.S = 0.45;
+                    pidf.P = 1;
+                    pidf.S = 0.32;
+                    pidf.kV = 0.32;
                     return pidf;
                 }
             }}
