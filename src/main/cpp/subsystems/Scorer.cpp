@@ -1,10 +1,12 @@
 #include "Constants.h"
 #include "subsystems/Scorer.h"
+#include "units/angular_velocity.h"
 #include "units/current.h"
 #include "units/time.h"
 #include "units/length.h"
 #include "units/math.h"
 #include "Drivetrain.h"
+#include "units/velocity.h"
 #include "valkyrie/controllers/NeutralMode.h"
 #include "valkyrie/controllers/PIDF.h"
 #include <iostream>
@@ -627,19 +629,16 @@ void Scorer::analyzeDashboard()
         (state.elevState == TWO || state.elevState == THREE || state.elevState == FOUR)
     ) {
         bool shouldAutoDunk = drivetrain->withinXRange((units::meter_t) table->GetNumber("Viable Dunk Distance (m)", VIABLE_DUNK_DISTANCE.value()));
+        bool autoDunkYSpeed = units::math::fabs(drivetrain->yControllerInitialVelocity) < .05_mps;
+        bool autoDunkRotSpeed = units::math::fabs(drivetrain->getYawVelocity()) < units::degrees_per_second_t{3};
+        bool autoDunkSpeedLimit = autoDunkYSpeed && autoDunkRotSpeed;
         auto autoDunkSpeedThreshold = Constants::Scorer::getAutoDunkSpeedLimitation(drivetrain->xAlign);
         if (shouldAutoDunk) {
-            if (state.elevState == FOUR && drivetrain->isSpeedBelowThreshold(frc::DriverStation::IsAutonomous() ? AUTO_VIABLE_DUNK_SPEED_L4 : autoDunkSpeedThreshold)) {
+            if (state.elevState == FOUR && autoDunkSpeedLimit && drivetrain->isSpeedBelowThreshold(frc::DriverStation::IsAutonomous() ? AUTO_VIABLE_DUNK_SPEED_L4 : autoDunkSpeedThreshold)) {
                 state.scoringState = SCORE_STATE::SCORING;
-                return;
-            } else if ((state.elevState == TWO || state.elevState == THREE) && drivetrain->isSpeedBelowThreshold(autoDunkSpeedThreshold)) {
+            } else if ((state.elevState == TWO || state.elevState == THREE) && autoDunkSpeedLimit && drivetrain->isSpeedBelowThreshold(autoDunkSpeedThreshold)) {
                 state.scoringState = SCORE_STATE::SCORING;
-                return;
             }
-        }
-
-        if (state.shootOverCoral) {
-            state.scoringState = SCORE_STATE::SCORING;
         }
     }
 

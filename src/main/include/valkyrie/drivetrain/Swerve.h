@@ -109,6 +109,9 @@ public:
 
     void InitSendable(wpi::SendableBuilder& builder) override;
 
+    units::meters_per_second_t yControllerInitialVelocity;
+    units::meters_per_second_t xControllerInitialVelocity;
+
 protected:
     double xSpeed;
     double ySpeed;
@@ -164,8 +167,6 @@ protected:
     units::meter_t xGoalAlign = 18.2_in;
 
     bool yControllerAligned();
-    units::meters_per_second_t yControllerInitialVelocity;
-    units::meters_per_second_t xControllerInitialVelocity;
     wpi::array<frc::SwerveModuleState, MODULE_COUNT> testModeDesiredStates{wpi::empty_array};
 
     std::vector<valor::SwerveModule<AzimuthMotor, DriveMotor> *> swerveModules;

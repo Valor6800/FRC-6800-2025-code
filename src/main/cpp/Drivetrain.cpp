@@ -10,6 +10,7 @@
 #include "Constants.h"
 #include "frc2/command/FunctionalCommand.h"
 #include "units/acceleration.h"
+#include "units/angular_velocity.h"
 #include "units/base.h"
 #include "units/length.h"
 #include "units/math.h"
@@ -659,6 +660,7 @@ void Drivetrain::alignAngleZoning()
 
     }
 }
+
 bool Drivetrain::withinXRange(units::meter_t distance) {
     auto measuredDistance = lidarDistance();
     return (measuredDistance < distance);
@@ -687,6 +689,10 @@ units::meter_t Drivetrain::lidarDistance() {
 
 bool Drivetrain::withinYRange() {
     return yControllerAligned();
+}
+
+units::degrees_per_second_t Drivetrain::getYawVelocity() {
+    return pigeon->GetAngularVelocityZWorld().GetValue();
 }
 
 bool Drivetrain::isSpeedBelowThreshold(units::meters_per_second_t m) {
