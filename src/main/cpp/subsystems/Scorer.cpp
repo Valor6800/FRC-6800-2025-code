@@ -630,7 +630,7 @@ void Scorer::analyzeDashboard()
     ) {
         bool shouldAutoDunk = drivetrain->withinXRange((units::meter_t) table->GetNumber("Viable Dunk Distance (m)", VIABLE_DUNK_DISTANCE.value()));
         bool autoDunkYSpeed = units::math::fabs(drivetrain->yControllerInitialVelocity) < .05_mps;
-        bool autoDunkRotSpeed = units::math::fabs(drivetrain->getYawVelocity()) < units::degrees_per_second_t{3};
+        bool autoDunkRotSpeed = units::math::fabs(drivetrain->getYawVelocity()) < units::degrees_per_second_t{4};
         bool autoDunkSpeedLimit = autoDunkYSpeed && autoDunkRotSpeed;
         auto autoDunkSpeedThreshold = Constants::Scorer::getAutoDunkSpeedLimitation(drivetrain->xAlign);
         if (shouldAutoDunk) {
@@ -716,19 +716,19 @@ void Scorer::assignOutputs()
     }
 
   // Scorer State Machine
-if (state.scoringState == SCORE_STATE::SCORING) {
-    if (state.gamePiece == GAME_PIECE::ALGEE) {
-        scorerMotor->setSpeed(ALGEE_SCORE_SPEED);
-    } else if (!state.protectChin) {
-        auto it = scoringSpeedMap.find(state.elevState);
-        if (it != scoringSpeedMap.end()) {
-            scorerMotor->setSpeed(it->second);
+    if (state.scoringState == SCORE_STATE::SCORING) {
+        if (state.gamePiece == GAME_PIECE::ALGEE) {
+            scorerMotor->setSpeed(ALGEE_SCORE_SPEED);
+        } else if (!state.protectChin) {
+            auto it = scoringSpeedMap.find(state.elevState);
+            if (it != scoringSpeedMap.end()) {
+                scorerMotor->setSpeed(it->second);
+            } else {
+                scorerMotor->setSpeed(SCORE_SPEED);
+            }
         } else {
-            scorerMotor->setSpeed(SCORE_SPEED);
+            scorerMotor->setSpeed(0_tps);
         }
-    } else {
-        scorerMotor->setSpeed(0_tps);
-    }
     } else if (state.hasAlgae && state.gamePiece == GAME_PIECE::ALGEE) {
         scorerMotor->setSpeed(ALGEE_HOLD_SPD);
     } else if (!scorerStagingSensor.isTriggered()) {
