@@ -3,6 +3,7 @@
 #include <valkyrie/sensors/CANRangeSensor.h>
 #include "frc/geometry/Pose3d.h" 
 #include "units/acceleration.h"
+#include "units/angular_velocity.h"
 #include "units/length.h"
 #include "units/time.h"
 #include "valkyrie/sensors/AprilTagsSensor.h"
@@ -177,6 +178,7 @@ public:
      bool withinYRange();
      bool isSpeedBelowThreshold(units::meters_per_second_t m);
      bool isSpeedStopped();
+     units::degrees_per_second_t getYawVelocity();
 
 private:
 
