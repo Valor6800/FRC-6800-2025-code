@@ -68,6 +68,8 @@ public:
         units::volt_t manualSpeed;
 
         bool hasAlgae;
+        bool hasCoral;
+        bool intaking;
         double algaeSpikeCurrent;
 
         bool hasZeroed;
@@ -97,6 +99,7 @@ private:
 
     valor::CANrangeSensor scorerStagingSensor;
     valor::CurrentSensor currentSensor;
+    valor::CurrentSensor coralCurrentSensor;
 
     Constants::Scorer::PositionMap positionMap;
     Constants::Scorer::ScoringSpeedMap scoringSpeedMap;

@@ -505,6 +505,7 @@ namespace Constants {
             enum PIVOT_STATE
             {
                 CORAL_STOW,
+                CORAL_GROUND,
                 GROUND,
                 PICK,
                 PRESCORE,
@@ -544,7 +545,7 @@ namespace Constants {
                 };
                 default: return {
                     {ELEVATOR_STATE::FLOOR, 5_tps},
-                    {ELEVATOR_STATE::ONE, 6_tps},
+                    {ELEVATOR_STATE::ONE, -6_tps},
                     {ELEVATOR_STATE::TWO, 12_tps},
                     {ELEVATOR_STATE::THREE, 12_tps},
                     {ELEVATOR_STATE::FOUR, 12_tps} // 25
@@ -614,7 +615,7 @@ namespace Constants {
                                 { ELEVATOR_STATE::FLOOR, 3.25_in },
                                 { ELEVATOR_STATE::STOWED, 10_in },
                                 { ELEVATOR_STATE::HP, 3.25_in },
-                                { ELEVATOR_STATE::ONE, 10.2_in },
+                                { ELEVATOR_STATE::ONE, 3.25_in },
                                 { ELEVATOR_STATE::TWO, 14.2_in },
                                 { ELEVATOR_STATE::THREE, 19.25_in },
                                 { ELEVATOR_STATE::FOUR, 27_in }
@@ -639,6 +640,7 @@ namespace Constants {
                 case Robot::Gold:
                     return {
                         { PIVOT_STATE::CORAL_STOW, 0.11_tr },
+                        { PIVOT_STATE::CORAL_GROUND, 0.5_tr },
                         { PIVOT_STATE::GROUND, 0.6_tr },
                         { PIVOT_STATE::PICK, 0.4_tr },
                         { PIVOT_STATE::PRESCORE, 0.5_tr },
@@ -647,6 +649,7 @@ namespace Constants {
                 default:
                     return {
                         { PIVOT_STATE::CORAL_STOW, 0.11_tr },
+                        { PIVOT_STATE::CORAL_GROUND, 0.5_tr },
                         { PIVOT_STATE::GROUND, 0.6_tr },
                         { PIVOT_STATE::PICK, 0.4_tr },
                         { PIVOT_STATE::PRESCORE, 0.42_tr },

@@ -17,10 +17,12 @@
 #define ELEVATOR_SENSOR_TO_MECH 1.0f
 
 #define CORAL_INTAKE_SPEED 20_tps //5
+#define CORAL_GROUND_INTAKE_SPEED -20_tps //5
 #define ALGEE_INTAKE_SPEED -16_tps
 #define SCORE_SPEED 20_tps
 #define ALGEE_SCORE_SPEED 11.5_tps
 #define ALGEE_HOLD_SPD -1_tps
+#define CORAL_HOLD_SPD 0.25_tps
 
 #define ELEVATOR_FORWARD_LIMIT 6_tr
 #define ELEVATOR_OFFSET 3_in
@@ -41,6 +43,7 @@
 //21-9 gear to encoder
 
 #define ALGAE_CACHE_SIZE 2000
+#define CORAL_CACHE_SIZE 750
 
 #define VIABLE_ELEVATOR_THRESHOLD 0.02_m
 #define VIABLE_DUNK_DISTANCE 0.28_m
@@ -62,6 +65,7 @@ Scorer::Scorer(frc::TimedRobot *_robot, Drivetrain *_drivetrain, valor::CANdleSe
     scorerPivotMotor(new valor::PhoenixController(Constants::getScorerPivotMotorType(), CANIDs::SCORER_PIVOT_MOTOR, valor::NeutralMode::Brake, scorerPivotInverted(), "baseCAN")),
     scorerStagingSensor(_robot, "Scorer Staging Sensor", CANIDs::STAGING_LIDAR_SENSOR, "baseCAN", -1_mm),
     currentSensor(_robot, "Algae Current Sensor"),
+    coralCurrentSensor(_robot, "Coral Current Sensor"),
     positionMap{std::move(getPositionMap())},
     scoringSpeedMap{std::move(getScoringSpeedMap())},
     drivetrain(_drivetrain),
@@ -382,7 +386,10 @@ void Scorer::resetState()
     state.manualSpeed = 0_V;
     state.algaeSpikeCurrent = 30;
     currentSensor.reset();
+    coralCurrentSensor.reset();
+    state.intaking = false;
     state.hasAlgae = false;
+    state.hasCoral = false;
     state.protectChin = false;
     state.autoDunkEnabled = true;
 }
@@ -506,6 +513,11 @@ void Scorer::init()
     currentSensor.setSpikeCallback([this]() {state.hasAlgae = true;});
     currentSensor.setCacheSize(ALGAE_CACHE_SIZE);
 
+    currentSensor.setSpikeSetpoint(15);
+    currentSensor.setGetter([this]() {return scorerMotor->getCurrent().to<double>(); });
+    currentSensor.setSpikeCallback([this]() {state.hasCoral = true;});
+    currentSensor.setCacheSize(CORAL_CACHE_SIZE);
+
     resetState();
     table->PutBoolean("Auto Dunk Disabled", false);
     
@@ -532,8 +544,6 @@ void Scorer::assessInputs()
     if (operatorGamepad->leftStickYActive()) {
         state.elevState = MANUAL;
         state.manualSpeed = operatorGamepad->leftStickY(3) * 12_V * 0.75;
-    } else if (driverGamepad->GetXButton()) {
-        state.elevState = ELEVATOR_STATE::FLOOR;
     } else if (operatorGamepad->GetYButton()) {
          state.elevState = ELEVATOR_STATE::FOUR;
     } else if (operatorGamepad->GetBButton()) {
@@ -558,10 +568,16 @@ void Scorer::assessInputs()
         state.scopedState = UNSCOPED;
     }
 
+    if (driverGamepad->GetXButton()) {
+        state.intaking = true;
+    } else {
+        state.intaking = false;
+    }
 
     if (driverGamepad->GetRightBumperButton()) {
         state.scoringState = SCORE_STATE::SCORING;
         state.hasAlgae = false;
+        state.hasCoral = false;
     } else {
         state.scoringState = SCORE_STATE::HOLD;
     }
@@ -672,7 +688,7 @@ void Scorer::assignOutputs()
 
     // Pivot State Machine
     if (state.gamePiece == GAME_PIECE::ALGEE) {
-        if (state.elevState == ELEVATOR_STATE::FLOOR) {
+        if (state.intaking) {
             if (state.hasAlgae) {
                 scorerPivotMotor->setPosition(getPivotPositionMap()[PIVOT_STATE::CARRY]);
             } else {
@@ -690,14 +706,18 @@ void Scorer::assignOutputs()
             scorerPivotMotor->setPosition(getPivotPositionMap()[PIVOT_STATE::CARRY]);
         }
     } else {
-        scorerPivotMotor->setPosition(getPivotPositionMap()[PIVOT_STATE::CORAL_STOW]);
+        if (state.intaking) {
+            scorerPivotMotor->setPosition(getPivotPositionMap()[PIVOT_STATE::CORAL_GROUND]);
+        } else {
+            scorerPivotMotor->setPosition(getPivotPositionMap()[PIVOT_STATE::CORAL_STOW]);
+        }
     }
 
     //Elevator State Machine
     if (state.elevState == ELEVATOR_STATE::MANUAL) {
         elevatorMotor->setPower(state.manualSpeed + units::volt_t{Constants::Scorer::getElevatorPIDF().aFF});
     } else {
-        if (state.elevState == ELEVATOR_STATE::FLOOR) {
+        if (state.intaking) {
             if (state.hasAlgae) {
                 state.targetHeight = positionMap.at(state.gamePiece).at(ELEVATOR_STATE::STOWED);
             } else {
@@ -729,6 +749,8 @@ void Scorer::assignOutputs()
 
     // Scorer State Machine
     if (state.scoringState == SCORE_STATE::SCORING) {
+        currentSensor.reset();
+        coralCurrentSensor.reset();
         if (state.gamePiece == GAME_PIECE::ALGEE) {
             scorerMotor->setSpeed(ALGEE_SCORE_SPEED);
         } else if (!state.protectChin) {
@@ -743,6 +765,14 @@ void Scorer::assignOutputs()
         }
     } else if (state.hasAlgae && state.gamePiece == GAME_PIECE::ALGEE) {
         scorerMotor->setSpeed(ALGEE_HOLD_SPD);
+    } else if (state.hasCoral && state.gamePiece == GAME_PIECE::CORAL) {
+        scorerMotor->setSpeed(CORAL_HOLD_SPD);
+    } else if (state.intaking) {
+        if (state.gamePiece == GAME_PIECE::ALGEE) {
+            scorerMotor->setSpeed(ALGEE_INTAKE_SPEED);
+        } else {
+            scorerMotor->setSpeed(CORAL_GROUND_INTAKE_SPEED);
+        }
     } else if (!scorerStagingSensor.isTriggered()) {
         if (state.gamePiece == GAME_PIECE::ALGEE) {
             scorerMotor->setSpeed(ALGEE_INTAKE_SPEED);
