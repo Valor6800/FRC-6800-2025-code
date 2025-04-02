@@ -669,6 +669,16 @@ void Scorer::analyzeDashboard()
         leds->setColor(5, botColor, valor::CANdleSensor::Priority::PRIORITY_SCORER);
     }
 
+    int tagID = drivetrain->state.reefTag;
+
+    if (state.gamePiece == GAME_PIECE::ALGEE) {
+        if (tagID >= 6 && tagID <= 11) {
+            state.elevState = (tagID % 2 == 1) ? ELEVATOR_STATE::THREE : ELEVATOR_STATE::TWO;
+        } else if (tagID >= 17 && tagID <= 22) {
+            state.elevState = (tagID % 2 == 0) ? ELEVATOR_STATE::THREE : ELEVATOR_STATE::TWO;
+        }
+    }
+   
     state.algaeSpikeCurrent = table->GetNumber("Algae Spike Setpoint", 30);
     drivetrain->setGamePieceInRobot(state.gamePiece);
     drivetrain->state.elevState = state.elevState;
