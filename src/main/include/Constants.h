@@ -265,7 +265,7 @@ namespace Constants {
 
         static units::angle::turn_t getElevatorMagnetOffset() { switch (robot) {
             case Robot::Alpha: return 0.10327_tr;
-            case Robot::Gold: return .053955_tr; //  0.989014_tr;
+            case Robot::Gold: return .2260738594_tr; //  0.989014_tr;
             default: return -0.303710_tr;
         }};
 
@@ -419,7 +419,7 @@ namespace Constants {
             {19,
                 {
                     {LEFT, 0_cm},
-                    {RIGHT, .5_in},
+                    {RIGHT, 0_cm},
                     {NONE, 0_in}
                 }},
             {20,
@@ -445,38 +445,38 @@ namespace Constants {
         static std::unordered_map<AprilTag, DirectionalOffSet> redPoleOffsets {
             {6,
                 {
-                    {LEFT, -1_cm},
-                    {RIGHT, -1_cm},
+                    {LEFT, 0_cm},
+                    {RIGHT, 0_cm},
                     {NONE, 0_in}
                 }},
             {7,
                 {
-                    {LEFT, -1_cm},
-                    {RIGHT, -1_cm},
+                    {LEFT, 0_cm},
+                    {RIGHT, 0_cm},
                     {NONE, 0_in}
                 }},
             {8,
                 {
-                    {LEFT, -1_cm},
-                    {RIGHT, -1_cm},
+                    {LEFT, 0_cm},
+                    {RIGHT, 0_cm},
                     {NONE, 0_in}
                 }},
             {9,
                 {
-                    {LEFT, -1_cm},
-                    {RIGHT, -1_cm},
+                    {LEFT, 0_cm},
+                    {RIGHT, 0_cm},
                     {NONE, 0_in}
                 }},
             {10,
                 {
-                    {LEFT, -1_cm},
-                    {RIGHT, -1_cm},
+                    {LEFT, 0_cm},
+                    {RIGHT, 0_cm},
                     {NONE, 0_in}
                 }},
             {11,
                 {
-                    {LEFT, -1_cm},
-                    {RIGHT, -1_cm},
+                    {LEFT, 0_cm},
+                    {RIGHT, 0_cm},
                     {NONE, 0_in}
                 }},
         };
