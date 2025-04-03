@@ -181,7 +181,7 @@ protected:
     units::meters_per_second_t xVelTolerance = 0.0_mps; //0.01_mps;
     units::radian_t angularPosition = 0_rad;
     units::meter_t goalAlign = 0.0_m;
-    units::meter_t xGoalAlign = 18.2_in;
+    units::meter_t xGoalAlign = 17.7_in;
 
     bool yControllerAligned();
     wpi::array<frc::SwerveModuleState, MODULE_COUNT> testModeDesiredStates{wpi::empty_array};
