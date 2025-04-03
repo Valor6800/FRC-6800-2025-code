@@ -97,7 +97,9 @@ Swerve<AzimuthMotor, DriveMotor>::Swerve(frc::TimedRobot *_robot,
     table->PutNumber("Y_KAFF", Y_KAFF);
     table->PutNumber("X_KAFF", X_KFF);
     RobotConfig config = RobotConfig::fromGUISettings();
-
+    
+    table->PutBoolean("X ALIGN ACTIVE", xAlign);
+    table->PutBoolean("Y ALIGN ACTIVE", yAlign);
     /*setpointGenerator = SwerveSetpointGenerator(config, 9.4_rad_per_s);
 
     frc::ChassisSpeeds currentSpeeds = getRobotRelativeSpeeds();
@@ -264,6 +266,9 @@ void Swerve<AzimuthMotor, DriveMotor>::analyzeDashboard()
         xSpeedMPS = units::meters_per_second_t{powerVector[0]};
         ySpeedMPS = units::meters_per_second_t{powerVector[1]};
     }
+
+    table->PutBoolean("X ALIGN ACTIVE", xAlign);
+    table->PutBoolean("Y ALIGN ACTIVE", yAlign);
 }
 
 template<class AzimuthMotor, class DriveMotor>
