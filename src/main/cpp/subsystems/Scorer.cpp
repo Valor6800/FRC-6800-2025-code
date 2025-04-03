@@ -15,6 +15,9 @@
 
 #include <frc/DriverStation.h>
 
+#define Y_CONTROLLER_SPEED_LIMIT .075_mps
+#define ROT_CONTROLLER_SPEED_LIMIT units::degrees_per_second_t{5}
+
 #define ELEV_K_ERROR units::angle::turn_t (0)
 #define ELEVATOR_SENSOR_TO_MECH 1.0f
 
@@ -629,8 +632,8 @@ void Scorer::analyzeDashboard()
         (state.elevState == TWO || state.elevState == THREE || state.elevState == FOUR)
     ) {
         bool shouldAutoDunk = drivetrain->withinXRange((units::meter_t) table->GetNumber("Viable Dunk Distance (m)", VIABLE_DUNK_DISTANCE.value()));
-        bool autoDunkYSpeed = units::math::fabs(drivetrain->yControllerInitialVelocity) < .05_mps;
-        bool autoDunkRotSpeed = units::math::fabs(drivetrain->getYawVelocity()) < units::degrees_per_second_t{5};
+        bool autoDunkYSpeed = units::math::fabs(drivetrain->yControllerInitialVelocity) < Y_CONTROLLER_SPEED_LIMIT;
+        bool autoDunkRotSpeed = units::math::fabs(drivetrain->getYawVelocity()) < ROT_CONTROLLER_SPEED_LIMIT;
         bool autoDunkSpeedLimit = autoDunkYSpeed && autoDunkRotSpeed;
         auto autoDunkSpeedThreshold = Constants::Scorer::getAutoDunkSpeedLimitation(drivetrain->xAlign);
         if (shouldAutoDunk) {
@@ -824,6 +827,25 @@ void Scorer::InitSendable(wpi::SendableBuilder& builder)
     builder.AddBooleanProperty(
         "ABSOLUTE POSITION NO OFFSET?",
         [this] {return absSensorCorrect.value();},
+        nullptr
+    );
+    builder.AddBooleanArrayProperty(
+        "Auto Dunk Acceptance",
+        [this] {
+            std::vector<int> gates = {
+                state.autoDunkEnabled && !table->GetBoolean("Auto Dunk Disabled", false),
+                drivetrain->withinYRange(),
+                state.scopedState == SCOPED_STATE::SCOPED,
+                elevatorWithinThreshold,
+                state.gamePiece == GAME_PIECE::CORAL,
+                state.elevState == TWO || state.elevState == THREE || state.elevState == FOUR,
+                drivetrain->withinXRange((units::meter_t) table->GetNumber("Viable Dunk Distance (m)", VIABLE_DUNK_DISTANCE.value())),
+                units::math::fabs(drivetrain->yControllerInitialVelocity) < Y_CONTROLLER_SPEED_LIMIT,
+                units::math::fabs(drivetrain->getYawVelocity()) < ROT_CONTROLLER_SPEED_LIMIT,
+                drivetrain->isSpeedBelowThreshold(Constants::Scorer::getAutoDunkSpeedLimitation(drivetrain->xAlign))
+            };
+            return gates;
+        },
         nullptr
     );
 }

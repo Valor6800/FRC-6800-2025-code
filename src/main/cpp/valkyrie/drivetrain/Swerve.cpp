@@ -83,7 +83,7 @@ Swerve<AzimuthMotor, DriveMotor>::Swerve(frc::TimedRobot *_robot,
     rot_controller.SetTolerance(rotPosTolerance, rotVelTolerance);
     y_controller.SetTolerance(yPosTolerance, yVelTolerance);
     x_controller.SetTolerance(xPosTolerance, xVelTolerance);
-    maxDriveSpeed = swerveModules[0]->getMaxDriveSpeed();
+    maxDriveSpeed = swerveModules[0]->getMaxDriveSpeed(); // 4.560 mps
     maxRotationSpeed = units::radians_per_second_t{(swerveModules[0]->getMaxDriveSpeed() / _module_radius).value()};
 
     kinematics = std::make_unique<frc::SwerveDriveKinematics<MODULE_COUNT>>(motorLocations);
@@ -750,11 +750,6 @@ void Swerve<AzimuthMotor, DriveMotor>::InitSendable(wpi::SendableBuilder& builde
         nullptr
     );
     builder.AddDoubleProperty(
-        "Max Drive Speed MPS",
-        [this] {return maxDriveSpeed.value();},
-        nullptr
-    );
-    builder.AddDoubleProperty(
         "Target Angle",
         [this] {return units::radian_t{targetAngle}.to<double>();},
         nullptr
@@ -885,21 +880,6 @@ void Swerve<AzimuthMotor, DriveMotor>::InitSendable(wpi::SendableBuilder& builde
         [this] {return xControllerInitialVelocity.value();},
         nullptr
     );
-    builder.AddBooleanProperty(
-        "Rot Controller Aligned",
-        [this] {return rot_controller.AtGoal();},
-        nullptr
-    );
-    builder.AddBooleanProperty(
-        "Y Controller Aligned",
-        [this] {return y_controller.AtGoal();},
-        nullptr
-    );
-    builder.AddBooleanProperty(
-        "X Controller Aligned",
-        [this] {return x_controller.AtGoal();},
-        nullptr
-    );
     builder.AddDoubleProperty(
         "Rot Controller Position Error",
         [this] {return rot_controller.GetPositionError().value();},
@@ -930,27 +910,9 @@ void Swerve<AzimuthMotor, DriveMotor>::InitSendable(wpi::SendableBuilder& builde
         [this] {return x_controller.GetVelocityError().value();},
         nullptr
     );
-
-    builder.AddDoubleProperty(
-        "Pigeon Estimated Rotational Position",
-        [this] { return angularPosition.value(); },
-        nullptr
-    );
-    builder.AddDoubleProperty(
-        "Smoothed Angular Acceleration (rad/s^2)",
-        [this] { return getSmoothedAngularAcceleration().value(); },
-        nullptr
-    );
-
     builder.AddDoubleProperty(
         "Angular Velocity",
         [this] { return pigeon->GetAngularVelocityZWorld().GetValue().value(); },  
-        nullptr
-    );
-    
-    builder.AddDoubleProperty(
-        "Angular Acceleration (NOT AVERAGED)",
-        [this] { return angularAcceleration.value();},  
         nullptr
     );
 }
