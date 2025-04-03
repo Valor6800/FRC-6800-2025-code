@@ -630,7 +630,7 @@ void Scorer::analyzeDashboard()
     ) {
         bool shouldAutoDunk = drivetrain->withinXRange((units::meter_t) table->GetNumber("Viable Dunk Distance (m)", VIABLE_DUNK_DISTANCE.value()));
         bool autoDunkYSpeed = units::math::fabs(drivetrain->yControllerInitialVelocity) < .05_mps;
-        bool autoDunkRotSpeed = units::math::fabs(drivetrain->getYawVelocity()) < units::degrees_per_second_t{4};
+        bool autoDunkRotSpeed = units::math::fabs(drivetrain->getYawVelocity()) < units::degrees_per_second_t{5};
         bool autoDunkSpeedLimit = autoDunkYSpeed && autoDunkRotSpeed;
         auto autoDunkSpeedThreshold = Constants::Scorer::getAutoDunkSpeedLimitation(drivetrain->xAlign);
         if (shouldAutoDunk) {
