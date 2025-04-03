@@ -611,6 +611,15 @@ void Scorer::analyzeDashboard()
         state.protectChin = false;
     }
 
+    if (state.elevState == ELEVATOR_STATE::FOUR && drivetrain->getXConstraints().maxVelocity != drivetrain->x_constraints_l4.maxVelocity) {
+        drivetrain->setXConstraints(drivetrain->x_constraints_l4);
+    } else if (
+        (state.elevState == ELEVATOR_STATE::ONE || state.elevState == ELEVATOR_STATE::TWO || state.elevState == ELEVATOR_STATE::THREE) && 
+        drivetrain->getXConstraints().maxVelocity != drivetrain->x_constraints.maxVelocity
+    ) {
+        drivetrain->setXConstraints(drivetrain->x_constraints);
+    }
+
     units::meter_t elevatorSetpoint = positionMap[state.gamePiece][state.elevState];
 
     bool isStopped = drivetrain->isSpeedStopped();

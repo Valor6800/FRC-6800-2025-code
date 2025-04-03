@@ -467,6 +467,16 @@ void Swerve<AzimuthMotor, DriveMotor>::resetLinearAlignControllers() {
 }
 
 template<class AzimuthMotor, class DriveMotor>
+void Swerve<AzimuthMotor, DriveMotor>::setXConstraints(frc::TrapezoidProfile<units::meter>::Constraints constraints) {
+    x_controller.SetConstraints(constraints);
+}
+
+template<class AzimuthMotor, class DriveMotor>
+frc::TrapezoidProfile<units::meter>::Constraints Swerve<AzimuthMotor, DriveMotor>::getXConstraints() {
+    return x_controller.GetConstraints();
+}
+
+template<class AzimuthMotor, class DriveMotor>
 void  Swerve<AzimuthMotor, DriveMotor>::calculateCarpetPose()
 {
     static frc::Pose2d previousPose;

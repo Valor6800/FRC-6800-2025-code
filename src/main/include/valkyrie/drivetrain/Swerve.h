@@ -112,6 +112,23 @@ public:
     units::meters_per_second_t yControllerInitialVelocity;
     units::meters_per_second_t xControllerInitialVelocity;
 
+    const units::radians_per_second_t MAX_ROTATION_VEL = 16_rad_per_s;
+    const units::radians_per_second_squared_t MAX_ROTATION_ACCEL = 12_rad_per_s_sq;
+    const units::meters_per_second_t MAX_Y_VEL = 5.5_mps;
+    const units::meters_per_second_squared_t MAX_Y_ACCEL = 2_mps_sq;
+    const units::meters_per_second_t MAX_X_VEL = 1.5_mps;
+    const units::meters_per_second_t MAX_X_VEL_L4 = 1.0_mps;
+    const units::meters_per_second_squared_t MAX_X_ACCEL = 2.0_mps_sq;
+
+    const frc::TrapezoidProfile<units::radian>::Constraints rot_constraints{MAX_ROTATION_VEL, MAX_ROTATION_ACCEL};
+
+    const frc::TrapezoidProfile<units::meter>::Constraints y_constraints{MAX_Y_VEL, MAX_Y_ACCEL};
+    const frc::TrapezoidProfile<units::meter>::Constraints x_constraints{MAX_X_VEL, MAX_X_ACCEL};
+    const frc::TrapezoidProfile<units::meter>::Constraints x_constraints_l4{MAX_X_VEL_L4, MAX_X_ACCEL};
+
+    void setXConstraints(frc::TrapezoidProfile<units::meter>::Constraints constraints);
+    frc::TrapezoidProfile<units::meter>::Constraints getXConstraints();
+
 protected:
     double xSpeed;
     double ySpeed;
@@ -175,12 +192,6 @@ protected:
     void transformControllerSpeeds();
 
 private:
-    const units::radians_per_second_t MAX_ROTATION_VEL = 16_rad_per_s;
-    const units::radians_per_second_squared_t MAX_ROTATION_ACCEL = 12_rad_per_s_sq;
-    const units::meters_per_second_t MAX_Y_VEL = 5.5_mps;
-    const units::meters_per_second_squared_t MAX_Y_ACCEL = 2_mps_sq;
-    const units::meters_per_second_t MAX_X_VEL = 1.5_mps;
-    const units::meters_per_second_squared_t MAX_X_ACCEL = 2.0_mps_sq;
 
     std::deque<units::angular_acceleration::radians_per_second_squared_t> yawRateBuffer;
 
@@ -208,11 +219,10 @@ private:
     
     CharMode charac;
 
-    frc::TrapezoidProfile<units::radian>::Constraints rot_constraints{MAX_ROTATION_VEL, MAX_ROTATION_ACCEL};
+    
     frc::ProfiledPIDController<units::radian> rot_controller{ROT_KP, 0.0, ROT_KD, rot_constraints};
 
-    frc::TrapezoidProfile<units::meter>::Constraints y_constraints{MAX_Y_VEL, MAX_Y_ACCEL};
-    frc::TrapezoidProfile<units::meter>::Constraints x_constraints{MAX_X_VEL, MAX_X_ACCEL};
+
     frc::ProfiledPIDController<units::meter> y_controller{Y_KP, 0.0, Y_KD, y_constraints};
     frc::ProfiledPIDController<units::meter> x_controller{X_KP, 0.0, X_KD, x_constraints};
     double calculated_y_controller_val;
