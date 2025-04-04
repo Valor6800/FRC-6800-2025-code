@@ -16,7 +16,7 @@
 #include <frc/DriverStation.h>
 
 #define Y_CONTROLLER_SPEED_LIMIT .1_mps
-#define ROT_CONTROLLER_SPEED_LIMIT units::degrees_per_second_t{7}
+#define ROT_CONTROLLER_SPEED_LIMIT units::degrees_per_second_t{7.5}
 
 #define ELEV_K_ERROR units::angle::turn_t (0)
 #define ELEVATOR_SENSOR_TO_MECH 1.0f
@@ -507,7 +507,9 @@ void Scorer::init()
         state.hasZeroed = true;
         absSensorCorrect = elevatorMotor->getAbsEncoderPosition();
 
-        std::cout << "\nNew Magnet Offset: " << -(Constants::getElevatorMagnetOffset() - elevatorMotor->getCANCoder()->GetPosition().GetValue()).value() << std::endl;
+        if (frc::DriverStation::IsTest()){
+            std::cout << "\nNew Magnet Offset: " << -(Constants::getElevatorMagnetOffset() - elevatorMotor->getCANCoder()->GetAbsolutePosition().GetValue()).value() << std::endl;
+        }
     });
 
     // Beambreak debounce sensor (on scoring mechanism)
