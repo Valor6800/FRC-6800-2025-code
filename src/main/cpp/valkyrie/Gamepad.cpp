@@ -112,7 +112,7 @@ bool Gamepad::DPadRight()
     return GetPOV() == DPAD_RIGHT;
 }
 
-void Gamepad::setRumble(bool turnOn)
+void Gamepad::setRumble(bool turnOn, double intensity)
 {
-    SetRumble(RumbleType::kBothRumble, turnOn ? 0.25 : 0.0);
+    SetRumble(RumbleType::kBothRumble, turnOn ? intensity: 0.0);
 }

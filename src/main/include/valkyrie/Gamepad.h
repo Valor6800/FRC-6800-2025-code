@@ -201,7 +201,7 @@ public:
      */
     bool DPadRight();
 
-    void setRumble(bool);
+    void setRumble(bool turnOn, double intensity = .25);
 
 private:
     double deadband(double, double, int);
