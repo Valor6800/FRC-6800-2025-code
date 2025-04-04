@@ -575,10 +575,10 @@ frc2::CommandPtr Drivetrain::pitSequenceCommand(const frc::ChassisSpeeds& speeds
 
 frc2::CommandPtr Drivetrain::pitSequence() {
     return frc2::cmd::Sequence(
-        pitSequenceCommand(frc::ChassisSpeeds{0_mps, maxDriveSpeed / 2, 0_rad_per_s}, 0, 2),
-        pitSequenceCommand(frc::ChassisSpeeds(0_mps, 0_mps, maxRotationSpeed / 2), 2, 2),
-        pitSequenceCommand(frc::ChassisSpeeds{maxDriveSpeed / 2, 0_mps, 0_rad_per_s}, 4, 2),
-        pitSequenceCommand(frc::ChassisSpeeds{-maxDriveSpeed / 2, 0_mps, 0_rad_per_s}, 6, 2),
+        pitSequenceCommand(frc::ChassisSpeeds{0_mps, maxDriveSpeed / 3.0, 0_rad_per_s}, 0, 2),
+        pitSequenceCommand(frc::ChassisSpeeds(0_mps, 0_mps, maxRotationSpeed / 3.0), 2, 2),
+        pitSequenceCommand(frc::ChassisSpeeds{maxDriveSpeed / 3.0, 0_mps, 0_rad_per_s}, 4, 2),
+        pitSequenceCommand(frc::ChassisSpeeds{-maxDriveSpeed / 3.0, 0_mps, 0_rad_per_s}, 6, 2),
         frc2::cmd::RunOnce([this] {
             for (int i = 0; i < MODULE_COUNT; i++)
                 testModeDesiredStates[i].angle = 0_deg;
