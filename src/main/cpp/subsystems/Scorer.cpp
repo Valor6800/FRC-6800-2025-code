@@ -842,16 +842,16 @@ void Scorer::InitSendable(wpi::SendableBuilder& builder)
         "Auto Dunk Acceptance",
         [this] {
             std::vector<int> gates = {
-                state.autoDunkEnabled && !table->GetBoolean("Auto Dunk Disabled", false),
-                drivetrain->withinYRange(),
-                state.scopedState == SCOPED_STATE::SCOPED,
-                elevatorWithinThreshold,
-                state.gamePiece == GAME_PIECE::CORAL,
-                state.elevState == TWO || state.elevState == THREE || state.elevState == FOUR,
-                drivetrain->withinXRange((units::meter_t) table->GetNumber("Viable Dunk Distance (m)", VIABLE_DUNK_DISTANCE.value())),
-                units::math::fabs(drivetrain->yControllerInitialVelocity) < Y_CONTROLLER_SPEED_LIMIT,
-                units::math::fabs(drivetrain->getYawVelocity()) < ROT_CONTROLLER_SPEED_LIMIT,
-                drivetrain->isSpeedBelowThreshold(Constants::Scorer::getAutoDunkSpeedLimitation(drivetrain->xAlign))
+                state.autoDunkEnabled && !table->GetBoolean("Auto Dunk Disabled", false), // 0
+                drivetrain->withinYRange(), // 1
+                state.scopedState == SCOPED_STATE::SCOPED, // 2
+                elevatorWithinThreshold, // 3
+                state.gamePiece == GAME_PIECE::CORAL, // 4
+                state.elevState == TWO || state.elevState == THREE || state.elevState == FOUR, // 5
+                drivetrain->withinXRange((units::meter_t) table->GetNumber("Viable Dunk Distance (m)", VIABLE_DUNK_DISTANCE.value())), // 6
+                units::math::fabs(drivetrain->yControllerInitialVelocity) < Y_CONTROLLER_SPEED_LIMIT, // 7
+                units::math::fabs(drivetrain->getYawVelocity()) < ROT_CONTROLLER_SPEED_LIMIT, // 8
+                drivetrain->isSpeedBelowThreshold(Constants::Scorer::getAutoDunkSpeedLimitation(drivetrain->xAlign)) // 9
             };
             return gates;
         },
