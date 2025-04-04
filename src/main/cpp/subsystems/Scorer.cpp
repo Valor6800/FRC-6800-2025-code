@@ -16,7 +16,7 @@
 #include <frc/DriverStation.h>
 
 #define Y_CONTROLLER_SPEED_LIMIT .1_mps
-#define ROT_CONTROLLER_SPEED_LIMIT units::degrees_per_second_t{5}
+#define ROT_CONTROLLER_SPEED_LIMIT units::degrees_per_second_t{5.5}
 
 #define ELEV_K_ERROR units::angle::turn_t (0)
 #define ELEVATOR_SENSOR_TO_MECH 1.0f
@@ -31,7 +31,7 @@
 #define ELEVATOR_OFFSET 3_in
 #define ELEVATOR_MAGNET_OFFSET 0.321_tr
 #define ELEVATOR_JERK 40_tr_per_s_cu
-#define ELEVATOR_HEALTH_LIMIT 0.05_tr
+#define ELEVATOR_HEALTH_LIMIT 0.04_tr
 
 #define ELEVATOR_MOTOR_TO_SENSOR 8.02f
 #define PULLEY_CIRCUMFERENCE 1.432_in
