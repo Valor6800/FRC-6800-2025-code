@@ -15,7 +15,7 @@
 
 #include <frc/DriverStation.h>
 
-#define Y_CONTROLLER_SPEED_LIMIT .13_mps
+#define Y_CONTROLLER_SPEED_LIMIT .15_mps
 #define ROT_CONTROLLER_SPEED_LIMIT units::degrees_per_second_t{9}
 
 #define ELEV_K_ERROR units::angle::turn_t (0)
