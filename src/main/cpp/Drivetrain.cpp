@@ -512,6 +512,12 @@ void Drivetrain::analyzeDashboard()
 void Drivetrain::assignOutputs()
 {
     Swerve::assignOutputs();
+
+    state.accel = {
+        pigeon->GetAccelerationX().GetValue(),
+        pigeon->GetAccelerationY().GetValue(),
+        pigeon->GetAccelerationZ().GetValue()
+    };
 }
 
 units::meters_per_second_t Drivetrain::getRobotSpeeds(){
@@ -760,9 +766,9 @@ void Drivetrain::InitSendable(wpi::SendableBuilder& builder)
             "Acceleration",
             [this] {
                 std::vector<double> acceleration;
-                acceleration.push_back(state.accel.x.to<double>());
-                acceleration.push_back(state.accel.y.to<double>());
-                acceleration.push_back(state.accel.z.to<double>());
+                acceleration.push_back(state.accel.x.value());
+                acceleration.push_back(state.accel.y.value());
+                acceleration.push_back(state.accel.z.value());
                 return acceleration;
             },
             nullptr
