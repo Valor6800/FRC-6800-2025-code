@@ -1,0 +1,19 @@
+{
+  "version": "2025.0",
+  "command": {
+    "type": "sequential",
+    "data": {
+      "commands": [
+        {
+          "type": "path",
+          "data": {
+            "pathName": "ch full straight"
+          }
+        }
+      ]
+    }
+  },
+  "resetOdom": true,
+  "folder": "tests",
+  "choreoAuto": true
+}
