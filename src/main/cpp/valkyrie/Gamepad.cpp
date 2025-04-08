@@ -111,6 +111,14 @@ bool Gamepad::DPadRight()
 {
     return GetPOV() == DPAD_RIGHT;
 }
+bool Gamepad::GetLeftStickButton()
+{
+    return GetLeftStickButton();
+}
+bool Gamepad::GetRightStickButton()
+{
+    return GetRightStickButton();
+}
 
 void Gamepad::setRumble(bool turnOn, double intensity)
 {

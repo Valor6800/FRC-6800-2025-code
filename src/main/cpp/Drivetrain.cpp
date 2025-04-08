@@ -321,7 +321,7 @@ void Drivetrain::assessInputs()
     }
 
     state.alignToTarget = driverGamepad->leftTriggerActive() || driverGamepad->rightTriggerActive();
-    state.climberAlign = driverGamepad->GetBButton();
+    state.climberAlign = driverGamepad->GetYButton();
 
     Swerve::assessInputs();
 }
