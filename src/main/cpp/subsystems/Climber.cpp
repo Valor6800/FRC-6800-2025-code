@@ -134,7 +134,7 @@ void Climber::assessInputs()
         state.manualSpeed = operatorGamepad->rightStickY(2) * 12_V;
     }
 
-    if(driverGamepad->GetYButton() && driverGamepad->GetBButton()){
+    if(driverGamepad->GetYButton()){
         state.climbState = CLIMB_STATE::DEPLOYED;
     } else if(driverGamepad->GetAButton()){
         state.climbState = CLIMB_STATE::RETRACTED;
