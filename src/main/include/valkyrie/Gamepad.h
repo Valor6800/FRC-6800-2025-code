@@ -201,9 +201,9 @@ public:
      */
     bool DPadRight();
 
-    bool GetLeftStickButton();
+    bool getLeftStickButton();
 
-    bool GetRightStickButton();
+    bool getRightStickButton();
 
     void setRumble(bool turnOn, double intensity = .25);
 

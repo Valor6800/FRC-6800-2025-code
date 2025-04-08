@@ -111,11 +111,11 @@ bool Gamepad::DPadRight()
 {
     return GetPOV() == DPAD_RIGHT;
 }
-bool Gamepad::GetLeftStickButton()
+bool Gamepad::getLeftStickButton()
 {
     return GetLeftStickButton();
 }
-bool Gamepad::GetRightStickButton()
+bool Gamepad::getRightStickButton()
 {
     return GetRightStickButton();
 }
