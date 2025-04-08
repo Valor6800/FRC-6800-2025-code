@@ -359,10 +359,10 @@ public:
     }
 
 private:
-    static constexpr units::ampere_t SUPPLY_CURRENT_THRESHOLD = 45_A;
+    static constexpr units::ampere_t SUPPLY_CURRENT_THRESHOLD = 65_A;
     static constexpr units::ampere_t STATOR_CURRENT_LIMIT = 80_A;
-    static constexpr units::ampere_t SUPPLY_CURRENT_LIMIT = 60_A;
-    static constexpr units::millisecond_t SUPPLY_TIME_THRESHOLD = 500_ms;
+    static constexpr units::ampere_t SUPPLY_CURRENT_LIMIT = 80_A;
+    static constexpr units::millisecond_t SUPPLY_TIME_THRESHOLD = 1000_ms;
     static constexpr units::ampere_t PEAK_TORQUE_CURRENT = 100_A;
     static constexpr units::turn_t DEADBAND = 0.01_tr;
 
