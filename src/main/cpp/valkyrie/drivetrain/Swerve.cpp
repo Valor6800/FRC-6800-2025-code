@@ -35,6 +35,8 @@
 
 #define Y_KAFF 1
 
+#define X_CONTROLLER_MIN_SPEED -0.3_mps
+
 const units::hertz_t KP_ROTATE(-90);
 const units::hertz_t KD_ROTATE(-30);
 
@@ -230,7 +232,7 @@ void Swerve<AzimuthMotor, DriveMotor>::analyzeDashboard()
     }
     
     y_controller.SetGoal(goalAlign);
-    x_controller.SetGoal(xGoalAlign);
+    x_controller.SetGoal({ xGoalAlign, X_CONTROLLER_MIN_SPEED });
     calculated_y_controller_val = y_controller.Calculate(yDistance, goalAlign);
     calculated_x_controller_val = x_controller.Calculate(xDistance, xGoalAlign);
     if (yAlign){
@@ -250,6 +252,7 @@ void Swerve<AzimuthMotor, DriveMotor>::analyzeDashboard()
         relativeToTagXSpeed = (units::meters_per_second_t) (
             - xAlignPID.P * (xDistance - x_controller.GetSetpoint().position).value() - xAlignPID.D * (xControllerInitialVelocity - x_controller.GetSetpoint().velocity).value() + xAlignPID.aFF * x_controller.GetSetpoint().velocity.value()
         );
+        relativeToTagXSpeed = units::math::min(relativeToTagXSpeed, X_CONTROLLER_MIN_SPEED);
 
         yAlignVector = MAKE_VECTOR(targetAngle - 90_deg) * relativeToTagSpeed.value();
         if (dumbAutoAlign) {
