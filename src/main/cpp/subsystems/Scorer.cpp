@@ -550,9 +550,9 @@ void Scorer::assessInputs()
     if (operatorGamepad == nullptr || !operatorGamepad->IsConnected())
         return;
 
-    if(operatorGamepad->leftTriggerActive() || driverGamepad->GetLeftBumperButton()) {
+    if(operatorGamepad->leftTriggerActive() || driverGamepad->GetXButton()) {
         state.gamePiece = ALGEE;
-    } else if(operatorGamepad->rightTriggerActive() || driverGamepad->GetRightBumperButton()) {
+    } else if(operatorGamepad->rightTriggerActive() || driverGamepad->GetBButton()) {
         state.gamePiece = CORAL;
     }
 
@@ -575,7 +575,7 @@ void Scorer::assessInputs()
     if (driverGamepad == nullptr || !driverGamepad->IsConnected())
         return;
     
-    if (driverGamepad->GetXButton()) {
+    if (driverGamepad->GetLeftBumperButton()) {
         state.scopedState = MANUAL_SCOPE;
     } else if (driverGamepad->leftTriggerActive() || driverGamepad->rightTriggerActive()) {
         state.scopedState = SCOPED;
@@ -583,8 +583,7 @@ void Scorer::assessInputs()
         state.scopedState = UNSCOPED;
     }
 
-
-    if (driverGamepad->GetBButton()) {
+    if (driverGamepad->GetRightBumperButton()) {
         state.scoringState = SCORE_STATE::SCORING;
         state.hasAlgae = false;
     } else {
