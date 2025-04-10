@@ -1,0 +1,25 @@
+{
+  "version": "2025.0",
+  "command": {
+    "type": "sequential",
+    "data": {
+      "commands": [
+        {
+          "type": "path",
+          "data": {
+            "pathName": "C1-J"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "AlignRight"
+          }
+        }
+      ]
+    }
+  },
+  "resetOdom": true,
+  "folder": "tests",
+  "choreoAuto": true
+}
