@@ -474,7 +474,6 @@ void Drivetrain::analyzeDashboard()
 
     state.yEstimate += Swerve::yControllerInitialVelocity.value() * LOOP_TIME;
     unfilteredYDistance = Swerve::goalAlign.to<double>();
-
     for(valor::AprilTagsSensor* aprilLime : aprilTagSensors) {
         if (aprilLime->hasTarget() && valor::isReefTag(aprilLime->getTagID())) {
             if (state.reefTag == aprilLime->getTagID()) {
