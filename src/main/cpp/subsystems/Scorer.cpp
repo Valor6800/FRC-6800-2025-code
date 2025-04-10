@@ -7,6 +7,7 @@
 #include "units/math.h"
 #include "Drivetrain.h"
 #include "units/velocity.h"
+#include "subsystems/Climber.h"
 #include "valkyrie/controllers/NeutralMode.h"
 #include "valkyrie/controllers/PIDF.h"
 #include <iostream>
@@ -64,7 +65,7 @@
 
 using namespace Constants::Scorer;
 
-Scorer::Scorer(frc::TimedRobot *_robot, Drivetrain *_drivetrain, valor::CANdleSensor* _leds) :
+Scorer::Scorer(frc::TimedRobot *_robot, Drivetrain *_drivetrain, Climber *_climber, valor::CANdleSensor* _leds) :
     valor::BaseSubsystem(_robot, "Scorer"),
     hallEffectDebounceSensor(_robot, "HallEffectDebounce"),
     candi(CANIDs::HALL_EFFECT, "baseCAN"),
@@ -77,6 +78,7 @@ Scorer::Scorer(frc::TimedRobot *_robot, Drivetrain *_drivetrain, valor::CANdleSe
     positionMap{std::move(getPositionMap())},
     scoringSpeedMap{std::move(getScoringSpeedMap())},
     drivetrain(_drivetrain),
+    climber(_climber),
     leds(_leds)
 {
 
@@ -744,34 +746,38 @@ void Scorer::assignOutputs()
     }
 
     // Pivot State Machine
-    if (state.gamePiece == GAME_PIECE::ALGEE) {
-        if (state.intaking) {
-            if (state.hasAlgae && !state.intaking) {
+    if(climber->state.climbState == Climber::CLIMB_STATE::STOW) {
+        if (state.gamePiece == GAME_PIECE::ALGEE) {
+            if (state.intaking) {
+                if (state.hasAlgae && !state.intaking) {
+                    scorerPivotMotor->setPosition(getPivotPositionMap()[PIVOT_STATE::CARRY]);
+                } else {
+                    scorerPivotMotor->setPosition(getPivotPositionMap()[PIVOT_STATE::GROUND]);
+                }
+            } else if (state.scopedState == SCOPED_STATE::SCOPED || state.scopedState == SCOPED_STATE::MANUAL_SCOPE)  {
+                if (state.elevState == ELEVATOR_STATE::TWO || state.elevState == ELEVATOR_STATE::THREE || state.elevState == ELEVATOR_STATE::FOUR) {
+                    scorerPivotMotor->setPosition(getPivotPositionMap()[PIVOT_STATE::PICK]);
+                } else {
+                    scorerPivotMotor->setPosition(getPivotPositionMap()[PIVOT_STATE::PRESCORE]);
+                }
+            } else if (state.hasAlgae) {
                 scorerPivotMotor->setPosition(getPivotPositionMap()[PIVOT_STATE::CARRY]);
             } else {
-                scorerPivotMotor->setPosition(getPivotPositionMap()[PIVOT_STATE::GROUND]);
+                scorerPivotMotor->setPosition(getPivotPositionMap()[PIVOT_STATE::CARRY]);
             }
-        } else if (state.scopedState == SCOPED_STATE::SCOPED || state.scopedState == SCOPED_STATE::MANUAL_SCOPE)  {
-            if (state.elevState == ELEVATOR_STATE::TWO || state.elevState == ELEVATOR_STATE::THREE || state.elevState == ELEVATOR_STATE::FOUR) {
-                scorerPivotMotor->setPosition(getPivotPositionMap()[PIVOT_STATE::PICK]);
-            } else {
-                scorerPivotMotor->setPosition(getPivotPositionMap()[PIVOT_STATE::PRESCORE]);
-            }
-        } else if (state.hasAlgae) {
-            scorerPivotMotor->setPosition(getPivotPositionMap()[PIVOT_STATE::CARRY]);
         } else {
-            scorerPivotMotor->setPosition(getPivotPositionMap()[PIVOT_STATE::CARRY]);
-        }
-    } else {
-        if (state.intaking) {
-            scorerPivotMotor->setPosition(getPivotPositionMap()[PIVOT_STATE::CORAL_GROUND]);
-        } else {
-            if (state.elevState == ELEVATOR_STATE::ONE) {
-                scorerPivotMotor->setPosition(getPivotPositionMap()[PIVOT_STATE::PICK]);
+            if (state.intaking) {
+                scorerPivotMotor->setPosition(getPivotPositionMap()[PIVOT_STATE::CORAL_GROUND]);
             } else {
-                scorerPivotMotor->setPosition(getPivotPositionMap()[PIVOT_STATE::CORAL_STOW]);
+                if (state.elevState == ELEVATOR_STATE::ONE) {
+                    scorerPivotMotor->setPosition(getPivotPositionMap()[PIVOT_STATE::PICK]);
+                } else {
+                    scorerPivotMotor->setPosition(getPivotPositionMap()[PIVOT_STATE::CORAL_STOW]);
+                }
             }
         }
+    } else{
+        scorerPivotMotor->setPosition(getPivotPositionMap()[PIVOT_STATE::CARRY]);
     }
 
     //Elevator State Machine
