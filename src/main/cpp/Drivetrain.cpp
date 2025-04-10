@@ -1,4 +1,5 @@
 #include "Drivetrain.h"
+#include <bitset>
 #include <cmath> 
 #include <cstddef>
 #include <frc/DriverStation.h>
@@ -98,16 +99,22 @@ const units::meter_t WHEEL_DIAMETER(0.0973_m);
 
 #define AA_LEFT_OFFSET 0.0_in // 0.5_in
 #define AA_RIGHT_OFFSET 0.0_in // 1.5_in
+
+
 #define VIABLE_DUNK_SPEED 1.1_mps
+#define Y_CONTROLLER_SPEED_LIMIT .15_mps
+#define ROT_CONTROLLER_SPEED_LIMIT units::degrees_per_second_t{9}
+#define VIABLE_DUNK_DISTANCE 0.28_m
+#define AUTO_VIABLE_DUNK_SPEED_L4 1.1_mps
 
 #define Y_ACTIVATION_THRESHOLD 30.0_deg
+#define X_SHUTOFF_Y_DISTANCE 1_ft
 
 #define ROBOT_STOPPED_THRESHOLD 0.2_mps
 
 #define FIELD_LENGTH 17.5482504_m
 #define FIELD_WIDTH 8.0519016_m 
 
-#define VIABLE_DUNK_DISTANCE 0.28_m
 #define VIABLE_ELEVATOR_DISTANCE 1.2_m
 
 Drivetrain::Drivetrain(frc::TimedRobot *_robot, valor::CANdleSensor* _leds) : 
@@ -139,6 +146,7 @@ Drivetrain::Drivetrain(frc::TimedRobot *_robot, valor::CANdleSensor* _leds) :
     //
     table->PutNumber("Left Align Offset", AA_LEFT_OFFSET.value());
     table->PutNumber("Right Align Offset", AA_RIGHT_OFFSET.value());
+    table->PutNumber("X SHUTOFF Y DISTANCE", X_SHUTOFF_Y_DISTANCE.value());
 
     leftDistanceSensor.setMaxDistance(2_m);
     rightdistanceSensor.setMaxDistance(2_m);
@@ -172,6 +180,7 @@ Drivetrain::Drivetrain(frc::TimedRobot *_robot, valor::CANdleSensor* _leds) :
     table->PutBoolean("Align Right", false);
     table->PutBoolean("Align Left", false);
     table->PutBoolean("Use xController", true);
+    table->PutNumber("Viable Dunk Distance (m)", VIABLE_DUNK_DISTANCE.value());
 
     setRotAlignOffset(00_deg);
 
@@ -350,56 +359,6 @@ void Drivetrain::analyzeDashboard()
     poseErrorPP = currentPosePathPlanner.Get() - targetPosePathPlanner.Get();
 
 
-    if (!state.alignToTarget) {
-        Swerve::resetRotationAlignControllers();
-        hasReset = false;
-    }
-
-    frc::Pose2d robotToCenter{
-        getCalculatedPose().Translation() + frc::Translation2d(-FIELD_LENGTH / 2.0, -FIELD_WIDTH / 2.0),
-        getCalculatedPose().Rotation()
-    };
-
-
-    std::pair<int, frc::Pose3d> temp = valor::getNearestTag(
-        robotToCenter,
-        frc::DriverStation::kRed == frc::DriverStation::GetAlliance() ? valor::redReefAprilTagPoses : valor::blueReefAprilTagPoses
-    );
-
-    if (state.alignToTarget && state.reefTag == -1) {
-        state.reefTag = temp.first;
-    }
-    reefPublisher.Set(
-        frc::Pose2d(
-            temp.second.ToPose2d().Translation() + frc::Translation2d(FIELD_LENGTH / 2.0, FIELD_WIDTH / 2.0),
-            temp.second.ToPose2d().Rotation()
-        )
-    );
-
-    alignAngleTags(); 
-    transformControllerSpeeds();
-
-    state.yEstimate += Swerve::yControllerInitialVelocity.value() * LOOP_TIME;
-    unfilteredYDistance = Swerve::goalAlign.to<double>();
-    
-    for(valor::AprilTagsSensor* aprilLime : aprilTagSensors) {
-        if (aprilLime->hasTarget() && valor::isReefTag(aprilLime->getTagID())) {
-            if (state.reefTag == aprilLime->getTagID() && !hasReset) {
-                state.yEstimate = aprilLime->get_botpose_targetspace().X().to<double>();
-                state.xEstimate = -aprilLime->get_botpose_targetspace().Z().to<double>();
-                Swerve::yDistance = units::length::meter_t (state.yEstimate);
-                Swerve::xDistance = units::length::meter_t (state.xEstimate);
-
-                Swerve::resetLinearAlignControllers();
-                hasReset = true;
-            }
-            if (state.reefTag == aprilLime->getTagID()) {
-                //unfilteredYDistance = aprilLime->get_botpose_targetspace().X().to<double>();
-                state.yEstimate = Y_FILTER_CONST * state.yEstimate + ((1 - Y_FILTER_CONST) * aprilLime->get_botpose_targetspace().X().to<double>());
-                state.xEstimate = -aprilLime->get_botpose_targetspace().Z().to<double>();
-            }
-        }
-    }
 
     Swerve::yDistance = units::length::meter_t (state.yEstimate); //units::length::meter_t {filter.Calculate(unfilteredYDistance)};
     Swerve::xDistance = units::length::meter_t (state.xEstimate);
@@ -466,16 +425,71 @@ void Drivetrain::analyzeDashboard()
             Swerve::rotAlign = true;
         }
     } else if (state.alignToTarget) {
-        Swerve::yAlign = hasReset && units::math::abs(getRotControllerError()) < (units::degree_t) table->GetNumber(
+        Swerve::yAlign = hasYReset && state.elevState != Constants::Scorer::ELEVATOR_STATE::ONE && units::math::abs(getRotControllerError()) < (units::degree_t) table->GetNumber(
             "Y Controller Activation Degree Threshold",
             Y_ACTIVATION_THRESHOLD.value()
         );
         Swerve::rotAlign = true;
-        Swerve::xAlign = table->GetBoolean("Use xController", true) && state.gamePiece == Constants::Scorer::GAME_PIECE::CORAL;
+        Swerve::xAlign = Swerve::yAlign && lidarDistance().value() > table->GetNumber("X SHUTOFF Y DISTANCE", X_SHUTOFF_Y_DISTANCE.value()) && state.gamePiece == Constants::Scorer::GAME_PIECE::CORAL && state.elevState != Constants::Scorer::ELEVATOR_STATE::ONE;
     } else {
         Swerve::yAlign = false;
         Swerve::xAlign = false;
         Swerve::rotAlign = false;
+    }
+
+    if (!state.alignToTarget) {
+        Swerve::resetRotationAlignControllers();
+        hasYReset = false;
+        hasXReset = false;
+    }
+
+    frc::Pose2d robotToCenter{
+        getCalculatedPose().Translation() + frc::Translation2d(-FIELD_LENGTH / 2.0, -FIELD_WIDTH / 2.0),
+        getCalculatedPose().Rotation()
+    };
+
+
+    std::pair<int, frc::Pose3d> temp = valor::getNearestTag(
+        robotToCenter,
+        frc::DriverStation::kRed == frc::DriverStation::GetAlliance() ? valor::redReefAprilTagPoses : valor::blueReefAprilTagPoses
+    );
+
+    if (state.alignToTarget && state.reefTag == -1) {
+        state.reefTag = temp.first;
+    }
+    reefPublisher.Set(
+        frc::Pose2d(
+            temp.second.ToPose2d().Translation() + frc::Translation2d(FIELD_LENGTH / 2.0, FIELD_WIDTH / 2.0),
+            temp.second.ToPose2d().Rotation()
+        )
+    );
+
+    alignAngleTags(); 
+    transformControllerSpeeds();
+
+    state.yEstimate += Swerve::yControllerInitialVelocity.value() * LOOP_TIME;
+    unfilteredYDistance = Swerve::goalAlign.to<double>();
+    
+    for(valor::AprilTagsSensor* aprilLime : aprilTagSensors) {
+        if (aprilLime->hasTarget() && valor::isReefTag(aprilLime->getTagID())) {
+            if (state.reefTag == aprilLime->getTagID()) {
+                if (Swerve::yAlign && Swerve::xAlign && !hasXReset) {
+                    state.xEstimate = -aprilLime->get_botpose_targetspace().Z().to<double>();
+                    Swerve::xDistance = units::length::meter_t (state.xEstimate);
+                    Swerve::resetXAlignControllers();
+                    hasXReset = true;
+                }
+                if (!hasYReset) {
+                    state.yEstimate = aprilLime->get_botpose_targetspace().X().to<double>();
+                    Swerve::yDistance = units::length::meter_t (state.yEstimate);
+                    Swerve::resetYAlignControllers();
+                    hasYReset = true;
+                }
+                //unfilteredYDistance = aprilLime->get_botpose_targetspace().X().to<double>();
+                state.yEstimate = Y_FILTER_CONST * state.yEstimate + ((1 - Y_FILTER_CONST) * aprilLime->get_botpose_targetspace().X().to<double>());
+                state.xEstimate = -aprilLime->get_botpose_targetspace().Z().to<double>();
+            }
+        }
     }
 
     Swerve::analyzeDashboard();
@@ -556,6 +570,25 @@ frc2::FunctionalCommand* Drivetrain::getResetOdom() {
         },
         {}
     );
+}
+
+std::bitset<5> Drivetrain::getAutoDunkAcceptance() {
+    std::bitset<5> acceptance;
+
+    acceptance[0] = withinYRange();
+    acceptance[1] = withinXRange(
+        (units::meter_t) table->GetNumber("Viable Dunk Distance (m)", VIABLE_DUNK_DISTANCE.value())
+    );
+    acceptance[2] = units::math::fabs(yControllerInitialVelocity) < Y_CONTROLLER_SPEED_LIMIT;
+    acceptance[3] = units::math::fabs(getYawVelocity()) < ROT_CONTROLLER_SPEED_LIMIT;
+
+    units::meters_per_second_t autoDunkSpeedThreshold = Constants::Scorer::getAutoDunkSpeedLimitation(xAlign);
+    acceptance[4] = isSpeedBelowThreshold(frc::DriverStation::IsAutonomous() ? AUTO_VIABLE_DUNK_SPEED_L4 : autoDunkSpeedThreshold);
+    return acceptance;
+}
+
+bool Drivetrain::autoAlignShutOff() {
+    return getAutoDunkAcceptance().all();
 }
 
 frc2::CommandPtr Drivetrain::pitSequenceCommand(const frc::ChassisSpeeds& speeds, int offset, int numLeds) {
