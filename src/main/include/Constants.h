@@ -678,7 +678,7 @@ namespace Constants {
             static units::angle::turn_t scorerPivotMagnetOffset() { switch (robot) {
                 case Robot::Alpha: return 1.37_tr;
                 case Robot::Gold: return 0.5_tr;
-                default: return 0.24169925_tr;
+                default: return -0.7521969219_tr;
             }}
 
             /// Amount of rotations needed for after detecting coral intake
@@ -786,7 +786,7 @@ namespace Constants {
             static units::turn_t magnetOffset() { switch (robot) {
                 case Robot::Alpha: return 0_tr;
                 case Robot::Gold: return 0.0875_tr;
-                default: return 0.0875_tr;
+                default: return 0.0046386563_tr;
             }}
 
             static bool climbMotorInverted() { switch (robot) {
