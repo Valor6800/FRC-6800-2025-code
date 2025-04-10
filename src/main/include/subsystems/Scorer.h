@@ -1,5 +1,6 @@
 # pragma once 
 #include "Drivetrain.h"
+#include "subsystems/Climber.h"
 #include "valkyrie/BaseSubsystem.h"
 #include "valkyrie/controllers/PhoenixController.h"
 #include "Constants.h"
@@ -29,7 +30,7 @@ class Scorer : public valor::BaseSubsystem
 {
 public:
 
-    Scorer(frc::TimedRobot *robot, Drivetrain *drivetrain, valor::CANdleSensor*);
+    Scorer(frc::TimedRobot *robot, Drivetrain *drivetrain, Climber *climber, valor::CANdleSensor*);
     
     void resetState();
      
@@ -104,6 +105,7 @@ private:
     Constants::Scorer::ScoringSpeedMap scoringSpeedMap;
 
     Drivetrain *drivetrain;
+    Climber *climber;
     valor::CANdleSensor *leds;
 
     frc::Alert elevatorStage{"Elevator going to stage", frc::Alert::AlertType::kInfo};
