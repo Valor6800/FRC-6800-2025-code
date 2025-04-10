@@ -22,7 +22,7 @@
 #define SCORE_SPEED 20_tps
 #define ALGEE_SCORE_SPEED 11.5_tps
 #define ALGEE_HOLD_SPD -1_tps
-#define CORAL_HOLD_SPD 0.25_tps
+#define CORAL_HOLD_SPD -0.25_tps
 
 #define ELEVATOR_FORWARD_LIMIT 6_tr
 #define ELEVATOR_OFFSET 3_in
@@ -35,17 +35,17 @@
 
 #define PIVOT_MOTOR_TO_SENSOR 60.75f
 #define PIVOT_SENSOR_TO_MECH 1.0f
-#define SECOND_SCORER_FORWARD_LIMIT 0.6_tr
+#define SECOND_SCORER_FORWARD_LIMIT 0.65_tr
 #define SECOND_SCORER_REVERSE_LIMIT 0.15_tr
 #define PIVOT_CANCODER_RATIO 9.0f/21.0f
 
-#define MINIMUM_PIVOT_SPEED 0.05_tps
+#define MINIMUM_PIVOT_SPEED 0.25_tps
 
 //1-50 motor - sensor
 //21-9 gear to encoder
 
 #define ALGAE_CACHE_SIZE 2000
-#define CORAL_CACHE_SIZE 1000
+#define CORAL_CACHE_SIZE 500
 
 #define VIABLE_ELEVATOR_THRESHOLD 0.02_m
 #define VIABLE_DUNK_DISTANCE 0.28_m
@@ -505,7 +505,7 @@ void Scorer::init()
     currentSensor.setSpikeSetpoint(25);
     currentSensor.setGetter([this]() {return scorerMotor->getCurrent().to<double>(); });
     currentSensor.setSpikeCallback([this]() {
-        if (scorerPivotMotor->getSpeed() < MINIMUM_PIVOT_SPEED) {
+        if (scorerPivotMotor->getSpeed() < MINIMUM_PIVOT_SPEED && state.gamePiece == GAME_PIECE::ALGEE) {
             state.hasAlgae = true;
             currentSensor.reset();
         }
@@ -515,7 +515,7 @@ void Scorer::init()
     coralCurrentSensor.setSpikeSetpoint(25);
     coralCurrentSensor.setGetter([this]() {return scorerMotor->getCurrent().to<double>(); });
     coralCurrentSensor.setSpikeCallback([this]() {
-        if (scorerPivotMotor->getSpeed() < MINIMUM_PIVOT_SPEED) {
+        if (scorerPivotMotor->getSpeed() < MINIMUM_PIVOT_SPEED && state.gamePiece == GAME_PIECE::CORAL) {
             state.hasCoral = true;
             coralCurrentSensor.reset();
         }
@@ -690,7 +690,7 @@ void Scorer::assignOutputs()
     // Pivot State Machine
     if (state.gamePiece == GAME_PIECE::ALGEE) {
         if (state.intaking) {
-            if (state.hasAlgae) {
+            if (state.hasAlgae && !state.intaking) {
                 scorerPivotMotor->setPosition(getPivotPositionMap()[PIVOT_STATE::CARRY]);
             } else {
                 scorerPivotMotor->setPosition(getPivotPositionMap()[PIVOT_STATE::GROUND]);
@@ -735,9 +735,6 @@ void Scorer::assignOutputs()
             )) || state.scopedState == MANUAL_SCOPE
         ) {
             state.targetHeight = positionMap.at(state.gamePiece).at(state.elevState);
-            if (state.elevState == ELEVATOR_STATE::ONE && state.gamePiece == GAME_PIECE::CORAL && state.scoringState == SCORE_STATE::SCORING) {
-                state.targetHeight += 4_in;
-            }
             if (state.shootOverCoral) {
                 state.targetHeight += DUNK_OFFSET_OVER_CORAL;
             }
@@ -768,7 +765,7 @@ void Scorer::assignOutputs()
         }
     } else if (state.hasAlgae && state.gamePiece == GAME_PIECE::ALGEE) {
         scorerMotor->setSpeed(ALGEE_HOLD_SPD);
-    } else if (state.hasCoral && state.gamePiece == GAME_PIECE::CORAL) {
+    } else if (state.hasCoral && state.gamePiece == GAME_PIECE::CORAL && state.elevState == ELEVATOR_STATE::ONE) {
         scorerMotor->setSpeed(CORAL_HOLD_SPD);
     } else if (state.intaking) {
         if (state.gamePiece == GAME_PIECE::ALGEE) {
