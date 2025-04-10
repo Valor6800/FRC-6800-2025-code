@@ -93,6 +93,7 @@ namespace CANIDs {
     constexpr static int CANCODER_CANS[4] = {20, 21, 22, 23};
     constexpr static int PIGEON_CAN = 61;
     constexpr static int SCORER_WHEEL = 11;
+    constexpr static int FUNNEL = 12;
     constexpr static int ELEV_WHEEL = 30;
     constexpr static int CLIMBER_LEAD = 32;
     constexpr static int CLIMBER_FOLLOW = 31;
@@ -101,7 +102,6 @@ namespace CANIDs {
     constexpr static int STAGING_LIDAR_SENSOR = 47;
     constexpr static int LEFT_CAN_RANGE_DRIVETRAIN_SENSOR = 48;
     constexpr static int RIGHT_CAN_RANGE_DRIVETRAIN_SENSOR = 49;
-    constexpr static int CRABB = 33;
     constexpr static int ELEVATOR_CAN = 24;
     constexpr static int CLIMBER_CAN = 25;
     constexpr static int SCORER_PIVOT_MOTOR = 33;
@@ -259,7 +259,13 @@ namespace Constants {
             default: return valor::PhoenixControllerType::KRAKEN_X44;
         }};
 
-         static valor::PhoenixControllerType getScorerPivotMotorType() { switch (robot) {
+        static valor::PhoenixControllerType getScorerPivotMotorType() { switch (robot) {
+            case Robot::Alpha: return valor::PhoenixControllerType::FALCON_FOC;
+            case Robot::Gold: return valor::PhoenixControllerType::KRAKEN_X44;
+            default: return valor::PhoenixControllerType::KRAKEN_X44;
+        }};
+
+        static valor::PhoenixControllerType getFunnelMotorType() { switch (robot) {
             case Robot::Alpha: return valor::PhoenixControllerType::FALCON_FOC;
             case Robot::Gold: return valor::PhoenixControllerType::KRAKEN_X44;
             default: return valor::PhoenixControllerType::KRAKEN_X44;
@@ -639,7 +645,7 @@ namespace Constants {
             static PositionAngleMap getPivotPositionMap() { switch (robot) {
                 case Robot::Gold:
                     return {
-                        { PIVOT_STATE::CORAL_STOW, 0.15_tr },
+                        { PIVOT_STATE::CORAL_STOW, 0.1259_tr },
                         { PIVOT_STATE::CORAL_GROUND, 0.65_tr },
                         { PIVOT_STATE::GROUND, 0.6_tr },
                         { PIVOT_STATE::PICK, 0.4_tr },
@@ -648,7 +654,7 @@ namespace Constants {
                     };
                 default:
                     return {
-                        { PIVOT_STATE::CORAL_STOW, 0.15_tr },
+                        { PIVOT_STATE::CORAL_STOW, 0.1259_tr },
                         { PIVOT_STATE::CORAL_GROUND, 0.637_tr },
                         { PIVOT_STATE::GROUND, 0.637_tr },
                         { PIVOT_STATE::PICK, 0.4_tr },
@@ -675,6 +681,12 @@ namespace Constants {
                 default: return false;
             }}
 
+            static bool funnelInverted() { switch (robot) {
+                case Robot::Alpha: return true;
+                case Robot::Gold: return false;
+                default: return true;
+            }}
+
             static units::angle::turn_t scorerPivotMagnetOffset() { switch (robot) {
                 case Robot::Alpha: return 1.37_tr;
                 case Robot::Gold: return 0.5_tr;
@@ -685,7 +697,7 @@ namespace Constants {
             static units::angle::turn_t getIntakeTurns() { switch (robot) {
                 case Robot::Alpha: return 1.37_tr;
                 case Robot::Gold: return 0.5_tr;
-                default: return 0.5_tr;
+                default: return 0.25_tr;
             }};
 
             /// Time to reach max velocity
@@ -699,6 +711,12 @@ namespace Constants {
                 case Robot::Alpha: return 2;
                 case Robot::Gold: return 5 / 3;
                 default: return 2.75;
+            }}
+
+            static double getFunnelSensorToMech() { switch (robot) {
+                case Robot::Alpha: return 40/24;
+                case Robot::Gold: return 40/24;
+                default: return 40/24;
             }}
 
             static bool isElevatorClockwise() { switch (robot) {
@@ -771,6 +789,30 @@ namespace Constants {
                     pidf.P = 1;
                     pidf.S = 0.32;
                     pidf.kV = 0.32;
+                    return pidf;
+                }
+            }}
+
+            static valor::PIDF getFunnelPIDF() { switch (robot) {
+                case Robot::Alpha: {
+                    valor::PIDF pidf;
+                    pidf.P = 0.25;
+                    pidf.S = 0.1201;
+                    pidf.kV = 0.12;
+                    return pidf;
+                }
+                case Robot::Gold: {
+                    valor::PIDF pidf;
+                    pidf.P = 0.25;
+                    pidf.S = 0.1201;
+                    pidf.kV = 0.12;
+                    return pidf;
+                }
+                default: {
+                    valor::PIDF pidf;
+                    pidf.P = 0.25;
+                    pidf.S = 0.1201;
+                    pidf.kV = 0.12;
                     return pidf;
                 }
             }}

@@ -95,6 +95,7 @@ private:
     valor::PhoenixController<> *elevatorMotor;
     valor::PhoenixController<> *scorerMotor;
     valor::PhoenixController<> *scorerPivotMotor;
+    valor::PhoenixController<> *funnelMotor;
 
 
     valor::CANrangeSensor scorerStagingSensor;
