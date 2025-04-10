@@ -670,7 +670,7 @@ void Scorer::analyzeDashboard()
 
     int tagID = drivetrain->state.reefTag;
 
-    if (state.gamePiece == GAME_PIECE::ALGEE) {
+    if (state.gamePiece == GAME_PIECE::ALGEE && (state.scopedState == SCOPED || state.scopedState == MANUAL_SCOPE )) {
         if (tagID >= 6 && tagID <= 11) {
             state.elevState = (tagID % 2 == 1) ? ELEVATOR_STATE::THREE : ELEVATOR_STATE::TWO;
         } else if (tagID >= 17 && tagID <= 22) {
