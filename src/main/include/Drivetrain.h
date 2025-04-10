@@ -1,5 +1,6 @@
 #pragma once
 
+#include <bitset>
 #include <valkyrie/sensors/CANRangeSensor.h>
 #include "frc/geometry/Pose3d.h" 
 #include "units/acceleration.h"
@@ -172,13 +173,16 @@ public:
 
      double doubtX, doubtY, doubtRot;
 
-     bool hasReset;
+     bool hasXReset;
+     bool hasYReset;
      units::meter_t lidarDistance();
      bool withinXRange(units::meter_t);
      bool withinYRange();
      bool isSpeedBelowThreshold(units::meters_per_second_t m);
      bool isSpeedStopped();
      units::degrees_per_second_t getYawVelocity();
+
+     std::bitset<5> getAutoDunkAcceptance();
 
 private:
 
@@ -207,4 +211,5 @@ private:
      valor::CANdleSensor *leds;
      
      nt::StructPublisher<frc::Transform2d> poseErrorPPTopic;
+     bool autoAlignShutOff();
 };

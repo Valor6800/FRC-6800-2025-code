@@ -255,6 +255,8 @@ void Swerve<AzimuthMotor, DriveMotor>::analyzeDashboard()
         if (dumbAutoAlign) {
             xAlignVector = MAKE_VECTOR(targetAngle) * 0.6;
             powerVector = yAlignVector + xAlignVector;
+        } else if (autoAlignShutOff()) {
+            powerVector *= 0;
         } else if (xAlign) {
             xAlignVector = MAKE_VECTOR(targetAngle) * -relativeToTagXSpeed.value();
             powerVector = yAlignVector + xAlignVector;
@@ -466,11 +468,14 @@ void Swerve<AzimuthMotor, DriveMotor>::resetRotationAlignControllers() {
 }
 
 template<class AzimuthMotor, class DriveMotor>
-void Swerve<AzimuthMotor, DriveMotor>::resetLinearAlignControllers() {
+void Swerve<AzimuthMotor, DriveMotor>::resetYAlignControllers() {
     y_controller.Reset(yDistance, yControllerInitialVelocity);
-    x_controller.Reset(xDistance, -xControllerInitialVelocity);
 }
 
+template<class AzimuthMotor, class DriveMotor>
+void Swerve<AzimuthMotor, DriveMotor>::resetXAlignControllers() {
+    x_controller.Reset(xDistance, -xControllerInitialVelocity);
+}
 template<class AzimuthMotor, class DriveMotor>
 void Swerve<AzimuthMotor, DriveMotor>::setXConstraints(frc::TrapezoidProfile<units::meter>::Constraints constraints) {
     x_controller.SetConstraints(constraints);

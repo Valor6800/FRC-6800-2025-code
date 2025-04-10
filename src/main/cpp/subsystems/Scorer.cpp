@@ -9,14 +9,12 @@
 #include "units/velocity.h"
 #include "valkyrie/controllers/NeutralMode.h"
 #include "valkyrie/controllers/PIDF.h"
+#include <bitset>
 #include <iostream>
 
 #include <pathplanner/lib/auto/NamedCommands.h>
 
 #include <frc/DriverStation.h>
-
-#define Y_CONTROLLER_SPEED_LIMIT .15_mps
-#define ROT_CONTROLLER_SPEED_LIMIT units::degrees_per_second_t{9}
 
 #define ELEV_K_ERROR units::angle::turn_t (0)
 #define ELEVATOR_SENSOR_TO_MECH 1.0f
@@ -39,10 +37,8 @@
 #define ALGAE_CACHE_SIZE 1000
 
 #define VIABLE_ELEVATOR_THRESHOLD 0.02_m
-#define VIABLE_DUNK_DISTANCE 0.28_m
 #define VIABLE_ELEVATOR_DISTANCE 1.8_m //consider the offset of the canrange from the front of robot which is 8 inches
 #define TELEOP_VIABLE_DUNK_SPEED_L4 0.25_mps
-#define AUTO_VIABLE_DUNK_SPEED_L4 1.1_mps
 
 #define MIN_DUNK_DISTANCE_OVER_CORAL 11_in
 #define MAX_DUNK_DISTANCE_OVER_CORAL 14.5_in
@@ -215,7 +211,7 @@ Scorer::Scorer(frc::TimedRobot *_robot, Drivetrain *_drivetrain, valor::CANdleSe
 
                     drivetrain->state.dir = LEFT;
                     // drivetrain->resetAlignControllers();
-                    drivetrain->hasReset = true;
+                    drivetrain->hasYReset = true;
 
                     state.gamePiece = GAME_PIECE::CORAL;
                     state.scopedState = SCOPED_STATE::SCOPED;
@@ -234,7 +230,7 @@ Scorer::Scorer(frc::TimedRobot *_robot, Drivetrain *_drivetrain, valor::CANdleSe
                     state.scopedState = SCOPED_STATE::UNSCOPED;
 
                     drivetrain->state.reefTag = -1;
-                    drivetrain->hasReset = false;
+                    drivetrain->hasYReset = false;
                 },
                 [&]{ // is Finished
                     // return state.scoringState == SCORE_STATE::SCORING;
@@ -254,7 +250,7 @@ Scorer::Scorer(frc::TimedRobot *_robot, Drivetrain *_drivetrain, valor::CANdleSe
                     drivetrain->state.reefTag = -1;
                     
                     drivetrain->state.dir = RIGHT;
-                    drivetrain->hasReset = true;
+                    drivetrain->hasYReset = true;
                     // drivetrain->resetAlignControllers();
 
                     state.gamePiece = GAME_PIECE::CORAL;
@@ -273,7 +269,7 @@ Scorer::Scorer(frc::TimedRobot *_robot, Drivetrain *_drivetrain, valor::CANdleSe
                     state.scopedState = SCOPED_STATE::UNSCOPED;
 
                     drivetrain->state.reefTag = -1;
-                    drivetrain->hasReset = false;
+                    drivetrain->hasYReset = false;
                 },
                 [&]{ // is Finished
                     // return state.scoringState == SCORE_STATE::SCORING;
@@ -294,7 +290,7 @@ Scorer::Scorer(frc::TimedRobot *_robot, Drivetrain *_drivetrain, valor::CANdleSe
                     
                     state.gamePiece = GAME_PIECE::ALGEE;
                     drivetrain->state.dir = NONE;
-                    drivetrain->hasReset = true;
+                    drivetrain->hasYReset = true;
                     // drivetrain->resetAlignControllers();
 
                     state.scopedState = SCOPED_STATE::SCOPED;
@@ -314,7 +310,7 @@ Scorer::Scorer(frc::TimedRobot *_robot, Drivetrain *_drivetrain, valor::CANdleSe
                     state.scopedState = SCOPED_STATE::UNSCOPED;
 
                     drivetrain->state.reefTag = -1;
-                    drivetrain->hasReset = false;
+                    drivetrain->hasYReset = false;
                 },
                 [&]{ // is Finished
                     // return state.scoringState == SCORE_STATE::SCORING;
@@ -330,7 +326,7 @@ Scorer::Scorer(frc::TimedRobot *_robot, Drivetrain *_drivetrain, valor::CANdleSe
     ).ToPtr());*/
 
 
-    table->PutNumber("Viable Dunk Distance (m)", VIABLE_DUNK_DISTANCE.value());
+    
     table->PutNumber("Viable Elevator Distance (m)", VIABLE_ELEVATOR_DISTANCE.value());
 
     init();
@@ -635,24 +631,13 @@ void Scorer::analyzeDashboard()
     
     if (
         (state.autoDunkEnabled && !disableAutoDunk) &&
-        drivetrain->withinYRange() &&
         state.scopedState == SCOPED_STATE::SCOPED &&
         elevatorWithinThreshold &&
         state.gamePiece == GAME_PIECE::CORAL &&
-        (state.elevState == TWO || state.elevState == THREE || state.elevState == FOUR)
+        (state.elevState == TWO || state.elevState == THREE || state.elevState == FOUR) &&
+        drivetrain->getAutoDunkAcceptance().all()
     ) {
-        bool shouldAutoDunk = drivetrain->withinXRange((units::meter_t) table->GetNumber("Viable Dunk Distance (m)", VIABLE_DUNK_DISTANCE.value()));
-        bool autoDunkYSpeed = units::math::fabs(drivetrain->yControllerInitialVelocity) < Y_CONTROLLER_SPEED_LIMIT;
-        bool autoDunkRotSpeed = units::math::fabs(drivetrain->getYawVelocity()) < ROT_CONTROLLER_SPEED_LIMIT;
-        bool autoDunkSpeedLimit = autoDunkYSpeed && autoDunkRotSpeed;
-        auto autoDunkSpeedThreshold = Constants::Scorer::getAutoDunkSpeedLimitation(drivetrain->xAlign);
-        if (shouldAutoDunk) {
-            if (state.elevState == FOUR && autoDunkSpeedLimit && drivetrain->isSpeedBelowThreshold(frc::DriverStation::IsAutonomous() ? AUTO_VIABLE_DUNK_SPEED_L4 : autoDunkSpeedThreshold)) {
-                state.scoringState = SCORE_STATE::SCORING;
-            } else if ((state.elevState == TWO || state.elevState == THREE) && autoDunkSpeedLimit && drivetrain->isSpeedBelowThreshold(autoDunkSpeedThreshold)) {
-                state.scoringState = SCORE_STATE::SCORING;
-            }
-        }
+        state.scoringState = SCORE_STATE::SCORING;
     }
 
     int botColor = state.gamePiece == GAME_PIECE::CORAL ? valor::CANdleSensor::VALOR_GOLD : valor::CANdleSensor::VALOR_PURPLE;
@@ -842,17 +827,18 @@ void Scorer::InitSendable(wpi::SendableBuilder& builder)
     builder.AddBooleanArrayProperty(
         "Auto Dunk Acceptance",
         [this] {
+            std::bitset<5> drivetrainAcceptances = drivetrain->getAutoDunkAcceptance();
             std::vector<int> gates = {
                 state.autoDunkEnabled && !table->GetBoolean("Auto Dunk Disabled", false), // 0
-                drivetrain->withinYRange(), // 1
+                drivetrainAcceptances[0],
                 state.scopedState == SCOPED_STATE::SCOPED, // 2
                 elevatorWithinThreshold, // 3
                 state.gamePiece == GAME_PIECE::CORAL, // 4
                 state.elevState == TWO || state.elevState == THREE || state.elevState == FOUR, // 5
-                drivetrain->withinXRange((units::meter_t) table->GetNumber("Viable Dunk Distance (m)", VIABLE_DUNK_DISTANCE.value())), // 6
-                units::math::fabs(drivetrain->yControllerInitialVelocity) < Y_CONTROLLER_SPEED_LIMIT, // 7
-                units::math::fabs(drivetrain->getYawVelocity()) < ROT_CONTROLLER_SPEED_LIMIT, // 8
-                drivetrain->isSpeedBelowThreshold(Constants::Scorer::getAutoDunkSpeedLimitation(drivetrain->xAlign)) // 9
+                drivetrainAcceptances[1], // 6
+                drivetrainAcceptances[2], // 7
+                drivetrainAcceptances[3], // 8
+                drivetrainAcceptances[4] // 9
             };
             return gates;
         },
