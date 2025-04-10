@@ -22,7 +22,7 @@
 #define ELEV_K_ERROR units::angle::turn_t (0)
 #define ELEVATOR_SENSOR_TO_MECH 1.0f
 
-#define CORAL_INTAKE_SPEED 20_tps //5
+#define CORAL_INTAKE_SPEED 30_tps //5
 #define CORAL_GROUND_INTAKE_SPEED -20_tps //5
 #define ALGEE_INTAKE_SPEED -16_tps
 #define SCORE_SPEED 20_tps
@@ -72,6 +72,7 @@ Scorer::Scorer(frc::TimedRobot *_robot, Drivetrain *_drivetrain, Climber *_climb
     elevatorMotor(new valor::PhoenixController(valor::PhoenixControllerType::KRAKEN_X60, CANIDs::ELEV_WHEEL, valor::NeutralMode::Brake, elevatorMotorInverted(), "baseCAN")),
     scorerMotor(new valor::PhoenixController(Constants::getScorerMotorType(), CANIDs::SCORER_WHEEL, valor::NeutralMode::Brake, scorerMotorInverted(), "baseCAN")),
     scorerPivotMotor(new valor::PhoenixController(Constants::getScorerPivotMotorType(), CANIDs::SCORER_PIVOT_MOTOR, valor::NeutralMode::Brake, scorerPivotInverted(), "baseCAN")),
+    funnelMotor(new valor::PhoenixController(Constants::getFunnelMotorType(), CANIDs::FUNNEL, valor::NeutralMode::Coast, funnelInverted(), "baseCAN")),
     scorerStagingSensor(_robot, "Scorer Staging Sensor", CANIDs::STAGING_LIDAR_SENSOR, "baseCAN", -1_mm),
     currentSensor(_robot, "Algae Current Sensor"),
     coralCurrentSensor(_robot, "Coral Current Sensor"),
@@ -528,6 +529,21 @@ void Scorer::init()
     scorerPivotMotor->setupCANCoder(CANIDs::SCORER_PIVOT_CAN, scorerPivotMagnetOffset(), ctre::phoenix6::signals::SensorDirectionValue::CounterClockwise_Positive, "baseCAN");
     scorerPivotMotor->applyConfig();
 
+    funnelMotor->setGearRatios(1, Constants::Scorer::getFunnelSensorToMech());
+    funnelMotor->enableFOC(true);
+    funnelMotor->setCurrentLimits(
+        units::ampere_t{100},
+        units::ampere_t{60},
+        units::ampere_t{45},
+        units::second_t{0.5},
+        true
+    );
+
+    valor::PIDF funnelPID = Constants::Scorer::getFunnelPIDF();
+    
+    funnelMotor->setPIDF(funnelPID);
+    funnelMotor->applyConfig();
+
     // Zeroing debounce sensor (utilizes CANdi configured hall effect sensor)
     hallEffectDebounceSensor.setGetter([this] { return hallEffectSensorActive();});
     hallEffectDebounceSensor.setRisingEdgeCallback([this] {
@@ -843,6 +859,13 @@ void Scorer::assignOutputs()
         }
     } else {
         scorerMotor->setPosition(getIntakeTurns());
+    }
+
+    if(!scorerStagingSensor.isTriggered() && state.gamePiece == GAME_PIECE::CORAL && !state.intaking &&
+        convertToMechSpace(elevatorMotor->getPosition()) < positionMap.at(CORAL).at(HP) + 0.2_in){
+        funnelMotor->setSpeed(30_tps);
+    } else{
+        funnelMotor->setPower(0_V);
     }
 }
 
