@@ -135,7 +135,7 @@ void Climber::assessInputs()
         state.manualSpeed = operatorGamepad->rightStickY(2) * 12_V;
     }
 
-    if(driverGamepad->GetStartButton()){
+    if(driverGamepad->GetStartButton() || operatorGamepad->GetStartButton()){
         state.lockOut = true;
     }
 

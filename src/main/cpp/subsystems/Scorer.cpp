@@ -782,7 +782,17 @@ void Scorer::assignOutputs()
     if(climber->state.climbState == Climber::CLIMB_STATE::STOW) {
         if (state.gamePiece == GAME_PIECE::ALGEE) {
             if (state.intaking) {
-                scorerPivotMotor->setPosition(getPivotPositionMap()[PIVOT_STATE::GROUND]);
+                if (state.hasAlgae && !state.intaking) {
+                    scorerPivotMotor->setPosition(getPivotPositionMap()[PIVOT_STATE::CARRY]);
+                } else {
+                    scorerPivotMotor->setPosition(getPivotPositionMap()[PIVOT_STATE::GROUND]);
+                }  
+            } else if (state.elevState == ELEVATOR_STATE::FOUR && state.gamePiece == GAME_PIECE::ALGEE) {
+                if (units::math::fabs(convertToMechSpace(elevatorMotor->getPosition()) - positionMap[state.gamePiece][state.elevState]) < 0.1_m){
+                    scorerPivotMotor->setPosition(getPivotPositionMap()[PIVOT_STATE::PRESCORE]);
+                } else {
+                    scorerPivotMotor->setPosition(getPivotPositionMap()[PIVOT_STATE::CARRY]);
+                }   
             } else if (state.scopedState == SCOPED_STATE::SCOPED || state.scopedState == SCOPED_STATE::MANUAL_SCOPE)  {
                 if (state.elevState == ELEVATOR_STATE::TWO || state.elevState == ELEVATOR_STATE::THREE || state.elevState == ELEVATOR_STATE::FOUR) {
                     scorerPivotMotor->setPosition(getPivotPositionMap()[PIVOT_STATE::PICK]);
@@ -841,41 +851,42 @@ void Scorer::assignOutputs()
     }
 
     // Scorer State Machine
-    if (state.scoringState == SCORE_STATE::SCORING) {
-        currentSensor.reset();
-        coralCurrentSensor.reset();
-        if (state.gamePiece == GAME_PIECE::ALGEE) {
-            scorerMotor->setSpeed(ALGEE_SCORE_SPEED);
-        } else {
-            auto it = scoringSpeedMap.find(state.elevState);
-            if (it != scoringSpeedMap.end()) {
-                scorerMotor->setSpeed(it->second);
+    if (climber->state.climbState != Climber::CLIMB_STATE::DEPLOYED){
+        if (state.scoringState == SCORE_STATE::SCORING) {
+            currentSensor.reset();
+            coralCurrentSensor.reset();
+            if (state.gamePiece == GAME_PIECE::ALGEE) {
+                scorerMotor->setSpeed(ALGEE_SCORE_SPEED);
             } else {
-                scorerMotor->setSpeed(SCORE_SPEED);
+                auto it = scoringSpeedMap.find(state.elevState);
+                if (it != scoringSpeedMap.end()) {
+                    scorerMotor->setSpeed(it->second);
+                } else {
+                    scorerMotor->setSpeed(SCORE_SPEED);
+                }
             }
-        }
-    } else if (state.hasAlgae && state.gamePiece == GAME_PIECE::ALGEE) {
-        scorerMotor->setSpeed(ALGEE_HOLD_SPD);
-    } else if (state.hasCoral && state.gamePiece == GAME_PIECE::CORAL && state.elevState == ELEVATOR_STATE::ONE) {
-        scorerMotor->setSpeed(CORAL_HOLD_SPD);
-    } else if (state.intaking) {
-        if (state.gamePiece == GAME_PIECE::ALGEE) {
-            scorerMotor->setSpeed(ALGEE_INTAKE_SPEED);
+        } else if (state.hasAlgae && state.gamePiece == GAME_PIECE::ALGEE) {
+            scorerMotor->setSpeed(ALGEE_HOLD_SPD);
+        } else if (state.hasCoral && state.gamePiece == GAME_PIECE::CORAL && state.elevState == ELEVATOR_STATE::ONE) {
+            scorerMotor->setSpeed(CORAL_HOLD_SPD);
+        } else if (state.intaking) {
+            if (state.gamePiece == GAME_PIECE::ALGEE) {
+                scorerMotor->setSpeed(ALGEE_INTAKE_SPEED);
+            } else {
+                scorerMotor->setSpeed(CORAL_GROUND_INTAKE_SPEED);
+            }
+        } else if (!scorerStagingSensor.isTriggered()) {
+            if (state.gamePiece == GAME_PIECE::ALGEE) {
+                scorerMotor->setSpeed(ALGEE_INTAKE_SPEED);
+            } else {
+                scorerMotor->setSpeed(CORAL_INTAKE_SPEED);
+            }
         } else {
-            scorerMotor->setSpeed(CORAL_GROUND_INTAKE_SPEED);
+            scorerMotor->setPosition(getIntakeTurns());
         }
-    } else if (!scorerStagingSensor.isTriggered()) {
-        if (state.gamePiece == GAME_PIECE::ALGEE) {
-            scorerMotor->setSpeed(ALGEE_INTAKE_SPEED);
-        } else {
-            scorerMotor->setSpeed(CORAL_INTAKE_SPEED);
-        }
-    } else {
-        scorerMotor->setPosition(getIntakeTurns());
-    }
 
     if(!scorerStagingSensor.isTriggered() && state.gamePiece == GAME_PIECE::CORAL && !state.intaking 
-        && convertToMechSpace(elevatorMotor->getPosition()) < positionMap.at(CORAL).at(HP) + 0.2_in
+        && (convertToMechSpace(elevatorMotor->getPosition()) < positionMap.at(CORAL).at(HP) + 0.2_in || hallEffectSensorActive())
         && state.elevState != ELEVATOR_STATE::ONE
         && scorerPivotMotor->getPosition() < getPivotPositionMap().at(PIVOT_STATE::CORAL_STOW) + 0.05_tr){
         funnelMotor->setSpeed(30_tps);
@@ -884,7 +895,8 @@ void Scorer::assignOutputs()
     }
 }
 
-
+}
+    
 
 void Scorer::InitSendable(wpi::SendableBuilder& builder)
 {
