@@ -605,6 +605,10 @@ void Scorer::assessInputs()
     if (operatorGamepad == nullptr || !operatorGamepad->IsConnected())
         return;
 
+    // Driver controller section
+    if (driverGamepad == nullptr || !driverGamepad->IsConnected())
+        return;
+
     if(operatorGamepad->leftTriggerActive() || driverGamepad->GetXButton()) {
         state.gamePiece = ALGEE;
     } else if(operatorGamepad->rightTriggerActive() || driverGamepad->GetBButton()) {
@@ -626,17 +630,20 @@ void Scorer::assessInputs()
         state.elevState = ELEVATOR_STATE::HP;
     }
 
-    // Driver controller section
-    if (driverGamepad == nullptr || !driverGamepad->IsConnected())
-        return;
-    
-    if (driverGamepad->GetLeftBumperButton()) {
-        state.scopedState = MANUAL_SCOPE;
-    } else if (driverGamepad->leftTriggerActive() || driverGamepad->rightTriggerActive()) {
-        state.scopedState = SCOPED;
-    } else {
+    if (state.elevState == ELEVATOR_STATE::ONE && driverGamepad->leftTriggerActive()) {
+        state.intaking = true;
         state.scopedState = UNSCOPED;
+    } else {
+        state.intaking = false;
+        if (driverGamepad->GetLeftBumperButton()) {
+            state.scopedState = MANUAL_SCOPE;
+        } else if (driverGamepad->leftTriggerActive() || driverGamepad->rightTriggerActive()) {
+            state.scopedState = SCOPED;
+        } else {
+            state.scopedState = UNSCOPED;
+        }
     }
+    
 
     if (driverGamepad->GetRightBumperButton()) {
         state.scoringState = SCORE_STATE::SCORING;
