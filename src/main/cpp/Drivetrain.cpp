@@ -315,13 +315,13 @@ void Drivetrain::assessInputs()
     }
     // state.lockingToReef = driverGamepad->GetAButtonPressed();
     state.getTag = false;
-    if ((driverGamepad->leftTriggerActive() || driverGamepad->rightTriggerActive()) && state.reefTag == -1) {
+    if ((driverGamepad->leftTriggerActive() || driverGamepad->rightTriggerActive()) && state.reefTag == -1 && !state.intaking) {
         state.getTag = true;
     } else if (!driverGamepad->leftTriggerActive() && !driverGamepad->rightTriggerActive()) {
         state.reefTag = -1;
     }
 
-    state.alignToTarget = driverGamepad->leftTriggerActive() || driverGamepad->rightTriggerActive();
+    state.alignToTarget = (driverGamepad->leftTriggerActive() || driverGamepad->rightTriggerActive()) && !state.intaking;
     state.climberAlign = driverGamepad->GetYButton();
 
     Swerve::assessInputs();
