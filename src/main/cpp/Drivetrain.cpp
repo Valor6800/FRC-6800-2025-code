@@ -430,7 +430,12 @@ void Drivetrain::analyzeDashboard()
             Y_ACTIVATION_THRESHOLD.value()
         );
         Swerve::rotAlign = true;
-        Swerve::xAlign = Swerve::yAlign && lidarDistance().value() > table->GetNumber("X SHUTOFF Y DISTANCE", X_SHUTOFF_Y_DISTANCE.value()) && state.gamePiece == Constants::Scorer::GAME_PIECE::CORAL && state.elevState != Constants::Scorer::ELEVATOR_STATE::ONE;
+        Swerve::xAlign = (
+            Swerve::yAlign && 
+            lidarDistance().value() > table->GetNumber("X SHUTOFF Y DISTANCE", X_SHUTOFF_Y_DISTANCE.value()) &&
+            state.gamePiece == Constants::Scorer::GAME_PIECE::CORAL &&
+            state.elevState != Constants::Scorer::ELEVATOR_STATE::ONE
+        );
     } else {
         Swerve::yAlign = false;
         Swerve::xAlign = false;

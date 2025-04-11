@@ -258,8 +258,6 @@ void Swerve<AzimuthMotor, DriveMotor>::analyzeDashboard()
         if (dumbAutoAlign) {
             xAlignVector = MAKE_VECTOR(targetAngle) * 0.75;
             powerVector = yAlignVector + xAlignVector;
-        } else if (autoAlignShutOff()) {
-            powerVector *= 0;
         } else if (xAlign) {
             xAlignVector = MAKE_VECTOR(targetAngle) * -relativeToTagXSpeed.value();
             powerVector = yAlignVector + xAlignVector;
