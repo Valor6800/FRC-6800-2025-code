@@ -422,37 +422,37 @@ namespace Constants {
                 {
                     {LEFT, 0_cm},
                     {RIGHT, 0_cm},
-                    {NONE, 0_in}
+                    {NONE, 2_in}
                 }},
             {18,
                 {
                     {LEFT, 0_cm},
                     {RIGHT, 0_cm},
-                    {NONE, 0_in}
+                    {NONE, 2_in}
                 }},
             {19,
                 {
                     {LEFT, 0_cm},
                     {RIGHT, 0_cm},
-                    {NONE, 0_in}
+                    {NONE, 2_in}
                 }},
             {20,
                 {
                     {LEFT, 0_cm},
                     {RIGHT, 0_in},
-                    {NONE, 0_in}
+                    {NONE, 2_in}
                 }},
             {21,
                 {
                     {LEFT, 0_cm},
                     {RIGHT, 0_cm},
-                    {NONE, 0_in}
+                    {NONE, 2_in}
                 }},
             {22,
                 {
                     {LEFT, 0_cm},
                     {RIGHT, 0_in},
-                    {NONE, 0_in}
+                    {NONE, 2_in}
                 }}
         };
 
@@ -461,37 +461,37 @@ namespace Constants {
                 {
                     {LEFT, 0_cm},
                     {RIGHT, 0_cm},
-                    {NONE, 0_in}
+                    {NONE, 2_in}
                 }},
             {7,
                 {
                     {LEFT, 0_cm},
                     {RIGHT, 0_cm},
-                    {NONE, 0_in}
+                    {NONE, 2_in}
                 }},
             {8,
                 {
                     {LEFT, 0_cm},
                     {RIGHT, 0_cm},
-                    {NONE, 0_in}
+                    {NONE, 2_in}
                 }},
             {9,
                 {
                     {LEFT, 0_cm},
                     {RIGHT, 0_cm},
-                    {NONE, 0_in}
+                    {NONE, 2_in}
                 }},
             {10,
                 {
                     {LEFT, 0_cm},
                     {RIGHT, 0_cm},
-                    {NONE, 0_in}
+                    {NONE, 2_in}
                 }},
             {11,
                 {
                     {LEFT, 0_cm},
                     {RIGHT, 0_cm},
-                    {NONE, 0_in}
+                    {NONE, 2_in}
                 }},
         };
 
@@ -631,7 +631,7 @@ namespace Constants {
                             GAME_PIECE::ALGEE,
                             {
                                 { ELEVATOR_STATE::FLOOR, 6.0_in },
-                                { ELEVATOR_STATE::STOWED, 3.15_in},
+                                { ELEVATOR_STATE::STOWED, 8.0_in},
                                 { ELEVATOR_STATE::HP, 4.5_in},
                                 { ELEVATOR_STATE::ONE, 3.15_in },
                                 { ELEVATOR_STATE::TWO, 7.24_in},

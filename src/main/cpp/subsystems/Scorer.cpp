@@ -524,7 +524,7 @@ void Scorer::init()
 
     valor::PIDF pivotPID = Constants::Scorer::getScorerPivotPIDF();
     pivotPID.maxVelocity = scorerPivotMotor->getMaxMechSpeed();
-    pivotPID.maxAcceleration = scorerPivotMotor->getMaxMechSpeed() / 0.333_s;
+    pivotPID.maxAcceleration = scorerPivotMotor->getMaxMechSpeed() / 1_s;
     scorerPivotMotor->setPIDF(pivotPID);
     scorerPivotMotor->setupCANCoder(CANIDs::SCORER_PIVOT_CAN, scorerPivotMagnetOffset(), ctre::phoenix6::signals::SensorDirectionValue::CounterClockwise_Positive, "baseCAN");
     scorerPivotMotor->applyConfig();
@@ -633,8 +633,10 @@ void Scorer::assessInputs()
     if (state.elevState == ELEVATOR_STATE::ONE && driverGamepad->leftTriggerActive()) {
         state.intaking = true;
         state.scopedState = UNSCOPED;
+        drivetrain->state.intaking = true;
     } else {
         state.intaking = false;
+        drivetrain->state.intaking = false;
         if (driverGamepad->GetLeftBumperButton()) {
             state.scopedState = MANUAL_SCOPE;
         } else if (driverGamepad->leftTriggerActive() || driverGamepad->rightTriggerActive()) {
@@ -679,6 +681,12 @@ void Scorer::analyzeDashboard()
         drivetrain->setXConstraints(drivetrain->x_constraints);
     }
 
+    if ((state.hasAlgae || state.hasCoral) && state.intaking){
+        driverGamepad->setRumble(true);
+    } else {
+        driverGamepad->setRumble(false);
+    }
+
     units::meter_t elevatorSetpoint = positionMap[state.gamePiece][state.elevState];
 
     bool isStopped = drivetrain->isSpeedStopped();
@@ -716,7 +724,7 @@ void Scorer::analyzeDashboard()
     int botColor = state.gamePiece == GAME_PIECE::CORAL ? valor::CANdleSensor::VALOR_GOLD : valor::CANdleSensor::VALOR_PURPLE;
     int midTopColor = state.scoringState == SCORE_STATE::SCORING ? valor::CANdleSensor::BLUE :
         (drivetrain->state.alignToTarget ? valor::CANdleSensor::RED : 
-        (scorerStagingSensor.isTriggered() && state.gamePiece == GAME_PIECE::CORAL ? valor::CANdleSensor::GREEN : valor::CANdleSensor::OFF));
+        (scorerStagingSensor.isTriggered() || state.hasAlgae || state.hasCoral ? valor::CANdleSensor::GREEN : valor::CANdleSensor::OFF));
 
     if (!frc::DriverStation::IsTestEnabled()) {
         leds->setColor(0, botColor, valor::CANdleSensor::Priority::PRIORITY_SCORER);
@@ -729,7 +737,7 @@ void Scorer::analyzeDashboard()
 
     int tagID = drivetrain->state.reefTag;
 
-    if (state.gamePiece == GAME_PIECE::ALGEE) {
+    if (state.gamePiece == GAME_PIECE::ALGEE && !state.intaking) {
         if (tagID >= 6 && tagID <= 11) {
             state.elevState = (tagID % 2 == 1) ? ELEVATOR_STATE::THREE : ELEVATOR_STATE::TWO;
         } else if (tagID >= 17 && tagID <= 22) {
@@ -772,11 +780,7 @@ void Scorer::assignOutputs()
     if(climber->state.climbState == Climber::CLIMB_STATE::STOW) {
         if (state.gamePiece == GAME_PIECE::ALGEE) {
             if (state.intaking) {
-                if (state.hasAlgae && !state.intaking) {
-                    scorerPivotMotor->setPosition(getPivotPositionMap()[PIVOT_STATE::CARRY]);
-                } else {
-                    scorerPivotMotor->setPosition(getPivotPositionMap()[PIVOT_STATE::GROUND]);
-                }
+                scorerPivotMotor->setPosition(getPivotPositionMap()[PIVOT_STATE::GROUND]);
             } else if (state.scopedState == SCOPED_STATE::SCOPED || state.scopedState == SCOPED_STATE::MANUAL_SCOPE)  {
                 if (state.elevState == ELEVATOR_STATE::TWO || state.elevState == ELEVATOR_STATE::THREE || state.elevState == ELEVATOR_STATE::FOUR) {
                     scorerPivotMotor->setPosition(getPivotPositionMap()[PIVOT_STATE::PICK]);
