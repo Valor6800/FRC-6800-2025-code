@@ -431,8 +431,8 @@ void Drivetrain::analyzeDashboard()
         );
         Swerve::rotAlign = true;
         Swerve::xAlign = (
-            Swerve::yAlign && 
-            lidarDistance().value() > table->GetNumber("X SHUTOFF Y DISTANCE", X_SHUTOFF_Y_DISTANCE.value()) &&
+            Swerve::yAlign &&
+            units::math::fabs(Swerve::yDistance - Swerve::goalAlign).value() < table->GetNumber("X SHUTOFF Y DISTANCE", X_SHUTOFF_Y_DISTANCE.value()) &&
             state.gamePiece == Constants::Scorer::GAME_PIECE::CORAL &&
             state.elevState != Constants::Scorer::ELEVATOR_STATE::ONE
         );
@@ -474,7 +474,7 @@ void Drivetrain::analyzeDashboard()
 
     state.yEstimate += Swerve::yControllerInitialVelocity.value() * LOOP_TIME;
     unfilteredYDistance = Swerve::goalAlign.to<double>();
-    
+
     for(valor::AprilTagsSensor* aprilLime : aprilTagSensors) {
         if (aprilLime->hasTarget() && valor::isReefTag(aprilLime->getTagID())) {
             if (state.reefTag == aprilLime->getTagID()) {
