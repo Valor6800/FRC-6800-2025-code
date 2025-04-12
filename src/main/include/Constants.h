@@ -217,12 +217,12 @@ namespace Constants {
         static double driveKP(){ switch (robot) {
             case Robot::Alpha: return 5.0;
             case Robot::Gold: return 3.0; // 4
-            default: return 15;
+            default: return 3.0;
         }};
         static double driveKD(){ switch(robot){
             case Robot::Alpha: return 0.01;
             case Robot::Gold: return 0; // 0.001
-            default: return 0.01;
+            default: return 0.0;
         }};
         static units::meters_per_second_t driveKVel(){ switch (robot) {
             case Robot::Alpha: return 5.36_mps;
@@ -624,7 +624,7 @@ namespace Constants {
                                 { ELEVATOR_STATE::ONE, 3.25_in },
                                 { ELEVATOR_STATE::TWO, 14_in },
                                 { ELEVATOR_STATE::THREE, 19.25_in },
-                                { ELEVATOR_STATE::FOUR, 27_in }
+                                { ELEVATOR_STATE::FOUR, 26.5_in }
                             }
                         },
                         {
@@ -728,7 +728,7 @@ namespace Constants {
             static units::angle::turn_t getElevatorAbsoluteRange() { switch (robot) {
                 case Robot::Alpha: return .75_tr;
                 case Robot::Gold: return 0.5_tr;
-                default: return 1_tr;
+                default: return 0.5_tr;
             }};
 
             static valor::PIDF getElevatorPIDF() { switch (robot) {
@@ -748,9 +748,9 @@ namespace Constants {
                 }
                 default: {
                     valor::PIDF pidf;
-                    pidf.P = 10;
-                    pidf.aFF = 0.72;
-                    pidf.maxJerk = 150_tr_per_s_cu;
+                    pidf.P = 15;
+                    pidf.aFF = 0.75;
+                    pidf.maxJerk = 135_tr_per_s_cu;
                     return pidf;
                 }
             }}

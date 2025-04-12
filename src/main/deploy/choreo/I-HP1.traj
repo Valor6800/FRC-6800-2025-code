@@ -111,6 +111,6 @@
   "splits":[0]
  },
  "events":[
-   {"name":"L4", "from":{"target":0, "targetTimestamp":0.0, "offset":{"exp":"0.01 s", "val":0.01}}, "event":{"type":"named", "data":{"name":"LEVEL FOUR POSITION"}}},
+   {"name":"HP", "from":{"target":0, "targetTimestamp":0.0, "offset":{"exp":"0.01 s", "val":0.01}}, "event":{"type":"named", "data":{"name":"HP"}}},
    {"name":"Intaking", "from":{"target":0, "targetTimestamp":0.0, "offset":{"exp":"0.1 s", "val":0.1}}, "event":{"type":"named", "data":{"name":"Intaking"}}}]
 }
