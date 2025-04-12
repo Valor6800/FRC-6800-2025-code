@@ -427,37 +427,37 @@ namespace Constants {
                 {
                     {LEFT, 0_cm},
                     {RIGHT, 0_cm},
-                    {NONE, -6_in}
+                    {NONE, -4_in}
                 }},
             {18,
                 {
                     {LEFT, 0_cm},
                     {RIGHT, 0_cm},
-                    {NONE, -6_in}
+                    {NONE, -4_in}
                 }},
             {19,
                 {
                     {LEFT, 0_cm},
                     {RIGHT, 0_cm},
-                    {NONE, -6_in}
+                    {NONE, -4_in}
                 }},
             {20,
                 {
                     {LEFT, 0_cm},
                     {RIGHT, 0_in},
-                    {NONE, -6_in}
+                    {NONE, -4_in}
                 }},
             {21,
                 {
                     {LEFT, 0_cm},
                     {RIGHT, 0_cm},
-                    {NONE, -6_in}
+                    {NONE, -4_in}
                 }},
             {22,
                 {
                     {LEFT, 0_cm},
                     {RIGHT, 0_in},
-                    {NONE, -6_in}
+                    {NONE, -4_in}
                 }}
         };
 
@@ -466,37 +466,37 @@ namespace Constants {
                 {
                     {LEFT, 0_cm},
                     {RIGHT, 0_cm},
-                    {NONE, -6_in}
+                    {NONE, -4_in}
                 }},
             {7,
                 {
                     {LEFT, 0_cm},
                     {RIGHT, 0_cm},
-                    {NONE, -6_in}
+                    {NONE, -4_in}
                 }},
             {8,
                 {
                     {LEFT, 0_cm},
                     {RIGHT, 0_cm},
-                    {NONE, -6_in}
+                    {NONE, -4_in}
                 }},
             {9,
                 {
                     {LEFT, 0_cm},
                     {RIGHT, 0_cm},
-                    {NONE, -6_in}
+                    {NONE, -4_in}
                 }},
             {10,
                 {
                     {LEFT, 0_cm},
                     {RIGHT, 0_cm},
-                    {NONE, -6_in}
+                    {NONE, -4_in}
                 }},
             {11,
                 {
                     {LEFT, 0_cm},
                     {RIGHT, 0_cm},
-                    {NONE, -6_in}
+                    {NONE, -4_in}
                 }},
         };
 
@@ -600,8 +600,8 @@ namespace Constants {
                                 { ELEVATOR_STATE::STOWED, 10_in },
                                 { ELEVATOR_STATE::HP, 3.25_in },
                                 { ELEVATOR_STATE::ONE, 3.25_in },
-                                { ELEVATOR_STATE::TWO, 14_in },
-                                { ELEVATOR_STATE::THREE, 19.16667_in },
+                                { ELEVATOR_STATE::TWO, 14_in - .55_in },
+                                { ELEVATOR_STATE::THREE, 18.7_in },
                                 { ELEVATOR_STATE::FOUR, 26.5_in }
                             }
                         },

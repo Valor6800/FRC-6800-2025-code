@@ -400,7 +400,7 @@ void Drivetrain::analyzeDashboard()
 
     choosePoleDirection(
         state.gamePiece == Constants::Scorer::ALGEE ? Direction::NONE : state.dir,
-        state.gamePiece == Constants::Scorer::ALGEE ? -1 : state.reefTag.first
+        state.reefTag.first
     );
 
     if (state.climberAlign){
