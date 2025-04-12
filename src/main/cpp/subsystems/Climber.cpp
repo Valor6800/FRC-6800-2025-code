@@ -130,11 +130,6 @@ void Climber::assessInputs()
 {
     if (operatorGamepad == nullptr || !operatorGamepad->IsConnected()) return;
 
-    if (operatorGamepad->rightStickYActive()) {
-        state.climbState = CLIMB_STATE::MANUAL;
-        state.manualSpeed = operatorGamepad->rightStickY(2) * 12_V;
-    }
-
     if(driverGamepad->GetStartButton() || operatorGamepad->GetStartButton()){
         state.lockOut = true;
     }
@@ -143,6 +138,11 @@ void Climber::assessInputs()
         state.climbState = CLIMB_STATE::DEPLOYED;
     } else if(driverGamepad->GetAButton() && state.lockOut){
         state.climbState = CLIMB_STATE::RETRACTED;
+    }
+
+    if (operatorGamepad->rightStickYActive() && state.lockOut) {
+        state.climbState = CLIMB_STATE::MANUAL;
+        state.manualSpeed = operatorGamepad->rightStickY(2) * 12_V;
     }
 }
 

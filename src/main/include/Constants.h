@@ -596,7 +596,7 @@ namespace Constants {
                                 { ELEVATOR_STATE::HP, 3.25_in },
                                 { ELEVATOR_STATE::ONE, 3.25_in },
                                 { ELEVATOR_STATE::TWO, 14_in },
-                                { ELEVATOR_STATE::THREE, 19.25_in },
+                                { ELEVATOR_STATE::THREE, 19.16667_in },
                                 { ELEVATOR_STATE::FOUR, 26.5_in }
                             }
                         },
@@ -744,6 +744,7 @@ namespace Constants {
                     pidf.P = 20;
                     pidf.aFF = 0.8;
                     pidf.maxJerk = 150_tr_per_s_cu;
+                    pidf.D = 1.0;
                     return pidf;
                 }
                 default: {
