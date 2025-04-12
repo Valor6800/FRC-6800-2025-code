@@ -885,10 +885,10 @@ void Scorer::assignOutputs()
         }
 
     if(!scorerStagingSensor.isTriggered() && state.gamePiece == GAME_PIECE::CORAL && !state.intaking 
-        && (convertToMechSpace(elevatorMotor->getPosition()) < positionMap.at(CORAL).at(HP) + 0.2_in || hallEffectSensorActive())
+        && (convertToMechSpace(elevatorMotor->getPosition()) < positionMap.at(CORAL).at(HP) + 0.4_in || hallEffectSensorActive())
         && state.elevState != ELEVATOR_STATE::ONE
         && scorerPivotMotor->getPosition() < getPivotPositionMap().at(PIVOT_STATE::CORAL_STOW) + 0.05_tr){
-        funnelMotor->setSpeed(30_tps);
+        funnelMotor->setSpeed(40_tps);
     } else{
         funnelMotor->setPower(0_V);
     }
