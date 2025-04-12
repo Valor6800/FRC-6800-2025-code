@@ -16,12 +16,12 @@
     },
     {
       "anchor": {
-        "x": 6.125717213114753,
-        "y": 5.0331158328716565
+        "x": 5.367940055249573,
+        "y": 5.5682042582256095
       },
       "prevControl": {
-        "x": 6.79702868852459,
-        "y": 5.001997950819672
+        "x": 6.03925153065941,
+        "y": 5.537086376173625
       },
       "nextControl": null,
       "isLocked": false,
@@ -33,7 +33,7 @@
     {
       "name": "Constraints Zone",
       "minWaypointRelativePos": 0,
-      "maxWaypointRelativePos": 1.0,
+      "maxWaypointRelativePos": 0.2,
       "constraints": {
         "maxVelocity": 1.0,
         "maxAcceleration": 1.0,
@@ -68,7 +68,7 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 0.0
+    "rotation": -119.99999999999999
   },
   "reversed": false,
   "folder": "Algae",

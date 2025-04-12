@@ -39,6 +39,18 @@
           "data": {
             "pathName": "Barge-Back"
           }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "AlignAlgae"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "A2-Barge"
+          }
         }
       ]
     }

@@ -3,16 +3,16 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 5.8,
-        "y": 4.02
+        "x": 5.156950334668361,
+        "y": 5.148064710856781
       },
       "prevControl": null,
       "nextControl": {
-        "x": 6.4409088260985685,
-        "y": 4.620677087538316
+        "x": 6.150026975814034,
+        "y": 5.495005665669453
       },
       "isLocked": false,
-      "linkedName": "B-GA"
+      "linkedName": null
     },
     {
       "anchor": {
@@ -20,8 +20,8 @@
         "y": 5.0331158328716565
       },
       "prevControl": {
-        "x": 5.95,
-        "y": 5.0331158328716565
+        "x": 6.490657862409718,
+        "y": 5.301674621925956
       },
       "nextControl": null,
       "isLocked": false,
@@ -64,7 +64,7 @@
     },
     {
       "name": "Barge",
-      "waypointRelativePos": 0.7,
+      "waypointRelativePos": 0.6,
       "endWaypointRelativePos": null,
       "command": {
         "type": "named",
@@ -101,7 +101,7 @@
   "folder": "Algae",
   "idealStartingState": {
     "velocity": 0,
-    "rotation": 180.0
+    "rotation": -119.99999999999999
   },
   "useDefaultConstraints": true
 }
