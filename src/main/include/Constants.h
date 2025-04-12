@@ -280,7 +280,7 @@ namespace Constants {
         static units::angle::turn_t getElevatorMagnetOffset() { switch (robot) {
             case Robot::Alpha: return 0.10327_tr;
             case Robot::Gold: return -0.354248046875_tr; //  0.989014_tr;
-            default: return 0.318604_tr;
+            default: return 0.764893_tr;
         }};
 
         static frc::Pose3d mintCameraPosition(){ switch (robot) {
@@ -422,37 +422,37 @@ namespace Constants {
                 {
                     {LEFT, 0_cm},
                     {RIGHT, 0_cm},
-                    {NONE, -2_in}
+                    {NONE, -6_in}
                 }},
             {18,
                 {
                     {LEFT, 0_cm},
                     {RIGHT, 0_cm},
-                    {NONE, -2_in}
+                    {NONE, -6_in}
                 }},
             {19,
                 {
                     {LEFT, 0_cm},
                     {RIGHT, 0_cm},
-                    {NONE, -2_in}
+                    {NONE, -6_in}
                 }},
             {20,
                 {
                     {LEFT, 0_cm},
                     {RIGHT, 0_in},
-                    {NONE, -2_in}
+                    {NONE, -6_in}
                 }},
             {21,
                 {
                     {LEFT, 0_cm},
                     {RIGHT, 0_cm},
-                    {NONE, -2_in}
+                    {NONE, -6_in}
                 }},
             {22,
                 {
                     {LEFT, 0_cm},
                     {RIGHT, 0_in},
-                    {NONE, -2_in}
+                    {NONE, -6_in}
                 }}
         };
 
@@ -461,37 +461,37 @@ namespace Constants {
                 {
                     {LEFT, 0_cm},
                     {RIGHT, 0_cm},
-                    {NONE, -2_in}
+                    {NONE, -6_in}
                 }},
             {7,
                 {
                     {LEFT, 0_cm},
                     {RIGHT, 0_cm},
-                    {NONE, -2_in}
+                    {NONE, -6_in}
                 }},
             {8,
                 {
                     {LEFT, 0_cm},
                     {RIGHT, 0_cm},
-                    {NONE, -2_in}
+                    {NONE, -6_in}
                 }},
             {9,
                 {
                     {LEFT, 0_cm},
                     {RIGHT, 0_cm},
-                    {NONE, -2_in}
+                    {NONE, -6_in}
                 }},
             {10,
                 {
                     {LEFT, 0_cm},
                     {RIGHT, 0_cm},
-                    {NONE, -2_in}
+                    {NONE, -6_in}
                 }},
             {11,
                 {
                     {LEFT, 0_cm},
                     {RIGHT, 0_cm},
-                    {NONE, -2_in}
+                    {NONE, -6_in}
                 }},
         };
 
@@ -552,8 +552,8 @@ namespace Constants {
                 default: return {
                     {ELEVATOR_STATE::FLOOR, 5_tps},
                     {ELEVATOR_STATE::ONE, 12_tps},
-                    {ELEVATOR_STATE::TWO, 12_tps},
-                    {ELEVATOR_STATE::THREE, 12_tps},
+                    {ELEVATOR_STATE::TWO, 9_tps},
+                    {ELEVATOR_STATE::THREE, 9_tps},
                     {ELEVATOR_STATE::FOUR, 12_tps} // 25
                 };
             }}
@@ -622,7 +622,7 @@ namespace Constants {
                                 { ELEVATOR_STATE::STOWED, 10_in },
                                 { ELEVATOR_STATE::HP, 3.25_in },
                                 { ELEVATOR_STATE::ONE, 3.25_in },
-                                { ELEVATOR_STATE::TWO, 14.2_in },
+                                { ELEVATOR_STATE::TWO, 14_in },
                                 { ELEVATOR_STATE::THREE, 19.25_in },
                                 { ELEVATOR_STATE::FOUR, 27_in }
                             }
