@@ -130,11 +130,9 @@ public:
 
           bool lockingToReef;
 
-          int reefTag;
           bool intaking;
-          bool getTag;
+          std::pair<int, frc::Pose2d> reefTag;
           Direction dir;
-          bool aligned;
           double yEstimate;
           double xEstimate;
 
@@ -146,6 +144,7 @@ public:
           Constants::Scorer::ELEVATOR_STATE elevState;
 
           units::angle::degree_t netAngle;
+          bool worldAlign;
      } state;
 
      frc2::FunctionalCommand* getResetOdom();
@@ -188,6 +187,8 @@ public:
      frc::Transform2d reefTransformConversion(frc::Pose2d reefTagPose);
 
 private:
+     valor::PIDF worldAlignpidx;
+     valor::PIDF worldAlignpidy;
 
      valor::CANrangeSensor leftDistanceSensor;
      valor::CANrangeSensor rightdistanceSensor;
@@ -208,6 +209,7 @@ private:
      nt::StructSubscriber<frc::Pose2d> targetPosePathPlanner;
      nt::StructPublisher<frc::Pose2d> reefPublisher;
      nt::StructPublisher<frc::Pose2d> robotPublisher;
+     nt::StructPublisher<frc::Pose2d> robotPredictedPublisher;
      nt::StructPublisher<frc::Transform2d> robotInTagSpacePublisher;
      frc::Transform2d poseErrorPP;
      frc::LinearFilter<double> filter = frc::LinearFilter<double>::MovingAverage(10);

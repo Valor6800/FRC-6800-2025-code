@@ -20,6 +20,7 @@
 #include "units/velocity.h"
 #include "units/acceleration.h"
 #include "valkyrie/BaseSubsystem.h"
+#include "valkyrie/controllers/PIDF.h"
 #include "valkyrie/drivetrain/SwerveModule.h"
 #include "valkyrie/CharMode.h"
 #include <networktables/StructArrayTopic.h>
@@ -119,7 +120,7 @@ public:
     const units::radians_per_second_t MAX_ROTATION_VEL = 16_rad_per_s;
     const units::radians_per_second_squared_t MAX_ROTATION_ACCEL = 12_rad_per_s_sq;
     const units::meters_per_second_t MAX_Y_VEL = 5.5_mps;
-    const units::meters_per_second_squared_t MAX_Y_ACCEL = 2_mps_sq;
+    const units::meters_per_second_squared_t MAX_Y_ACCEL = 1.5_mps_sq;
     const units::meters_per_second_t MAX_X_VEL = 1.5_mps;
     const units::meters_per_second_t MAX_X_VEL_L4 = 1.0_mps;
     const units::meters_per_second_squared_t MAX_X_ACCEL = 2.0_mps_sq;
@@ -166,6 +167,7 @@ protected:
     void enableCarpetGrain(double grainMultiplier, bool roughTowardsRed);
     
     frc::ChassisSpeeds getRobotRelativeSpeeds();
+    frc::ChassisSpeeds getFieldRelativeSpeeds();
     void setSwerveDesiredState(wpi::array<frc::SwerveModuleState, MODULE_COUNT> desiredStates, bool isDriveOpenLoop);
 
     double ROT_KP = 4;
@@ -197,6 +199,9 @@ protected:
     units::degree_t getRotControllerError();
     void transformControllerSpeeds();
 
+    void setPIDx(valor::PIDF pid);
+    void setPIDy(valor::PIDF pid);
+    
 private:
 
     std::deque<units::angular_acceleration::radians_per_second_squared_t> yawRateBuffer;

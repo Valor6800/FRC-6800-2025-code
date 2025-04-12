@@ -226,7 +226,7 @@ Scorer::Scorer(frc::TimedRobot *_robot, Drivetrain *_drivetrain, Climber *_climb
             frc2::FunctionalCommand(
                 [&]{ // on begin
                     drivetrain->state.startTimestamp = frc::Timer::GetFPGATimestamp();
-                    drivetrain->state.reefTag = -1;
+                    drivetrain->state.reefTag.first = -1;
 
                     drivetrain->state.dir = LEFT;
                     // drivetrain->resetAlignControllers();
@@ -248,7 +248,7 @@ Scorer::Scorer(frc::TimedRobot *_robot, Drivetrain *_drivetrain, Climber *_climb
                     drivetrain->xAlign = false;
                     state.scopedState = SCOPED_STATE::UNSCOPED;
 
-                    drivetrain->state.reefTag = -1;
+                    drivetrain->state.reefTag.first = -1;
                     drivetrain->hasYReset = false;
                 },
                 [&]{ // is Finished
@@ -266,7 +266,7 @@ Scorer::Scorer(frc::TimedRobot *_robot, Drivetrain *_drivetrain, Climber *_climb
             frc2::FunctionalCommand(
                 [&]{ // on begin
                     drivetrain->state.startTimestamp = frc::Timer::GetFPGATimestamp();
-                    drivetrain->state.reefTag = -1;
+                    drivetrain->state.reefTag.first = -1;
                     
                     drivetrain->state.dir = RIGHT;
                     drivetrain->hasYReset = true;
@@ -287,7 +287,7 @@ Scorer::Scorer(frc::TimedRobot *_robot, Drivetrain *_drivetrain, Climber *_climb
                     drivetrain->xAlign = false;
                     state.scopedState = SCOPED_STATE::UNSCOPED;
 
-                    drivetrain->state.reefTag = -1;
+                    drivetrain->state.reefTag.first = -1;
                     drivetrain->hasYReset = false;
                 },
                 [&]{ // is Finished
@@ -305,7 +305,7 @@ Scorer::Scorer(frc::TimedRobot *_robot, Drivetrain *_drivetrain, Climber *_climb
             frc2::FunctionalCommand(
                 [&]{ // on begin
                     drivetrain->state.startTimestamp = frc::Timer::GetFPGATimestamp();
-                    drivetrain->state.reefTag = -1;
+                    drivetrain->state.reefTag.first = -1;
                     
                     state.gamePiece = GAME_PIECE::ALGEE;
                     drivetrain->state.dir = NONE;
@@ -328,7 +328,7 @@ Scorer::Scorer(frc::TimedRobot *_robot, Drivetrain *_drivetrain, Climber *_climb
                     drivetrain->xAlign = false;
                     state.scopedState = SCOPED_STATE::UNSCOPED;
 
-                    drivetrain->state.reefTag = -1;
+                    drivetrain->state.reefTag.first = -1;
                     drivetrain->hasYReset = false;
                 },
                 [&]{ // is Finished
@@ -721,7 +721,7 @@ void Scorer::analyzeDashboard()
         leds->setColor(5, botColor, valor::CANdleSensor::Priority::PRIORITY_SCORER);
     }
 
-    int tagID = drivetrain->state.reefTag;
+    int tagID = drivetrain->state.reefTag.first;
 
     if (state.gamePiece == GAME_PIECE::ALGEE && !state.intaking) {
         if (tagID >= 6 && tagID <= 11) {

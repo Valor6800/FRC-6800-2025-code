@@ -35,7 +35,7 @@
 
 #define Y_KAFF 1
 
-#define X_CONTROLLER_MIN_SPEED -0.3_mps
+#define X_CONTROLLER_MIN_SPEED -0.5_mps
 
 const units::hertz_t KP_ROTATE(-90);
 const units::hertz_t KD_ROTATE(-30);
@@ -399,6 +399,11 @@ frc::ChassisSpeeds Swerve<AzimuthMotor, DriveMotor>::getRobotRelativeSpeeds(){
 }
 
 template<class AzimuthMotor, class DriveMotor>
+frc::ChassisSpeeds Swerve<AzimuthMotor, DriveMotor>::getFieldRelativeSpeeds(){
+    return frc::ChassisSpeeds::FromRobotRelativeSpeeds(getRobotRelativeSpeeds(), calcEstimator->GetEstimatedPosition().Rotation());
+}
+
+template<class AzimuthMotor, class DriveMotor>
 void Swerve<AzimuthMotor, DriveMotor>::updateAngularPosition() {
     static units::second_t lastTime = frc::Timer::GetFPGATimestamp();
     units::second_t currentTime = frc::Timer::GetFPGATimestamp();
@@ -517,6 +522,20 @@ void  Swerve<AzimuthMotor, DriveMotor>::calculateCarpetPose()
         {0.1, 0.1, 0.1}
     );
     previousPose = calcEstimator->GetEstimatedPosition();
+}
+
+template<class AzimuthMotor, class DriveMotor>
+void Swerve<AzimuthMotor, DriveMotor>::setPIDy(valor::PIDF pid) {
+    y_controller.SetP(pid.P);
+    y_controller.SetI(pid.I);
+    y_controller.SetD(pid.D);
+}
+
+template<class AzimuthMotor, class DriveMotor>
+void Swerve<AzimuthMotor, DriveMotor>::setPIDx(valor::PIDF pid) {
+    x_controller.SetP(pid.P);
+    x_controller.SetI(pid.I);
+    x_controller.SetD(pid.D);
 }
 
 template<class AzimuthMotor, class DriveMotor>
