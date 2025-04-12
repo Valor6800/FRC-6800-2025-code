@@ -545,9 +545,9 @@ namespace Constants {
                 case Robot::Gold: return {
                     {ELEVATOR_STATE::FLOOR, 5_tps},
                     {ELEVATOR_STATE::ONE, 12_tps},
-                    {ELEVATOR_STATE::TWO, 16_tps},
-                    {ELEVATOR_STATE::THREE, 16_tps},
-                    {ELEVATOR_STATE::FOUR, 28_tps} // 25
+                    {ELEVATOR_STATE::TWO, 9_tps},
+                    {ELEVATOR_STATE::THREE, 9_tps},
+                    {ELEVATOR_STATE::FOUR, 12_tps} // 25
                 };
                 default: return {
                     {ELEVATOR_STATE::FLOOR, 5_tps},
@@ -591,24 +591,24 @@ namespace Constants {
                         {
                             GAME_PIECE::CORAL,
                             {
-                                { ELEVATOR_STATE::FLOOR, 3.5_in },
+                                { ELEVATOR_STATE::FLOOR, 3.625_in },
                                 { ELEVATOR_STATE::STOWED, 10_in },
-                                { ELEVATOR_STATE::HP, 3.1_in },
-                                { ELEVATOR_STATE::ONE, 10.2_in },
-                                { ELEVATOR_STATE::TWO, 14.06_in }, //Tomball: 14.1
-                                { ELEVATOR_STATE::THREE, 19.1_in }, //Tomball: 19.5
-                                { ELEVATOR_STATE::FOUR, 26.75_in } //Tomball: 27.25
+                                { ELEVATOR_STATE::HP, 3.25_in },
+                                { ELEVATOR_STATE::ONE, 3.25_in },
+                                { ELEVATOR_STATE::TWO, 14_in },
+                                { ELEVATOR_STATE::THREE, 19.25_in },
+                                { ELEVATOR_STATE::FOUR, 27_in }
                             }
                         },
                         {
                             GAME_PIECE::ALGEE,
                             {
-                                { ELEVATOR_STATE::FLOOR, 3.5_in },
-                                { ELEVATOR_STATE::STOWED, 6.39_in},
-                                { ELEVATOR_STATE::HP, 6.39_in + 1_in},
-                                { ELEVATOR_STATE::ONE, 3.5_in },
-                                { ELEVATOR_STATE::TWO, 10.38_in}, //Tomball: 11.21
-                                { ELEVATOR_STATE::THREE, 15.89_in}, //Tomball: 16.72
+                                { ELEVATOR_STATE::FLOOR, 6.0_in },
+                                { ELEVATOR_STATE::STOWED, 8.0_in},
+                                { ELEVATOR_STATE::HP, 4.5_in},
+                                { ELEVATOR_STATE::ONE, 3.15_in },
+                                { ELEVATOR_STATE::TWO, 7.24_in},
+                                { ELEVATOR_STATE::THREE, 12.43_in},
                                 { ELEVATOR_STATE::FOUR, 29.9_in }
                             }
                         }
@@ -646,10 +646,10 @@ namespace Constants {
                 case Robot::Gold:
                     return {
                         { PIVOT_STATE::CORAL_STOW, 0.1259_tr },
-                        { PIVOT_STATE::CORAL_GROUND, 0.65_tr },
-                        { PIVOT_STATE::GROUND, 0.6_tr },
+                        { PIVOT_STATE::CORAL_GROUND, 0.637_tr },
+                        { PIVOT_STATE::GROUND, 0.637_tr },
                         { PIVOT_STATE::PICK, 0.4_tr },
-                        { PIVOT_STATE::PRESCORE, 0.5_tr },
+                        { PIVOT_STATE::PRESCORE, 0.4625_tr },
                         { PIVOT_STATE::CARRY, 0.27_tr },
                     };
                 default:
@@ -671,7 +671,7 @@ namespace Constants {
 
             static bool scorerMotorInverted() { switch (robot) {
                 case Robot::Alpha: return true;
-                case Robot::Gold: return false;
+                case Robot::Gold: return true;
                 default: return true;
             }}
 
@@ -683,20 +683,20 @@ namespace Constants {
 
             static bool funnelInverted() { switch (robot) {
                 case Robot::Alpha: return true;
-                case Robot::Gold: return false;
+                case Robot::Gold: return true;
                 default: return true;
             }}
 
             static units::angle::turn_t scorerPivotMagnetOffset() { switch (robot) {
                 case Robot::Alpha: return 1.37_tr;
-                case Robot::Gold: return 0.5_tr;
+                case Robot::Gold: return -0.7521969219_tr;
                 default: return -0.7521969219_tr;
             }}
 
             /// Amount of rotations needed for after detecting coral intake
             static units::angle::turn_t getIntakeTurns() { switch (robot) {
                 case Robot::Alpha: return 1.37_tr;
-                case Robot::Gold: return 0.5_tr;
+                case Robot::Gold: return 0.25_tr;
                 default: return 0.25_tr;
             }};
 
@@ -709,7 +709,7 @@ namespace Constants {
 
             static double getScorerSensorToMech() { switch (robot) {
                 case Robot::Alpha: return 2;
-                case Robot::Gold: return 5 / 3;
+                case Robot::Gold: return 2.75;
                 default: return 2.75;
             }}
 
@@ -741,8 +741,8 @@ namespace Constants {
                 }
                 case Robot::Gold: {
                     valor::PIDF pidf;
-                    pidf.P = 10;
-                    pidf.aFF = 0.65;
+                    pidf.P = 20;
+                    pidf.aFF = 0.8;
                     pidf.maxJerk = 150_tr_per_s_cu;
                     return pidf;
                 }
@@ -779,9 +779,9 @@ namespace Constants {
                 }
                 case Robot::Gold: {
                     valor::PIDF pidf;
-                    pidf.P = 0.5;
-                    pidf.S = 0.58;
-                    pidf.kV = 0.11;
+                    pidf.P = 1;
+                    pidf.S = 0.32;
+                    pidf.kV = 0.32;
                     return pidf;
                 }
                 default: {
@@ -819,7 +819,7 @@ namespace Constants {
 
             static units::second_t getScorerMaxVelRampTime() { switch (robot) {
                 case Robot::Alpha: return 1.0_s / 2;
-                case Robot::Gold: return 1.0_s / 2;
+                case Robot::Gold: return 1.0_s / 5;
                 default: return 1.0_s / 5;
             }}
         }

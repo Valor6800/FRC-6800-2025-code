@@ -491,7 +491,7 @@ void Scorer::init()
         Constants::Scorer::getElevatorAbsoluteRange()
     );
     elevatorMotor->setCurrentLimits(
-        units::ampere_t{100},
+        units::ampere_t{120},
         units::ampere_t{60},
         units::ampere_t{45},
         units::second_t{0.5},
@@ -647,7 +647,6 @@ void Scorer::assessInputs()
             state.scopedState = UNSCOPED;
         }
     }
-    
 
     if (driverGamepad->GetRightBumperButton()) {
         state.scoringState = SCORE_STATE::SCORING;
