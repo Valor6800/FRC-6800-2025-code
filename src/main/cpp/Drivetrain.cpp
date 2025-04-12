@@ -397,6 +397,37 @@ void Drivetrain::analyzeDashboard()
 
     // Swerve::yGoalAlign = units::meter_t{table->GetNumber("Pole Offset", Swerve::yGoalAlign.to<double>())};
     
+    frc::Pose2d predictedPose = getCalculatedPose().Exp(getRobotRelativeSpeeds().ToTwist2d(.25_s));
+    robotPredictedPublisher.Set(predictedPose);
+
+    frc::Pose2d robotToCenter{
+        predictedPose.Translation() + frc::Translation2d(-FIELD_LENGTH / 2.0, -FIELD_WIDTH / 2.0),
+        predictedPose.Rotation()
+    };
+
+
+    std::pair<int, frc::Pose3d> temp = valor::getNearestTag(
+        robotToCenter,
+        frc::DriverStation::kRed == frc::DriverStation::GetAlliance() ? valor::redReefAprilTagPoses : valor::blueReefAprilTagPoses
+    );
+
+    frc::Pose2d reefTagPose {
+        temp.second.ToPose2d().Translation() + frc::Translation2d(FIELD_LENGTH / 2.0, FIELD_WIDTH / 2.0),
+        temp.second.ToPose2d().Rotation()
+    };
+
+    if (!state.alignToTarget){
+        state.reefTag = {
+            temp.first,
+            reefTagPose
+        };
+    }
+    
+
+    reefPublisher.Set(state.reefTag.second);
+
+    alignAngleTags(); 
+    Swerve::transformControllerSpeeds();
 
     choosePoleDirection(
         state.gamePiece == Constants::Scorer::ALGEE ? Direction::NONE : state.dir,
@@ -432,7 +463,7 @@ void Drivetrain::analyzeDashboard()
     } else if (state.alignToTarget) {
         Swerve::yAlign = hasYReset && state.elevState != Constants::Scorer::ELEVATOR_STATE::ONE;
         Swerve::rotAlign = true;
-        Swerve::xAlign = (
+        Swerve::xAlign = state.worldAlign || (
             Swerve::yAlign &&
             units::math::fabs(Swerve::yDistance - Swerve::yGoalAlign).value() < table->GetNumber("X SHUTOFF Y DISTANCE", X_SHUTOFF_Y_DISTANCE.value()) &&
             state.gamePiece == Constants::Scorer::GAME_PIECE::CORAL &&
@@ -449,37 +480,6 @@ void Drivetrain::analyzeDashboard()
         hasYReset = false;
         hasXReset = false;
     }
-    frc::Pose2d predictedPose = getCalculatedPose().Exp(getRobotRelativeSpeeds().ToTwist2d(.25_s));
-    robotPredictedPublisher.Set(predictedPose);
-
-    frc::Pose2d robotToCenter{
-        predictedPose.Translation() + frc::Translation2d(-FIELD_LENGTH / 2.0, -FIELD_WIDTH / 2.0),
-        predictedPose.Rotation()
-    };
-
-
-    std::pair<int, frc::Pose3d> temp = valor::getNearestTag(
-        robotToCenter,
-        frc::DriverStation::kRed == frc::DriverStation::GetAlliance() ? valor::redReefAprilTagPoses : valor::blueReefAprilTagPoses
-    );
-
-    frc::Pose2d reefTagPose {
-        temp.second.ToPose2d().Translation() + frc::Translation2d(FIELD_LENGTH / 2.0, FIELD_WIDTH / 2.0),
-        temp.second.ToPose2d().Rotation()
-    };
-
-    if (!state.alignToTarget){
-        state.reefTag = {
-            temp.first,
-            reefTagPose
-        };
-    }
-    
-
-    reefPublisher.Set(state.reefTag.second);
-
-    alignAngleTags(); 
-    transformControllerSpeeds();
 
     valor::AprilTagsSensor* detectedAprilCam = nullptr;
     for (valor::AprilTagsSensor* aprilLime : aprilTagSensors) {
@@ -491,8 +491,10 @@ void Drivetrain::analyzeDashboard()
         }
     }
 
+    frc::Transform2d reefSpace = reefTransformConversion(state.reefTag.second);
+
     state.yEstimate += Swerve::yTagRelativeVelocity.value() * LOOP_TIME;
-    if (detectedAprilCam != nullptr){
+    if (detectedAprilCam != nullptr && reefSpace.X() < 1_m){
         if (state.worldAlign) {
             valor::PIDF tempX;
             tempX.P = X_ALIGN_KP;
@@ -533,7 +535,6 @@ void Drivetrain::analyzeDashboard()
         }
         state.worldAlign = true;
 
-        frc::Transform2d reefSpace = reefTransformConversion(state.reefTag.second);
 
         Swerve::yDistance = reefSpace.Y();
         Swerve::xDistance = reefSpace.X();
