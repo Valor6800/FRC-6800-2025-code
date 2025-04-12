@@ -204,7 +204,6 @@ private:
      
      std::vector<valor::AprilTagsSensor*> aprilTagSensors;
 
-     units::meter_t visionAcceptanceRadius;
      nt::StructSubscriber<frc::Pose2d> currentPosePathPlanner;
      nt::StructSubscriber<frc::Pose2d> targetPosePathPlanner;
      nt::StructPublisher<frc::Pose2d> reefPublisher;
@@ -213,7 +212,6 @@ private:
      nt::StructPublisher<frc::Transform2d> robotInTagSpacePublisher;
      frc::Transform2d poseErrorPP;
      frc::LinearFilter<double> filter = frc::LinearFilter<double>::MovingAverage(10);
-     double unfilteredYDistance;
 
      valor::CANdleSensor *leds;
      

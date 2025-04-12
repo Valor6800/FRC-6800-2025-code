@@ -395,7 +395,7 @@ void Drivetrain::analyzeDashboard()
     Swerve::xPosTolerance = table->GetNumber("X_Pos_Tol", Swerve::xPosTolerance.to<double>()) * 1_mm;
     // Swerve::yVelTolerance = table->GetNumber("Y_Vel_Tol", Swerve::yVelTolerance.to<double>()) * 1_mps;
 
-    // Swerve::goalAlign = units::meter_t{table->GetNumber("Pole Offset", Swerve::goalAlign.to<double>())};
+    // Swerve::yGoalAlign = units::meter_t{table->GetNumber("Pole Offset", Swerve::yGoalAlign.to<double>())};
     
 
     choosePoleDirection(
@@ -434,7 +434,7 @@ void Drivetrain::analyzeDashboard()
         Swerve::rotAlign = true;
         Swerve::xAlign = (
             Swerve::yAlign &&
-            units::math::fabs(Swerve::yDistance - Swerve::goalAlign).value() < table->GetNumber("X SHUTOFF Y DISTANCE", X_SHUTOFF_Y_DISTANCE.value()) &&
+            units::math::fabs(Swerve::yDistance - Swerve::yGoalAlign).value() < table->GetNumber("X SHUTOFF Y DISTANCE", X_SHUTOFF_Y_DISTANCE.value()) &&
             state.gamePiece == Constants::Scorer::GAME_PIECE::CORAL &&
             state.elevState != Constants::Scorer::ELEVATOR_STATE::ONE
         );
@@ -485,14 +485,13 @@ void Drivetrain::analyzeDashboard()
     for (valor::AprilTagsSensor* aprilLime : aprilTagSensors) {
         if (
             aprilLime->hasTarget() &&
-            valor::isReefTag(aprilLime->getTagID()) &&
             state.reefTag.first == aprilLime->getTagID()
         ) {
             detectedAprilCam = aprilLime;
         }
     }
 
-    state.yEstimate += Swerve::yControllerInitialVelocity.value() * LOOP_TIME;
+    state.yEstimate += Swerve::yTagRelativeVelocity.value() * LOOP_TIME;
     if (detectedAprilCam != nullptr){
         if (state.worldAlign) {
             valor::PIDF tempX;
@@ -510,21 +509,17 @@ void Drivetrain::analyzeDashboard()
             hasYReset = false;
         }
         state.worldAlign = false;
-        unfilteredYDistance = Swerve::goalAlign.to<double>();
 
         if (Swerve::yAlign && Swerve::xAlign && !hasXReset) {
             state.xEstimate = -detectedAprilCam->get_botpose_targetspace().Z().to<double>();
-            Swerve::xDistance = units::length::meter_t (state.xEstimate);
             Swerve::resetXAlignControllers();
             hasXReset = true;
         }
         if (!hasYReset) {
             state.yEstimate = detectedAprilCam->get_botpose_targetspace().X().to<double>();
-            Swerve::yDistance = units::length::meter_t (state.yEstimate);
             Swerve::resetYAlignControllers();
             hasYReset = true;
         }
-        //unfilteredYDistance = detectedAprilCam->get_botpose_targetspace().X().to<double>();
         state.yEstimate = Y_FILTER_CONST * state.yEstimate + ((1 - Y_FILTER_CONST) * detectedAprilCam->get_botpose_targetspace().X().to<double>());
         state.xEstimate = -detectedAprilCam->get_botpose_targetspace().Z().to<double>();
 
@@ -553,8 +548,6 @@ void Drivetrain::analyzeDashboard()
     }
 
     Swerve::analyzeDashboard();
-
-    visionAcceptanceRadius = (units::meter_t) table->GetNumber("Vision Acceptance", VISION_ACCEPTANCE.to<double>());
 
     for (valor::AprilTagsSensor* aprilLime : aprilTagSensors) {
         if (aprilLime->hasTarget() &&
@@ -666,7 +659,7 @@ std::bitset<5> Drivetrain::getAutoDunkAcceptance() {
     acceptance[1] = withinXRange(
         (units::meter_t) table->GetNumber("Viable Dunk Distance (m)", VIABLE_DUNK_DISTANCE.value())
     );
-    acceptance[2] = units::math::fabs(yControllerInitialVelocity) < Y_CONTROLLER_SPEED_LIMIT;
+    acceptance[2] = units::math::fabs(yTagRelativeVelocity) < Y_CONTROLLER_SPEED_LIMIT;
     acceptance[3] = units::math::fabs(getYawVelocity()) < ROT_CONTROLLER_SPEED_LIMIT;
 
     units::meters_per_second_t autoDunkSpeedThreshold = Constants::Scorer::getAutoDunkSpeedLimitation(xAlign);
@@ -851,13 +844,13 @@ void Drivetrain::choosePoleDirection(Direction dir, Constants::AprilTag tag){
     units::inch_t offset = poleOffset.find(tag) != poleOffset.end() ? poleOffset.at(tag).at(dir) : 0.0_in;
     switch (dir) {
         case LEFT:
-            Swerve::goalAlign = -units::math::abs(POLE_OFFSET - offset);
+            Swerve::yGoalAlign = -units::math::abs(POLE_OFFSET - offset);
             break;
         case RIGHT:
-            Swerve::goalAlign = units::math::abs(POLE_OFFSET + offset);
+            Swerve::yGoalAlign = units::math::abs(POLE_OFFSET + offset);
             break;
         default:
-            Swerve::goalAlign = poleOffset.find(tag) != poleOffset.end() ? poleOffset.at(tag).at(NONE) : 0_in;
+            Swerve::yGoalAlign = poleOffset.find(tag) != poleOffset.end() ? poleOffset.at(tag).at(NONE) : 0_in;
             break;
     }
 
@@ -936,18 +929,7 @@ void Drivetrain::InitSendable(wpi::SendableBuilder& builder)
             [this] {return rightdistanceSensor.getLidarData().value();},
             nullptr
         );
-        builder.AddDoubleProperty(
-            "Unfiltered Y Distance",
-            [this] {return unfilteredYDistance;},
-            nullptr
-        );
 
-        builder.AddDoubleProperty(
-            "Average X Distance",
-            [this] {return averageXDistance.value();},
-            nullptr
-        );
-        
         builder.AddBooleanProperty(
             "State: Align To Target",
             [this] {return state.alignToTarget;},

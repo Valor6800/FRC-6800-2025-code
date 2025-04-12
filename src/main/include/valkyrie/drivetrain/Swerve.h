@@ -114,8 +114,8 @@ public:
 
     void InitSendable(wpi::SendableBuilder& builder) override;
 
-    units::meters_per_second_t yControllerInitialVelocity;
-    units::meters_per_second_t xControllerInitialVelocity;
+    units::meters_per_second_t yTagRelativeVelocity;
+    units::meters_per_second_t xTagRelativeVelocity;
 
     const units::radians_per_second_t MAX_ROTATION_VEL = 16_rad_per_s;
     const units::radians_per_second_squared_t MAX_ROTATION_ACCEL = 12_rad_per_s_sq;
@@ -187,7 +187,7 @@ protected:
     units::meters_per_second_t yVelTolerance = 0.0_mps; //0.01_mps;
     units::meters_per_second_t xVelTolerance = 0.0_mps; //0.01_mps;
     units::radian_t angularPosition = 0_rad;
-    units::meter_t goalAlign = 0.0_m;
+    units::meter_t yGoalAlign = 0.0_m;
     // units::meter_t xGoalAlign = 17.7_in;
     units::meter_t xGoalAlign = 23_in;
 

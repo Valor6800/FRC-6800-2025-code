@@ -221,25 +221,18 @@ void Swerve<AzimuthMotor, DriveMotor>::analyzeDashboard()
     double dotProduct = joystickVector.dot(MAKE_VECTOR(targetAngle));
     joystickVector = dotProduct * MAKE_VECTOR(targetAngle + (frc::DriverStation::GetAlliance() == frc::DriverStation::kRed ? 180_deg : 0_deg));
     joystickVector *= maxDriveSpeed.value();
-    // joystickVector = Eigen::Vector2d{joystickVector[0], joystickVector[1]};
-
     
-
-     // meters_per_second_t
-    
-    
-
     getSkiddingRatio();
 
-    if(units::math::fabs(yDistance - goalAlign).value() < I_ZONE) {
+    if(units::math::fabs(yDistance - yGoalAlign).value() < I_ZONE) {
         y_controller.SetIZone(I_ZONE);
     } else{
         y_controller.SetIZone(0);
     }
     
-    y_controller.SetGoal(goalAlign);
+    y_controller.SetGoal(yGoalAlign);
     x_controller.SetGoal({ xGoalAlign, X_CONTROLLER_MIN_SPEED });
-    calculated_y_controller_val = y_controller.Calculate(yDistance, goalAlign);
+    calculated_y_controller_val = y_controller.Calculate(yDistance, yGoalAlign);
     calculated_x_controller_val = x_controller.Calculate(xDistance, xGoalAlign);
     if (yAlign){
         valor::PIDF yAlignPID;
@@ -253,10 +246,10 @@ void Swerve<AzimuthMotor, DriveMotor>::analyzeDashboard()
         xAlignPID.aFF = table->GetNumber("X_KAFF", X_KFF);
 
         relativeToTagSpeed = (units::meters_per_second_t) (
-            - yAlignPID.P * (yDistance - y_controller.GetSetpoint().position).value() - yAlignPID.D * (yControllerInitialVelocity - y_controller.GetSetpoint().velocity).value() + yAlignPID.aFF * y_controller.GetSetpoint().velocity.value()
+            - yAlignPID.P * (yDistance - y_controller.GetSetpoint().position).value() - yAlignPID.D * (yTagRelativeVelocity - y_controller.GetSetpoint().velocity).value() + yAlignPID.aFF * y_controller.GetSetpoint().velocity.value()
         );
         relativeToTagXSpeed = (units::meters_per_second_t) (
-            - xAlignPID.P * (xDistance - x_controller.GetSetpoint().position).value() - xAlignPID.D * (xControllerInitialVelocity - x_controller.GetSetpoint().velocity).value() + xAlignPID.aFF * x_controller.GetSetpoint().velocity.value()
+            - xAlignPID.P * (xDistance - x_controller.GetSetpoint().position).value() - xAlignPID.D * (xTagRelativeVelocity - x_controller.GetSetpoint().velocity).value() + xAlignPID.aFF * x_controller.GetSetpoint().velocity.value()
         );
         relativeToTagXSpeed = units::math::min(relativeToTagXSpeed, X_CONTROLLER_MIN_SPEED);
 
@@ -282,7 +275,7 @@ void Swerve<AzimuthMotor, DriveMotor>::analyzeDashboard()
 
 template<class AzimuthMotor, class DriveMotor>
 bool Swerve<AzimuthMotor, DriveMotor>::yControllerAligned() {
-    return units::math::abs((units::meter_t) yDistance-goalAlign) < yPosTolerance;
+    return units::math::abs((units::meter_t) yDistance-yGoalAlign) < yPosTolerance;
 }
 
 template<class AzimuthMotor, class DriveMotor>
@@ -348,8 +341,8 @@ void Swerve<AzimuthMotor, DriveMotor>::transformControllerSpeeds() {
         fieldSpaceSpeeds.vy.value()
     };
 
-    yControllerInitialVelocity = units::meters_per_second_t{currVelocitiesFieldSpace.dot(MAKE_VECTOR(targetAngle - 90_deg))};
-    xControllerInitialVelocity = units::meters_per_second_t{currVelocitiesFieldSpace.dot(MAKE_VECTOR(targetAngle))};
+    yTagRelativeVelocity = units::meters_per_second_t{currVelocitiesFieldSpace.dot(MAKE_VECTOR(targetAngle - 90_deg))};
+    xTagRelativeVelocity = units::meters_per_second_t{currVelocitiesFieldSpace.dot(MAKE_VECTOR(targetAngle))};
 }
 
 template<class AzimuthMotor, class DriveMotor>
@@ -476,18 +469,18 @@ void Swerve<AzimuthMotor, DriveMotor>::resetRotationAlignControllers() {
         pigeon->GetAngularVelocityZWorld().GetValue()
     );
 
-    y_controller.Reset(yDistance, yControllerInitialVelocity);
-    x_controller.Reset(xDistance, -xControllerInitialVelocity);
+    y_controller.Reset(yDistance, yTagRelativeVelocity);
+    x_controller.Reset(xDistance, -xTagRelativeVelocity);
 }
 
 template<class AzimuthMotor, class DriveMotor>
 void Swerve<AzimuthMotor, DriveMotor>::resetYAlignControllers() {
-    y_controller.Reset(yDistance, yControllerInitialVelocity);
+    y_controller.Reset(yDistance, yTagRelativeVelocity);
 }
 
 template<class AzimuthMotor, class DriveMotor>
 void Swerve<AzimuthMotor, DriveMotor>::resetXAlignControllers() {
-    x_controller.Reset(xDistance, -xControllerInitialVelocity);
+    x_controller.Reset(xDistance, -xTagRelativeVelocity);
 }
 template<class AzimuthMotor, class DriveMotor>
 void Swerve<AzimuthMotor, DriveMotor>::setXConstraints(frc::TrapezoidProfile<units::meter>::Constraints constraints) {
@@ -769,16 +762,7 @@ void Swerve<AzimuthMotor, DriveMotor>::InitSendable(wpi::SendableBuilder& builde
         },
         nullptr
     );
-    builder.AddBooleanProperty(
-        "Tilted",
-        [this]
-        {
-            double yaw = pigeon->GetYaw().GetValueAsDouble(), roll = pigeon->GetRoll().GetValueAsDouble(); // in degrees
-            double elevation = std::fabs(yaw) + std::fabs(roll); // not at all but close enough
-            return elevation > 5.0;
-        },
-        nullptr
-    );
+
     builder.AddDoubleArrayProperty(
         "swerve states",
         [this] 
@@ -796,83 +780,53 @@ void Swerve<AzimuthMotor, DriveMotor>::InitSendable(wpi::SendableBuilder& builde
         },
         nullptr
     );
-    builder.AddDoubleProperty(
-        "Target Angle",
-        [this] {return units::radian_t{targetAngle}.to<double>();},
-        nullptr
-    );
-    builder.AddDoubleProperty(
-        "Y Distance",
-        [this] {return yDistance.to<double>();},
-        nullptr
-    );
-    builder.AddDoubleProperty(
-        "X Distance",
-        [this] {return xDistance.to<double>();},
-        nullptr
-    );
-    builder.AddDoubleProperty(
-        "Feedforward",
-        [this] {return feedForward.to<double>();},
-        nullptr
-    );
-    builder.AddDoubleProperty(
-        "Calculated y_controller value",
-        [this] {return calculated_y_controller_val;},
-        nullptr
-    );
-    builder.AddDoubleProperty(
-        "Calculated x_controller value",
-        [this] {return calculated_x_controller_val;},
-        nullptr
-    );
+    
+    // ------------------------------------------------------
+    // ------------------------------------------------------
+    // ------------------------------------------------------
 
     builder.AddDoubleArrayProperty(
-        "Joystick Vector",
+        "Power Vector: Joystick Vector",
         [this] {return std::vector<double>{joystickVector[0], joystickVector[1]};},
         nullptr
     );
     builder.AddDoubleArrayProperty(
-        "Y_Controller PID Vector",
+        "Power Vector: Y_Controller PID Vector",
         [this] {return std::vector<double>{yAlignVector[0], yAlignVector[1]};},
         nullptr
     );
     builder.AddDoubleArrayProperty(
-        "X_Controller PID Vector",
+        "Power Vector: X_Controller PID Vector",
         [this] {return std::vector<double>{xAlignVector[0], xAlignVector[1]};},
         nullptr
     );
     builder.AddDoubleArrayProperty(
-        "Power Vector",
+        "Power Vector: Power Vector",
         [this] {return std::vector<double>{powerVector[0], powerVector[1]};},
         nullptr
     );
-    builder.AddDoubleProperty(
-        "Rotation Controller Setpoint",
-        [this] {return static_cast<double>(rot_controller.GetSetpoint().position());},
-        nullptr
-    );
-    builder.AddDoubleProperty(
-        "Y Controller Setpoint",
-        [this] {return static_cast<double>(y_controller.GetSetpoint().position());},
-        nullptr
-    );
-    builder.AddDoubleProperty(
-        "Y Controller Setpoint Velocity",
-        [this] {return static_cast<double>(y_controller.GetSetpoint().velocity());},
-        nullptr
-    );
-    builder.AddDoubleProperty(
-        "X Controller Setpoint",
-        [this] {return static_cast<double>(x_controller.GetSetpoint().position());},
-        nullptr
-    );
-    builder.AddDoubleProperty(
-        "X Controller Setpoint Velocity",
-        [this] {return static_cast<double>(x_controller.GetSetpoint().velocity());},
-        nullptr
-    );
     
+    // ------------------------------------------------------
+    // ------------------------------------------------------
+    // ------------------------------------------------------ 
+
+    builder.AddDoubleProperty(
+        "Align: Target Angle",
+        [this] {return units::radian_t{targetAngle}.to<double>();},
+        nullptr
+    );
+
+    builder.AddDoubleProperty(
+        "Align: Y Distance",
+        [this] {return yDistance.to<double>();},
+        nullptr
+    );
+    builder.AddDoubleProperty(
+        "Align: X Distance",
+        [this] {return xDistance.to<double>();},
+        nullptr
+    );
+
     builder.AddBooleanProperty(
         "Align: Locking on Target",
         [this] {return yAlign && rotAlign;},
@@ -895,15 +849,102 @@ void Swerve<AzimuthMotor, DriveMotor>::InitSendable(wpi::SendableBuilder& builde
     );
 
     builder.AddDoubleProperty(
-        "Align: Y Goal Align",
-        [this] {return goalAlign.value();},
+        "Align: Y Goal Target",
+        [this] {return yGoalAlign.value();},
         nullptr
     );
+
     builder.AddDoubleProperty(
-        "Align: X Goal Align",
+        "Align: X Goal Target",
         [this] {return xGoalAlign.value();},
         nullptr
     );
+
+    builder.AddDoubleProperty(
+        "Align: Y Tag Relative Velocity",
+        [this] {return yTagRelativeVelocity.value();},
+        nullptr
+    );
+
+    builder.AddDoubleProperty(
+        "Align: X Tag Relative Velocity",
+        [this] {return xTagRelativeVelocity.value();},
+        nullptr
+    );
+
+    // ------------------------------------------------------
+    // ------------------------------------------------------
+    // ------------------------------------------------------
+
+    builder.AddDoubleProperty(
+        "Align Controller: Rot Controller: Rotation Controller Setpoint",
+        [this] {return static_cast<double>(rot_controller.GetSetpoint().position());},
+        nullptr
+    );
+    builder.AddDoubleProperty(
+        "Align Controller: Y Controller: Y Controller Setpoint",
+        [this] {return static_cast<double>(y_controller.GetSetpoint().position());},
+        nullptr
+    );
+    builder.AddDoubleProperty(
+        "Align Controller: Y Controller: Y Controller Setpoint Velocity",
+        [this] {return static_cast<double>(y_controller.GetSetpoint().velocity());},
+        nullptr
+    );
+    builder.AddDoubleProperty(
+        "Align Controller: X Controller: X Controller Setpoint",
+        [this] {return static_cast<double>(x_controller.GetSetpoint().position());},
+        nullptr
+    );
+    builder.AddDoubleProperty(
+        "Align Controller: X Controller: X Controller Setpoint Velocity",
+        [this] {return static_cast<double>(x_controller.GetSetpoint().velocity());},
+        nullptr
+    );
+    builder.AddDoubleProperty(
+        "Align Controller: Calculated y_controller value",
+        [this] {return calculated_y_controller_val;},
+        nullptr
+    );
+    builder.AddDoubleProperty(
+        "Align Controller: Calculated x_controller value",
+        [this] {return calculated_x_controller_val;},
+        nullptr
+    );
+    builder.AddDoubleProperty(
+        "Align Controller: Rot Controller: Rot Controller Position Error",
+        [this] {return rot_controller.GetPositionError().value();},
+        nullptr
+    );
+    builder.AddDoubleProperty(
+        "Align Controller: Y Controller: Y Controller Position Error",
+        [this] {return y_controller.GetPositionError().value();},
+        nullptr
+    );
+    builder.AddDoubleProperty(
+        "Align Controller: X Controller: X Controller Position Error",
+        [this] {return x_controller.GetPositionError().value();},
+        nullptr
+    );
+    builder.AddDoubleProperty(
+        "Align Controller: Rot Controller: Rot Controller Velocity Error",
+        [this] {return rot_controller.GetVelocityError().value();},
+        nullptr
+    );
+    builder.AddDoubleProperty(
+        "Align Controller: Y Controller: Y Controller Velocity Error",
+        [this] {return y_controller.GetVelocityError().value();},
+        nullptr
+    );
+    builder.AddDoubleProperty(
+        "Align Controller: X Controller: X Controller Velocity Error",
+        [this] {return x_controller.GetVelocityError().value();},
+        nullptr
+    );
+
+    // ------------------------------------------------------
+    // ------------------------------------------------------
+    // ------------------------------------------------------ 
 
     builder.AddDoubleProperty(
         "Skidding Ratio",
@@ -917,46 +958,6 @@ void Swerve<AzimuthMotor, DriveMotor>::InitSendable(wpi::SendableBuilder& builde
         nullptr
     );
 
-    builder.AddDoubleProperty(
-        "Y Controller Initial Speed",
-        [this] {return yControllerInitialVelocity.value();},
-        nullptr
-    );
-    builder.AddDoubleProperty(
-        "X Controller Initial Speed",
-        [this] {return xControllerInitialVelocity.value();},
-        nullptr
-    );
-    builder.AddDoubleProperty(
-        "Rot Controller Position Error",
-        [this] {return rot_controller.GetPositionError().value();},
-        nullptr
-    );
-    builder.AddDoubleProperty(
-        "Y Controller Position Error",
-        [this] {return y_controller.GetPositionError().value();},
-        nullptr
-    );
-    builder.AddDoubleProperty(
-        "X Controller Position Error",
-        [this] {return x_controller.GetPositionError().value();},
-        nullptr
-    );
-    builder.AddDoubleProperty(
-        "Rot Controller Velocity Error",
-        [this] {return rot_controller.GetVelocityError().value();},
-        nullptr
-    );
-    builder.AddDoubleProperty(
-        "Y Controller Velocity Error",
-        [this] {return y_controller.GetVelocityError().value();},
-        nullptr
-    );
-    builder.AddDoubleProperty(
-        "X Controller Velocity Error",
-        [this] {return x_controller.GetVelocityError().value();},
-        nullptr
-    );
     builder.AddDoubleProperty(
         "Angular Velocity",
         [this] { return pigeon->GetAngularVelocityZWorld().GetValue().value(); },  
