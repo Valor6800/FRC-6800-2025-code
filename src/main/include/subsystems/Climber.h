@@ -54,6 +54,7 @@ public:
         // STABBY_STATE stabState;
 
         bool hasClimbed;
+        bool lockOut;
         double spikeCurrent;
         double cacheSize;
         units::volt_t manualSpeed;

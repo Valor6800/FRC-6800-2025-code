@@ -581,7 +581,7 @@ void Scorer::init()
     coralCurrentSensor.setSpikeSetpoint(25);
     coralCurrentSensor.setGetter([this]() {return scorerMotor->getCurrent().to<double>(); });
     coralCurrentSensor.setSpikeCallback([this]() {
-        if (scorerPivotMotor->getSpeed() < MINIMUM_PIVOT_SPEED && state.gamePiece == GAME_PIECE::CORAL) {
+        if (scorerPivotMotor->getSpeed() < MINIMUM_PIVOT_SPEED && state.gamePiece == GAME_PIECE::CORAL && state.intaking) {
             state.hasCoral = true;
             coralCurrentSensor.reset();
         }
@@ -611,8 +611,10 @@ void Scorer::assessInputs()
 
     if(operatorGamepad->leftTriggerActive() || driverGamepad->GetXButton()) {
         state.gamePiece = ALGEE;
+        state.elevState = ELEVATOR_STATE::TWO;
     } else if(operatorGamepad->rightTriggerActive() || driverGamepad->GetBButton()) {
         state.gamePiece = CORAL;
+        state.elevState = ELEVATOR_STATE::TWO;
     }
 
     if (operatorGamepad->leftStickYActive()) {
@@ -872,8 +874,10 @@ void Scorer::assignOutputs()
         scorerMotor->setPosition(getIntakeTurns());
     }
 
-    if(!scorerStagingSensor.isTriggered() && state.gamePiece == GAME_PIECE::CORAL && !state.intaking &&
-        convertToMechSpace(elevatorMotor->getPosition()) < positionMap.at(CORAL).at(HP) + 0.2_in){
+    if(!scorerStagingSensor.isTriggered() && state.gamePiece == GAME_PIECE::CORAL && !state.intaking 
+        && convertToMechSpace(elevatorMotor->getPosition()) < positionMap.at(CORAL).at(HP) + 0.2_in
+        && state.elevState != ELEVATOR_STATE::ONE
+        && scorerPivotMotor->getPosition() < getPivotPositionMap().at(PIVOT_STATE::CORAL_STOW) + 0.05_tr){
         funnelMotor->setSpeed(30_tps);
     } else{
         funnelMotor->setPower(0_V);

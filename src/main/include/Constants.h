@@ -422,37 +422,37 @@ namespace Constants {
                 {
                     {LEFT, 0_cm},
                     {RIGHT, 0_cm},
-                    {NONE, 2_in}
+                    {NONE, -2_in}
                 }},
             {18,
                 {
                     {LEFT, 0_cm},
                     {RIGHT, 0_cm},
-                    {NONE, 2_in}
+                    {NONE, -2_in}
                 }},
             {19,
                 {
                     {LEFT, 0_cm},
                     {RIGHT, 0_cm},
-                    {NONE, 2_in}
+                    {NONE, -2_in}
                 }},
             {20,
                 {
                     {LEFT, 0_cm},
                     {RIGHT, 0_in},
-                    {NONE, 2_in}
+                    {NONE, -2_in}
                 }},
             {21,
                 {
                     {LEFT, 0_cm},
                     {RIGHT, 0_cm},
-                    {NONE, 2_in}
+                    {NONE, -2_in}
                 }},
             {22,
                 {
                     {LEFT, 0_cm},
                     {RIGHT, 0_in},
-                    {NONE, 2_in}
+                    {NONE, -2_in}
                 }}
         };
 
@@ -461,37 +461,37 @@ namespace Constants {
                 {
                     {LEFT, 0_cm},
                     {RIGHT, 0_cm},
-                    {NONE, 2_in}
+                    {NONE, -2_in}
                 }},
             {7,
                 {
                     {LEFT, 0_cm},
                     {RIGHT, 0_cm},
-                    {NONE, 2_in}
+                    {NONE, -2_in}
                 }},
             {8,
                 {
                     {LEFT, 0_cm},
                     {RIGHT, 0_cm},
-                    {NONE, 2_in}
+                    {NONE, -2_in}
                 }},
             {9,
                 {
                     {LEFT, 0_cm},
                     {RIGHT, 0_cm},
-                    {NONE, 2_in}
+                    {NONE, -2_in}
                 }},
             {10,
                 {
                     {LEFT, 0_cm},
                     {RIGHT, 0_cm},
-                    {NONE, 2_in}
+                    {NONE, -2_in}
                 }},
             {11,
                 {
                     {LEFT, 0_cm},
                     {RIGHT, 0_cm},
-                    {NONE, 2_in}
+                    {NONE, -2_in}
                 }},
         };
 
@@ -704,7 +704,7 @@ namespace Constants {
             static units::second_t getElevMaxVelRampTime() { switch (robot) {
                 case Robot::Alpha: return 1.0_s / 5;
                 case Robot::Gold: return 12.6_s/60.0;
-                default: return 12.6_s/16.0;
+                default: return 12.6_s/60.0; // Use 12.6 / 16
             }}
 
             static double getScorerSensorToMech() { switch (robot) {
@@ -728,7 +728,7 @@ namespace Constants {
             static units::angle::turn_t getElevatorAbsoluteRange() { switch (robot) {
                 case Robot::Alpha: return .75_tr;
                 case Robot::Gold: return 0.5_tr;
-                default: return 0.5_tr;
+                default: return 1_tr;
             }};
 
             static valor::PIDF getElevatorPIDF() { switch (robot) {
@@ -750,7 +750,7 @@ namespace Constants {
                     valor::PIDF pidf;
                     pidf.P = 10;
                     pidf.aFF = 0.72;
-                    pidf.maxJerk = 100_tr_per_s_cu;
+                    pidf.maxJerk = 150_tr_per_s_cu;
                     return pidf;
                 }
             }}
