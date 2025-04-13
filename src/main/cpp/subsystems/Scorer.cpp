@@ -835,7 +835,7 @@ void Scorer::assignOutputs()
     }
 
     // Scorer State Machine
-    if (climber->state.climbState != Climber::CLIMB_STATE::DEPLOYED){
+    if (climber->state.climbState == Climber::CLIMB_STATE::STOW){
         if (state.scoringState == SCORE_STATE::SCORING) {
             currentSensor.reset();
             coralCurrentSensor.reset();
@@ -869,15 +869,20 @@ void Scorer::assignOutputs()
             scorerMotor->setPosition(getIntakeTurns());
         }
 
+    } else {
+        scorerMotor->setPower(0_V);
+    }
+
+    // Funnel State Machine
     if(!scorerStagingSensor.isTriggered() && state.gamePiece == GAME_PIECE::CORAL && !state.intaking 
         && (convertToMechSpace(elevatorMotor->getPosition()) < positionMap.at(CORAL).at(HP) + 0.4_in || hallEffectSensorActive())
         && state.elevState != ELEVATOR_STATE::ONE
-        && scorerPivotMotor->getPosition() < getPivotPositionMap().at(PIVOT_STATE::CORAL_STOW) + 0.05_tr){
+        && scorerPivotMotor->getPosition() < getPivotPositionMap().at(PIVOT_STATE::CORAL_STOW) + 0.05_tr
+        && climber->state.climbState == Climber::CLIMB_STATE::STOW){
         funnelMotor->setSpeed(40_tps);
     } else{
         funnelMotor->setPower(0_V);
     }
-}
 
 }
     
