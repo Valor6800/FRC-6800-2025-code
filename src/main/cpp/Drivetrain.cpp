@@ -494,7 +494,7 @@ void Drivetrain::analyzeDashboard()
     frc::Transform2d reefSpace = reefTransformConversion(state.reefTag.second);
 
     state.yEstimate += Swerve::yTagRelativeVelocity.value() * LOOP_TIME;
-    if (detectedAprilCam != nullptr && reefSpace.X() < 1_m){
+    if (detectedAprilCam != nullptr && reefSpace.X() < 2_m){
         if (state.worldAlign) {
             valor::PIDF tempX;
             tempX.P = X_ALIGN_KP;
