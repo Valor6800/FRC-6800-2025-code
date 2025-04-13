@@ -769,8 +769,8 @@ namespace Constants {
                 }
                 default: {
                     valor::PIDF pidf;
-                    pidf.P = 200;
-                    pidf.aFF = 0.46;
+                    pidf.P = 100;
+                    pidf.aFF = 0.0;
                     pidf.aFFType = valor::FeedForwardType::CIRCULAR;
                     return pidf;
                 }

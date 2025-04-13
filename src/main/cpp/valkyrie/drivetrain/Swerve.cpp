@@ -892,6 +892,11 @@ void Swerve<AzimuthMotor, DriveMotor>::InitSendable(wpi::SendableBuilder& builde
         nullptr
     );
     builder.AddDoubleProperty(
+        "Align Controller: Y Controller: Y Controller P Value",
+        [this] {return y_controller.GetP();},
+        nullptr
+    );
+    builder.AddDoubleProperty(
         "Align Controller: X Controller: X Controller Setpoint",
         [this] {return static_cast<double>(x_controller.GetSetpoint().position());},
         nullptr

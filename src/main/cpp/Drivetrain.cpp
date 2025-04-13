@@ -376,27 +376,7 @@ void Drivetrain::analyzeDashboard()
     poseErrorPP = currentPosePathPlanner.Get() - targetPosePathPlanner.Get();
 
     poseErrorPPTopic.Set(poseErrorPP);
-    //
-    Swerve::ROT_KP = table->GetNumber("Rot_KP", Swerve::ROT_KP);
-    Swerve::ROT_KD = table->GetNumber("Rot_KD", Swerve::ROT_KD);
 
-    Swerve::Y_KP = table->GetNumber("Y_KP", Swerve::Y_KP);
-    Swerve::Y_KI = table->GetNumber("Y_KI", Swerve::Y_KI);
-    Swerve::Y_KD = table->GetNumber("Y_KD", Swerve::Y_KD);
-
-    Swerve::X_KP = table->GetNumber("X_KP", Swerve::X_KP);
-    Swerve::X_KI = table->GetNumber("X_KI", Swerve::X_KI);
-    Swerve::X_KD = table->GetNumber("X_KD", Swerve::X_KD);
-
-    // Swerve::rotPosTolerance = table->GetNumber("Rot_Pos_Tol", Swerve::rotPosTolerance.to<double>()) * 1_deg;
-    // Swerve::rotVelTolerance = table->GetNumber("Rot_Vel_Tol", Swerve::rotVelTolerance.to<double>()) * 1_deg_per_s;
-
-    Swerve::yPosTolerance = table->GetNumber("Y_Pos_Tol", Swerve::yPosTolerance.to<double>()) * 1_mm;
-    Swerve::xPosTolerance = table->GetNumber("X_Pos_Tol", Swerve::xPosTolerance.to<double>()) * 1_mm;
-    // Swerve::yVelTolerance = table->GetNumber("Y_Vel_Tol", Swerve::yVelTolerance.to<double>()) * 1_mps;
-
-    // Swerve::yGoalAlign = units::meter_t{table->GetNumber("Pole Offset", Swerve::yGoalAlign.to<double>())};
-    
     frc::Pose2d predictedPose = getCalculatedPose().Exp(getRobotRelativeSpeeds().ToTwist2d(.25_s));
     robotPredictedPublisher.Set(predictedPose);
 
@@ -494,7 +474,7 @@ void Drivetrain::analyzeDashboard()
     frc::Transform2d reefSpace = reefTransformConversion(state.reefTag.second);
 
     state.yEstimate += Swerve::yTagRelativeVelocity.value() * LOOP_TIME;
-    if (detectedAprilCam != nullptr && reefSpace.X() < 2_m){
+    if (detectedAprilCam != nullptr && reefSpace.X() < 1.5_m){
         if (state.worldAlign) {
             valor::PIDF tempX;
             tempX.P = X_ALIGN_KP;
@@ -504,8 +484,8 @@ void Drivetrain::analyzeDashboard()
             tempY.P = Y_ALIGN_KP;
             tempY.I = Y_ALIGN_KI;
             tempY.D = Y_ALIGN_KD;
-            setPIDx(tempX);
-            setPIDy(tempY);
+            Swerve::setPIDx(tempX);
+            Swerve::setPIDy(tempY);
 
             hasXReset = false;
             hasYReset = false;
@@ -530,8 +510,8 @@ void Drivetrain::analyzeDashboard()
 
     } else {
         if (!state.worldAlign) {
-            setPIDx(worldAlignpidx);
-            setPIDy(worldAlignpidy);
+            Swerve::setPIDx(worldAlignpidx);
+            Swerve::setPIDy(worldAlignpidy);
         }
         state.worldAlign = true;
 
@@ -658,7 +638,7 @@ std::bitset<5> Drivetrain::getAutoDunkAcceptance() {
 
     acceptance[0] = withinYRange();
     acceptance[1] = withinXRange(
-        (units::meter_t) table->GetNumber("Viable Dunk Distance (m)", VIABLE_DUNK_DISTANCE.value())
+        frc::DriverStation::IsAutonomous() ? .32_m : (units::meter_t) table->GetNumber("Viable Dunk Distance (m)", VIABLE_DUNK_DISTANCE.value())
     );
     acceptance[2] = units::math::fabs(yTagRelativeVelocity) < Y_CONTROLLER_SPEED_LIMIT;
     acceptance[3] = units::math::fabs(getYawVelocity()) < ROT_CONTROLLER_SPEED_LIMIT;
