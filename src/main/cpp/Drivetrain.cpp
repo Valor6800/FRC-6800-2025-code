@@ -117,7 +117,7 @@ const units::meter_t WHEEL_DIAMETER(0.0973_m);
 #define AUTO_VIABLE_DUNK_SPEED_L4 1.1_mps
 
 #define Y_ACTIVATION_THRESHOLD 30.0_deg
-#define X_SHUTOFF_Y_DISTANCE 1_ft
+#define X_SHUTOFF_Y_DISTANCE 4_in
 
 #define ROBOT_STOPPED_THRESHOLD 0.2_mps
 
@@ -162,14 +162,20 @@ Drivetrain::Drivetrain(frc::TimedRobot *_robot, valor::CANdleSensor* _leds) :
 
     table->PutNumber("LEFT ALIGN OFFSET (in)", LEFT_TO_ROBOT.value());
     table->PutNumber("RIGHT ALIGN OFFSET (in)", RIGHT_TO_ROBOT.value());
+    
+    valor::PIDF tempY;
+    tempY.P = Y_ALIGN_KP;
+    tempY.I = Y_ALIGN_KI;
+    tempY.D = Y_ALIGN_KD;
 
-    Swerve::Y_KP = Y_ALIGN_KP;
-    Swerve::Y_KI = Y_ALIGN_KI;
-    Swerve::Y_KD = Y_ALIGN_KD;
+    Swerve::setPIDy(tempY);
 
-    Swerve::X_KP = X_ALIGN_KP;
-    Swerve::X_KI = X_ALIGN_KI;
-    Swerve::X_KD = X_ALIGN_KD;
+    valor::PIDF tempX;
+    tempX.P = X_ALIGN_KP;
+    tempX.I = X_ALIGN_KI;
+    tempX.D = X_ALIGN_KD;
+
+    Swerve::setPIDx(tempX);
 
     worldAlignpidx.P = X_WORLD_ALIGN_KP;
     worldAlignpidx.I = X_WORLD_ALIGN_KI;

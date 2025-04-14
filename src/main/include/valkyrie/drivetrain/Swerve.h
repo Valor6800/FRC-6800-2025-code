@@ -189,7 +189,7 @@ protected:
     units::radian_t angularPosition = 0_rad;
     units::meter_t yGoalAlign = 0.0_m;
     // units::meter_t xGoalAlign = 17.7_in;
-    units::meter_t xGoalAlign = 23_in;
+    units::meter_t xGoalAlign = 26_in;
 
     bool yControllerAligned();
     wpi::array<frc::SwerveModuleState, MODULE_COUNT> testModeDesiredStates{wpi::empty_array};
@@ -216,6 +216,8 @@ private:
                                                                     bool);
 
     double _drivetrain_accel;
+
+    valor::PIDF yAlignPID, xAlignPID;
 
     bool useCarpetGrain;
     double carpetGrainMultiplier;

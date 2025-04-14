@@ -235,14 +235,8 @@ void Swerve<AzimuthMotor, DriveMotor>::analyzeDashboard()
     calculated_y_controller_val = y_controller.Calculate(yDistance, yGoalAlign);
     calculated_x_controller_val = x_controller.Calculate(xDistance, xGoalAlign);
     if (yAlign){
-        valor::PIDF yAlignPID;
-        yAlignPID.P = table->GetNumber("Y_KP", Y_KP);
-        yAlignPID.D = table->GetNumber("Y_KD", Y_KD);
         yAlignPID.aFF = table->GetNumber("Y_KAFF", Y_KAFF);
 
-        valor::PIDF xAlignPID;
-        xAlignPID.P = table->GetNumber("X_KP", X_KP);
-        xAlignPID.D = table->GetNumber("X_KD", X_KD);
         xAlignPID.aFF = table->GetNumber("X_KAFF", X_KFF);
 
         relativeToTagSpeed = (units::meters_per_second_t) (
@@ -522,6 +516,9 @@ void Swerve<AzimuthMotor, DriveMotor>::setPIDy(valor::PIDF pid) {
     y_controller.SetP(pid.P);
     y_controller.SetI(pid.I);
     y_controller.SetD(pid.D);
+    yAlignPID.P = pid.P;
+    yAlignPID.I = pid.I;
+    yAlignPID.D = pid.D;
 }
 
 template<class AzimuthMotor, class DriveMotor>
@@ -529,6 +526,9 @@ void Swerve<AzimuthMotor, DriveMotor>::setPIDx(valor::PIDF pid) {
     x_controller.SetP(pid.P);
     x_controller.SetI(pid.I);
     x_controller.SetD(pid.D);
+    xAlignPID.P = pid.P;
+    xAlignPID.I = pid.I;
+    xAlignPID.D = pid.D;
 }
 
 template<class AzimuthMotor, class DriveMotor>
@@ -893,7 +893,7 @@ void Swerve<AzimuthMotor, DriveMotor>::InitSendable(wpi::SendableBuilder& builde
     );
     builder.AddDoubleProperty(
         "Align Controller: Y Controller: Y Controller P Value",
-        [this] {return y_controller.GetP();},
+        [this] {return yAlignPID.P;},
         nullptr
     );
     builder.AddDoubleProperty(
