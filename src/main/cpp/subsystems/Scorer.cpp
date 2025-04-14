@@ -59,6 +59,9 @@
 #define MAX_DUNK_DISTANCE_OVER_CORAL 14.5_in
 #define DUNK_OFFSET_OVER_CORAL 2.5_in
 
+#define ELEVATOR_THRESHOLD_FOR_FUNNEL 0.25_in
+#define PIVOT_THRESHOLD_FOR_FUNNEL 0.05_tr
+
 using namespace Constants::Scorer;
 
 Scorer::Scorer(frc::TimedRobot *_robot, Drivetrain *_drivetrain, Climber *_climber, valor::CANdleSensor* _leds) :
@@ -875,9 +878,9 @@ void Scorer::assignOutputs()
 
     // Funnel State Machine
     if(!scorerStagingSensor.isTriggered() && state.gamePiece == GAME_PIECE::CORAL && !state.intaking 
-        && (convertToMechSpace(elevatorMotor->getPosition()) < positionMap.at(CORAL).at(HP) + 0.4_in || hallEffectSensorActive())
+        && (convertToMechSpace(elevatorMotor->getPosition()) < positionMap.at(CORAL).at(HP) + ELEVATOR_THRESHOLD_FOR_FUNNEL || hallEffectSensorActive())
         && state.elevState != ELEVATOR_STATE::ONE
-        && scorerPivotMotor->getPosition() < getPivotPositionMap().at(PIVOT_STATE::CORAL_STOW) + 0.05_tr
+        && scorerPivotMotor->getPosition() < getPivotPositionMap().at(PIVOT_STATE::CORAL_STOW) + PIVOT_THRESHOLD_FOR_FUNNEL
         && climber->state.climbState == Climber::CLIMB_STATE::STOW){
         funnelMotor->setSpeed(40_tps);
     } else{
