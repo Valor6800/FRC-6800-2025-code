@@ -70,7 +70,7 @@ const units::meter_t WHEEL_DIAMETER(0.0973_m);
 #define MT2_POSE true
 
 #define Y_FILTER_CONST 0.95 // .99
-#define Y_ALIGN_KP 20
+#define Y_ALIGN_KP 25
 #define Y_ALIGN_KI 10
 #define Y_ALIGN_KD 0.1
 

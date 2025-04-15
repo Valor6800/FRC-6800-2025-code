@@ -25,7 +25,7 @@
 #define ALGEE_INTAKE_SPEED -16_tps
 #define SCORE_SPEED 20_tps
 #define ALGEE_SCORE_SPEED 11.5_tps
-#define ALGEE_HOLD_SPD -1_tps
+#define ALGEE_HOLD_SPD -1.25_tps
 #define CORAL_HOLD_SPD -0.25_tps
 
 #define ELEVATOR_FORWARD_LIMIT 6_tr
