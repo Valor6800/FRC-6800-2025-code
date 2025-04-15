@@ -644,7 +644,7 @@ std::bitset<5> Drivetrain::getAutoDunkAcceptance() {
 
     acceptance[0] = withinYRange();
     acceptance[1] = withinXRange(
-        frc::DriverStation::IsAutonomous() ? .32_m : (units::meter_t) table->GetNumber("Viable Dunk Distance (m)", VIABLE_DUNK_DISTANCE.value())
+        frc::DriverStation::IsAutonomous() ? .34_m : (units::meter_t) table->GetNumber("Viable Dunk Distance (m)", VIABLE_DUNK_DISTANCE.value())
     );
     acceptance[2] = units::math::fabs(yTagRelativeVelocity) < Y_CONTROLLER_SPEED_LIMIT;
     acceptance[3] = units::math::fabs(getYawVelocity()) < ROT_CONTROLLER_SPEED_LIMIT;

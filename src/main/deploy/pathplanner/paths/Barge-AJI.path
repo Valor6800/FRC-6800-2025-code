@@ -4,12 +4,12 @@
     {
       "anchor": {
         "x": 7.45,
-        "y": 5.0331158328716565
+        "y": 4.784353126112219
       },
       "prevControl": null,
       "nextControl": {
         "x": 6.399200740286158,
-        "y": 5.001997950819672
+        "y": 4.753235244060234
       },
       "isLocked": false,
       "linkedName": "B-Barge"
@@ -54,6 +54,17 @@
         "type": "named",
         "data": {
           "name": "HP"
+        }
+      }
+    },
+    {
+      "name": "NoAlgae",
+      "waypointRelativePos": 0.2,
+      "endWaypointRelativePos": null,
+      "command": {
+        "type": "named",
+        "data": {
+          "name": "NoAlgae"
         }
       }
     }

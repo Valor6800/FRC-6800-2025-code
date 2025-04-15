@@ -25,7 +25,13 @@
         {
           "type": "named",
           "data": {
-            "name": "AlignAlgae"
+            "name": "AlignAlgaeL2"
+          }
+        },
+        {
+          "type": "wait",
+          "data": {
+            "waitTime": 0.3
           }
         },
         {
@@ -43,13 +49,25 @@
         {
           "type": "named",
           "data": {
-            "name": "AlignAlgae"
+            "name": "AlignAlgaeL3"
+          }
+        },
+        {
+          "type": "wait",
+          "data": {
+            "waitTime": 0.3
           }
         },
         {
           "type": "path",
           "data": {
             "pathName": "AJI-Barge"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Barge-Back"
           }
         }
       ]

@@ -3,49 +3,40 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 5.156950334668361,
-        "y": 5.148064710856781
-      },
-      "prevControl": null,
-      "nextControl": {
-        "x": 5.544892886327883,
-        "y": 6.373884321301334
-      },
-      "isLocked": false,
-      "linkedName": null
-    },
-    {
-      "anchor": {
         "x": 7.45,
         "y": 4.784353126112219
       },
+      "prevControl": null,
+      "nextControl": {
+        "x": 7.191014334603078,
+        "y": 4.784353126112219
+      },
+      "isLocked": false,
+      "linkedName": "B-Barge"
+    },
+    {
+      "anchor": {
+        "x": 6.425409836065573,
+        "y": 5.0331158328716565
+      },
       "prevControl": {
-        "x": 6.490657862409718,
-        "y": 5.0529119151665185
+        "x": 6.88094262295082,
+        "y": 5.0331158328716565
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "B-Barge"
+      "linkedName": null
     }
   ],
-  "rotationTargets": [
-    {
-      "waypointRelativePos": 0.15487382483918935,
-      "rotationDegrees": -119.99999999999999
-    },
-    {
-      "waypointRelativePos": 0.5,
-      "rotationDegrees": 0.0
-    }
-  ],
+  "rotationTargets": [],
   "constraintZones": [
     {
       "name": "Constraints Zone",
-      "minWaypointRelativePos": 0.75,
+      "minWaypointRelativePos": 0,
       "maxWaypointRelativePos": 1.0,
       "constraints": {
         "maxVelocity": 1.0,
-        "maxAcceleration": 1.0,
+        "maxAcceleration": 2.5,
         "maxAngularVelocity": 540.0,
         "maxAngularAcceleration": 720.0,
         "nominalVoltage": 12.0,
@@ -56,35 +47,13 @@
   "pointTowardsZones": [],
   "eventMarkers": [
     {
-      "name": "HPAlgae",
-      "waypointRelativePos": 0.2,
+      "name": "HP",
+      "waypointRelativePos": 0.02,
       "endWaypointRelativePos": null,
       "command": {
         "type": "named",
         "data": {
-          "name": "HPAlgae"
-        }
-      }
-    },
-    {
-      "name": "Barge",
-      "waypointRelativePos": 0.6,
-      "endWaypointRelativePos": null,
-      "command": {
-        "type": "named",
-        "data": {
-          "name": "Barge"
-        }
-      }
-    },
-    {
-      "name": "Enable Scorer",
-      "waypointRelativePos": 0.98,
-      "endWaypointRelativePos": null,
-      "command": {
-        "type": "named",
-        "data": {
-          "name": "Enable Scorer"
+          "name": "HP"
         }
       }
     }
@@ -105,7 +74,7 @@
   "folder": "Algae",
   "idealStartingState": {
     "velocity": 0,
-    "rotation": -119.99999999999999
+    "rotation": 0.0
   },
   "useDefaultConstraints": true
 }

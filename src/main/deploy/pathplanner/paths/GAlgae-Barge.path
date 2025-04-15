@@ -8,20 +8,36 @@
       },
       "prevControl": null,
       "nextControl": {
-        "x": 6.4409088260985685,
-        "y": 4.620677087538316
+        "x": 6.513729377656553,
+        "y": 4.025581403729535
       },
       "isLocked": false,
       "linkedName": "B-GA"
     },
     {
       "anchor": {
-        "x": 7.45,
-        "y": 5.0331158328716565
+        "x": 7.048252214025558,
+        "y": 4.02
       },
       "prevControl": {
-        "x": 5.95,
-        "y": 5.0331158328716565
+        "x": 6.798252265470152,
+        "y": 4.019839618282602
+      },
+      "nextControl": {
+        "x": 7.298252162580962,
+        "y": 4.020160381717397
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 7.45,
+        "y": 4.784353126112219
+      },
+      "prevControl": {
+        "x": 7.333612151398708,
+        "y": 4.351362638329066
       },
       "nextControl": null,
       "isLocked": false,
@@ -31,17 +47,30 @@
   "rotationTargets": [
     {
       "waypointRelativePos": 0.5,
-      "rotationDegrees": 0.0
+      "rotationDegrees": 180.0
     }
   ],
   "constraintZones": [
     {
       "name": "Constraints Zone",
-      "minWaypointRelativePos": 0.75,
-      "maxWaypointRelativePos": 1.0,
+      "minWaypointRelativePos": 1.75,
+      "maxWaypointRelativePos": 2.0,
       "constraints": {
         "maxVelocity": 1.0,
         "maxAcceleration": 1.0,
+        "maxAngularVelocity": 540.0,
+        "maxAngularAcceleration": 720.0,
+        "nominalVoltage": 12.0,
+        "unlimited": false
+      }
+    },
+    {
+      "name": "Constraints Zone",
+      "minWaypointRelativePos": 0.0,
+      "maxWaypointRelativePos": 0.5,
+      "constraints": {
+        "maxVelocity": 1.0,
+        "maxAcceleration": 2.5,
         "maxAngularVelocity": 540.0,
         "maxAngularAcceleration": 720.0,
         "nominalVoltage": 12.0,
@@ -52,19 +81,41 @@
   "pointTowardsZones": [],
   "eventMarkers": [
     {
-      "name": "HP",
-      "waypointRelativePos": 0.02,
+      "name": "Scoped",
+      "waypointRelativePos": 0.01,
       "endWaypointRelativePos": null,
       "command": {
         "type": "named",
         "data": {
-          "name": "HP"
+          "name": "Scope"
+        }
+      }
+    },
+    {
+      "name": "HPAlgae",
+      "waypointRelativePos": 0.35,
+      "endWaypointRelativePos": null,
+      "command": {
+        "type": "named",
+        "data": {
+          "name": "HPAlgae"
+        }
+      }
+    },
+    {
+      "name": "Unscoped",
+      "waypointRelativePos": 0.35,
+      "endWaypointRelativePos": null,
+      "command": {
+        "type": "named",
+        "data": {
+          "name": "Unscope"
         }
       }
     },
     {
       "name": "Barge",
-      "waypointRelativePos": 0.7,
+      "waypointRelativePos": 1.5,
       "endWaypointRelativePos": null,
       "command": {
         "type": "named",
@@ -75,7 +126,7 @@
     },
     {
       "name": "Enable Scorer",
-      "waypointRelativePos": 0.98,
+      "waypointRelativePos": 1.98,
       "endWaypointRelativePos": null,
       "command": {
         "type": "named",

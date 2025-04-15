@@ -200,6 +200,18 @@ Scorer::Scorer(frc::TimedRobot *_robot, Drivetrain *_drivetrain, Climber *_climb
             )
         )
     ).ToPtr());
+
+        pathplanner::NamedCommands::registerCommand("HPAlgae", std::move(
+        frc2::SequentialCommandGroup(
+            frc2::InstantCommand(
+                [this]() {
+                    state.scopedState = SCOPED_STATE::UNSCOPED;
+                    state.elevState = ELEVATOR_STATE::HP;
+                    state.gamePiece = GAME_PIECE::ALGEE;
+                }
+            )
+        )
+    ).ToPtr());
     pathplanner::NamedCommands::registerCommand("Algae1", std::move(
         frc2::SequentialCommandGroup(
             frc2::InstantCommand(
@@ -223,6 +235,37 @@ Scorer::Scorer(frc::TimedRobot *_robot, Drivetrain *_drivetrain, Climber *_climb
             )
         )
     ).ToPtr());
+
+    pathplanner::NamedCommands::registerCommand("Scope", std::move(
+        frc2::SequentialCommandGroup(
+            frc2::InstantCommand(
+                [this](){
+                    state.scopedState = SCOPED_STATE::SCOPED;
+                }
+            )
+        )
+    ).ToPtr());
+
+    pathplanner::NamedCommands::registerCommand("Unscope", std::move(
+        frc2::SequentialCommandGroup(
+            frc2::InstantCommand(
+                [this](){
+                    state.scopedState = SCOPED_STATE::UNSCOPED;
+                }
+            )
+        )
+    ).ToPtr());
+
+    pathplanner::NamedCommands::registerCommand("NoAlgae", std::move(
+        frc2::SequentialCommandGroup(
+            frc2::InstantCommand(
+                [this](){
+                    state.hasAlgae = false;
+                }
+            )
+        )
+    ).ToPtr());
+
 
     pathplanner::NamedCommands::registerCommand("AlignLeft", std::move(
         frc2::SequentialCommandGroup(
@@ -303,7 +346,7 @@ Scorer::Scorer(frc::TimedRobot *_robot, Drivetrain *_drivetrain, Climber *_climb
         )
     ).ToPtr());
 
-    pathplanner::NamedCommands::registerCommand("AlignAlgae", std::move(
+    pathplanner::NamedCommands::registerCommand("AlignAlgaeL2", std::move(
         frc2::SequentialCommandGroup(
             frc2::FunctionalCommand(
                 [&]{ // on begin
@@ -329,7 +372,47 @@ Scorer::Scorer(frc::TimedRobot *_robot, Drivetrain *_drivetrain, Climber *_climb
                 [&](bool){ // on end
                     drivetrain->state.alignToTarget = false;
                     drivetrain->xAlign = false;
-                    state.scopedState = SCOPED_STATE::UNSCOPED;
+                    // state.scopedState = SCOPED_STATE::UNSCOPED;
+
+                    drivetrain->state.reefTag.first = -1;
+                    drivetrain->hasYReset = false;
+                },
+                [&]{ // is Finished
+                    // return state.scoringState == SCORE_STATE::SCORING;
+                    return state.hasAlgae;
+                },
+                {}
+            )
+        )
+    ).ToPtr());
+
+        pathplanner::NamedCommands::registerCommand("AlignAlgaeL3", std::move(
+        frc2::SequentialCommandGroup(
+            frc2::FunctionalCommand(
+                [&]{ // on begin
+                    drivetrain->state.startTimestamp = frc::Timer::GetFPGATimestamp();
+                    drivetrain->state.reefTag.first = -1;
+                    
+                    state.gamePiece = GAME_PIECE::ALGEE;
+                    drivetrain->state.dir = NONE;
+                    drivetrain->hasYReset = true;
+                    // drivetrain->resetAlignControllers();
+
+                    state.scopedState = SCOPED_STATE::SCOPED;
+                    state.elevState = ELEVATOR_STATE::THREE;
+                    // state.scoringState = SCORE_STATE::SCORING;
+                    state.scoringState = SCORE_STATE::INTAKING;
+                },
+                [&]{ // on execute
+                    drivetrain->state.alignToTarget = true;
+                    drivetrain->xAlign = true;
+                    // frc::ChassisSpeeds speeds = frc::ChassisSpeeds{0.5_mps, 0.0_mps, 0.0_rad_per_s};
+                    // drive(0.5_mps, 0.0_mps, 0.0_rad_per_s, true);
+                },
+                [&](bool){ // on end
+                    drivetrain->state.alignToTarget = false;
+                    drivetrain->xAlign = false;
+                    // state.scopedState = SCOPED_STATE::UNSCOPED;
 
                     drivetrain->state.reefTag.first = -1;
                     drivetrain->hasYReset = false;
