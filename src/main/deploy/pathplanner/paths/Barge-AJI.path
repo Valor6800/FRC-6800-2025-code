@@ -3,13 +3,13 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 7.45,
-        "y": 4.784353126112219
+        "x": 7.3,
+        "y": 4.784
       },
       "prevControl": null,
       "nextControl": {
-        "x": 6.399200740286158,
-        "y": 4.753235244060234
+        "x": 6.249200740286158,
+        "y": 4.752882117948015
       },
       "isLocked": false,
       "linkedName": "B-Barge"
