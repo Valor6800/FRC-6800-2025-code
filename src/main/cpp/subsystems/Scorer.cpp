@@ -606,7 +606,7 @@ void Scorer::init()
 
     valor::PIDF pivotPID = Constants::Scorer::getScorerPivotPIDF();
     pivotPID.maxVelocity = scorerPivotMotor->getMaxMechSpeed();
-    pivotPID.maxAcceleration = scorerPivotMotor->getMaxMechSpeed() / 1_s;
+    pivotPID.maxAcceleration = units::turns_per_second_squared_t(3.45); // scorerPivotMotor->getMaxMechSpeed() / 1_s;
     scorerPivotMotor->setPIDF(pivotPID);
     scorerPivotMotor->setupCANCoder(CANIDs::SCORER_PIVOT_CAN, scorerPivotMagnetOffset(), ctre::phoenix6::signals::SensorDirectionValue::CounterClockwise_Positive, "baseCAN");
     scorerPivotMotor->applyConfig();
