@@ -694,7 +694,7 @@ namespace Constants {
 
             static units::angle::turn_t scorerPivotMagnetOffset() { switch (robot) {
                 case Robot::Alpha: return 1.37_tr;
-                case Robot::Gold: return -0.7521969219_tr;
+                case Robot::Gold: return -0.846435125_tr; //setPoint - currentPos +/"-" currentOffset
                 default: return -0.7521969219_tr;
             }}
 
