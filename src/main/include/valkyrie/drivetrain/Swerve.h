@@ -119,8 +119,8 @@ public:
 
     const units::radians_per_second_t MAX_ROTATION_VEL = 16_rad_per_s;
     const units::radians_per_second_squared_t MAX_ROTATION_ACCEL = 12_rad_per_s_sq;
-    const units::meters_per_second_t MAX_Y_VEL = 5.5_mps;
-    const units::meters_per_second_squared_t MAX_Y_ACCEL = 1.5_mps_sq;
+    const units::meters_per_second_t MAX_Y_VEL = 3.0_mps;
+    const units::meters_per_second_squared_t MAX_Y_ACCEL = 2_mps_sq;
     const units::meters_per_second_t MAX_X_VEL = 1.5_mps;
     const units::meters_per_second_t MAX_X_VEL_L4 = 1.0_mps;
     const units::meters_per_second_squared_t MAX_X_ACCEL = 1.4_mps_sq;
