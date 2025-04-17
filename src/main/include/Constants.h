@@ -278,9 +278,16 @@ namespace Constants {
             default: return valor::PhoenixControllerType::KRAKEN_X60_FOC;
         }}
 
+        /** Process for ReZeroing:
+         *      1. Move elevator position to when the hall effect just trips
+         *      2. ReZero elevator cancoder using phoenix tuner and record value
+         *      3. Put in value from phoenix tuner into getElevatorMagnetOffset
+         *      4. Deploy and validate position
+         *      5. Position should be roughly 2.85_in when at the bottom
+        */
         static units::angle::turn_t getElevatorMagnetOffset() { switch (robot) {
             case Robot::Alpha: return 0.10327_tr;
-            case Robot::Gold: return -0.26123046_tr; //  0.989014_tr;
+            case Robot::Gold: return 0.012939453125_tr;
             default: return 0.764893_tr;
         }};
 
@@ -535,7 +542,7 @@ namespace Constants {
 
             static units::meters_per_second_t getAutoDunkSpeedLimitation(bool autoDunking) { switch (robot) {
                 case Robot::Alpha: return autoDunking ? 0.25_mps : 0.6_mps ;
-                case Robot::Gold: return autoDunking ? 0.25_mps : 0.6_mps ;
+                case Robot::Gold: return autoDunking ? 0.35_mps : 0.6_mps ;
                 default: return autoDunking ? 0.25_mps : 0.6_mps;
             }}
 
