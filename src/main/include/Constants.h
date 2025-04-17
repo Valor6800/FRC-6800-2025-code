@@ -280,14 +280,14 @@ namespace Constants {
 
         /** Process for ReZeroing:
          *      1. Move elevator position to when the hall effect just trips
-         *      2. ReZero elevator cancoder using phoenix tuner and record value
+         *      2. ReZero elevator cancoder using phoenix tuner and record negated value
          *      3. Put in value from phoenix tuner into getElevatorMagnetOffset
          *      4. Deploy and validate position
          *      5. Position should be roughly 2.85_in when at the bottom
         */
         static units::angle::turn_t getElevatorMagnetOffset() { switch (robot) {
             case Robot::Alpha: return 0.10327_tr;
-            case Robot::Gold: return 0.012939453125_tr;
+            case Robot::Gold: return 0.050537109375_tr;
             default: return 0.764893_tr;
         }};
 
