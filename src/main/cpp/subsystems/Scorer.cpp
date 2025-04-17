@@ -483,30 +483,65 @@ frc2::CommandPtr Scorer::scorerPitSequenceStage(GAME_PIECE gamePiece, ELEVATOR_S
 
 frc2::CommandPtr Scorer::scorerPitSequence() {
     return frc2::cmd::Sequence(
-        frc2::cmd::RunOnce([this] { state.scopedState = SCOPED; }),
-        scorerPitSequenceStage(GAME_PIECE::CORAL, ELEVATOR_STATE::STOWED, 8, 2),
-        scorerPitSequenceStage(GAME_PIECE::CORAL, ELEVATOR_STATE::ONE, 10, 2),
-        frc2::cmd::RunOnce([this] { elevatorBButtonWait.Set(true); }),
+        frc2::cmd::Sequence(
+            frc2::cmd::RunOnce([this] {
+                state.gamePiece = GAME_PIECE::ALGEE;
+                state.intaking = true;
+            }),
+            frc2::cmd::WaitUntil([this] { return state.hasAlgae; })
+        ),
         frc2::cmd::WaitUntil([this] { return driverGamepad->GetBButton(); }),
-        frc2::cmd::RunOnce([this] { state.scoringState = SCORING; }),
-        frc2::cmd::RunOnce([this] { elevatorBButtonWait.Set(true); }),
+        frc2::cmd::Sequence(
+            frc2::cmd::RunOnce([this] {
+                state.elevState = ELEVATOR_STATE::ONE;
+                state.scopedState = SCOPED_STATE::MANUAL_SCOPE;
+            }),
+            // frc2::cmd::WaitUntil([this] {  })
+            frc2::cmd::Wait(1_s),
+            frc2::cmd::RunOnce([this] {
+                state.scoringState = SCORE_STATE::SCORING;
+                state.hasAlgae = false;
+            }),
+            frc2::cmd::Wait(2_s),
+            frc2::cmd::RunOnce([this] {
+                state.scoringState = SCORE_STATE::HOLD;
+                state.scopedState = SCOPED_STATE::UNSCOPED;
+            })
+        ),
         frc2::cmd::WaitUntil([this] { return driverGamepad->GetBButton(); }),
-        scorerPitSequenceStage(GAME_PIECE::CORAL, ELEVATOR_STATE::TWO, 12, 2),
-        scorerPitSequenceStage(GAME_PIECE::CORAL, ELEVATOR_STATE::THREE, 14, 2),
-        scorerPitSequenceStage(GAME_PIECE::CORAL, ELEVATOR_STATE::FOUR, 16, 2),
-        scorerPitSequenceStage(GAME_PIECE::CORAL, ELEVATOR_STATE::STOWED, 18, 3),
-        frc2::cmd::RunOnce([this] {
-            state.scoringState = HOLD;
-            elevatorBButtonWait.Set(true);
-        }),
+        frc2::cmd::Sequence(
+            frc2::cmd::RunOnce([this] {
+                state.gamePiece = GAME_PIECE::ALGEE;
+                state.elevState = ELEVATOR_STATE::FOUR;
+                state.scopedState = SCOPED_STATE::MANUAL_SCOPE;
+            }),
+            frc2::cmd::Wait(4_s)
+        ),
         frc2::cmd::WaitUntil([this] { return driverGamepad->GetBButton(); }),
-        scorerPitSequenceStage(GAME_PIECE::ALGEE, ELEVATOR_STATE::STOWED, 21, 3),
-        frc2::cmd::RunOnce([this] { state.scoringState = SCORING; }),
-        frc2::cmd::Wait(3_s),
-        scorerPitSequenceStage(GAME_PIECE::ALGEE, ELEVATOR_STATE::FOUR, 24, 3),
+        // frc2::cmd::RunOnce([this] { state.scopedState = SCOPED; }),
+        // scorerPitSequenceStage(GAME_PIECE::CORAL, ELEVATOR_STATE::STOWED, 8, 2),
+        // scorerPitSequenceStage(GAME_PIECE::CORAL, ELEVATOR_STATE::ONE, 10, 2),
+        // frc2::cmd::RunOnce([this] { elevatorBButtonWait.Set(true); }),
+        // frc2::cmd::WaitUntil([this] { return driverGamepad->GetBButton(); }),
+        // frc2::cmd::RunOnce([this] { state.scoringState = SCORING; }),
+        // frc2::cmd::RunOnce([this] { elevatorBButtonWait.Set(true); }),
+        // frc2::cmd::WaitUntil([this] { return driverGamepad->GetBButton(); }),
+        // scorerPitSequenceStage(GAME_PIECE::CORAL, ELEVATOR_STATE::TWO, 12, 2),
+        // scorerPitSequenceStage(GAME_PIECE::CORAL, ELEVATOR_STATE::THREE, 14, 2),
+        // scorerPitSequenceStage(GAME_PIECE::CORAL, ELEVATOR_STATE::FOUR, 16, 2),
+        // scorerPitSequenceStage(GAME_PIECE::CORAL, ELEVATOR_STATE::STOWED, 18, 3),
+        // frc2::cmd::RunOnce([this] {
+        //     state.scoringState = HOLD;
+        //     elevatorBButtonWait.Set(true);
+        // }),
+        // frc2::cmd::WaitUntil([this] { return driverGamepad->GetBButton(); }),
+        // scorerPitSequenceStage(GAME_PIECE::ALGEE, ELEVATOR_STATE::STOWED, 21, 3),
+        // frc2::cmd::RunOnce([this] { state.scoringState = SCORING; }),
+        // frc2::cmd::Wait(3_s),
+        // scorerPitSequenceStage(GAME_PIECE::ALGEE, ELEVATOR_STATE::FOUR, 24, 3),
         frc2::cmd::RunOnce([this] {
             resetState();
-            elevatorStage.Set(false);
+            // elevatorStage.Set(false);
         })
     );
 }
