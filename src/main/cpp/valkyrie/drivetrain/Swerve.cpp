@@ -233,7 +233,7 @@ void Swerve<AzimuthMotor, DriveMotor>::analyzeDashboard()
     y_controller.SetGoal(yGoalAlign);
     x_controller.SetGoal({ xGoalAlign, X_CONTROLLER_MIN_SPEED });
     calculated_y_controller_val = y_controller.Calculate(yDistance, yGoalAlign);
-    calculated_x_controller_val = x_controller.Calculate(xDistance, xGoalAlign);
+    calculated_x_controller_val = x_controller.Calculate(xDistance, xGoalAlign); // endState not going to min controller velocity
     if (yAlign){
         yAlignPID.aFF = table->GetNumber("Y_KAFF", Y_KAFF);
 
