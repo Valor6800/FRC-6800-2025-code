@@ -25,6 +25,24 @@
         {
           "type": "path",
           "data": {
+            "pathName": "FHP1-L"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "AlignRight"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "L-HP1"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
             "pathName": "HP1-K"
           }
         },
@@ -38,24 +56,6 @@
           "type": "path",
           "data": {
             "pathName": "K-HP1"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "HP1-L"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "AlignRight"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "L-HP1"
           }
         },
         {
