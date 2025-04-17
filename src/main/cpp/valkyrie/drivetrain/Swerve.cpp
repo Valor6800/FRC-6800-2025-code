@@ -35,7 +35,7 @@
 
 #define Y_KAFF 1
 
-#define X_CONTROLLER_MIN_SPEED -0.5_mps // -.5_mps
+#define X_CONTROLLER_MIN_SPEED -0.7_mps // -.5_mps
 
 const units::hertz_t KP_ROTATE(-90);
 const units::hertz_t KD_ROTATE(-30);
