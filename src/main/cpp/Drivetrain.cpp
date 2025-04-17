@@ -499,12 +499,14 @@ void Drivetrain::analyzeDashboard()
         state.worldAlign = false;
 
         if (Swerve::yAlign && Swerve::xAlign && !hasXReset) {
-            state.xEstimate = -detectedAprilCam->get_botpose_targetspace().Z().to<double>();
+            Swerve::xDistance = reefSpace.X();
+            state.xEstimate = Swerve::xDistance.value(); 
             Swerve::resetXAlignControllers();
             hasXReset = true;
         }
         if (!hasYReset) {
-            state.yEstimate = detectedAprilCam->get_botpose_targetspace().X().to<double>();
+            Swerve::yDistance = reefSpace.Y();
+            state.yEstimate = Swerve::yDistance.value();
             Swerve::resetYAlignControllers();
             hasYReset = true;
         }
