@@ -231,9 +231,9 @@ void Swerve<AzimuthMotor, DriveMotor>::analyzeDashboard()
     }
     
     y_controller.SetGoal(yGoalAlign);
-    x_controller.SetGoal({ xGoalAlign, X_CONTROLLER_MIN_SPEED });
+    x_controller.SetGoal({ xGoalAlign, 0.0_mps });
     calculated_y_controller_val = y_controller.Calculate(yDistance, yGoalAlign);
-    calculated_x_controller_val = x_controller.Calculate(xDistance, {xGoalAlign, X_CONTROLLER_MIN_SPEED}); // endState not going to min controller velocity
+    calculated_x_controller_val = x_controller.Calculate(xDistance, {xGoalAlign, 0.0_mps}); // endState not going to min controller velocity
     if (yAlign){
         yAlignPID.aFF = table->GetNumber("Y_KAFF", Y_KAFF);
 
@@ -245,7 +245,10 @@ void Swerve<AzimuthMotor, DriveMotor>::analyzeDashboard()
         relativeToTagXSpeed = (units::meters_per_second_t) (
             - xAlignPID.P * (xDistance - x_controller.GetSetpoint().position).value() - xAlignPID.D * (xTagRelativeVelocity - x_controller.GetSetpoint().velocity).value() + xAlignPID.aFF * x_controller.GetSetpoint().velocity.value()
         );
-        relativeToTagXSpeed = units::math::min(relativeToTagXSpeed, X_CONTROLLER_MIN_SPEED);
+
+        if (yGoalAlign - yDistance <= 3_in) {
+            relativeToTagXSpeed = units::math::min(relativeToTagXSpeed, X_CONTROLLER_MIN_SPEED);
+        }
 
         yAlignVector = MAKE_VECTOR(targetAngle - 90_deg) * relativeToTagSpeed.value();
         if (dumbAutoAlign) {
