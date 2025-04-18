@@ -246,7 +246,7 @@ void Swerve<AzimuthMotor, DriveMotor>::analyzeDashboard()
             - xAlignPID.P * (xDistance - x_controller.GetSetpoint().position).value() - xAlignPID.D * (xTagRelativeVelocity - x_controller.GetSetpoint().velocity).value() + xAlignPID.aFF * x_controller.GetSetpoint().velocity.value()
         );
 
-        if (units::math::fabs(yGoalAlign - yDistance) <= 3_in) {
+        if (units::math::fabs(yGoalAlign - yDistance) <= 1_in) {
             relativeToTagXSpeed = units::math::min(relativeToTagXSpeed, X_CONTROLLER_MIN_SPEED);
         }
 

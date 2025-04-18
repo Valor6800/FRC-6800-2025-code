@@ -123,7 +123,7 @@ public:
     const units::meters_per_second_squared_t MAX_Y_ACCEL = 2_mps_sq;
     const units::meters_per_second_t MAX_X_VEL = 1.5_mps;
     const units::meters_per_second_t MAX_X_VEL_L4 = 1.0_mps;
-    const units::meters_per_second_squared_t MAX_X_ACCEL = 1.4_mps_sq;
+    const units::meters_per_second_squared_t MAX_X_ACCEL = 2.0_mps_sq;
 
     const frc::TrapezoidProfile<units::radian>::Constraints rot_constraints{MAX_ROTATION_VEL, MAX_ROTATION_ACCEL};
 
