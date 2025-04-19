@@ -608,7 +608,7 @@ namespace Constants {
                                 { ELEVATOR_STATE::HP, 3.25_in },
                                 { ELEVATOR_STATE::ONE, 3.25_in },
                                 { ELEVATOR_STATE::TWO, 13.4_in }, // raised by point 0.1 from 13.3
-                                { ELEVATOR_STATE::THREE, 18.7_in },
+                                { ELEVATOR_STATE::THREE, 18.61667_in },
                                 { ELEVATOR_STATE::FOUR, 26.5_in }
                             }
                         },
