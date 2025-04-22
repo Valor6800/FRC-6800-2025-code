@@ -272,11 +272,44 @@ namespace Constants {
             default: return valor::PhoenixControllerType::KRAKEN_X44;
         }};
 
-        static valor::PhoenixControllerType getAzimuthMotorType() {switch (robot ){
-            case Robot::Alpha: return valor::PhoenixControllerType::FALCON_FOC;
-            case Robot::Gold: return valor::PhoenixControllerType::KRAKEN_X60_FOC;
-            default: return valor::PhoenixControllerType::KRAKEN_X60_FOC;
-        }}
+        static valor::BaseController *getAzimuthMotor(int i, valor::PIDF pidf) {
+            valor::PhoenixControllerType motorType = valor::PhoenixControllerType::KRAKEN_X60_FOC;
+            if (robot == Robot::Alpha) motorType = valor::PhoenixControllerType::FALCON_FOC;
+
+            valor::PhoenixController<> *motor = new valor::PhoenixController<>{
+                motorType,
+                CANIDs::AZIMUTH_CANS[i],
+                valor::NeutralMode::Brake,
+                swerveAzimuthsReversals()[i],
+                azimuthGearRatio(),
+                1.0,
+                "baseCAN"
+            };
+            motor->setPIDF(pidf);
+            motor->enableFOC();
+            motor->setupCANCoder(CANIDs::CANCODER_CANS[i], swerveZeros()[i], false, "baseCAN");
+            motor->config.ClosedLoopGeneral.ContinuousWrap = true;
+            ctre::phoenix6::BaseStatusSignal::SetUpdateFrequencyForAll(250_Hz, motor->position_res, motor->velocity_res);
+            motor->applyConfig();
+            return motor;
+        }
+
+        static valor::BaseController *getDriveMotor(int i, valor::PIDF pidf) {
+            valor::PhoenixController<> *motor = new valor::PhoenixController<>{
+                valor::PhoenixControllerType::KRAKEN_X60_FOC,
+                CANIDs::DRIVE_CANS[i],
+                valor::NeutralMode::Coast,
+                swerveDrivesReversals()[i],
+                1.0,
+                driveGearRatio(),
+                "baseCAN"
+            };
+            motor->setPIDF(pidf);
+            motor->enableFOC();
+            ctre::phoenix6::BaseStatusSignal::SetUpdateFrequencyForAll(250_Hz, motor->position_res, motor->velocity_res);
+            motor->applyConfig();
+            return motor;
+        }
 
         /** Process for ReZeroing:
          *      1. Move elevator position to when the hall effect just trips

@@ -126,8 +126,6 @@ const units::meter_t WHEEL_DIAMETER(0.0973_m);
 
 #define VIABLE_ELEVATOR_DISTANCE 1.2_m
 
-#define ODOM_UPDATE_FREQUENCY 250_Hz
-
 Drivetrain::Drivetrain(frc::TimedRobot *_robot, valor::CANdleSensor* _leds) : 
     valor::Swerve(
         _robot,
@@ -295,43 +293,10 @@ std::vector<std::pair<valor::BaseController*, valor::BaseController*>> Drivetrai
     drivePID.error = 0.0027_tr;
 
     for (size_t i = 0; i < 4; i++) {
-        valor::PhoenixController<>* azimuthMotor = new valor::PhoenixController<>(
-            Constants::getAzimuthMotorType(),
-            CANIDs::AZIMUTH_CANS[i],
-            valor::NeutralMode::Brake,
-            Constants::swerveAzimuthsReversals()[i],
-            Constants::azimuthGearRatio(),
-            1.0,
-            PIGEON_CAN_BUS
-            
-        );
-        azimuthMotor->setPIDF(azimuthPID);
-        azimuthMotor->enableFOC();
-        azimuthMotor->setupCANCoder(CANIDs::CANCODER_CANS[i], Constants::swerveZeros()[i], false, PIGEON_CAN_BUS);
-        azimuthMotor->config.ClosedLoopGeneral.ContinuousWrap = true;
-        azimuthMotor->applyConfig();
-
-        valor::PhoenixController<>* driveMotor = new valor::PhoenixController<>(
-            valor::PhoenixControllerType::KRAKEN_X60_FOC,
-            CANIDs::DRIVE_CANS[i],
-            valor::NeutralMode::Coast,
-            Constants::swerveDrivesReversals()[i],
-            1.0,
-            Constants::driveGearRatio(),
-            PIGEON_CAN_BUS
-        );
-        driveMotor->setPIDF(drivePID);
-        driveMotor->enableFOC();
-        driveMotor->applyConfig();
-        ctre::phoenix6::BaseStatusSignal::SetUpdateFrequencyForAll(
-            ODOM_UPDATE_FREQUENCY,
-            azimuthMotor->position_res,
-            azimuthMotor->velocity_res,
-            driveMotor->position_res,
-            driveMotor->velocity_res
-        );
-
-        modules.push_back(std::make_pair(azimuthMotor, driveMotor));
+        modules.push_back(std::make_pair(
+            Constants::getAzimuthMotor(i, azimuthPID),
+            Constants::getDriveMotor(i, drivePID)
+        ));
     }
     return modules;
 }
