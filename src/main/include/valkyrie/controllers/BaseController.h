@@ -6,7 +6,6 @@
 #include <ctre/phoenix6/CANcoder.hpp>
 
 namespace valor {
-
 /**
  * @brief Neutral / Idle Modes for motorcontrollers. Either Brake or Coast.
  */

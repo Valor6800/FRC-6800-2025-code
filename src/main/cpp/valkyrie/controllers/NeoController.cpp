@@ -19,68 +19,155 @@ using namespace valor;
 
 
 NeoController::NeoController(valor::NeoControllerType controllerType,
-                                    int canID,
-                                    valor::NeutralMode _mode,
-                                    bool _inverted,
-                                    double _rotorToSensor,
-                                    double _sensorToMech,
-                                    std::string canbus) :
-    BaseController(getNeoControllerMotorSpeed(controllerType), _rotorToSensor, _sensorToMech),
-    rev::spark::SparkMax(canID, rev::spark::SparkMax::MotorType::kBrushless),
-    pidController{GetClosedLoopController()}
+                             int canID,
+                             valor::NeutralMode mode,
+                             bool inverted,
+                             double _rotorToSensor,
+                             double _sensorToMech) :
+    BaseController{getNeoControllerMotorSpeed(controllerType), _rotorToSensor, _sensorToMech},
+    rev::spark::SparkMax{canID, rev::spark::SparkMax::MotorType::kBrushless}
 {
-    valor::PIDF motionPIDF;
-    motionPIDF.P = NEO_PIDF_KP;
-    motionPIDF.I = NEO_PIDF_KI;
-    motionPIDF.D = NEO_PIDF_KD;
-    motionPIDF.error = 0_tr;
-    motionPIDF.maxVelocity = NEO_PIDF_KV;
-    motionPIDF.maxAcceleration = NEO_PIDF_KA;
+    wpi::SendableRegistry::AddLW(this, "NeoController", "ID " + std::to_string(canID));
 
-    wpi::SendableRegistry::AddLW(this, "NeoController", "ID " + std::to_string(0));
+    pidf.P = NEO_PIDF_KP;
+    pidf.I = NEO_PIDF_KI;
+    pidf.D = NEO_PIDF_KD;
+    pidf.maxVelocity = NEO_PIDF_KV;
+    pidf.maxAcceleration = NEO_PIDF_KA;
+
+    config.Inverted(inverted);
+
+    config.SetIdleMode(
+        mode == valor::NeutralMode::Brake ?
+        rev::spark::SparkBaseConfig::IdleMode::kBrake :
+        rev::spark::SparkBaseConfig::IdleMode::kCoast
+    );
+
+    double conversion = 1 / (rotorToSensor * sensorToMech);
+
+    // The primary encoder is the one inside the motor so this is the only one that it makes sense to apply conversion to
+    config.encoder.PositionConversionFactor(conversion);
+    config.encoder.VelocityConversionFactor(conversion);
+
+    config.SmartCurrentLimit(STATOR_CURRENT_LIMIT.value(), STATOR_CURRENT_LIMIT.value(), 0);
+    setPIDF(pidf);
+
+    applyConfig();
 }
 
-void NeoController::reset()
-{
+void NeoController::applyConfig() {
+    Configure(config, rev::spark::SparkMax::ResetMode::kResetSafeParameters, rev::spark::SparkMax::PersistMode::kNoPersistParameters);
 }
 
-void NeoController::setEncoderPosition(units::turn_t) {}
+void NeoController::reset() {
+    setEncoderPosition(0_tr);
+}
+
+void NeoController::setEncoderPosition(units::turn_t pos) {
+    using rev::spark::ClosedLoopConfig;
+    switch (configAccessor.closedLoop.GetFeedbackSensor()) {
+    case ClosedLoopConfig::FeedbackSensor::kPrimaryEncoder: GetEncoder().SetPosition(pos.value()); break;
+    case ClosedLoopConfig::FeedbackSensor::kAlternateOrExternalEncoder: GetAlternateEncoder().SetPosition(pos.value()); break;
+    default: {} // Analog + Absolute encoders don't support setting positions
+    }
+}
+
+void NeoController::setupFollower(int canID, bool followerInverted) {
+    followerMotor = std::make_unique<rev::spark::SparkMax>(canID, rev::spark::SparkMax::MotorType::kBrushless);
+    rev::spark::SparkBaseConfig followerConfig;
+    followerConfig.Follow(*this, followerInverted);
+    followerMotor->Configure(
+        followerConfig,
+        rev::spark::SparkMax::ResetMode::kResetSafeParameters,
+        rev::spark::SparkMax::PersistMode::kNoPersistParameters
+    );
+}
+
+void NeoController::setPIDF(valor::PIDF _pidf, int _slot, bool saveImmediately) {
+    pidf = _pidf;
+    rev::spark::ClosedLoopSlot slot = rev::spark::ClosedLoopSlot::kSlot0;
+    if (_slot == 1) slot = rev::spark::ClosedLoopSlot::kSlot1;
+    else if (_slot == 2) slot = rev::spark::ClosedLoopSlot::kSlot2;
+    else if (_slot == 3) slot = rev::spark::ClosedLoopSlot::kSlot3;
+    if (pidf.kV < 0)
+        pidf.kV = (voltageCompensation / getMaxMechSpeed()).value();
+    config.closedLoop.Pidf(pidf.P, pidf.I, pidf.D, pidf.kV, slot);
+    config.closedLoop.maxMotion.MaxVelocity(units::revolutions_per_minute_t{pidf.maxVelocity}.value(), slot);
+    config.closedLoop.maxMotion.MaxAcceleration(units::revolutions_per_minute_per_second_t{pidf.maxAcceleration}.value(), slot);
+    config.closedLoop.maxMotion.AllowedClosedLoopError(pidf.error.value(), slot);
+
+    if (saveImmediately) applyConfig();
+}
 
 /**
  * Output is in mechanism rotations!
 */
-units::turn_t NeoController::getPosition()
-{
-    return 0_tr;
+units::turn_t NeoController::getPosition() {
+    using rev::spark::ClosedLoopConfig;
+    switch (configAccessor.closedLoop.GetFeedbackSensor()) {
+    case ClosedLoopConfig::FeedbackSensor::kPrimaryEncoder: return units::turn_t{GetEncoder().GetPosition()};
+    case ClosedLoopConfig::FeedbackSensor::kAbsoluteEncoder: return units::turn_t{GetAbsoluteEncoder().GetPosition()};
+    case ClosedLoopConfig::FeedbackSensor::kAlternateOrExternalEncoder: return units::turn_t{GetAlternateEncoder().GetPosition()};
+    case ClosedLoopConfig::FeedbackSensor::kAnalogSensor: return units::turn_t{GetAnalog().GetPosition()};
+    default: return 0_tr;
+    }
 }
 
-/**
- * Output is in mechanism rotations!
-*/
-units::turns_per_second_t NeoController::getSpeed()
-{
-    return 0_tps;
+units::turns_per_second_t NeoController::getSpeed() {
+    using rev::spark::ClosedLoopConfig;
+    switch (configAccessor.closedLoop.GetFeedbackSensor()) {
+    case ClosedLoopConfig::FeedbackSensor::kPrimaryEncoder: return units::revolutions_per_minute_t{GetEncoder().GetVelocity()};
+    case ClosedLoopConfig::FeedbackSensor::kAbsoluteEncoder: return units::revolutions_per_minute_t{GetAbsoluteEncoder().GetVelocity()};
+    case ClosedLoopConfig::FeedbackSensor::kAlternateOrExternalEncoder: return units::revolutions_per_minute_t{GetAlternateEncoder().GetVelocity()};
+    case ClosedLoopConfig::FeedbackSensor::kAnalogSensor: return units::revolutions_per_minute_t{GetAnalog().GetVelocity()};
+    default: return 0_tps;
+    };
 }
 
 /**
  * Set a position in mechanism rotations
 */
-void NeoController::setPosition(units::turn_t position, int slot)
-{
+void NeoController::setPosition(units::turn_t position, int _slot) {
+    auto slot = rev::spark::ClosedLoopSlot::kSlot0;
+    if (_slot == 1) slot = rev::spark::ClosedLoopSlot::kSlot1;
+    else if (_slot == 2) slot = rev::spark::ClosedLoopSlot::kSlot2;
+    else if (_slot == 3) slot = rev::spark::ClosedLoopSlot::kSlot3;
+    GetClosedLoopController().SetReference(
+        position.value(),
+        rev::spark::SparkMax::ControlType::kPosition,
+        slot,
+        pidf.S
+    );
 }
 
-void NeoController::setSpeed(units::turns_per_second_t speed, int slot)
-{
+void NeoController::setSpeed(units::turns_per_second_t speed, int _slot) {
+    auto slot = rev::spark::ClosedLoopSlot::kSlot0;
+    if (_slot == 1) slot = rev::spark::ClosedLoopSlot::kSlot1;
+    else if (_slot == 2) slot = rev::spark::ClosedLoopSlot::kSlot2;
+    else if (_slot == 3) slot = rev::spark::ClosedLoopSlot::kSlot3;
+    GetClosedLoopController().SetReference(
+        speed.value(),
+        rev::spark::SparkMax::ControlType::kVelocity,
+        slot,
+        pidf.S
+    );
 }
 
-void NeoController::setPower(units::volt_t) {}
-void NeoController::setPower(units::scalar_t) {}
-
-units::volt_t NeoController::getVoltage() { return 0_V; }
-units::ampere_t NeoController::getCurrent() { return 0_A; }
-units::scalar_t NeoController::getDutyCycle() { return 0; }
-
-void NeoController::InitSendable(wpi::SendableBuilder& builder)
-{
+void NeoController::InitSendable(wpi::SendableBuilder& builder) {
     builder.SetSmartDashboardType("Subsystem");
+    builder.AddDoubleProperty(
+        "Stator Current", 
+        [this] { return GetOutputCurrent(); },
+        nullptr
+    );
+    builder.AddDoubleProperty(
+        "Position", 
+        [this] { return getPosition().to<double>(); },
+        nullptr
+    );
+    builder.AddDoubleProperty(
+        "Speed", 
+        [this] { return getSpeed().to<double>(); },
+        nullptr
+    );
 }
