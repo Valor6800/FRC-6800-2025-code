@@ -126,8 +126,10 @@ const units::meter_t WHEEL_DIAMETER(0.0973_m);
 
 #define VIABLE_ELEVATOR_DISTANCE 1.2_m
 
+#define ODOM_UPDATE_FREQUENCY 250_Hz
+
 Drivetrain::Drivetrain(frc::TimedRobot *_robot, valor::CANdleSensor* _leds) : 
-    valor::Swerve<SwerveAzimuthMotor, SwerveDriveMotor>(
+    valor::Swerve(
         _robot,
         "SwerveDrive",
         generateModules(),
@@ -274,9 +276,9 @@ Drivetrain::Drivetrain(frc::TimedRobot *_robot, valor::CANdleSensor* _leds) :
 
 Drivetrain::~Drivetrain(){}
 
-std::vector<std::pair<SwerveAzimuthMotor*, SwerveDriveMotor*>> Drivetrain::generateModules()
+std::vector<std::pair<valor::BaseController*, valor::BaseController*>> Drivetrain::generateModules()
 {
-    std::vector<std::pair<SwerveAzimuthMotor*, SwerveDriveMotor*>> modules;
+    std::vector<std::pair<valor::BaseController*, valor::BaseController*>> modules;
 
     valor::PIDF azimuthPID;
     azimuthPID.maxVelocity = Constants::azimuthKVel();
@@ -293,7 +295,7 @@ std::vector<std::pair<SwerveAzimuthMotor*, SwerveDriveMotor*>> Drivetrain::gener
     drivePID.error = 0.0027_tr;
 
     for (size_t i = 0; i < 4; i++) {
-        SwerveAzimuthMotor* azimuthMotor = new SwerveAzimuthMotor(
+        valor::PhoenixController<>* azimuthMotor = new valor::PhoenixController<>(
             Constants::getAzimuthMotorType(),
             CANIDs::AZIMUTH_CANS[i],
             valor::NeutralMode::Brake,
@@ -303,13 +305,13 @@ std::vector<std::pair<SwerveAzimuthMotor*, SwerveDriveMotor*>> Drivetrain::gener
             PIGEON_CAN_BUS
             
         );
-        azimuthMotor->setPIDF(azimuthPID, 0);
+        azimuthMotor->setPIDF(azimuthPID);
         azimuthMotor->enableFOC();
         azimuthMotor->setupCANCoder(CANIDs::CANCODER_CANS[i], Constants::swerveZeros()[i], false, PIGEON_CAN_BUS);
         azimuthMotor->config.ClosedLoopGeneral.ContinuousWrap = true;
         azimuthMotor->applyConfig();
 
-        SwerveAzimuthMotor* driveMotor = new SwerveDriveMotor(
+        valor::PhoenixController<>* driveMotor = new valor::PhoenixController<>(
             valor::PhoenixControllerType::KRAKEN_X60_FOC,
             CANIDs::DRIVE_CANS[i],
             valor::NeutralMode::Coast,
@@ -318,9 +320,16 @@ std::vector<std::pair<SwerveAzimuthMotor*, SwerveDriveMotor*>> Drivetrain::gener
             Constants::driveGearRatio(),
             PIGEON_CAN_BUS
         );
-        driveMotor->setPIDF(drivePID, 0);
+        driveMotor->setPIDF(drivePID);
         driveMotor->enableFOC();
         driveMotor->applyConfig();
+        ctre::phoenix6::BaseStatusSignal::SetUpdateFrequencyForAll(
+            ODOM_UPDATE_FREQUENCY,
+            azimuthMotor->position_res,
+            azimuthMotor->velocity_res,
+            driveMotor->position_res,
+            driveMotor->velocity_res
+        );
 
         modules.push_back(std::make_pair(azimuthMotor, driveMotor));
     }
@@ -363,8 +372,10 @@ void Drivetrain::assessInputs()
 void Drivetrain::analyzeDashboard()
 {
     for (size_t i = 0; i < swerveModules.size(); i++) {
-        auto cancoder = swerveModules.at(i)->azimuthMotor->cancoder;
-        leds->setLED(i, valor::CANdleSensor::cancoderMagnetHealthGetter(cancoder));
+        // TODO: Find an alternative to using dynamic_cast. Also doesn't support if azimuth motor template args change
+        valor::PhoenixController<> *derivedMotor = dynamic_cast<valor::PhoenixController<>*>(swerveModules.at(i)->azimuthMotor);
+        if (derivedMotor)
+            leds->setLED(i, valor::CANdleSensor::cancoderMagnetHealthGetter(derivedMotor->cancoder));
     }
 
     if(robot->IsDisabled()){

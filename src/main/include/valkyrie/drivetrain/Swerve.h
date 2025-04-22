@@ -35,7 +35,6 @@
 
 namespace valor {
 
-template<class AzimuthMotor, class DriveMotor>
 class Swerve : public valor::BaseSubsystem
 {
 public:
@@ -43,7 +42,7 @@ public:
 
     Swerve(frc::TimedRobot *_robot,
                 const char* _name,
-                std::vector<std::pair<AzimuthMotor*, DriveMotor*>> modules,
+                std::vector<std::pair<BaseController*, BaseController*>> modules,
                 units::meter_t module_radius,
                 units::meter_t _wheelDiameter);
     ~Swerve();
@@ -194,7 +193,7 @@ protected:
     bool yControllerAligned();
     wpi::array<frc::SwerveModuleState, MODULE_COUNT> testModeDesiredStates{wpi::empty_array};
 
-    std::vector<valor::SwerveModule<AzimuthMotor, DriveMotor> *> swerveModules;
+    std::vector<valor::SwerveModule*> swerveModules;
 
     units::degree_t getRotControllerError();
     void transformControllerSpeeds();

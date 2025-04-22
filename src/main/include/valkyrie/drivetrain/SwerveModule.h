@@ -20,21 +20,13 @@ using meters_per_turn_t = units::unit_t<units::compound_unit<units::meters, unit
 
 /**
  * @brief SwerveModule
- * @tparam AzimuthMotor Azimuth motor on the swerve module (Neo or Falcon)
- * @tparam DriveMotor Drive motor on the swerve module (Neo or Falcon)
- * 
- * Usage:
- * \code {.cpp}
- * SwerveModule<ValorNeoController, ValorFalconController> swerve;
- * \endcode
  */
-template<class AzimuthMotor, class DriveMotor>
-class SwerveModule: public wpi::Sendable, public wpi::SendableHelper<SwerveModule<AzimuthMotor, DriveMotor>>
+class SwerveModule: public wpi::Sendable, public wpi::SendableHelper<SwerveModule>
 {
 public: 
 
-    SwerveModule(AzimuthMotor* _azimuthMotor,
-                DriveMotor* _driveMotor,
+    SwerveModule(BaseController* _azimuthMotor,
+                BaseController* _driveMotor,
                 frc::Translation2d _wheelLocation,
                 units::meter_t wheelDiameter
     );
@@ -92,14 +84,12 @@ public:
     void setAzimuthPower(units::volt_t voltage);
     void setDrivePower(units::volt_t voltage);
 
-    void setUpdateFrequency(units::frequency::hertz_t);
-
     frc::Translation2d convertSwerveStateToVelocityVector(frc::SwerveModuleState state);
 
     void InitSendable(wpi::SendableBuilder& builder) override;
 
-    AzimuthMotor* azimuthMotor;
-    DriveMotor* driveMotor;
+    BaseController* azimuthMotor;
+    BaseController* driveMotor;
 
 private:
 
@@ -115,7 +105,6 @@ private:
     frc::SwerveModuleState desiredState;
 
     int wheelIdx;
-    units::turn_t initialMagEncoderValue;
     meters_per_turn_t wheelConversion;
 };
 }

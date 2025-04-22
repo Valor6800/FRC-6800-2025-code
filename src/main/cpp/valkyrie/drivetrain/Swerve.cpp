@@ -50,14 +50,9 @@ const std::pair<double, double> P5{1.0, 1.0};
 
 using namespace valor;
 
-// Explicit template instantiation
-// This is needed for linking
-template class valor::Swerve<valor::PhoenixController<>, valor::PhoenixController<>>;
-
-template<class AzimuthMotor, class DriveMotor>
-Swerve<AzimuthMotor, DriveMotor>::Swerve(frc::TimedRobot *_robot,
+Swerve::Swerve(frc::TimedRobot *_robot,
     const char* _name,
-    std::vector<std::pair<AzimuthMotor*, DriveMotor*>> modules,
+    std::vector<std::pair<BaseController*, BaseController*>> modules,
     units::meter_t _module_radius,
     units::meter_t _wheelDiameter
 ) : valor::BaseSubsystem(_robot, _name), lockingToTarget(false), useCarpetGrain(false)
@@ -73,7 +68,7 @@ Swerve<AzimuthMotor, DriveMotor>::Swerve(frc::TimedRobot *_robot,
     wpi::array<frc::Translation2d, MODULE_COUNT> motorLocations = wpi::array<frc::Translation2d, MODULE_COUNT>(wpi::empty_array);
     for (size_t i = 0; i < MODULE_COUNT; i++) {
         motorLocations[i] = frc::Translation2d{_module_radius * MDX[i], _module_radius * MDY[i]};
-        swerveModules.push_back(new valor::SwerveModule<AzimuthMotor, DriveMotor>(
+        swerveModules.push_back(new valor::SwerveModule(
             modules[i].first,
             modules[i].second,
             motorLocations[i],
@@ -113,8 +108,7 @@ Swerve<AzimuthMotor, DriveMotor>::Swerve(frc::TimedRobot *_robot,
     resetState();
 }
 
-template<class AzimuthMotor, class DriveMotor>
-Swerve<AzimuthMotor, DriveMotor>::~Swerve()
+Swerve::~Swerve()
 {
     for (int i = 0; i < MODULE_COUNT; i++)
     {
@@ -126,18 +120,13 @@ Swerve<AzimuthMotor, DriveMotor>::~Swerve()
     alignEstimator.release();
 }
 
-template<class AzimuthMotor, class DriveMotor>
-void Swerve<AzimuthMotor, DriveMotor>::init()
+void Swerve::init()
 {
     angularPosition = getCalculatedPose().Rotation().Radians();
     rot_controller.EnableContinuousInput(units::radian_t{-M_PI}, units::radian_t{M_PI});
-    for(size_t i = 0; i < MODULE_COUNT; i++){
-        swerveModules[i]->setUpdateFrequency(250_Hz);
-    }
 }
 
-template<class AzimuthMotor, class DriveMotor>
-void Swerve<AzimuthMotor, DriveMotor>::assessInputs()
+void Swerve::assessInputs()
 {
     if (!driverGamepad || !driverGamepad->IsConnected())
         return;
@@ -152,8 +141,7 @@ void Swerve<AzimuthMotor, DriveMotor>::assessInputs()
     //rotSpeed = rotationLerping(driverGamepad->rightStickX(1)) * gcem::inv_sqrt(2);
 }
 
-template<class AzimuthMotor, class DriveMotor>
-void Swerve<AzimuthMotor, DriveMotor>::analyzeDashboard()
+void Swerve::analyzeDashboard()
 {
     toast = table->GetBoolean("Toast", false); 
     if(toast) {
@@ -270,13 +258,11 @@ void Swerve<AzimuthMotor, DriveMotor>::analyzeDashboard()
     table->PutBoolean("Y ALIGN ACTIVE", yAlign);
 }
 
-template<class AzimuthMotor, class DriveMotor>
-bool Swerve<AzimuthMotor, DriveMotor>::yControllerAligned() {
+bool Swerve::yControllerAligned() {
     return units::math::abs((units::meter_t) yDistance-yGoalAlign) < yPosTolerance;
 }
 
-template<class AzimuthMotor, class DriveMotor>
-void Swerve<AzimuthMotor, DriveMotor>::assignOutputs()
+void Swerve::assignOutputs()
 {
     if (rotTest) {
         swerveModules[0]->setAzimuthPosition(frc::Rotation2d(-45_deg));
@@ -298,8 +284,7 @@ void Swerve<AzimuthMotor, DriveMotor>::assignOutputs()
     }
 }
 
-template<class AzimuthMotor, class DriveMotor>
-void Swerve<AzimuthMotor, DriveMotor>::drive(
+void Swerve::drive(
     units::velocity::meters_per_second_t vx_mps,
     units::velocity::meters_per_second_t vy_mps,
     units::angular_velocity::radians_per_second_t omega_radps,
@@ -313,20 +298,17 @@ void Swerve<AzimuthMotor, DriveMotor>::drive(
     setSwerveDesiredState(desiredStates, true);
 }
 
-template<class AzimuthMotor, class DriveMotor>
-void Swerve<AzimuthMotor, DriveMotor>::setRotAlignOffset(units::degree_t angle) {
+void Swerve::setRotAlignOffset(units::degree_t angle) {
     rotAlignOffset = angle;
 }
 
 
-template<class AzimuthMotor, class DriveMotor>
-units::degree_t Swerve<AzimuthMotor, DriveMotor>::getRotControllerError() {
+units::degree_t Swerve::getRotControllerError() {
     return rot_controller.GetPositionError();
 }
 
 
-template<class AzimuthMotor, class DriveMotor>
-void Swerve<AzimuthMotor, DriveMotor>::transformControllerSpeeds() {
+void Swerve::transformControllerSpeeds() {
 
     frc::ChassisSpeeds fieldSpaceSpeeds = frc::ChassisSpeeds::FromRobotRelativeSpeeds(
         getRobotRelativeSpeeds(),
@@ -342,14 +324,12 @@ void Swerve<AzimuthMotor, DriveMotor>::transformControllerSpeeds() {
     xTagRelativeVelocity = units::meters_per_second_t{currVelocitiesFieldSpace.dot(MAKE_VECTOR(targetAngle))};
 }
 
-template<class AzimuthMotor, class DriveMotor>
-void Swerve<AzimuthMotor, DriveMotor>::driveRobotRelative(frc::ChassisSpeeds speeds) {
+void Swerve::driveRobotRelative(frc::ChassisSpeeds speeds) {
     auto desiredStates = getModuleStates(speeds);
     setSwerveDesiredState(desiredStates, false);
 }
 
-template<class AzimuthMotor, class DriveMotor>
-void Swerve<AzimuthMotor, DriveMotor>::updateAngularAcceleration() {
+void Swerve::updateAngularAcceleration() {
     if (!pigeon) return;
 
     // Get current angular velocity (yaw rate)
@@ -366,8 +346,7 @@ void Swerve<AzimuthMotor, DriveMotor>::updateAngularAcceleration() {
     } 
 }
 
-template<class AzimuthMotor, class DriveMotor>
-units::angular_acceleration::radians_per_second_squared_t Swerve<AzimuthMotor, DriveMotor>::getSmoothedAngularAcceleration() {
+units::angular_acceleration::radians_per_second_squared_t Swerve::getSmoothedAngularAcceleration() {
     if (yawRateBuffer.empty()) return 0_rad_per_s_sq;
 
     units::angular_acceleration::radians_per_second_squared_t sum = 0_rad_per_s_sq;
@@ -377,8 +356,7 @@ units::angular_acceleration::radians_per_second_squared_t Swerve<AzimuthMotor, D
     return sum / yawRateBuffer.size();
 }
 
-template<class AzimuthMotor, class DriveMotor>
-frc::ChassisSpeeds Swerve<AzimuthMotor, DriveMotor>::getRobotRelativeSpeeds(){
+frc::ChassisSpeeds Swerve::getRobotRelativeSpeeds(){
     wpi::array<frc::SwerveModuleState, 4> moduleStates = {
         swerveModules[0]->getState(),
         swerveModules[1]->getState(),
@@ -388,13 +366,11 @@ frc::ChassisSpeeds Swerve<AzimuthMotor, DriveMotor>::getRobotRelativeSpeeds(){
     return kinematics->ToChassisSpeeds(moduleStates);
 }
 
-template<class AzimuthMotor, class DriveMotor>
-frc::ChassisSpeeds Swerve<AzimuthMotor, DriveMotor>::getFieldRelativeSpeeds(){
+frc::ChassisSpeeds Swerve::getFieldRelativeSpeeds(){
     return frc::ChassisSpeeds::FromRobotRelativeSpeeds(getRobotRelativeSpeeds(), calcEstimator->GetEstimatedPosition().Rotation());
 }
 
-template<class AzimuthMotor, class DriveMotor>
-void Swerve<AzimuthMotor, DriveMotor>::updateAngularPosition() {
+void Swerve::updateAngularPosition() {
     static units::second_t lastTime = frc::Timer::GetFPGATimestamp();
     units::second_t currentTime = frc::Timer::GetFPGATimestamp();
     units::second_t deltaTime = currentTime - lastTime;
@@ -418,32 +394,28 @@ void Swerve<AzimuthMotor, DriveMotor>::updateAngularPosition() {
 
 }
 
-template<class AzimuthMotor, class DriveMotor>
-void Swerve<AzimuthMotor, DriveMotor>::setSwerveDesiredState(wpi::array<frc::SwerveModuleState, MODULE_COUNT> desiredStates, bool isDriveOpenLoop)
+void Swerve::setSwerveDesiredState(wpi::array<frc::SwerveModuleState, MODULE_COUNT> desiredStates, bool isDriveOpenLoop)
 {
     for (size_t i = 0; i < MODULE_COUNT; i++) {
         swerveModules[i]->setDesiredState(desiredStates[i], isDriveOpenLoop);
     }
 }
 
-template<class AzimuthMotor, class DriveMotor>
-void Swerve<AzimuthMotor, DriveMotor>::resetState()
+void Swerve::resetState()
 {
     resetOdometry(frc::Pose2d{0_m, 0_m, 0_rad});
     rotTest = false;
     strLineTest = false;
 }
 
-template<class AzimuthMotor, class DriveMotor>
-void Swerve<AzimuthMotor, DriveMotor>::resetOdometry(frc::Pose2d pose)
+void Swerve::resetOdometry(frc::Pose2d pose)
 {
     rawEstimator->ResetPosition(getGyro(), getModuleStates(), pose);
     calcEstimator->ResetPosition(getGyro(), getModuleStates(), pose);
     alignEstimator->ResetPosition(getGyro(), getModuleStates(), pose);
 }
 
-template<class AzimuthMotor, class DriveMotor>
-void Swerve<AzimuthMotor, DriveMotor>::resetEncoders()
+void Swerve::resetEncoders()
 {
     for (size_t i = 0; i < swerveModules.size(); i++)
     {
@@ -451,16 +423,14 @@ void Swerve<AzimuthMotor, DriveMotor>::resetEncoders()
     }
 }
 
-template<class AzimuthMotor, class DriveMotor>
-void Swerve<AzimuthMotor, DriveMotor>::enableCarpetGrain(double _grainMultiplier, bool _roughTowardsRed)
+void Swerve::enableCarpetGrain(double _grainMultiplier, bool _roughTowardsRed)
 {
     carpetGrainMultiplier = _grainMultiplier;
     roughTowardsRed = _roughTowardsRed;
     useCarpetGrain = true;
 }
 
-template<class AzimuthMotor, class DriveMotor>
-void Swerve<AzimuthMotor, DriveMotor>::resetRotationAlignControllers() {
+void Swerve::resetRotationAlignControllers() {
     rot_controller.Reset(
         getCalculatedPose().Rotation().Radians(),
         pigeon->GetAngularVelocityZWorld().GetValue()
@@ -470,27 +440,23 @@ void Swerve<AzimuthMotor, DriveMotor>::resetRotationAlignControllers() {
     x_controller.Reset(xDistance, -xTagRelativeVelocity);
 }
 
-template<class AzimuthMotor, class DriveMotor>
-void Swerve<AzimuthMotor, DriveMotor>::resetYAlignControllers() {
+void Swerve::resetYAlignControllers() {
     y_controller.Reset(yDistance, yTagRelativeVelocity);
 }
 
-template<class AzimuthMotor, class DriveMotor>
-void Swerve<AzimuthMotor, DriveMotor>::resetXAlignControllers() {
+void Swerve::resetXAlignControllers() {
     x_controller.Reset(xDistance, -xTagRelativeVelocity);
 }
-template<class AzimuthMotor, class DriveMotor>
-void Swerve<AzimuthMotor, DriveMotor>::setXConstraints(frc::TrapezoidProfile<units::meter>::Constraints constraints) {
+
+void Swerve::setXConstraints(frc::TrapezoidProfile<units::meter>::Constraints constraints) {
     x_controller.SetConstraints(constraints);
 }
 
-template<class AzimuthMotor, class DriveMotor>
-frc::TrapezoidProfile<units::meter>::Constraints Swerve<AzimuthMotor, DriveMotor>::getXConstraints() {
+frc::TrapezoidProfile<units::meter>::Constraints Swerve::getXConstraints() {
     return x_controller.GetConstraints();
 }
 
-template<class AzimuthMotor, class DriveMotor>
-void  Swerve<AzimuthMotor, DriveMotor>::calculateCarpetPose()
+void  Swerve::calculateCarpetPose()
 {
     static frc::Pose2d previousPose;
     frc::Pose2d newPose = calcEstimator->GetEstimatedPosition();
@@ -514,8 +480,7 @@ void  Swerve<AzimuthMotor, DriveMotor>::calculateCarpetPose()
     previousPose = calcEstimator->GetEstimatedPosition();
 }
 
-template<class AzimuthMotor, class DriveMotor>
-void Swerve<AzimuthMotor, DriveMotor>::setPIDy(valor::PIDF pid) {
+void Swerve::setPIDy(valor::PIDF pid) {
     y_controller.SetP(pid.P);
     y_controller.SetI(pid.I);
     y_controller.SetD(pid.D);
@@ -524,8 +489,7 @@ void Swerve<AzimuthMotor, DriveMotor>::setPIDy(valor::PIDF pid) {
     yAlignPID.D = pid.D;
 }
 
-template<class AzimuthMotor, class DriveMotor>
-void Swerve<AzimuthMotor, DriveMotor>::setPIDx(valor::PIDF pid) {
+void Swerve::setPIDx(valor::PIDF pid) {
     x_controller.SetP(pid.P);
     x_controller.SetI(pid.I);
     x_controller.SetD(pid.D);
@@ -534,8 +498,7 @@ void Swerve<AzimuthMotor, DriveMotor>::setPIDx(valor::PIDF pid) {
     xAlignPID.D = pid.D;
 }
 
-template<class AzimuthMotor, class DriveMotor>
-void Swerve<AzimuthMotor, DriveMotor>::setupGyro(
+void Swerve::setupGyro(
     int _pigeonCanID,
     const char* _pigeonCanBus,
     units::degree_t mountRoll,
@@ -556,8 +519,7 @@ void Swerve<AzimuthMotor, DriveMotor>::setupGyro(
     );
 }
 
-template<class AzimuthMotor, class DriveMotor>
-void Swerve<AzimuthMotor, DriveMotor>::resetGyro(){
+void Swerve::resetGyro(){
     frc::Pose2d initialPose = getRawPose();
     frc::Pose2d desiredPose = frc::Pose2d(initialPose.X(), initialPose.Y(), frc::Rotation2d(0_deg));
     resetOdometry(desiredPose);
@@ -565,27 +527,23 @@ void Swerve<AzimuthMotor, DriveMotor>::resetGyro(){
 
 }
 
-template<class AzimuthMotor, class DriveMotor>
-frc::Rotation2d Swerve<AzimuthMotor, DriveMotor>::getGyro() {
+frc::Rotation2d Swerve::getGyro() {
     if (pigeon)
         return pigeon->GetRotation2d();
     return frc::Rotation2d();
 }
 
-template<class AzimuthMotor, class DriveMotor>
-frc::Pose2d Swerve<AzimuthMotor, DriveMotor>::getRawPose()
+frc::Pose2d Swerve::getRawPose()
 {
     return rawEstimator->GetEstimatedPosition();
 }
 
-template<class AzimuthMotor, class DriveMotor>
-frc::Pose2d Swerve<AzimuthMotor, DriveMotor>::getCalculatedPose()
+frc::Pose2d Swerve::getCalculatedPose()
 {
     return calcEstimator->GetEstimatedPosition();
 }
 
-template<class AzimuthMotor, class DriveMotor>
-wpi::array<frc::SwerveModulePosition, MODULE_COUNT> Swerve<AzimuthMotor, DriveMotor>::getModuleStates()
+wpi::array<frc::SwerveModulePosition, MODULE_COUNT> Swerve::getModuleStates()
 {
     wpi::array<frc::SwerveModulePosition, MODULE_COUNT> modulePositions = wpi::array<frc::SwerveModulePosition, MODULE_COUNT>(wpi::empty_array);
     for (size_t i = 0; i < swerveModules.size(); i++) {
@@ -594,8 +552,7 @@ wpi::array<frc::SwerveModulePosition, MODULE_COUNT> Swerve<AzimuthMotor, DriveMo
     return modulePositions;
 }
 
-template<class AzimuthMotor, class DriveMotor>
-wpi::array<frc::SwerveModuleState, MODULE_COUNT> Swerve<AzimuthMotor, DriveMotor>::getModuleStates(units::velocity::meters_per_second_t vx_mps,
+wpi::array<frc::SwerveModuleState, MODULE_COUNT> Swerve::getModuleStates(units::velocity::meters_per_second_t vx_mps,
                                                                   units::velocity::meters_per_second_t vy_mps,
                                                                   units::angular_velocity::radians_per_second_t omega_radps,
                                                                   bool isFOC)
@@ -608,8 +565,7 @@ wpi::array<frc::SwerveModuleState, MODULE_COUNT> Swerve<AzimuthMotor, DriveMotor
     return getModuleStates(chassisSpeeds);
 }
 
-template<class AzimuthMotor, class DriveMotor>
-wpi::array<frc::SwerveModuleState, MODULE_COUNT> Swerve<AzimuthMotor, DriveMotor>::getModuleStates(frc::ChassisSpeeds chassisSpeeds)
+wpi::array<frc::SwerveModuleState, MODULE_COUNT> Swerve::getModuleStates(frc::ChassisSpeeds chassisSpeeds)
 {
     chassisSpeeds = discretize(chassisSpeeds);
     auto states = kinematics->ToSwerveModuleStates(chassisSpeeds);
@@ -617,8 +573,7 @@ wpi::array<frc::SwerveModuleState, MODULE_COUNT> Swerve<AzimuthMotor, DriveMotor
     return states;
 }
 
-template<class AzimuthMotor, class DriveMotor>
-wpi::array<frc::SwerveModuleState, MODULE_COUNT> Swerve<AzimuthMotor, DriveMotor>::getAllModuleStates(){
+wpi::array<frc::SwerveModuleState, MODULE_COUNT> Swerve::getAllModuleStates(){
     wpi::array<frc::SwerveModuleState, MODULE_COUNT> moduleStates = wpi::array<frc::SwerveModuleState, MODULE_COUNT>(wpi::empty_array);
     for (size_t i = 0; i < swerveModules.size(); i++) {
         moduleStates[i] = swerveModules[i]->getState();
@@ -626,8 +581,7 @@ wpi::array<frc::SwerveModuleState, MODULE_COUNT> Swerve<AzimuthMotor, DriveMotor
     return moduleStates;
 }
 
-template <class AzimuthMotor, class DriveMotor>
-std::vector<frc::SwerveModuleState> valor::Swerve<AzimuthMotor, DriveMotor>::getAllModuleStatesAsVector()
+std::vector<frc::SwerveModuleState> valor::Swerve::getAllModuleStatesAsVector()
 {
     std::vector<frc::SwerveModuleState> states;
     states.push_back(swerveModules[0]->getState());
@@ -636,8 +590,8 @@ std::vector<frc::SwerveModuleState> valor::Swerve<AzimuthMotor, DriveMotor>::get
     states.push_back(swerveModules[2]->getState());
     return states;
 }
-template<class AzimuthMotor, class DriveMotor>
-double Swerve<AzimuthMotor, DriveMotor>::getSkiddingRatio()
+
+double Swerve::getSkiddingRatio()
 {
     wpi::array<frc::SwerveModuleState, MODULE_COUNT> measuredModuleStates = getAllModuleStates();
     double angularVelocityMeasured = kinematics->ToChassisSpeeds(measuredModuleStates).omega.value();
@@ -661,22 +615,19 @@ double Swerve<AzimuthMotor, DriveMotor>::getSkiddingRatio()
     return maxTransSpeed/minTransSpeed;
 }
 
-template<class AzimuthMotor, class DriveMotor>
-bool Swerve<AzimuthMotor, DriveMotor>::isRobotSkidding()
+bool Swerve::isRobotSkidding()
 {
     return getSkiddingRatio() >= 1.5;
 }
 
-template<class AzimuthMotor, class DriveMotor>
-frc::ChassisSpeeds Swerve<AzimuthMotor, DriveMotor>::discretize(frc::ChassisSpeeds speeds){
+frc::ChassisSpeeds Swerve::discretize(frc::ChassisSpeeds speeds){
     frc::Pose2d desiredPose{speeds.vx * LOOP_TIME, speeds.vy * LOOP_TIME, frc::Rotation2d(speeds.omega * LOOP_TIME * 4)};
     frc::Twist2d twist = log(desiredPose);
     frc::ChassisSpeeds finalSpeeds{(twist.dx / LOOP_TIME), (twist.dy / LOOP_TIME), (speeds.omega)};
     return finalSpeeds;
 }
 
-template<class AzimuthMotor, class DriveMotor>
-frc::Twist2d Swerve<AzimuthMotor, DriveMotor>::log(frc::Pose2d transform){
+frc::Twist2d Swerve::log(frc::Pose2d transform){
     double dtheta = transform.Rotation().Radians().value();
     double half_dtheta = dtheta * 0.5;
     double cos_minus_one = std::cos(half_dtheta) - 1.0;
@@ -688,8 +639,7 @@ frc::Twist2d Swerve<AzimuthMotor, DriveMotor>::log(frc::Pose2d transform){
     return frc::Twist2d{translation_part.X(), translation_part.Y(), units::radian_t{dtheta}};
 }
 
-template<class AzimuthMotor, class DriveMotor>
-double Swerve<AzimuthMotor, DriveMotor>::rotationLerping(double input){
+double Swerve::rotationLerping(double input){
     double rot = 0.0;
     double abs = std::abs(input);
     if(abs > P4.first){
@@ -707,8 +657,7 @@ double Swerve<AzimuthMotor, DriveMotor>::rotationLerping(double input){
     return rot;
 }
 
-template<class AzimuthMotor, class DriveMotor>
-void Swerve<AzimuthMotor, DriveMotor>::InitSendable(wpi::SendableBuilder& builder)
+void Swerve::InitSendable(wpi::SendableBuilder& builder)
 {
     builder.SetSmartDashboardType("Subsystem");
     builder.AddDoubleProperty(

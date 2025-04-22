@@ -59,31 +59,13 @@
 
 #define SWERVE_COUNT 4
 
-
-
-/**
- * @brief Quick way to select the drive motor controller
- * To change what motor controller runs the drive motor, change this to either:
- * * valor::PhoenixController
- * * valor::NeoController
- */
-typedef valor::PhoenixController<> SwerveDriveMotor;
-
-/**
- * @brief Quick way to select the azimuth motor controller
- * To change what motor controller runs the azimuth motor, change this to either:
- * * valor::PhoenixController
- * * valor::NeoController
- */
-typedef valor::PhoenixController<> SwerveAzimuthMotor;
-
 /**
  * @brief Subsystem - Drivetrain
  * 
  * Subsystem responsible for driving the robot chassis, and housing all the logic to control the
  * 4 swerve modules on the robot.
  */
-class Drivetrain : public valor::Swerve<SwerveAzimuthMotor, SwerveDriveMotor>
+class Drivetrain : public valor::Swerve
 {
 public:
 
@@ -197,7 +179,7 @@ private:
      frc2::CommandPtr pitSequenceCommand(const frc::ChassisSpeeds&, int, int);
      bool aprilTagOnReef(int id);
 
-     std::vector<std::pair<SwerveAzimuthMotor*, SwerveDriveMotor*>> generateModules();
+     std::vector<std::pair<valor::BaseController*, valor::BaseController*>> generateModules();
 
      valor::PIDF xPIDF;
      valor::PIDF thetaPIDF;
