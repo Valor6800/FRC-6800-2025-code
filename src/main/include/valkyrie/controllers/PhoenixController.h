@@ -376,4 +376,20 @@ private:
     valor::PIDF pidf;
     std::unique_ptr<ctre::phoenix6::hardware::TalonFX> followerMotor;
 };
+
+namespace phoenix {
+    /**
+     * @brief Wrapper over DynamicMotionMagic* control requests
+     * @tparam T Specific DynamicMotionMagic control request
+     * 
+     * Since PhoenixController initializes the position control request with a single position argument,
+     * a compile error will be thrown when DynamicMotionMagic control requests are used as the constructor expects three arguments.
+     * This very simple class zeroes acceleration and velocity of the control request.
+     */
+    template<class T>
+    class DynamicMotionMagic : public T {
+    public:
+        DynamicMotionMagic(units::turn_t tr) : T{tr, 0_tps, 0_tr_per_s_sq, 0_tr_per_s_cu} {}
+    };
+}
 }
