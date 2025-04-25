@@ -20,27 +20,53 @@ enum PhoenixControllerType {
     FALCON
 }; 
 
-template <class RawOutput = ctre::phoenix6::controls::VoltageOut, class VelocityOutput = ctre::phoenix6::controls::VelocityVoltage, class PositionOutput = ctre::phoenix6::controls::MotionMagicVoltage>
-class PhoenixController : public BaseController<ctre::phoenix6::hardware::TalonFX>
+template <class PositionOutput = ctre::phoenix6::controls::MotionMagicVoltage, class VelocityOutput = ctre::phoenix6::controls::VelocityVoltage>
+class PhoenixController : public BaseController, ctre::phoenix6::hardware::TalonFX
 {
-    static_assert(std::is_base_of_v<ctre::phoenix6::controls::ControlRequest, RawOutput>);
     static_assert(std::is_base_of_v<ctre::phoenix6::controls::ControlRequest, VelocityOutput>);
     static_assert(std::is_base_of_v<ctre::phoenix6::controls::ControlRequest, PositionOutput>);
 
 public:
-    typedef decltype(RawOutput::Output) RawOutputUnit;
-
-    PhoenixController(valor::PhoenixControllerType controllerType, int canID, valor::NeutralMode _mode, bool _inverted, std::string canbus = "") :
-        BaseController{new ctre::phoenix6::hardware::TalonFX(canID, canbus), _inverted, _mode, getPhoenixControllerMotorSpeed(controllerType)},
-        req_raw_out{RawOutputUnit{}},
-        req_vel_out{0_tps},
-        req_pos_out{0_tr},
-        cancoder{nullptr},
-        res_position(getMotor()->GetPosition()),
-        res_velocity{getMotor()->GetVelocity()}
+    PhoenixController(valor::PhoenixControllerType controllerType, int canID, valor::NeutralMode mode, bool inverted, double _rotorToSensor, double _sensorToMech, std::string canbus = "") :
+        BaseController{getPhoenixControllerMotorSpeed(controllerType), _rotorToSensor, _sensorToMech},
+        ctre::phoenix6::hardware::TalonFX{canID, canbus},
+        position_res(GetPosition()),
+        velocity_res{GetVelocity()}
     {
-        init();
-    };
+        valor::PIDF pidf;
+        pidf.P = FALCON_PIDF_KP;
+        pidf.I = FALCON_PIDF_KI;
+        pidf.D = FALCON_PIDF_KD;
+        pidf.error = 0_tr;
+        pidf.maxVelocity = FALCON_PIDF_KV;
+        pidf.maxAcceleration = FALCON_PIDF_KA;
+
+        position_req.Slot = 0;
+        position_req.UpdateFreqHz = 0_Hz;
+        velocity_req.Slot = 0;
+        velocity_req.UpdateFreqHz = 0_Hz;
+        voltage_req.UpdateFreqHz = 0_Hz;
+        duty_cycle_req.UpdateFreqHz = 0_Hz;
+        current_req.UpdateFreqHz = 0_Hz;
+
+        config.MotorOutput.Inverted = inverted;
+
+        config.MotorOutput.DutyCycleNeutralDeadband = DEADBAND.value();
+        config.MotorOutput.NeutralMode = mode == valor::NeutralMode::Brake ?
+            ctre::phoenix6::signals::NeutralModeValue::Brake : 
+            ctre::phoenix6::signals::NeutralModeValue::Coast;
+
+        config.Feedback.RotorToSensorRatio = rotorToSensor;
+        config.Feedback.SensorToMechanismRatio = sensorToMech;
+
+        GetConfigurator().Apply(config.MotorOutput);
+        GetConfigurator().Apply(config.Feedback);
+
+        setCurrentLimits(STATOR_CURRENT_LIMIT, SUPPLY_CURRENT_LIMIT, SUPPLY_CURRENT_THRESHOLD, SUPPLY_TIME_THRESHOLD);
+        setPIDF(pidf, 0);
+
+        wpi::SendableRegistry::AddLW(this, "PhoenixController", "ID " + std::to_string(GetDeviceID()));
+    }
 
     static units::revolutions_per_minute_t getPhoenixControllerMotorSpeed(PhoenixControllerType controllerType)
     {
@@ -62,55 +88,23 @@ public:
         }
     }
 
-    void init() override {
-        valor::PIDF motionPIDF;
-        motionPIDF.P = FALCON_PIDF_KP;
-        motionPIDF.I = FALCON_PIDF_KI;
-        motionPIDF.D = FALCON_PIDF_KD;
-        motionPIDF.error = 0_tr;
-        motionPIDF.maxVelocity = FALCON_PIDF_KV;
-        motionPIDF.maxAcceleration = FALCON_PIDF_KA;
-
-        req_pos_out.Slot = 0;
-        req_pos_out.UpdateFreqHz = 0_Hz;
-        req_vel_out.Slot = 0;
-        req_vel_out.UpdateFreqHz = 0_Hz;
-        req_raw_out.UpdateFreqHz = 0_Hz;
-
-        setNeutralMode(neutralMode);
-        setCurrentLimits(STATOR_CURRENT_LIMIT, SUPPLY_CURRENT_LIMIT, SUPPLY_CURRENT_THRESHOLD, SUPPLY_TIME_THRESHOLD);
-        setGearRatios(rotorToSensor, sensorToMech);
-        setPIDF(pidf, 0);
-
-        wpi::SendableRegistry::AddLW(this, "PhoenixController", "ID " + std::to_string(getMotor()->GetDeviceID()));
+    void enableFOC() {
+        tryEnableFOC(voltage_req);
+        tryEnableFOC(current_req);
+        tryEnableFOC(duty_cycle_req);
+        tryEnableFOC(velocity_req);
+        tryEnableFOC(position_req);
     }
 
-    void enableFOC(bool enableFOC) {
-        tryEnableFOC(req_raw_out, enableFOC);
-        tryEnableFOC(req_vel_out, enableFOC);
-        tryEnableFOC(req_pos_out, enableFOC);
-    }
-
-    void applyConfig() override {
-        getMotor()->GetConfigurator().Apply(config, 5_s);
+    void applyConfig() {
+        GetConfigurator().Apply(config, 5_s);
     }
 
     void reset() override {
         setEncoderPosition(0_tr);
     }
-
-    void setNeutralMode(valor::NeutralMode mode, bool saveImmediately = false) override {
-        neutralMode = mode;
-        config.MotorOutput.DutyCycleNeutralDeadband = DEADBAND.value();
-        config.MotorOutput.Inverted = inverted;
-        config.MotorOutput.NeutralMode = neutralMode == valor::NeutralMode::Brake ?
-            ctre::phoenix6::signals::NeutralModeValue::Brake : 
-            ctre::phoenix6::signals::NeutralModeValue::Coast;
-        
-        if (saveImmediately) getMotor()->GetConfigurator().Apply(config.MotorOutput);
-    }
     
-    void setCurrentLimits(units::ampere_t statorCurrentLimit, units::ampere_t supplyCurrentLimit, units::ampere_t supplyCurrentThreshold, units::second_t supplyTimeThreshold, bool saveImmediately = false) override {
+    void setCurrentLimits(units::ampere_t statorCurrentLimit, units::ampere_t supplyCurrentLimit, units::ampere_t supplyCurrentThreshold, units::second_t supplyTimeThreshold, bool saveImmediately = false) {
         config.CurrentLimits.StatorCurrentLimit = statorCurrentLimit;
         config.CurrentLimits.StatorCurrentLimitEnable = true;
         config.CurrentLimits.SupplyCurrentLimit = supplyCurrentLimit;
@@ -121,8 +115,8 @@ public:
         config.TorqueCurrent.PeakReverseTorqueCurrent = -PEAK_TORQUE_CURRENT;
 
         if (saveImmediately) {
-            getMotor()->GetConfigurator().Apply(config.CurrentLimits);
-            getMotor()->GetConfigurator().Apply(config.TorqueCurrent);
+            GetConfigurator().Apply(config.CurrentLimits);
+            GetConfigurator().Apply(config.TorqueCurrent);
         }
     }
 
@@ -131,78 +125,59 @@ public:
         config.Voltage.PeakReverseVoltage = reverseLimit;
 
         if (saveImmediately) {
-            getMotor()->GetConfigurator().Apply(config.Voltage);
+            GetConfigurator().Apply(config.Voltage);
         }
     }
 
     units::turn_t getPosition() override {
-        return res_position.Refresh().GetValue();
+        return position_res.Refresh().GetValue();
     }
 
     units::turns_per_second_t getSpeed() override {
-        return res_velocity.Refresh().GetValue();
-    }
-
-    units::ampere_t getCurrent() override {
-        return getMotor()->GetStatorCurrent().GetValue();
-    }
-
-    void setPositionUpdateFrequency(units::hertz_t hertz) {
-        res_position.SetUpdateFrequency(hertz);
-        // Do we really need to set CANcoder update frequency because we always access through motor controller res_position
-        if (cancoder != nullptr) cancoder->GetPosition().SetUpdateFrequency(hertz);
-    }
-
-    void setSpeedUpdateFrequency(units::hertz_t hertz) {
-        res_velocity.SetUpdateFrequency(hertz);
-        // Do we really need to set CANcoder update frequency because we always access through motor controller res_velocity
-        if (cancoder != nullptr) cancoder->GetVelocity().SetUpdateFrequency(hertz);
+        return velocity_res.Refresh().GetValue();
     }
 
     void setEncoderPosition(units::turn_t position) override {
-        getMotor()->SetPosition(position);
+        SetPosition(position);
     }
 
-    void setContinuousWrap(bool continuousWrap, bool saveImmediately = false) {
-        config.ClosedLoopGeneral.ContinuousWrap = continuousWrap;
-
-        if (saveImmediately) getMotor()->GetConfigurator().Apply(config.ClosedLoopGeneral);
-    }
-    
     void setPosition(units::turn_t position, int slot = 0) override {
-        getMotor()->SetControl(req_pos_out.WithSlot(slot).WithPosition(position));
+        SetControl(position_req.WithSlot(slot).WithPosition(position));
     }
 
     void setSpeed(units::turns_per_second_t velocity, int slot = 0) override {
-        getMotor()->SetControl(req_vel_out.WithSlot(slot).WithVelocity(velocity));
+        SetControl(velocity_req.WithSlot(slot).WithVelocity(velocity));
     }
 
-    void setPower(RawOutputUnit out) {
-        getMotor()->SetControl(req_raw_out.WithOutput(out));
-    }
+    void setPower(units::volt_t voltage) override { SetControl(voltage_req.WithOutput(voltage)); }
+    void setPower(units::ampere_t current) override { SetControl(current_req.WithOutput(current)); }
+    void setPower(units::scalar_t dutyCycle) override { SetControl(duty_cycle_req.WithOutput(dutyCycle)); }
 
-    void setupFollower(int canID, bool followerInverted = false) override {
-        followerMotor = new ctre::phoenix6::hardware::TalonFX(canID, "baseCAN");
-        ctre::phoenix6::configs::MotorOutputConfigs config{};
+    units::volt_t getVoltage() override { return GetMotorVoltage().GetValue(); }
+    units::ampere_t getCurrent() override { return GetStatorCurrent().GetValue(); }
+    units::scalar_t getDutyCycle() override { return GetDutyCycle().GetValue(); }
+
+    void setupFollower(int canID, bool followerInverted = false) {
+        // TODO: can "baseCAN" be replaced by GetNetwork()?
+        followerMotor = std::make_unique<ctre::phoenix6::hardware::TalonFX>(canID, "baseCAN");
+        ctre::phoenix6::configs::MotorOutputConfigs config;
         config.Inverted = followerInverted;
         config.NeutralMode = ctre::phoenix6::signals::NeutralModeValue::Coast;
         followerMotor->GetConfigurator().Apply(config);
-        followerMotor->SetControl(ctre::phoenix6::controls::StrictFollower(getMotor()->GetDeviceID()));
+        followerMotor->SetControl(ctre::phoenix6::controls::StrictFollower(GetDeviceID()));
     }
     
-    void setPIDF(valor::PIDF _pidf, int slot = 0, bool saveImmediately = false) override {
-        pidf = _pidf;
-
+    void setPIDF(valor::PIDF pidf, int slot = 0, bool saveImmediately = false) {
         // Motion magic configuration
         config.MotionMagic.MotionMagicCruiseVelocity = pidf.maxVelocity;
         config.MotionMagic.MotionMagicAcceleration = pidf.maxAcceleration;
         config.MotionMagic.MotionMagicJerk = pidf.maxJerk;
 
-        if (slot == 1) setPIDFSlot(config.Slot1, saveImmediately);
-        else if (slot == 2) setPIDFSlot(config.Slot2, saveImmediately);
-        else setPIDFSlot(config.Slot0, saveImmediately); // Default case
+        if (slot == 1) setPIDFSlot(config.Slot1, pidf, saveImmediately);
+        else if (slot == 2) setPIDFSlot(config.Slot2, pidf, saveImmediately);
+        else setPIDFSlot(config.Slot0, pidf, saveImmediately); // Default case
 
-        if (saveImmediately) getMotor()->GetConfigurator().Apply(config.MotionMagic);
+        if (saveImmediately) GetConfigurator().Apply(config.MotionMagic);
     }
 
     void setupReverseHardwareLimit(int canID, ctre::phoenix6::signals::ReverseLimitTypeValue type, units::turn_t autosetPosition = 0_tr, bool saveImmediately = false) {
@@ -213,7 +188,7 @@ public:
         config.HardwareLimitSwitch.ReverseLimitAutosetPositionEnable = false;
         config.HardwareLimitSwitch.ReverseLimitSource = ctre::phoenix6::signals::ReverseLimitSourceValue::RemoteCANdiS1;
 
-        if (saveImmediately) getMotor()->GetConfigurator().Apply(config.HardwareLimitSwitch);
+        if (saveImmediately) GetConfigurator().Apply(config.HardwareLimitSwitch);
     }
 
     void setupForwardHardwareLimit(int canID, ctre::phoenix6::signals::ForwardLimitTypeValue type, units::turn_t autosetPosition = 0_tr, bool saveImmediately = false) {
@@ -224,32 +199,21 @@ public:
         config.HardwareLimitSwitch.ForwardLimitAutosetPositionEnable = true;
         config.HardwareLimitSwitch.ForwardLimitSource = ctre::phoenix6::signals::ReverseLimitSourceValue::RemoteCANdiS1;
 
-        if (saveImmediately) getMotor()->GetConfigurator().Apply(config.HardwareLimitSwitch);
+        if (saveImmediately) GetConfigurator().Apply(config.HardwareLimitSwitch);
     }
 
-    void setForwardLimit(units::turn_t forward, bool saveImmediately = false) override {
+    void setForwardLimit(units::turn_t forward, bool saveImmediately = false) {
         config.SoftwareLimitSwitch.ForwardSoftLimitEnable = true;
         config.SoftwareLimitSwitch.ForwardSoftLimitThreshold = forward;
 
-        if (saveImmediately) getMotor()->GetConfigurator().Apply(config.SoftwareLimitSwitch);
+        if (saveImmediately) GetConfigurator().Apply(config.SoftwareLimitSwitch);
     }
 
-    void setReverseLimit(units::turn_t reverse, bool saveImmediately = false) override {
+    void setReverseLimit(units::turn_t reverse, bool saveImmediately = false) {
         config.SoftwareLimitSwitch.ReverseSoftLimitEnable = true;
         config.SoftwareLimitSwitch.ReverseSoftLimitThreshold = reverse;
 
-        if (saveImmediately) getMotor()->GetConfigurator().Apply(config.SoftwareLimitSwitch);
-    }
-    
-    void setGearRatios(double _rotorToSensor, double _sensorToMech, bool saveImmediately = false) override {
-        rotorToSensor = _rotorToSensor;
-        sensorToMech = _sensorToMech;
-
-        config.Feedback.RotorToSensorRatio = rotorToSensor;
-        config.Feedback.SensorToMechanismRatio = sensorToMech;
-
-        if (saveImmediately)
-            getMotor()->GetConfigurator().Apply(config.Feedback);
+        if (saveImmediately) GetConfigurator().Apply(config.SoftwareLimitSwitch);
     }
 
     ctre::phoenix6::signals::MagnetHealthValue getMagnetHealth() {
@@ -262,7 +226,7 @@ public:
         return cancoder->GetAbsolutePosition().GetValue();
     }
 
-    void setupCANCoder(int deviceId, units::turn_t offset, bool clockwise, std::string canbus = "", units::turn_t absoluteRange=1_tr, bool saveImmediately = false) override {
+    void setupCANCoder(int deviceId, units::turn_t offset, bool clockwise, std::string canbus = "", units::turn_t absoluteRange=1_tr, bool saveImmediately = false) {
         cancoder = new ctre::phoenix6::hardware::CANcoder(deviceId, canbus);
     
         ctre::phoenix6::configs::MagnetSensorConfigs cancoderConfig;
@@ -277,11 +241,7 @@ public:
         config.Feedback.SensorToMechanismRatio = sensorToMech;
         config.Feedback.RotorToSensorRatio = rotorToSensor;
 
-        if (saveImmediately) getMotor()->GetConfigurator().Apply(config.Feedback);
-    }
-
-    ctre::phoenix6::hardware::CANcoder *getCANCoder() override {
-        return cancoder;
+        if (saveImmediately) GetConfigurator().Apply(config.Feedback);
     }
 
     float getBusUtil(const char* canBusName) {
@@ -289,18 +249,18 @@ public:
         return 0;
     }
 
-    void setOpenLoopRamp(units::second_t time, bool saveImmediately = false) override {
+    void setOpenLoopRamp(units::second_t time, bool saveImmediately = false) {
         config.OpenLoopRamps.DutyCycleOpenLoopRampPeriod = time;
-        if (saveImmediately) getMotor()->GetConfigurator().Apply(config.OpenLoopRamps);
+        if (saveImmediately) GetConfigurator().Apply(config.OpenLoopRamps);
     }
 
     units::frequency::hertz_t getPositionUpdateFrequency() {
         // Should we return CANcoder vs motor position update frequency
-        return res_position.GetAppliedUpdateFrequency();
+        return position_res.GetAppliedUpdateFrequency();
     }
 
     units::frequency::hertz_t getSpeedUpdateFrequency() {
-        return res_velocity.GetAppliedUpdateFrequency();
+        return velocity_res.GetAppliedUpdateFrequency();
     }
 
     bool GetFault_BadMagnet(bool refresh = true) {
@@ -314,15 +274,16 @@ public:
         return false;
     }
 
+    // This literally replaces the default TalonFX LiveWindow entry that gives zero useful information - shouldn't have any side effects
     void InitSendable(wpi::SendableBuilder& builder) override {
         builder.SetSmartDashboardType("Subsystem");
         builder.AddDoubleProperty(
             "Stator Current", 
-            [this] { return getMotor()->GetStatorCurrent().GetValueAsDouble(); },
+            [this] { return GetStatorCurrent().GetValueAsDouble(); },
             nullptr);
         builder.AddDoubleProperty(
             "Supply Current", 
-            [this] { return getMotor()->GetSupplyCurrent().GetValueAsDouble(); },
+            [this] { return GetSupplyCurrent().GetValueAsDouble(); },
             nullptr);
         builder.AddDoubleProperty(
             "Position", 
@@ -338,15 +299,15 @@ public:
             nullptr);
         builder.AddDoubleProperty(
             "Out Volt", 
-            [this] { return getMotor()->GetMotorVoltage().GetValueAsDouble(); },
+            [this] { return GetMotorVoltage().GetValueAsDouble(); },
             nullptr);
         builder.AddDoubleProperty(
             "reqPosition", 
-            [this] { return req_pos_out.Position.template to<double>(); },
+            [this] { return position_req.Position.template to<double>(); },
             nullptr);
         builder.AddDoubleProperty(
             "reqSpeed", 
-            [this] { return req_vel_out.Velocity.template to<double>(); },
+            [this] { return velocity_req.Velocity.template to<double>(); },
             nullptr);
         builder.AddStringProperty(
             "Magnet Health",
@@ -354,9 +315,22 @@ public:
             nullptr);
         builder.AddBooleanProperty(
             "Undervolting",
-            [this] { return getMotor()->GetFault_Undervoltage().GetValue(); },
+            [this] { return GetFault_Undervoltage().GetValue(); },
             nullptr);
     }
+
+    // This is to provide compatibility with the BaseController API
+    ctre::phoenix6::controls::DutyCycleOut duty_cycle_req{0};
+    ctre::phoenix6::controls::VoltageOut voltage_req{0_V};
+    ctre::phoenix6::controls::TorqueCurrentFOC current_req{0_A};
+
+    VelocityOutput velocity_req{0_tps};
+    PositionOutput position_req{0_tr};
+
+    ctre::phoenix6::StatusSignal<units::turn_t>& position_res;
+    ctre::phoenix6::StatusSignal<units::turns_per_second_t>& velocity_res;
+    ctre::phoenix6::configs::TalonFXConfiguration config;
+    ctre::phoenix6::hardware::CANcoder *cancoder;
 
 private:
     static constexpr units::ampere_t SUPPLY_CURRENT_THRESHOLD = 65_A;
@@ -381,25 +355,17 @@ private:
     static constexpr units::revolutions_per_minute_t FREE_SPD_FALCON_FOC = 6080_rpm;
 
     template <class S>
-    void setPIDFSlot(S& slot, bool saveImmediately) {
+    void setPIDFSlot(S& slot, valor::PIDF pidf, bool saveImmediately) {
         // Generic PIDF configurations
         // Numerator for closed loop controls will be in volts
         slot.kP = pidf.P;
         slot.kI = pidf.I;
         slot.kD = pidf.D;
         slot.kS = pidf.S;
-        slot.kV = 0;
-        if constexpr (std::is_same_v<RawOutputUnit, units::volt_t>) {
-            if (pidf.kV < 0)
-                slot.kV = (voltageCompenstation / getMaxMechSpeed()).value();
-            else
-                slot.kV = pidf.kV;
-        } else if constexpr (std::is_same_v<RawOutputUnit, units::ampere_t>) {
-            if (pidf.kV < 0)
-                slot.kV = 0;
-            else
-                slot.kV = pidf.kV;
-        }
+        if (pidf.kV < 0)
+            slot.kV = (voltageCompensation / getMaxMechSpeed()).value();
+        else
+            slot.kV = pidf.kV;
 
         // Feedforward gain configuration
         if (pidf.aFF != 0) {
@@ -409,29 +375,19 @@ private:
             slot.kG = pidf.aFF;
         }
 
-        if (saveImmediately) getMotor()->GetConfigurator().Apply(slot);
+        if (saveImmediately) GetConfigurator().Apply(slot);
     }
 
     // Helper function for enableFOC that only enables if the template has the field "EnableFOC"
     template <typename T>
-    static inline void tryEnableFOC(T& request, bool enableFOC) {
+    static inline void tryEnableFOC(T& request) {
         constexpr bool hasEnableFOC = requires (T& t) {
             t.EnableFOC;
         };
-        if constexpr (hasEnableFOC) request.EnableFOC = enableFOC;
+        if constexpr (hasEnableFOC) request.EnableFOC = true;
     }
 
     valor::PIDF pidf;
-
-    RawOutput req_raw_out;
-    VelocityOutput req_vel_out;
-    PositionOutput req_pos_out;
-
-    ctre::phoenix6::hardware::CANcoder *cancoder;
-
-    ctre::phoenix6::StatusSignal<units::turn_t>& res_position;
-    ctre::phoenix6::StatusSignal<units::turns_per_second_t>& res_velocity;
-
-    ctre::phoenix6::configs::TalonFXConfiguration config;
+    std::unique_ptr<ctre::phoenix6::hardware::TalonFX> followerMotor;
 };
 }

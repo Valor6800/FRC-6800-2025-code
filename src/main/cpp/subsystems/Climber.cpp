@@ -3,7 +3,6 @@
 #include <math.h>
 
 #include "units/voltage.h"
-#include "valkyrie/controllers/NeutralMode.h"
 #include "Constants.h"
 
 #include <pathplanner/lib/auto/NamedCommands.h>
@@ -65,6 +64,8 @@ void Climber::init()
         CANIDs::CLIMBER_LEAD,
         valor::NeutralMode::Brake,
         Constants::Climber::climbMotorInverted(),
+        1.0,
+        CLIMB_GEAR_RATIO,
         "baseCAN"
     );
 
@@ -91,7 +92,6 @@ void Climber::init()
         true
     );
 
-    climbMotors->setGearRatios(1.0, CLIMB_GEAR_RATIO);
     // stabbyMotor->setGearRatios(1.0, STABBY_ROTOR_TO_SENSOR);
     // stabbyPID.P = STABBY_K_P;
 
@@ -110,8 +110,7 @@ void Climber::init()
     // climbMotors->setupFollower(CANIDs::CLIMBER_FOLLOW, Constants::Climber::climbMotorInverted());
     climbMotors->setPIDF(climbRetractPID, 1);
     climbMotors->setPIDF(climbPID, 0);
-    climbMotors->setContinuousWrap(false);
-    climbMotors->enableFOC(true);
+    climbMotors->enableFOC();
     climbMotors->setVoltageLimits(
         units::volt_t(0.0),
         units::volt_t(12.0)

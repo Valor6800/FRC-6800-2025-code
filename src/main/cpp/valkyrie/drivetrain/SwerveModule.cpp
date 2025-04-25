@@ -170,10 +170,10 @@ void SwerveModule<AzimuthMotor, DriveMotor>::setDriveClosedLoop(units::meters_pe
 template<class AzimuthMotor, class DriveMotor>
 void SwerveModule<AzimuthMotor, DriveMotor>::setUpdateFrequency(units::frequency::hertz_t freq)
 {
-    azimuthMotor->setPositionUpdateFrequency(freq);
-    azimuthMotor->setSpeedUpdateFrequency(freq);
-    driveMotor->setPositionUpdateFrequency(freq);
-    driveMotor->setSpeedUpdateFrequency(freq);
+    azimuthMotor->position_res.SetUpdateFrequency(freq);
+    azimuthMotor->velocity_res.SetUpdateFrequency(freq);
+    driveMotor->position_res.SetUpdateFrequency(freq);
+    driveMotor->velocity_res.SetUpdateFrequency(freq);
 }
 
 template<class AzimuthMotor, class DriveMotor>

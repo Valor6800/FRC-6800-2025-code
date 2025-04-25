@@ -8,7 +8,6 @@
 #include "Drivetrain.h"
 #include "units/velocity.h"
 #include "subsystems/Climber.h"
-#include "valkyrie/controllers/NeutralMode.h"
 #include "valkyrie/controllers/PIDF.h"
 #include <bitset>
 #include <iostream>
@@ -68,10 +67,10 @@ Scorer::Scorer(frc::TimedRobot *_robot, Drivetrain *_drivetrain, Climber *_climb
     valor::BaseSubsystem(_robot, "Scorer"),
     hallEffectDebounceSensor(_robot, "HallEffectDebounce"),
     candi(CANIDs::HALL_EFFECT, "baseCAN"),
-    elevatorMotor(new valor::PhoenixController(valor::PhoenixControllerType::KRAKEN_X60, CANIDs::ELEV_WHEEL, valor::NeutralMode::Brake, elevatorMotorInverted(), "baseCAN")),
-    scorerMotor(new valor::PhoenixController(Constants::getScorerMotorType(), CANIDs::SCORER_WHEEL, valor::NeutralMode::Brake, scorerMotorInverted(), "baseCAN")),
-    scorerPivotMotor(new valor::PhoenixController(Constants::getScorerPivotMotorType(), CANIDs::SCORER_PIVOT_MOTOR, valor::NeutralMode::Brake, scorerPivotInverted(), "baseCAN")),
-    funnelMotor(new valor::PhoenixController(Constants::getFunnelMotorType(), CANIDs::FUNNEL, valor::NeutralMode::Coast, funnelInverted(), "baseCAN")),
+    elevatorMotor(new valor::PhoenixController(valor::PhoenixControllerType::KRAKEN_X60, CANIDs::ELEV_WHEEL, valor::NeutralMode::Brake, elevatorMotorInverted(), ELEVATOR_MOTOR_TO_SENSOR, ELEVATOR_SENSOR_TO_MECH, "baseCAN")),
+    scorerMotor(new valor::PhoenixController(Constants::getScorerMotorType(), CANIDs::SCORER_WHEEL, valor::NeutralMode::Brake, scorerMotorInverted(), 1, Constants::Scorer::getScorerSensorToMech(), "baseCAN")),
+    scorerPivotMotor(new valor::PhoenixController(Constants::getScorerPivotMotorType(), CANIDs::SCORER_PIVOT_MOTOR, valor::NeutralMode::Brake, scorerPivotInverted(), PIVOT_MOTOR_TO_SENSOR, PIVOT_SENSOR_TO_MECH, "baseCAN")),
+    funnelMotor(new valor::PhoenixController(Constants::getFunnelMotorType(), CANIDs::FUNNEL, valor::NeutralMode::Coast, funnelInverted(), 1, Constants::Scorer::getFunnelSensorToMech(), "baseCAN")),
     scorerStagingSensor(_robot, "Scorer Staging Sensor", CANIDs::STAGING_LIDAR_SENSOR, "baseCAN", -1_mm),
     currentSensor(_robot, "Algae Current Sensor"),
     coralCurrentSensor(_robot, "Coral Current Sensor"),
@@ -556,8 +555,7 @@ void Scorer::init()
     candi.GetConfigurator().Apply(candiConfig.DigitalInputs);
 
     // Elevator init sequence
-    elevatorMotor->setGearRatios(ELEVATOR_MOTOR_TO_SENSOR, ELEVATOR_SENSOR_TO_MECH);
-    elevatorMotor->enableFOC(true);
+    elevatorMotor->enableFOC();
     elevatorMotor->setForwardLimit(ELEVATOR_FORWARD_LIMIT);
     elevatorMotor->setupReverseHardwareLimit(CANIDs::HALL_EFFECT, ctre::phoenix6::signals::ReverseLimitTypeValue::NormallyOpen);
 
@@ -582,8 +580,7 @@ void Scorer::init()
     elevatorMotor->applyConfig();
 
     // Scorer init sequence
-    scorerMotor->setGearRatios(1, Constants::Scorer::getScorerSensorToMech());
-    scorerMotor->enableFOC(true);
+    scorerMotor->enableFOC();
     scorerMotor->setCurrentLimits(
         units::ampere_t{100},
         units::ampere_t{60},
@@ -599,8 +596,7 @@ void Scorer::init()
     scorerMotor->setPIDF(scorerPID);
     scorerMotor->applyConfig();
 
-    scorerPivotMotor->setGearRatios(PIVOT_MOTOR_TO_SENSOR, PIVOT_SENSOR_TO_MECH);
-    scorerPivotMotor->enableFOC(true);
+    scorerPivotMotor->enableFOC();
     scorerPivotMotor->setForwardLimit(SECOND_SCORER_FORWARD_LIMIT);
     scorerPivotMotor->setReverseLimit(SECOND_SCORER_REVERSE_LIMIT);
 
@@ -611,8 +607,7 @@ void Scorer::init()
     scorerPivotMotor->setupCANCoder(CANIDs::SCORER_PIVOT_CAN, scorerPivotMagnetOffset(), ctre::phoenix6::signals::SensorDirectionValue::CounterClockwise_Positive, "baseCAN");
     scorerPivotMotor->applyConfig();
 
-    funnelMotor->setGearRatios(1, Constants::Scorer::getFunnelSensorToMech());
-    funnelMotor->enableFOC(true);
+    funnelMotor->enableFOC();
     funnelMotor->setCurrentLimits(
         units::ampere_t{100},
         units::ampere_t{60},
@@ -637,7 +632,7 @@ void Scorer::init()
         absSensorCorrect = elevatorMotor->getAbsEncoderPosition();
 
         if (frc::DriverStation::IsTest()){
-            std::cout << "\nNew Magnet Offset: " << -(Constants::getElevatorMagnetOffset() - elevatorMotor->getCANCoder()->GetAbsolutePosition().GetValue()).value() << std::endl;
+            std::cout << "\nNew Magnet Offset: " << -(Constants::getElevatorMagnetOffset() - elevatorMotor->cancoder->GetAbsolutePosition().GetValue()).value() << std::endl;
         }
     });
 
@@ -741,8 +736,7 @@ void Scorer::assessInputs()
 
 void Scorer::analyzeDashboard()
 {
-
-    auto cancoder = elevatorMotor->getCANCoder();
+    auto cancoder = elevatorMotor->cancoder;
     leds->setLED(LEDConstants::LED_POS_ELEVATOR, valor::CANdleSensor::cancoderMagnetHealthGetter(cancoder));
     int elevatorHealthLED = std::abs(absSensorCorrect.value()) < ELEVATOR_HEALTH_LIMIT.value() ? valor::CANdleSensor::GREEN : valor::CANdleSensor::RED;
     leds->setLED(LEDConstants::LED_POS_ELEVATOR_NOT_ZERO, elevatorHealthLED);

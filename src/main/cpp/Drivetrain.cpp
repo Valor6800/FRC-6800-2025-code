@@ -298,14 +298,15 @@ std::vector<std::pair<SwerveAzimuthMotor*, SwerveDriveMotor*>> Drivetrain::gener
             CANIDs::AZIMUTH_CANS[i],
             valor::NeutralMode::Brake,
             Constants::swerveAzimuthsReversals()[i],
+            Constants::azimuthGearRatio(),
+            1.0,
             PIGEON_CAN_BUS
             
         );
-        azimuthMotor->setGearRatios(Constants::azimuthGearRatio(), 1.0);
         azimuthMotor->setPIDF(azimuthPID, 0);
-        azimuthMotor->enableFOC(true);
+        azimuthMotor->enableFOC();
         azimuthMotor->setupCANCoder(CANIDs::CANCODER_CANS[i], Constants::swerveZeros()[i], false, PIGEON_CAN_BUS);
-        azimuthMotor->setContinuousWrap(true);
+        azimuthMotor->config.ClosedLoopGeneral.ContinuousWrap = true;
         azimuthMotor->applyConfig();
 
         SwerveAzimuthMotor* driveMotor = new SwerveDriveMotor(
@@ -313,11 +314,12 @@ std::vector<std::pair<SwerveAzimuthMotor*, SwerveDriveMotor*>> Drivetrain::gener
             CANIDs::DRIVE_CANS[i],
             valor::NeutralMode::Coast,
             Constants::swerveDrivesReversals()[i],
+            1.0,
+            Constants::driveGearRatio(),
             PIGEON_CAN_BUS
         );
-        driveMotor->setGearRatios(1.0, Constants::driveGearRatio());
         driveMotor->setPIDF(drivePID, 0);
-        driveMotor->enableFOC(true);
+        driveMotor->enableFOC();
         driveMotor->setOpenLoopRamp(1_s);
         driveMotor->applyConfig();
 
@@ -362,7 +364,7 @@ void Drivetrain::assessInputs()
 void Drivetrain::analyzeDashboard()
 {
     for (size_t i = 0; i < swerveModules.size(); i++) {
-        auto cancoder = swerveModules.at(i)->azimuthMotor->getCANCoder();
+        auto cancoder = swerveModules.at(i)->azimuthMotor->cancoder;
         leds->setLED(i, valor::CANdleSensor::cancoderMagnetHealthGetter(cancoder));
     }
 
