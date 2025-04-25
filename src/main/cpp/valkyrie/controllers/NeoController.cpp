@@ -1,4 +1,4 @@
-#include "valkyrie/controllers/NeoController.h"
+#include <valkyrie/controllers/NeoController.h>
 
 #define NEO_PIDF_KP 10.0f
 #define NEO_PIDF_KI 0.0f
@@ -22,15 +22,12 @@ NeoController::NeoController(valor::NeoControllerType controllerType,
                                     int canID,
                                     valor::NeutralMode _mode,
                                     bool _inverted,
+                                    double _rotorToSensor,
+                                    double _sensorToMech,
                                     std::string canbus) :
-    BaseController(new rev::spark::SparkMax(canID, rev::spark::SparkMax::MotorType::kBrushless), _inverted, _mode, getNeoControllerMotorSpeed(controllerType)),
-    cancoder(nullptr),
-    pidController(motor->GetClosedLoopController())
-{
-    init();
-}
-
-void NeoController::init()
+    BaseController(getNeoControllerMotorSpeed(controllerType), _rotorToSensor, _sensorToMech),
+    rev::spark::SparkMax(canID, rev::spark::SparkMax::MotorType::kBrushless),
+    pidController{GetClosedLoopController()}
 {
     valor::PIDF motionPIDF;
     motionPIDF.P = NEO_PIDF_KP;
@@ -40,67 +37,14 @@ void NeoController::init()
     motionPIDF.maxVelocity = NEO_PIDF_KV;
     motionPIDF.maxAcceleration = NEO_PIDF_KA;
 
-    setNeutralMode(neutralMode);
-    setCurrentLimits(STATOR_CURRENT_LIMIT, SUPPLY_CURRENT_LIMIT, SUPPLY_CURRENT_THRESHOLD, SUPPLY_TIME_THRESHOLD);
-    setGearRatios(rotorToSensor, sensorToMech);
-    setPIDF(pidf, 0);
-
     wpi::SendableRegistry::AddLW(this, "NeoController", "ID " + std::to_string(0));
-}
-
-void NeoController::setupCANCoder(int deviceId, units::turn_t offset, bool clockwise, std::string canbus, units::turn_t absoluteRange, bool saveImmediately)
-{
-    cancoder = new ctre::phoenix6::hardware::CANcoder(deviceId, canbus);
-}
-
-void NeoController::applyConfig()
-{
-}
-
-ctre::phoenix6::hardware::CANcoder *NeoController::getCANCoder()
-{
-    return cancoder;
 }
 
 void NeoController::reset()
 {
 }
 
-void NeoController::setEncoderPosition(units::turn_t position)
-{
-}
-
-void NeoController::setupFollower(int canID, bool followerInverted)
-{
-}
-
-void NeoController::setForwardLimit(units::turn_t forward, bool saveImmediately)
-{
-}
-
-void NeoController::setReverseLimit(units::turn_t reverse, bool saveImmediately)
-{
-}
-
-void NeoController::setCurrentLimits(units::ampere_t statorCurrentLimit, units::ampere_t supplyCurrentLimit, units::ampere_t supplyCurrentThreshold, units::second_t supplyTimeThreshold, bool saveImmediately)
-{
-}
-
-void NeoController::setPIDF(valor::PIDF _pidf, int slot, bool saveImmediately)
-{
-    pidf = _pidf;
-}
-
-void NeoController::setGearRatios(double _rotorToSensor, double _sensorToMech, bool saveImmediately)
-{
-    rotorToSensor = _rotorToSensor;
-    sensorToMech = _sensorToMech;
-}
-
-units::ampere_t NeoController::getCurrent()
-{
-    return units::ampere_t{0};
-}
+void NeoController::setEncoderPosition(units::turn_t) {}
 
 /**
  * Output is in mechanism rotations!
@@ -129,70 +73,14 @@ void NeoController::setSpeed(units::turns_per_second_t speed, int slot)
 {
 }
 
-void NeoController::setPower(units::volt_t voltage)
-{
-}
+void NeoController::setPower(units::volt_t) {}
+void NeoController::setPower(units::scalar_t) {}
 
-void NeoController::setNeutralMode(valor::NeutralMode mode, bool saveImmediately)
-{
-    neutralMode = mode;
-}
-
-void NeoController::setOpenLoopRamp(units::second_t time, bool saveImmediately)
-{
-}
+units::volt_t NeoController::getVoltage() { return 0_V; }
+units::ampere_t NeoController::getCurrent() { return 0_A; }
+units::scalar_t NeoController::getDutyCycle() { return 0; }
 
 void NeoController::InitSendable(wpi::SendableBuilder& builder)
 {
     builder.SetSmartDashboardType("Subsystem");
-    // builder.AddDoubleProperty(
-    //     "Stator Current", 
-    //     [this] { return getMotor()->GetStatorCurrent().GetValueAsDouble(); },
-    //     nullptr);
-    // builder.AddDoubleProperty(
-    //     "Supply Current", 
-    //     [this] { return getMotor()->GetSupplyCurrent().GetValueAsDouble(); },
-    //     nullptr);
-    // builder.AddDoubleProperty(
-    //     "Device Temp", 
-    //     [this] { return getMotor()->GetDeviceTemp().GetValueAsDouble(); },
-    //     nullptr);
-    // builder.AddDoubleProperty(
-    //     "Processor Temp", 
-    //     [this] { return getMotor()->GetProcessorTemp().GetValueAsDouble(); },
-    //     nullptr);
-    // builder.AddDoubleProperty(
-    //     "Position", 
-    //     [this] { return getPosition().to<double>(); },
-    //     nullptr);
-    // builder.AddDoubleProperty(
-    //     "Speed", 
-    //     [this] { return getSpeed().to<double>(); },
-    //     nullptr);
-    // builder.AddDoubleProperty(
-    //     "Out Volt", 
-    //     [this] { return getMotor()->GetMotorVoltage().GetValueAsDouble(); },
-    //     nullptr);
-    // builder.AddDoubleProperty(
-    //     "CANCoder", 
-    //     [this] { return getCANCoder().to<double>(); },
-    //     nullptr);
-    // builder.AddBooleanProperty(
-    //     "Undervolting",
-    //     [this] { return getMotor()->GetFault_Undervoltage().GetValue(); },
-    //     nullptr);
-    // builder.AddIntegerProperty(
-    //     "Device ID",
-    //     [this] { return getMotor()->GetDeviceID(); },
-    //     nullptr
-    //     );
-    // builder.AddIntegerProperty(
-    //     "RotorToSensor",
-    //     [this] { return rotorToSensor; },
-    //     nullptr);
-    // builder.AddIntegerProperty(
-    //     "SensorToMech",
-    //     [this] { return sensorToMech; },
-    //     nullptr
-    //     );
 }
