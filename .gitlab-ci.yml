@@ -1,38 +1,56 @@
-image: wpilib/roborio-cross-ubuntu:2025-22.04
-
-stages:
-  - build
-  - deploy
+default:
+  image: lilshan24/valor-pipeline:latest
 
 build:
   stage: build
   script:
-    - apt-get update -y && apt-get install -y openjdk-11-jdk  # Install JDK or adjust as needed
-    - ./gradlew build
-  artifacts:
-    paths:
-      - build/
-    reports:
-      junit: '**/TEST-*.xml'
-    expire_in: 1 week
+    - git fetch origin $CI_DEFAULT_BRANCH:$CI_DEFAULT_BRANCH || true
+    - ./gradlew format build
 
-doxygen:
-  stage: build
-  script:
-    - apt-get update -y && apt-get install -y libtinfo5  # Install required dependencies
-    - ./gradlew doxygen
-    - mv docs/html public
-  artifacts:
-    paths:
-      - public
-    expire_in: 1 week
-
-pages:
+formatter:
   stage: deploy
+  rules:
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+  before_script:
+    - cp $PRIVATE_KEY ~/.ssh/id_ed25519
+    - cp $PUBLIC_KEY ~/.ssh/id_ed25519.pub
+    - |
+      cat <<EOF > ~/.ssh/config
+      Host git.valor6800.com
+        HostName git.valor6800.com
+        StrictHostKeyChecking no
+        Port 6822
+        IdentityFile ~/.ssh/id_ed25519
+      EOF
+    - chmod 600 ~/.ssh/id_ed25519
+    - git config --global user.email "bot@noreply.git.valor6800.com"
+    - git config --global user.name "Formatter Bot"
+    - git remote rm origin
+    - git remote add origin git@git.valor6800.com:$CI_PROJECT_NAMESPACE/$CI_PROJECT_NAME
   script:
-    - ls -l public
-  artifacts:
-    paths:
-      - public
-  only:
-    - main
+    - ./gradlew format
+    - git add .
+    - git commit -m "[bot] Fix formatting" || true
+    - git push origin HEAD:$CI_COMMIT_REF_NAME -o ci.skip
+
+# doxygen:
+#   stage: build
+#   rules:
+#     - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+#   script:
+#     - ./gradlew doxygen
+#     - mv docs/html public
+#   artifacts:
+#     paths:
+#       - public
+#     expire_in: 1 week
+
+# pages:
+#   stage: deploy
+#   rules:
+#     - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+#   script:
+#     - ls -l public
+#   artifacts:
+#     paths:
+#       - public

@@ -1,0 +1,27 @@
+cppHeaderFileInclude {
+  \.h$
+  \.hpp$
+}
+
+cppSrcFileInclude {
+  \.cpp$
+}
+
+includeOtherLibs {
+  ^frc2?/
+  ^units/
+  ^networktables/
+  ^pathplanner/
+  ^ctre/
+  ^rev/
+  ^Eigen/
+  ^gcem_incl/
+}
+
+includeProject {
+  ^valkyrie/
+}
+
+generatedFileExclude {
+  LimelightHelpers\.h$
+}
