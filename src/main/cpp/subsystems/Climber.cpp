@@ -36,7 +36,6 @@ Climber::Climber(frc::TimedRobot *_robot, valor::CANdleSensor* _leds) : valor::B
     climbCancoder(new ctre::phoenix6::hardware::CANcoder(CANIDs::CLIMBER_CAN, "baseCAN")),
     leds(_leds)
 {
-    frc2::CommandScheduler::GetInstance().RegisterSubsystem(this);
     init();
 }
 
@@ -124,6 +123,8 @@ void Climber::init()
     resetState();
 
     climbMotors->setEncoderPosition(climbCancoder->GetAbsolutePosition().GetValue());
+    AddChild("Climb Motor", climbMotors);
+    wpi::SendableRegistry::Remove(climbCancoder);
 }
 
 void Climber::assessInputs()

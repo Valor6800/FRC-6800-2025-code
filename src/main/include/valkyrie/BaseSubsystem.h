@@ -43,9 +43,8 @@ namespace valor {
  * Descriptions for each function and their intent is listed in the function description
  * 
  */
-class BaseSubsystem : public frc2::Subsystem, public wpi::Sendable, public wpi::SendableHelper<BaseSubsystem> {
+class BaseSubsystem : public frc2::SubsystemBase {
     public:
-
         /**
          * @brief Construct a new Valor Subsystem object
          * 
@@ -58,14 +57,27 @@ class BaseSubsystem : public frc2::Subsystem, public wpi::Sendable, public wpi::
          * @param name A human readable name of the subsystem 
          */
         BaseSubsystem(frc::TimedRobot *_robot, const char* name) :
-            robot(_robot), subsystemName(name),
-            operatorGamepad(NULL),
-            driverGamepad(NULL)
-        {
-            table = nt::NetworkTableInstance::GetDefault().GetTable(name);
-            wpi::SendableRegistry::AddLW(this, "BaseSubsystem", subsystemName);
-        }
-        
+            frc2::SubsystemBase{name},
+            table{nt::NetworkTableInstance::GetDefault().GetTable(GetSubsystem())},
+            robot(_robot)
+        {}
+
+        /**
+         * @brief Construct a new Valor Subsystem object
+         * 
+         * Sets up the infrastructure so that the various robot modes will automatically
+         * call the proper function. This NEEDS to be called from the constructor of every
+         * subsystem. This will force the constructor of every subsystem to also contain
+         * a pointer to the TimedRobot instance (aka. Robot since Robot implements TimedRobot).
+         * The name will be inferred from the class name.
+         * 
+         * @param _robot Pass in the Robot reference so robot state can be auto-determined
+         */
+        BaseSubsystem(frc::TimedRobot *_robot) :
+            table{nt::NetworkTableInstance::GetDefault().GetTable(GetSubsystem())},
+            robot(_robot)
+        {}
+
         /**
          * @brief Initialize the subsystem
          * 
@@ -167,10 +179,9 @@ class BaseSubsystem : public frc2::Subsystem, public wpi::Sendable, public wpi::
         std::shared_ptr<nt::NetworkTable> table;
 
         frc::TimedRobot *robot;
-        const char* subsystemName;
 
-        valor::Gamepad *operatorGamepad;
-        valor::Gamepad *driverGamepad;
+        valor::Gamepad *operatorGamepad{nullptr};
+        valor::Gamepad *driverGamepad{nullptr};
 
     private:
         

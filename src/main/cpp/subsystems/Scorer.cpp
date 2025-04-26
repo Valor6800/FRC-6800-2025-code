@@ -81,9 +81,6 @@ Scorer::Scorer(frc::TimedRobot *_robot, Drivetrain *_drivetrain, Climber *_climb
     climber(_climber),
     leds(_leds)
 {
-
-    frc2::CommandScheduler::GetInstance().RegisterSubsystem(this);
-
     pathplanner::NamedCommands::registerCommand("OUTTAKE, INTAKE, HOLD", std::move(
         frc2::SequentialCommandGroup(
             frc2::InstantCommand(
@@ -679,6 +676,12 @@ void Scorer::init()
     } else{
         state.hasZeroed = true;
     }
+    AddChild("Elevator Motor", elevatorMotor);
+    AddChild("Scorer Motor", scorerMotor);
+    AddChild("Scorer Pivot Motor", scorerPivotMotor);
+    AddChild("Funnel Motor", funnelMotor);
+    wpi::SendableRegistry::Remove(elevatorMotor->getCANCoder());
+    wpi::SendableRegistry::Remove(scorerPivotMotor->getCANCoder());
 }
 
 void Scorer::assessInputs()

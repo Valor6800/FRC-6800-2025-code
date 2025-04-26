@@ -62,23 +62,25 @@ Swerve<AzimuthMotor, DriveMotor>::Swerve(frc::TimedRobot *_robot,
     units::meter_t _wheelDiameter
 ) : valor::BaseSubsystem(_robot, _name), lockingToTarget(false), useCarpetGrain(false)
 {
-    frc2::CommandScheduler::GetInstance().RegisterSubsystem(this);
-
-    wpi::SendableRegistry::Add(
-        &rot_controller, "rot_controller"
-    );
+    AddChild("rot_controller", &rot_controller);
 
     std::vector<int> MDX = Constants::getModuleCoordsX();
     std::vector<int> MDY = Constants::getModuleCoordsY();
     wpi::array<frc::Translation2d, MODULE_COUNT> motorLocations = wpi::array<frc::Translation2d, MODULE_COUNT>(wpi::empty_array);
     for (size_t i = 0; i < MODULE_COUNT; i++) {
         motorLocations[i] = frc::Translation2d{_module_radius * MDX[i], _module_radius * MDY[i]};
-        swerveModules.push_back(new valor::SwerveModule<AzimuthMotor, DriveMotor>(
+        auto swerveModule = new valor::SwerveModule<AzimuthMotor, DriveMotor>(
             modules[i].first,
             modules[i].second,
             motorLocations[i],
             _wheelDiameter
-        ));
+        );
+        swerveModules.push_back(swerveModule);
+        std::string modString = "Swerve Module " + std::to_string(i);
+        AddChild(modString, swerveModule);
+        AddChild(modString + " Azimuth Motor", modules[i].first);
+        AddChild(modString + " Drive Motor", modules[i].second);
+        wpi::SendableRegistry::Remove(modules[i].first->getCANCoder());
     }
 
 

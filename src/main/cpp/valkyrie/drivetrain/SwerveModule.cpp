@@ -33,7 +33,6 @@ SwerveModule<AzimuthMotor, DriveMotor>::SwerveModule(AzimuthMotor* _azimuthMotor
     else if (_wheelLocation.X() < 0_m && _wheelLocation.Y() > 0_m) wheelIdx = 3;
     else wheelIdx = 2;
 
-    wpi::SendableRegistry::AddLW(this, "SwerveModule", "Module " + std::to_string(wheelIdx));
     initialMagEncoderValue = getMagEncoderCount();
 }
 

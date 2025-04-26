@@ -81,8 +81,6 @@ public:
         setCurrentLimits(STATOR_CURRENT_LIMIT, SUPPLY_CURRENT_LIMIT, SUPPLY_CURRENT_THRESHOLD, SUPPLY_TIME_THRESHOLD);
         setGearRatios(rotorToSensor, sensorToMech);
         setPIDF(pidf, 0);
-
-        wpi::SendableRegistry::AddLW(this, "PhoenixController", "ID " + std::to_string(getMotor()->GetDeviceID()));
     }
 
     void enableFOC(bool enableFOC) {
