@@ -741,10 +741,11 @@ frc::Twist2d Swerve<AzimuthMotor, DriveMotor>::log(frc::Pose2d transform) {
         -(half_dtheta * std::sin(transform.Rotation().Radians().value())) /
         cos_minus_one;
 
-  frc::Translation2d translation_part = transform.Translation().RotateBy(
-      frc::Rotation2d(halftheta_by_tan_of_halfdtheta,
-                      -half_dtheta)); //*std::sqrt(std::pow(halftheta_by_tan_of_halfdtheta,
-                                      //2) + std::pow(half_dtheta, 2));
+  frc::Translation2d translation_part =
+      transform.Translation().RotateBy(frc::Rotation2d(
+          halftheta_by_tan_of_halfdtheta,
+          -half_dtheta)); //*std::sqrt(std::pow(halftheta_by_tan_of_halfdtheta,
+                          // 2) + std::pow(half_dtheta, 2));
   return frc::Twist2d{translation_part.X(), translation_part.Y(),
                       units::radian_t{dtheta}};
 }

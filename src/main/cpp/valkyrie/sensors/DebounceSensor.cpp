@@ -1,5 +1,5 @@
 /*                                 Valor 6800                                 */
-/* Copyright (c) 2024 Company Name. All Rights Reserved.                      */
+/* Copyright (c) 2024-2025 Company Name. All Rights Reserved.                 */
 
 #include "valkyrie/sensors/DebounceSensor.h"
 
