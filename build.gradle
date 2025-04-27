@@ -137,3 +137,18 @@ doxygen  {
     
 }
 
+def wpiformatArgs = ['wpiformat', '-f', 'cpp', 'include', '-compile-commands', "${projectDir.getAbsolutePath()}/build/linuxathenarelease"]
+task lint(type: Exec, dependsOn: "generateCompileCommands") {
+    group = "Formatting"
+    description = "Lints the src/main/cpp and src/main/include directories without modifying files"
+    ignoreExitValue !project.hasProperty('ci')
+    workingDir "src/main"
+    commandLine *wpiformatArgs, '-no-format'
+}
+task format(type: Exec, dependsOn: "generateCompileCommands") {
+    group = "Formatting"
+    description = "Formats the src/main/cpp and src/main/include directories, with modifications"
+    ignoreExitValue !project.hasProperty('ci')
+    workingDir "src/main"
+    commandLine wpiformatArgs
+}
