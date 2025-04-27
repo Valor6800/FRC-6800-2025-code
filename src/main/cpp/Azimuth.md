@@ -54,7 +54,7 @@ $$ \alpha = 8876.669 {rad \over sec^2} $$
 
 Now that we have the angular acceleration in the mechanism space, we need to obtain the angular acceleration in motor space with the correct units. The unit conversion requires us to get from RPS^2 to RPM^2.
 
-$$ {8876.669 rad \over sec^2} {| \over |} {1 rot_{mech} \over 2 \pi rad} {| \over |} {13.37 rot_{motor} \over 1 rot_{mech}} {| \over |} {3600 sec^2 \over 1 min^2}$$ 
+$$ {8876.669 rad \over sec^2} {| \over |} {1 rot_{mech} \over 2 \pi rad} {| \over |} {13.37 rot_{motor} \over 1 rot_{mech}} {| \over |} {3600 sec^2 \over 1 min^2}$$
 
 We then end up with an angular acceleration in the motor space of:
 
@@ -62,7 +62,7 @@ $$ 67,999,246.69{rotations \over min^2} $$
 
 ## Azimuth Wheel Motion Profile
 
-Now that we know the max angular acceleration, we can identify the motion profile that the wheel should follow when attempting to drive to a position. 
+Now that we know the max angular acceleration, we can identify the motion profile that the wheel should follow when attempting to drive to a position.
 
 ### Distance to max velocity
 
@@ -116,17 +116,17 @@ $$ V_f = \sqrt { 2 a \Delta x } $$
 
 Once we have a final velocity, we can divide that by the max velocity of the motor which gives us the duty cycle the motor will be running at at final velocity
 
-$$ {Duty}_{cycle} = {\sqrt { 2 a \Delta x } \over 5676 } $$ 
+$$ {Duty}_{cycle} = {\sqrt { 2 a \Delta x } \over 5676 } $$
 
 If we run the motor at 12V, then we can determine the voltage at final velocity (or the peak of the profile)
 
-$$ Volt = {12 \sqrt { 2 a \Delta x } \over 5676 } $$ 
+$$ Volt = {12 \sqrt { 2 a \Delta x } \over 5676 } $$
 
 If we have a delta x of 3.3425 rotations of the motor, the peak of the triangle (aka. halfway to the target) would be our desired max speed before we have decelerate again.
 
 Plugging that in, we get a final equation of:
 
-$$ Volt = {12 \sqrt { 1.671 a} \over 5676 } $$ 
+$$ Volt = {12 \sqrt { 1.671 a} \over 5676 } $$
 
 Some possible a values and the peak voltage for reference:
 

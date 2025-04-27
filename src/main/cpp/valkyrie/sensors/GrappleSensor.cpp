@@ -1,22 +1,27 @@
+/*                                 Valor 6800                                 */
+/* Copyright (c) 2025 Company Name. All Rights Reserved.                      */
+
 #include "valkyrie/sensors/GrappleSensor.h"
 
 using namespace valor;
 
-GrappleSensor::GrappleSensor(frc::TimedRobot *_robot, const char *_name, int _canId) :
-    LaserProximitySensor(_robot, _name),
-    device(new grpl::LaserCan(_canId))
-{
-    device->set_ranging_mode(grpl::LaserCanRangingMode::Short);
-    device->set_timing_budget(grpl::LaserCanTimingBudget::TB50ms);
-    device->set_roi(grpl::LaserCanROI{ 8, 8, 16, 16 });
-    setMaxDistance(units::millimeter_t{300});
-    setThresholdDistance(units::inch_t{5});
+GrappleSensor::GrappleSensor(frc::TimedRobot *_robot, const char *_name,
+                             int _canId)
+    : LaserProximitySensor(_robot, _name), device(new grpl::LaserCan(_canId)) {
+  device->set_ranging_mode(grpl::LaserCanRangingMode::Short);
+  device->set_timing_budget(grpl::LaserCanTimingBudget::TB50ms);
+  device->set_roi(grpl::LaserCanROI{8, 8, 16, 16});
+  setMaxDistance(units::millimeter_t{300});
+  setThresholdDistance(units::inch_t{5});
 
-    LaserProximitySensor<units::millimeter_t>::setGetter([this](){
-        std::optional<grpl::LaserCanMeasurement> measurement = device->get_measurement();
-        if (measurement.has_value() && measurement.value().status == grpl::LASERCAN_STATUS_VALID_MEASUREMENT) {
-            return units::length::millimeter_t{static_cast<double>(measurement.value().distance_mm)};
-        }
-        return units::length::millimeter_t{-1};
-    });
+  LaserProximitySensor<units::millimeter_t>::setGetter([this]() {
+    std::optional<grpl::LaserCanMeasurement> measurement =
+        device->get_measurement();
+    if (measurement.has_value() &&
+        measurement.value().status == grpl::LASERCAN_STATUS_VALID_MEASUREMENT) {
+      return units::length::millimeter_t{
+          static_cast<double>(measurement.value().distance_mm)};
+    }
+    return units::length::millimeter_t{-1};
+  });
 }

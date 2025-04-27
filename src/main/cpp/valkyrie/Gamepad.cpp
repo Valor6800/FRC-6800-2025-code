@@ -1,3 +1,6 @@
+/*                                 Valor 6800                                 */
+/* Copyright (c) 2025 Company Name. All Rights Reserved.                      */
+
 #include "valkyrie/Gamepad.h"
 
 #include <cmath>
@@ -13,114 +16,70 @@
 
 using namespace valor;
 
-Gamepad::Gamepad(int id) :
-    frc::XboxController(id),
-    deadbandX(DEADBAND_X),
-    deadbandY(DEADBAND_Y)
-{
+Gamepad::Gamepad(int id)
+    : frc::XboxController(id), deadbandX(DEADBAND_X), deadbandY(DEADBAND_Y) {}
+
+void Gamepad::setDeadbandX(double deadband) { deadbandX = deadband; }
+
+void Gamepad::setDeadbandY(double deadband) { deadbandY = deadband; }
+
+double Gamepad::deadband(double input, double deadband, int polynomial) {
+  return std::fabs(input) > deadband
+             ? std::copysign(std::pow(std::abs(input), polynomial), input)
+             : 0;
 }
 
-void Gamepad::setDeadbandX(double deadband)
-{
-    deadbandX = deadband;
+double Gamepad::leftStickX(int polynomial) {
+  return -deadband(GetLeftX(), deadbandX, polynomial);
 }
 
-void Gamepad::setDeadbandY(double deadband)
-{
-    deadbandY = deadband;
+bool Gamepad::leftStickXActive(int polynomial) {
+  return leftStickX(polynomial) != 0;
 }
 
-double Gamepad::deadband(double input, double deadband, int polynomial)
-{
-    return std::fabs(input) > deadband ? copysign(std::pow(std::abs(input), polynomial), input) : 0;
+double Gamepad::leftStickY(int polynomial) {
+  return -deadband(GetLeftY(), deadbandY, polynomial);
 }
 
-double Gamepad::leftStickX(int polynomial)
-{
-    return -deadband(GetLeftX(), deadbandX, polynomial);
+bool Gamepad::leftStickYActive(int polynomial) {
+  return leftStickY(polynomial) != 0;
 }
 
-bool Gamepad::leftStickXActive(int polynomial)
-{
-    return leftStickX(polynomial) != 0;
+double Gamepad::rightStickX(int polynomial) {
+  return -deadband(GetRightX(), deadbandX, polynomial);
 }
 
-double Gamepad::leftStickY(int polynomial)
-{
-    return -deadband(GetLeftY(), deadbandY, polynomial);
+bool Gamepad::rightStickXActive(int polynomial) {
+  return rightStickX(polynomial) != 0;
 }
 
-bool Gamepad::leftStickYActive(int polynomial)
-{
-    return leftStickY(polynomial) != 0;
+double Gamepad::rightStickY(int polynomial) {
+  return -deadband(GetRightY(), deadbandY, polynomial);
 }
 
-double Gamepad::rightStickX(int polynomial)
-{
-    return -deadband(GetRightX(), deadbandX, polynomial);
+bool Gamepad::rightStickYActive(int polynomial) {
+  return rightStickY(polynomial) != 0;
 }
 
-bool Gamepad::rightStickXActive(int polynomial)
-{
-    return rightStickX(polynomial) != 0;
+double Gamepad::leftTrigger() {
+  return GetLeftTriggerAxis() > DEADBAND_TRIGGER ? GetLeftTriggerAxis() : 0;
 }
 
-double Gamepad::rightStickY(int polynomial)
-{
-    return -deadband(GetRightY(), deadbandY, polynomial);
+bool Gamepad::leftTriggerActive() { return leftTrigger() != 0; }
+
+double Gamepad::rightTrigger() {
+  return GetRightTriggerAxis() > DEADBAND_TRIGGER ? GetRightTriggerAxis() : 0;
 }
 
-bool Gamepad::rightStickYActive(int polynomial)
-{
-    return rightStickY(polynomial) != 0;
-}
+bool Gamepad::rightTriggerActive() { return rightTrigger() != 0; }
 
-double Gamepad::leftTrigger()
-{
-    return GetLeftTriggerAxis() > DEADBAND_TRIGGER ? GetLeftTriggerAxis() : 0;
-}
+bool Gamepad::DPadUp() { return GetPOV() == DPAD_UP; }
+bool Gamepad::DPadDown() { return GetPOV() == DPAD_DOWN; }
+bool Gamepad::DPadLeft() { return GetPOV() == DPAD_LEFT; }
+bool Gamepad::DPadRight() { return GetPOV() == DPAD_RIGHT; }
+bool Gamepad::getLeftStickButton() { return GetLeftStickButton(); }
+bool Gamepad::getRightStickButton() { return GetRightStickButton(); }
 
-bool Gamepad::leftTriggerActive()
-{
-    return leftTrigger() != 0;
-}
-
-double Gamepad::rightTrigger()
-{
-    return GetRightTriggerAxis() > DEADBAND_TRIGGER ? GetRightTriggerAxis() : 0;
-}
-
-bool Gamepad::rightTriggerActive()
-{
-    return rightTrigger() != 0;
-}
-
-bool Gamepad::DPadUp()
-{
-    return GetPOV() == DPAD_UP;
-}
-bool Gamepad::DPadDown()
-{
-    return GetPOV() == DPAD_DOWN;
-}
-bool Gamepad::DPadLeft()
-{
-    return GetPOV() == DPAD_LEFT;
-}
-bool Gamepad::DPadRight()
-{
-    return GetPOV() == DPAD_RIGHT;
-}
-bool Gamepad::getLeftStickButton()
-{
-    return GetLeftStickButton();
-}
-bool Gamepad::getRightStickButton()
-{
-    return GetRightStickButton();
-}
-
-void Gamepad::setRumble(bool turnOn, double intensity)
-{
-    SetRumble(RumbleType::kBothRumble, turnOn ? intensity: 0.0);
+void Gamepad::setRumble(bool turnOn, double intensity) {
+  SetRumble(RumbleType::kBothRumble, turnOn ? intensity : 0.0);
 }
