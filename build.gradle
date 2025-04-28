@@ -137,7 +137,7 @@ doxygen  {
     
 }
 
-def wpiformatArgs = ['wpiformat', '-f', 'cpp', 'include', '-compile-commands', "${projectDir.getAbsolutePath()}/build/linuxathenarelease"]
+def wpiformatArgs = ['wpiformat', '-f', 'cpp', 'include', '-compile-commands', "${projectDir.getAbsolutePath()}/build/TargetedCompileCommands/linuxathenarelease", '-tidy-all', '-list-changed-files', '-vv']
 task lint(type: Exec, dependsOn: "generateCompileCommands") {
     group = "Formatting"
     description = "Lints the src/main/cpp and src/main/include directories without modifying files"

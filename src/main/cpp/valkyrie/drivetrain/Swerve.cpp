@@ -1,30 +1,35 @@
 /*                                 Valor 6800                                 */
 /* Copyright (c) 2025 Company Name. All Rights Reserved.                      */
 
-#include "valkyrie/drivetrain/Swerve.h"
-#include "Eigen/Core"
-#include "frc/Timer.h"
-#include "frc/kinematics/ChassisSpeeds.h"
-#include "gcem_incl/inv_sqrt.hpp"
-#include "gcem_incl/max.hpp"
-#include "networktables/NetworkTableInstance.h"
-#include "units/angle.h"
-#include "units/angular_velocity.h"
-#include "units/length.h"
-#include "units/math.h"
-#include "units/velocity.h"
-#include "valkyrie/controllers/PIDF.h"
-#include "valkyrie/controllers/PhoenixController.h"
-#include "wpi/sendable/SendableRegistry.h"
+#include <algorithm>
 #include <cmath>
-#include <iostream>
-
 #include <cstdio>
 #include <filesystem>
+#include <iostream>
+#include <limits>
+#include <memory>
+#include <utility>
+#include <vector>
+
+#include <Eigen/Core>
 #include <frc/DriverStation.h>
+#include <frc/Timer.h>
 #include <frc/estimator/SwerveDrivePoseEstimator.h>
 #include <frc/geometry/Translation2d.h>
-#include <memory>
+#include <frc/kinematics/ChassisSpeeds.h>
+#include <gcem_incl/inv_sqrt.hpp>
+#include <gcem_incl/max.hpp>
+#include <networktables/NetworkTableInstance.h>
+#include <units/angle.h>
+#include <units/angular_velocity.h>
+#include <units/length.h>
+#include <units/math.h>
+#include <units/velocity.h>
+
+#include "valkyrie/controllers/PIDF.h"
+#include "valkyrie/controllers/PhoenixController.h"
+#include "valkyrie/drivetrain/Swerve.h"
+#include "wpi/sendable/SendableRegistry.h"
 
 #define MODULE_DIFF_XS                                                         \
   { 1, 1, -1, -1 }
@@ -374,7 +379,6 @@ units::degree_t Swerve<AzimuthMotor, DriveMotor>::getRotControllerError() {
 
 template <class AzimuthMotor, class DriveMotor>
 void Swerve<AzimuthMotor, DriveMotor>::transformControllerSpeeds() {
-
   frc::ChassisSpeeds fieldSpaceSpeeds =
       frc::ChassisSpeeds::FromRobotRelativeSpeeds(
           getRobotRelativeSpeeds(), getCalculatedPose().Rotation());
@@ -722,7 +726,7 @@ frc::ChassisSpeeds
 Swerve<AzimuthMotor, DriveMotor>::discretize(frc::ChassisSpeeds speeds) {
   frc::Pose2d desiredPose{speeds.vx * LOOP_TIME, speeds.vy * LOOP_TIME,
                           frc::Rotation2d(speeds.omega * LOOP_TIME * 4)};
-  frc::Twist2d twist = std::log(desiredPose);
+  frc::Twist2d twist = Swerve<AzimuthMotor, DriveMotor>::log(desiredPose);
   frc::ChassisSpeeds finalSpeeds{(twist.dx / LOOP_TIME), (twist.dy / LOOP_TIME),
                                  (speeds.omega)};
   return finalSpeeds;

@@ -1,19 +1,19 @@
 /*                                 Valor 6800                                 */
 /* Copyright (c) 2025 Company Name. All Rights Reserved.                      */
 
-#include "valkyrie/drivetrain/SwerveModule.h"
-
-#include <frc/RobotController.h>
-
 #include <cmath>
 #include <cstdio>
 #include <cstdlib>
 #include <fstream>
 #include <iostream>
 #include <string>
+#include <vector>
+
+#include <frc/RobotController.h>
 
 #include "Constants.h"
 #include "valkyrie/controllers/PhoenixController.h"
+#include "valkyrie/drivetrain/SwerveModule.h"
 
 const units::meters_per_second_t DRIVE_DEADBAND(0.05);
 #define MAG_ENCODER_TICKS_PER_REV 4096.0f

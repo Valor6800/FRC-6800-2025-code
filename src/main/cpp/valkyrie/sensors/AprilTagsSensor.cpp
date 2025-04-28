@@ -1,10 +1,6 @@
 /*                                 Valor 6800                                 */
 /* Copyright (c) 2025 Company Name. All Rights Reserved.                      */
 
-#include "valkyrie/sensors/AprilTagsSensor.h"
-
-#include <frc/Timer.h>
-
 #include <array>
 #include <chrono>
 #include <cmath>
@@ -12,11 +8,14 @@
 #include <span>
 #include <vector>
 
-#include "frc/geometry/Rotation3d.h"
-#include "units/angle.h"
-#include "units/length.h"
-#include "units/time.h"
-#include "units/velocity.h"
+#include <frc/Timer.h>
+#include <frc/geometry/Rotation3d.h>
+#include <units/angle.h>
+#include <units/length.h>
+#include <units/time.h>
+#include <units/velocity.h>
+
+#include "valkyrie/sensors/AprilTagsSensor.h"
 
 #define OUTLIER_EDGE 4.0f // meters
 #define DP 0.1f           // 0.1
@@ -138,7 +137,6 @@ int AprilTagsSensor::getTagID() {
 
 frc::Pose3d
 AprilTagsSensor::getMegaTagPose2(AprilTagsSensor::Orientation orient) {
-
   if (!hasTarget())
     return frc::Pose3d();
 

@@ -1,6 +1,8 @@
 /*                                 Valor 6800                                 */
 /* Copyright (c) 2025 Company Name. All Rights Reserved.                      */
 
+#include <string>
+
 #include "valkyrie/controllers/NeoController.h"
 
 #define NEO_PIDF_KP 10.0f

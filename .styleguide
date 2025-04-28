@@ -21,3 +21,7 @@ includeOtherLibs {
 includeProject {
   ^valkyrie/
 }
+
+generatedFileExclude {
+  include/LimelightHelpers\.h$
+}

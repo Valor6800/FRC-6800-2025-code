@@ -1,9 +1,9 @@
 /*                                 Valor 6800                                 */
 /* Copyright (c) 2025 Company Name. All Rights Reserved.                      */
 
-#include "valkyrie/Gamepad.h"
-
 #include <cmath>
+
+#include "valkyrie/Gamepad.h"
 
 #define DPAD_UP 0
 #define DPAD_DOWN 180

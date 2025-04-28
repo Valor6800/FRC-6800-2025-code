@@ -1,8 +1,12 @@
+/*                                 Valor 6800                                 */
+/* Copyright (c) 2025 Company Name. All Rights Reserved.                      */
+
 #pragma once
 
-#include "valkyrie/sensors/LidarSensor.h"
-#include "valkyrie/sensors/DebounceSensor.h"
 #include <units/length.h>
+
+#include "valkyrie/sensors/DebounceSensor.h"
+#include "valkyrie/sensors/LidarSensor.h"
 
 namespace valor {
 
@@ -12,44 +16,44 @@ namespace valor {
 template <class T>
 class LaserProximitySensor : public LidarSensor<T>, public DebounceSensor {
 public:
-    /**
-     * @brief Constructor for LaserProximitySensor.
-     * 
-     * @param _robot Pointer to the robot instance.
-     * @param name Name of the sensor.
-     */
-    LaserProximitySensor(frc::TimedRobot* _robot, const char* name);
+  /**
+   * @brief Constructor for LaserProximitySensor.
+   *
+   * @param _robot Pointer to the robot instance.
+   * @param name Name of the sensor.
+   */
+  LaserProximitySensor(frc::TimedRobot *_robot, const char *name);
 
-    /**
-     * @brief Set the threshold distance for debounce triggering.
-     * 
-     * @param threshold Distance in millimeters.
-     */
-    void setThresholdDistance(T threshold);
+  /**
+   * @brief Set the threshold distance for debounce triggering.
+   *
+   * @param threshold Distance in millimeters.
+   */
+  void setThresholdDistance(T threshold);
 
-    /**
-     * @brief Reset both the lidar and debounce states.
-     */
-    void reset() override;
+  /**
+   * @brief Reset both the lidar and debounce states.
+   */
+  void reset() override;
 
-    /**
-     * @brief Set the getter for the lidar sensor.
-     * 
-     * @param getter Lambda function to fetch lidar distance.
-     */
-    void setGetter(std::function<T()> getter) override;
+  /**
+   * @brief Set the getter for the lidar sensor.
+   *
+   * @param getter Lambda function to fetch lidar distance.
+   */
+  void setGetter(std::function<T()> getter) override;
 
-    /**
-     * @brief Retrieve the latest lidar distance measurement.
-     * 
-     * @return Latest distance in millimeters.
-     */
-    T getLidarData();
+  /**
+   * @brief Retrieve the latest lidar distance measurement.
+   *
+   * @return Latest distance in millimeters.
+   */
+  T getLidarData();
 
-    bool isTriggered();
+  bool isTriggered();
 
 private:
-    T thresholdDistance;
+  T thresholdDistance;
 };
 
-}
+} // namespace valor

@@ -3,17 +3,15 @@
 
 #include "Robot.h"
 
-#include <frc/RobotController.h>
-#include <frc/smartdashboard/SmartDashboard.h>
-#include <frc2/command/CommandScheduler.h>
-#include <pathplanner/lib/auto/NamedCommands.h>
-
 #include <ctime>
 
 #include <Constants.h>
-
-#include "frc/AnalogTriggerType.h"
-#include "frc2/command/Commands.h"
+#include <frc/AnalogTriggerType.h>
+#include <frc/RobotController.h>
+#include <frc/smartdashboard/SmartDashboard.h>
+#include <frc2/command/CommandScheduler.h>
+#include <frc2/command/Commands.h>
+#include <pathplanner/lib/auto/NamedCommands.h>
 
 #define AUTO_DOUBTX 3.0f;
 #define AUTO_DOUBTY 3.0f;

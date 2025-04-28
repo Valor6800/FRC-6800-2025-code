@@ -1,18 +1,18 @@
 /*                                 Valor 6800                                 */
 /* Copyright (c) 2025 Company Name. All Rights Reserved.                      */
 
-#include "valkyrie/sensors/VisionSensor.h"
-
 #include <array>
 #include <cstddef>
 #include <span>
 #include <vector>
 
-#include "networktables/NetworkTableInstance.h"
-#include "units/angle.h"
-#include "units/temperature.h"
-#include "units/time.h"
+#include <networktables/NetworkTableInstance.h>
+#include <units/angle.h>
+#include <units/temperature.h>
+#include <units/time.h>
+
 #include "valkyrie/sensors/BaseSensor.h"
+#include "valkyrie/sensors/VisionSensor.h"
 #include "wpi/array.h"
 #include "wpi/sendable/SendableBuilder.h"
 

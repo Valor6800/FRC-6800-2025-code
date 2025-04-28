@@ -1,6 +1,8 @@
 /*                                 Valor 6800                                 */
 /* Copyright (c) 2025 Company Name. All Rights Reserved.                      */
 
+#include <string>
+
 #include "valkyrie/sensors/CANRangeSensor.h"
 
 using namespace valor;

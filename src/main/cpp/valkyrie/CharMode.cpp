@@ -1,13 +1,13 @@
 /*                                 Valor 6800                                 */
 /* Copyright (c) 2025 Company Name. All Rights Reserved.                      */
 
-#include "valkyrie/CharMode.h"
+#include <iostream>
+#include <string>
 
 #include <frc/smartdashboard/SendableChooser.h>
 #include <frc/smartdashboard/SmartDashboard.h>
 
-#include <iostream>
-#include <string>
+#include "valkyrie/CharMode.h"
 
 using namespace valor;
 

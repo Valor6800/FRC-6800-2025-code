@@ -3,37 +3,38 @@
 
 #include "Drivetrain.h"
 
-#include <frc/Alert.h>
-#include <frc/DriverStation.h>
-#include <frc2/command/InstantCommand.h>
-#include <pathplanner/lib/auto/AutoBuilder.h>
-#include <pathplanner/lib/auto/NamedCommands.h>
-#include <pathplanner/lib/controllers/PPHolonomicDriveController.h>
-#include <units/math.h>
-
 #include <bitset>
 #include <cmath>
 #include <cstddef>
 #include <iterator>
 #include <limits>
+#include <memory>
 #include <string>
+#include <unordered_map>
 #include <utility>
+#include <vector>
 
 #include <ctre/phoenix6/TalonFX.hpp>
+#include <frc/Alert.h>
+#include <frc/DriverStation.h>
+#include <frc/geometry/Pose2d.h>
+#include <frc/geometry/Pose3d.h>
+#include <frc/geometry/Rotation3d.h>
+#include <frc2/command/FunctionalCommand.h>
+#include <frc2/command/InstantCommand.h>
+#include <pathplanner/lib/auto/AutoBuilder.h>
+#include <pathplanner/lib/auto/NamedCommands.h>
+#include <pathplanner/lib/controllers/PPHolonomicDriveController.h>
+#include <units/acceleration.h>
+#include <units/angle.h>
+#include <units/angular_velocity.h>
+#include <units/base.h>
+#include <units/length.h>
+#include <units/math.h>
+#include <units/velocity.h>
 
 #include "AprilTagPositions.h"
 #include "Constants.h"
-#include "frc/geometry/Pose2d.h"
-#include "frc/geometry/Pose3d.h"
-#include "frc/geometry/Rotation3d.h"
-#include "frc2/command/FunctionalCommand.h"
-#include "units/acceleration.h"
-#include "units/angle.h"
-#include "units/angular_velocity.h"
-#include "units/base.h"
-#include "units/length.h"
-#include "units/math.h"
-#include "units/velocity.h"
 #include "valkyrie/controllers/PIDF.h"
 #include "valkyrie/sensors/AprilTagsSensor.h"
 #include "valkyrie/sensors/VisionSensor.h"
@@ -49,7 +50,7 @@ using namespace pathplanner;
 #define KP_LIMELIGHT 0.7f
 
 #define KPX 4.5f // 4
-#define KIX 0.0f
+#define KIX 0.0fw
 #define KDX 0.1f
 
 #define KPT 5.0f
@@ -657,9 +658,7 @@ frc2::FunctionalCommand *Drivetrain::getResetOdom() {
           }
         }
       },
-      [&](bool) { // onEnd
-
-      },
+      [&](bool) {},
       [&] { // isFinished
         return (frc::Timer::GetFPGATimestamp() - state.startTimestamp) > 1.0_s;
       },
@@ -856,7 +855,6 @@ bool Drivetrain::isSpeedStopped() {
 #define SCORER_OFFSET 2_in
 
 void Drivetrain::choosePoleDirection(Direction dir, Constants::AprilTag tag) {
-
   std::unordered_map<Constants::AprilTag, Constants::DirectionalOffSet>
       poleOffset = frc::DriverStation::GetAlliance() == frc::DriverStation::kRed
                        ? Constants::redPoleOffsets

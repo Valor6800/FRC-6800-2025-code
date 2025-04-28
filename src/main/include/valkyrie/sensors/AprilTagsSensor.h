@@ -1,64 +1,65 @@
+/*                                 Valor 6800                                 */
+/* Copyright (c) 2025 Company Name. All Rights Reserved.                      */
+
 #pragma once
 
-#include "frc/estimator/PoseEstimator.h"
-#include "frc/estimator/SwerveDrivePoseEstimator.h"
-#include "frc/geometry/Pose3d.h"
-#include "frc/geometry/Rotation3d.h"
-#include "units/angle.h"
-#include "units/angular_velocity.h"
-#include "units/length.h"
-#include "units/velocity.h"
-#include "valkyrie/sensors/VisionSensor.h"
-#include "networktables/NetworkTableInstance.h"
-#include "networktables/NetworkTableEntry.h"
-#include "networktables/NetworkTableInstance.h"
+#include <frc/estimator/PoseEstimator.h>
+#include <frc/estimator/SwerveDrivePoseEstimator.h>
+#include <frc/geometry/Pose3d.h>
+#include <frc/geometry/Rotation3d.h>
+#include <networktables/NetworkTableEntry.h>
+#include <networktables/NetworkTableInstance.h>
+#include <units/angle.h>
+#include <units/angular_velocity.h>
+#include <units/length.h>
+#include <units/velocity.h>
+
 #include "Constants.h"
+#include "valkyrie/sensors/VisionSensor.h"
 
-namespace valor
-{
-    class AprilTagsSensor : public VisionSensor {
-        public:
-            /**
-             * @brief Constructor for AprilTagsSensor
-            *
-            * @param _robot Pass in the Robot reference so the calculate can be auto-scheduled
-            * @param _name The name of the specific sensor for logging and reporting
-            */
-            AprilTagsSensor(frc::TimedRobot* robot, const char *name, frc::Pose3d _cameraPose);
+namespace valor {
+class AprilTagsSensor : public VisionSensor {
+public:
+  /**
+   * @brief Constructor for AprilTagsSensor
+   *
+   * @param _robot Pass in the Robot reference so the calculate can be
+   * auto-scheduled
+   * @param _name The name of the specific sensor for logging and reporting
+   */
+  AprilTagsSensor(frc::TimedRobot *robot, const char *name,
+                  frc::Pose3d _cameraPose);
 
-            int getTagID();
+  int getTagID();
 
-            void InitSendable(wpi::SendableBuilder& builder) override;
+  void InitSendable(wpi::SendableBuilder &builder) override;
 
-            units::meter_t normalVisionOutlier = 2.2_m;
-            void applyVisionMeasurement(
-                frc::SwerveDrivePoseEstimator<4> *estimator,
-                units::velocity::meters_per_second_t speed,
-                double doubtX = 1, double doubtY = 1, double doubtRot = 1
-            );
+  units::meter_t normalVisionOutlier = 2.2_m;
+  void applyVisionMeasurement(frc::SwerveDrivePoseEstimator<4> *estimator,
+                              units::velocity::meters_per_second_t speed,
+                              double doubtX = 1, double doubtY = 1,
+                              double doubtRot = 1);
 
-            void applyVisionMeasurement(
-                frc::SwerveDrivePoseEstimator<4> *estimator,
-                units::velocity::meters_per_second_t speed,
-                units::angular_velocity::radians_per_second_t angular_velocity,
-                double doubtX = 1, double doubtY = 1, double doubtRot = 1
-            );
-            frc::Pose3d getPoseFromAprilTag();
+  void applyVisionMeasurement(
+      frc::SwerveDrivePoseEstimator<4> *estimator,
+      units::velocity::meters_per_second_t speed,
+      units::angular_velocity::radians_per_second_t angular_velocity,
+      double doubtX = 1, double doubtY = 1, double doubtRot = 1);
+  frc::Pose3d getPoseFromAprilTag();
 
-            struct Orientation {
-                units::degree_t yaw, pitch, roll;
-                units::degrees_per_second_t yawVel, pitchVel, rollVel;
-            };
+  struct Orientation {
+    units::degree_t yaw, pitch, roll;
+    units::degrees_per_second_t yawVel, pitchVel, rollVel;
+  };
 
-            frc::Pose3d getMegaTagPose2(Orientation orient);
-            frc::Pose3d getTargetToBotPose();
-            frc::Pose3d get_botpose_targetspace();
+  frc::Pose3d getMegaTagPose2(Orientation orient);
+  frc::Pose3d getTargetToBotPose();
+  frc::Pose3d get_botpose_targetspace();
 
-        private:
-            frc::Pose3d getGlobalPose() override;
-            frc::Pose3d megaTag2Pose = frc::Pose3d();
-            units::meter_t distance{0_m};
-            double dp, vp;
-            
-    };
+private:
+  frc::Pose3d getGlobalPose() override;
+  frc::Pose3d megaTag2Pose = frc::Pose3d();
+  units::meter_t distance{0_m};
+  double dp, vp;
+};
 } // namespace valor

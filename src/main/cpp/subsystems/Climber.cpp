@@ -3,14 +3,14 @@
 
 #include "subsystems/Climber.h"
 
-#include <frc/DriverStation.h>
-#include <pathplanner/lib/auto/NamedCommands.h>
-
 #include <cmath>
 #include <iostream>
 
+#include <frc/DriverStation.h>
+#include <pathplanner/lib/auto/NamedCommands.h>
+#include <units/voltage.h>
+
 #include "Constants.h"
-#include "units/voltage.h"
 #include "valkyrie/controllers/NeutralMode.h"
 
 #define STABBY_ROTOR_TO_SENSOR 1.6
@@ -156,7 +156,6 @@ void Climber::analyzeDashboard() {
 }
 
 void Climber::assignOutputs() {
-
   if (climbCancoder->GetAbsolutePosition().GetValue() <= LOCK_OUT_POS ||
       state.hasClimbed) {
     climbMotors->setPower(0_V);

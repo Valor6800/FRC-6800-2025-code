@@ -3,21 +3,24 @@
 
 #include "subsystems/Scorer.h"
 
-#include <frc/DriverStation.h>
-#include <pathplanner/lib/auto/NamedCommands.h>
-
 #include <bitset>
 #include <iostream>
+#include <string>
+#include <utility>
+#include <vector>
+
+#include <frc/DriverStation.h>
+#include <pathplanner/lib/auto/NamedCommands.h>
+#include <units/angular_velocity.h>
+#include <units/current.h>
+#include <units/length.h>
+#include <units/math.h>
+#include <units/time.h>
+#include <units/velocity.h>
 
 #include "Constants.h"
 #include "Drivetrain.h"
 #include "subsystems/Climber.h"
-#include "units/angular_velocity.h"
-#include "units/current.h"
-#include "units/length.h"
-#include "units/math.h"
-#include "units/time.h"
-#include "units/velocity.h"
 #include "valkyrie/controllers/NeutralMode.h"
 #include "valkyrie/controllers/PIDF.h"
 
@@ -94,7 +97,6 @@ Scorer::Scorer(frc::TimedRobot *_robot, Drivetrain *_drivetrain,
       positionMap{std::move(getPositionMap())},
       scoringSpeedMap{std::move(getScoringSpeedMap())}, drivetrain(_drivetrain),
       climber(_climber), leds(_leds) {
-
   frc2::CommandScheduler::GetInstance().RegisterSubsystem(this);
 
   pathplanner::NamedCommands::registerCommand(
@@ -224,7 +226,6 @@ Scorer::Scorer(frc::TimedRobot *_robot, Drivetrain *_drivetrain,
                       state.gamePiece = GAME_PIECE::CORAL;
                       state.scopedState = SCOPED_STATE::SCOPED;
                       state.elevState = ELEVATOR_STATE::FOUR;
-
                     },
                     [&] { // on execute
                       drivetrain->state.alignToTarget = true;
@@ -713,7 +714,6 @@ void Scorer::assessInputs() {
 }
 
 void Scorer::analyzeDashboard() {
-
   auto cancoder = elevatorMotor->getCANCoder();
   leds->setLED(LEDConstants::LED_POS_ELEVATOR,
                valor::CANdleSensor::cancoderMagnetHealthGetter(cancoder));
@@ -1000,7 +1000,6 @@ void Scorer::assignOutputs() {
 }
 
 void Scorer::InitSendable(wpi::SendableBuilder &builder) {
-
   builder.SetSmartDashboardType("Subsystem");
   builder.AddDoubleProperty(
       "Desired Position: Elevator (in)",

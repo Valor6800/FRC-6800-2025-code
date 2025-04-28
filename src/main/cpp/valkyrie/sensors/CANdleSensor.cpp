@@ -1,10 +1,10 @@
 /*                                 Valor 6800                                 */
 /* Copyright (c) 2025 Company Name. All Rights Reserved.                      */
 
-#include "valkyrie/sensors/CANdleSensor.h"
-
 #include <cmath>
 #include <string>
+
+#include "valkyrie/sensors/CANdleSensor.h"
 
 using namespace valor;
 

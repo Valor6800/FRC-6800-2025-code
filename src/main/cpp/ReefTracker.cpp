@@ -3,6 +3,10 @@
 
 #include "ReefTracker.h"
 
+#include <iostream>
+#include <string>
+#include <vector>
+
 ReefTracker::ReefTracker() { init(); }
 
 void ReefTracker::init() { resetReef(); }

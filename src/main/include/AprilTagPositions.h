@@ -1,20 +1,21 @@
-#include "Eigen/Core"
-#include "frc/DriverStation.h"
-#include "frc/geometry/Pose2d.h"
-#include "frc/geometry/Pose3d.h"
-#include "frc/geometry/Transform3d.h"
-#include "frc/geometry/Translation3d.h"
-#include "gcem_incl/abs.hpp"
+/*                                 Valor 6800                                 */
+/* Copyright (c) 2025 Company Name. All Rights Reserved.                      */
+
+#pragma once
 #include <algorithm>
 #include <unordered_map>
+#include <utility>
 
-#include "frc/geometry/Translation3d.h"
-#include "gcem_incl/abs.hpp"
-#include <algorithm>
+#include <Eigen/Core>
+#include <frc/DriverStation.h>
+#include <frc/geometry/Pose2d.h>
+#include <frc/geometry/Pose3d.h>
+#include <frc/geometry/Transform3d.h>
+#include <frc/geometry/Translation3d.h>
+#include <gcem_incl/abs.hpp>
 
 // aprilTagPoses is the tag position expressed in center space
 namespace valor {
-
 
 static const std::unordered_map<int, frc::Pose3d> blueReefAprilTagPoses{
     {17, frc::Pose3d(Eigen::Matrix4d{
@@ -42,9 +43,9 @@ static const std::unordered_map<int, frc::Pose3d> blueReefAprilTagPoses{
              {0, 0, 0, 1}})},
 
     {21, frc::Pose3d(Eigen::Matrix4d{{1, 0, 0, -3.452953999999999},
-                                          {0, 1, 0, -0.00009999999999976694},
-                                          {0, 0, 1, 0.308102},
-                                          {0, 0, 0, 1}})},
+                                     {0, 1, 0, -0.00009999999999976694},
+                                     {0, 0, 1, 0.308102},
+                                     {0, 0, 0, 1}})},
 
     {22, frc::Pose3d(Eigen::Matrix4d{
              {0.5000000000000001, 0.8660254037844386, 0, -3.8692599999999997},
@@ -60,9 +61,9 @@ static const std::unordered_map<int, frc::Pose3d> redReefAprilTagPoses{
             {0, 0, 1, 0.308102},
             {0, 0, 0, 1}})},
     {7, frc::Pose3d(Eigen::Matrix4d{{1, 0, 0, 5.116498},
-                                         {0, 1, 0, -0.00009999999999976694},
-                                         {0, 0, 1, 0.308102},
-                                         {0, 0, 0, 1}})},
+                                    {0, 1, 0, -0.00009999999999976694},
+                                    {0, 0, 1, 0.308102},
+                                    {0, 0, 0, 1}})},
     {8, frc::Pose3d(Eigen::Matrix4d{
             {0.5000000000000001, -0.8660254037844386, 0, 4.700446000000001},
             {0.8660254037844386, 0.5000000000000001, 0, 0.7194820000000002},
@@ -145,47 +146,48 @@ static const std::unordered_map<int, frc::Pose3d> aprilTagPoses{
          {1.0000000000000002, -2.220446049250313e-16, 0, -4.0298099999999994},
          {0, 0, 1, 1.30175},
          {0, 0, 0, 1}})},
-
-    
 };
 
 inline bool isReefTag(int tagID) {
-    bool isRedTag = frc::DriverStation::GetAlliance() == frc::DriverStation::kRed && 
-        tagID >= 6 &&
-        tagID <= 11;
-    bool isBlueTag = frc::DriverStation::GetAlliance() == frc::DriverStation::kBlue &&
-        tagID >= 17 &&
-        tagID <= 22;
-    return isRedTag || isBlueTag;
+  bool isRedTag =
+      frc::DriverStation::GetAlliance() == frc::DriverStation::kRed &&
+      tagID >= 6 && tagID <= 11;
+  bool isBlueTag =
+      frc::DriverStation::GetAlliance() == frc::DriverStation::kBlue &&
+      tagID >= 17 && tagID <= 22;
+  return isRedTag || isBlueTag;
 }
 
-inline std::pair<int, frc::Pose3d> getNearestTag(frc::Pose2d source, std::unordered_map<int, frc::Pose3d> tagPoses){
-    return *std::min_element(
-        tagPoses.begin(),
-        tagPoses.end(),
-        [source] (const std::pair<int, frc::Pose3d>& a, const std::pair<int, frc::Pose3d>& b) {
+inline std::pair<int, frc::Pose3d>
+getNearestTag(frc::Pose2d source,
+              std::unordered_map<int, frc::Pose3d> tagPoses) {
+  return *std::min_element(
+      tagPoses.begin(), tagPoses.end(),
+      [source](const std::pair<int, frc::Pose3d> &a,
+               const std::pair<int, frc::Pose3d> &b) {
+        units::meter_t aDistance =
+            source.Translation().Distance(a.second.ToPose2d().Translation());
+        units::meter_t bDistance =
+            source.Translation().Distance(b.second.ToPose2d().Translation());
 
-            units::meter_t aDistance = source.Translation().Distance(a.second.ToPose2d().Translation());
-            units::meter_t bDistance = source.Translation().Distance(b.second.ToPose2d().Translation());
-
-            if (aDistance == bDistance) {
-                return gcem::abs(
-                    (source.Rotation() - a.second.ToPose2d().Rotation()).Radians().value()
-                ) < gcem::abs(
-                    (source.Rotation() - b.second.ToPose2d().Rotation()).Radians().value()
-                );
-            }
-
-            return aDistance < bDistance;
+        if (aDistance == bDistance) {
+          return gcem::abs((source.Rotation() - a.second.ToPose2d().Rotation())
+                               .Radians()
+                               .value()) <
+                 gcem::abs((source.Rotation() - b.second.ToPose2d().Rotation())
+                               .Radians()
+                               .value());
         }
-    );
+
+        return aDistance < bDistance;
+      });
 }
 
-inline std::pair<int, frc::Pose3d> getNearestWorldTag(frc::Pose2d source){
-    std::unordered_map<int, frc::Pose3d> allTags = aprilTagPoses;
-    allTags.insert(blueReefAprilTagPoses.begin(), blueReefAprilTagPoses.end());
-    allTags.insert(redReefAprilTagPoses.begin(), redReefAprilTagPoses.end());
+inline std::pair<int, frc::Pose3d> getNearestWorldTag(frc::Pose2d source) {
+  std::unordered_map<int, frc::Pose3d> allTags = aprilTagPoses;
+  allTags.insert(blueReefAprilTagPoses.begin(), blueReefAprilTagPoses.end());
+  allTags.insert(redReefAprilTagPoses.begin(), redReefAprilTagPoses.end());
 
-    return getNearestTag(source, allTags);
+  return getNearestTag(source, allTags);
 }
-}
+} // namespace valor

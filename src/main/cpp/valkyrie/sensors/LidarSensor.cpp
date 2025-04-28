@@ -1,9 +1,9 @@
 /*                                 Valor 6800                                 */
 /* Copyright (c) 2025 Company Name. All Rights Reserved.                      */
 
-#include "valkyrie/sensors/LidarSensor.h"
-
 #include <iostream>
+
+#include "valkyrie/sensors/LidarSensor.h"
 
 using namespace valor;
 

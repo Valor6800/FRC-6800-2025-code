@@ -1,122 +1,123 @@
-# pragma once 
-#include "Drivetrain.h"
-#include "subsystems/Climber.h"
-#include "valkyrie/BaseSubsystem.h"
-#include "valkyrie/controllers/PhoenixController.h"
-#include "Constants.h"
+/*                                 Valor 6800                                 */
+/* Copyright (c) 2025 Company Name. All Rights Reserved.                      */
+
+#pragma once
+#include <unordered_map>
 #include <vector>
-#include "valkyrie/sensors/GrappleSensor.h"
-#include "valkyrie/sensors/CANRangeSensor.h"
-#include "valkyrie/sensors/CurrentSensor.h"
-#include "valkyrie/controllers/PIDF.h"
+
+#include <ctre/phoenix6/core/CoreCANdi.hpp>
+#include <frc/Alert.h>
+#include <frc/DigitalInput.h>
+#include <frc/geometry/Pose2d.h>
+#include <frc/geometry/Rotation2d.h>
 #include <frc/smartdashboard/SendableChooser.h>
 #include <frc/smartdashboard/SmartDashboard.h>
 #include <frc/trajectory/Trajectory.h>
-#include <frc/geometry/Pose2d.h>
-#include <frc/geometry/Rotation2d.h>
 #include <frc/trajectory/TrajectoryGenerator.h>
-#include <frc/DigitalInput.h>
-#include "valkyrie/sensors/DebounceSensor.h"
 #include <frc2/command/FunctionalCommand.h>
-#include <unordered_map>
-#include "valkyrie/Gamepad.h"
-#include <ctre/phoenix6/core/CoreCANdi.hpp>
-#include "valkyrie/sensors/CANdleSensor.h"
-#include <frc/Alert.h>
 #include <networktables/StructTopic.h>
-#include <frc2/command/FunctionalCommand.h>
 
-class Scorer : public valor::BaseSubsystem
-{
+#include "Constants.h"
+#include "Drivetrain.h"
+#include "subsystems/Climber.h"
+#include "valkyrie/BaseSubsystem.h"
+#include "valkyrie/Gamepad.h"
+#include "valkyrie/controllers/PIDF.h"
+#include "valkyrie/controllers/PhoenixController.h"
+#include "valkyrie/sensors/CANRangeSensor.h"
+#include "valkyrie/sensors/CANdleSensor.h"
+#include "valkyrie/sensors/CurrentSensor.h"
+#include "valkyrie/sensors/DebounceSensor.h"
+#include "valkyrie/sensors/GrappleSensor.h"
+
+class Scorer : public valor::BaseSubsystem {
 public:
+  Scorer(frc::TimedRobot *robot, Drivetrain *drivetrain, Climber *climber,
+         valor::CANdleSensor *);
 
-    Scorer(frc::TimedRobot *robot, Drivetrain *drivetrain, Climber *climber, valor::CANdleSensor*);
-    
-    void resetState();
-     
-    void init();
-    void assessInputs();
-    void analyzeDashboard();
-    void assignOutputs();
-    void InitSendable(wpi::SendableBuilder& builder);
+  void resetState();
 
-    frc2::CommandPtr scorerPitSequence();
+  void init();
+  void assessInputs();
+  void analyzeDashboard();
+  void assignOutputs();
+  void InitSendable(wpi::SendableBuilder &builder);
 
-    enum SCORE_STATE
-    {
-        HOLD,
-        INTAKING,
-        SCORING
-    };
+  frc2::CommandPtr scorerPitSequence();
 
-    enum SCOPED_STATE
-    {
-        UNSCOPED,
-        MANUAL_SCOPE,
-        SCOPED,
-    };
-    
-    void setScopedState(SCOPED_STATE);
+  enum SCORE_STATE { HOLD, INTAKING, SCORING };
 
-    struct x
-    {
-        SCORE_STATE scoringState;
-        Constants::Scorer::ELEVATOR_STATE elevState;
-        Constants::Scorer::GAME_PIECE gamePiece;
-        SCOPED_STATE scopedState;
+  enum SCOPED_STATE {
+    UNSCOPED,
+    MANUAL_SCOPE,
+    SCOPED,
+  };
 
-        units::meter_t targetHeight;
-        units::volt_t manualSpeed;
+  void setScopedState(SCOPED_STATE);
 
-        bool hasAlgae;
-        bool hasCoral;
-        bool intaking;
-        double algaeSpikeCurrent;
+  struct x {
+    SCORE_STATE scoringState;
+    Constants::Scorer::ELEVATOR_STATE elevState;
+    Constants::Scorer::GAME_PIECE gamePiece;
+    SCOPED_STATE scopedState;
 
-        bool hasZeroed;
-        bool autoDunkEnabled;
-        bool shootOverCoral;
-    } state;
+    units::meter_t targetHeight;
+    units::volt_t manualSpeed;
+
+    bool hasAlgae;
+    bool hasCoral;
+    bool intaking;
+    double algaeSpikeCurrent;
+
+    bool hasZeroed;
+    bool autoDunkEnabled;
+    bool shootOverCoral;
+  } state;
 
 private:
-    frc2::CommandPtr scorerPitSequenceStage(Constants::Scorer::GAME_PIECE, Constants::Scorer::ELEVATOR_STATE, int, int);
-    
-    units::meter_t convertToMechSpace(units::turn_t turns);
-    units::turn_t convertToMotorSpace(units::meter_t meters);
+  frc2::CommandPtr scorerPitSequenceStage(Constants::Scorer::GAME_PIECE,
+                                          Constants::Scorer::ELEVATOR_STATE,
+                                          int, int);
 
-    bool hallEffectSensorActive();
-    bool cancoderSensorBad();
-    units::turn_t absSensorCorrect;
+  units::meter_t convertToMechSpace(units::turn_t turns);
+  units::turn_t convertToMotorSpace(units::meter_t meters);
 
-    valor::DebounceSensor hallEffectDebounceSensor;
+  bool hallEffectSensorActive();
+  bool cancoderSensorBad();
+  units::turn_t absSensorCorrect;
 
-    ctre::phoenix6::hardware::core::CoreCANdi candi;
+  valor::DebounceSensor hallEffectDebounceSensor;
 
-    valor::PhoenixController<> *elevatorMotor;
-    valor::PhoenixController<> *scorerMotor;
-    valor::PhoenixController<> *scorerPivotMotor;
-    valor::PhoenixController<> *funnelMotor;
+  ctre::phoenix6::hardware::core::CoreCANdi candi;
 
+  valor::PhoenixController<> *elevatorMotor;
+  valor::PhoenixController<> *scorerMotor;
+  valor::PhoenixController<> *scorerPivotMotor;
+  valor::PhoenixController<> *funnelMotor;
 
-    valor::CANrangeSensor scorerStagingSensor;
-    valor::CurrentSensor currentSensor;
-    valor::CurrentSensor coralCurrentSensor;
+  valor::CANrangeSensor scorerStagingSensor;
+  valor::CurrentSensor currentSensor;
+  valor::CurrentSensor coralCurrentSensor;
 
-    Constants::Scorer::PositionMap positionMap;
-    Constants::Scorer::ScoringSpeedMap scoringSpeedMap;
+  Constants::Scorer::PositionMap positionMap;
+  Constants::Scorer::ScoringSpeedMap scoringSpeedMap;
 
-    Drivetrain *drivetrain;
-    Climber *climber;
-    valor::CANdleSensor *leds;
+  Drivetrain *drivetrain;
+  Climber *climber;
+  valor::CANdleSensor *leds;
 
-    frc::Alert elevatorStage{"Elevator going to stage", frc::Alert::AlertType::kInfo};
-    frc::Alert elevatorPositionSuccess{"Elevator position within tolerance", frc::Alert::AlertType::kInfo};
-    frc::Alert elevatorPositionFail{"Elevator position outside tolerance", frc::Alert::AlertType::kError};
-    frc::Alert elevatorBButtonWait{"Elevator waiting for driver B button...", frc::Alert::AlertType::kInfo};
-    
-    nt::StructPublisher<frc::Pose3d> visualizerStage1;
-    nt::StructPublisher<frc::Pose3d> visualizerStage2;
-    nt::StructPublisher<frc::Pose3d> visualizerStage3;
+  frc::Alert elevatorStage{"Elevator going to stage",
+                           frc::Alert::AlertType::kInfo};
+  frc::Alert elevatorPositionSuccess{"Elevator position within tolerance",
+                                     frc::Alert::AlertType::kInfo};
+  frc::Alert elevatorPositionFail{"Elevator position outside tolerance",
+                                  frc::Alert::AlertType::kError};
+  frc::Alert elevatorBButtonWait{"Elevator waiting for driver B button...",
+                                 frc::Alert::AlertType::kInfo};
 
-    bool elevatorWithinThreshold;
+  nt::StructPublisher<frc::Pose3d> visualizerStage1;
+  nt::StructPublisher<frc::Pose3d> visualizerStage2;
+  nt::StructPublisher<frc::Pose3d> visualizerStage3;
+
+  bool elevatorWithinThreshold;
 };
