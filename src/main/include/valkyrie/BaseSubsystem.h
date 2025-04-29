@@ -5,6 +5,7 @@
 #include <networktables/NetworkTableEntry.h>
 #include <networktables/NetworkTableInstance.h>
 #include <networktables/NetworkTable.h>
+#include <memory>
 
 #include <frc/TimedRobot.h>
 

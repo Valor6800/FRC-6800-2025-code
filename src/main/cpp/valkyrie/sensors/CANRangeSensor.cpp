@@ -1,4 +1,5 @@
 #include "valkyrie/sensors/CANRangeSensor.h"
+#include <string>
 using namespace valor;
 
 CANrangeSensor::CANrangeSensor(frc::TimedRobot *_robot, const char *name, int deviceId, std::string canbus, units::millimeter_t defaultDistance) :

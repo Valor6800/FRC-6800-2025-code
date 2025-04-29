@@ -17,7 +17,6 @@
 class Climber : public valor::BaseSubsystem
 {
 public:
-
     Climber(frc::TimedRobot *robot, valor::CANdleSensor* leds);
 
     ~Climber();
@@ -58,7 +57,6 @@ public:
         double spikeCurrent;
         double cacheSize;
         units::volt_t manualSpeed;
-
     } state;
 
 private:

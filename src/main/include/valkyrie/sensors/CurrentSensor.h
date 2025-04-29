@@ -35,7 +35,7 @@ public:
      */
     CurrentSensor(frc::TimedRobot *_robot, const char *_name);
 
-    void reset();
+    void reset() override;
 
     /**
      * @brief Setup a lambda function to identify when the current has risen above a certain threshold
@@ -63,7 +63,7 @@ public:
 private:
     std::function<void()> spikeCallback;
 
-    void calculate();
+    void calculate() override;
 
     std::deque<double> cache;
 

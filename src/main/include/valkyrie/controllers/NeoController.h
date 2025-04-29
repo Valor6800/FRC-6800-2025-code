@@ -3,8 +3,6 @@
 #include "valkyrie/controllers/BaseController.h"
 #include <string>
 #include <rev/SparkMax.h>
-#include <rev/AbsoluteEncoder.h>
-#include <rev/RelativeEncoder.h>
 #include <rev/config/ClosedLoopConfig.h>
 
 const units::revolutions_per_minute_t FREE_SPD_NEO_550(11000);

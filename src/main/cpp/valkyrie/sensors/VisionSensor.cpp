@@ -18,7 +18,7 @@ VisionSensor::VisionSensor(frc::TimedRobot* robot, const char *name, frc::Pose3d
             limeTable(nt::NetworkTableInstance::GetDefault().GetTable(name))
 {
     wpi::SendableRegistry::AddLW(this, "VisionSensor", sensorName);
-    reset();
+    reset(); // NOLINT
     setCameraPose(cameraPose);
 }
 

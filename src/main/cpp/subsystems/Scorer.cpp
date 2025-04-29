@@ -12,6 +12,9 @@
 #include "valkyrie/controllers/PIDF.h"
 #include <bitset>
 #include <iostream>
+#include <vector>
+#include <string>
+#include <utility>
 
 #include <pathplanner/lib/auto/NamedCommands.h>
 
@@ -75,13 +78,12 @@ Scorer::Scorer(frc::TimedRobot *_robot, Drivetrain *_drivetrain, Climber *_climb
     scorerStagingSensor(_robot, "Scorer Staging Sensor", CANIDs::STAGING_LIDAR_SENSOR, "baseCAN", -1_mm),
     currentSensor(_robot, "Algae Current Sensor"),
     coralCurrentSensor(_robot, "Coral Current Sensor"),
-    positionMap{std::move(getPositionMap())},
-    scoringSpeedMap{std::move(getScoringSpeedMap())},
+    positionMap{getPositionMap()},
+    scoringSpeedMap{getScoringSpeedMap()},
     drivetrain(_drivetrain),
     climber(_climber),
     leds(_leds)
 {
-
     frc2::CommandScheduler::GetInstance().RegisterSubsystem(this);
 
     pathplanner::NamedCommands::registerCommand("OUTTAKE, INTAKE, HOLD", std::move(
@@ -109,7 +111,6 @@ Scorer::Scorer(frc::TimedRobot *_robot, Drivetrain *_drivetrain, Climber *_climb
         frc2::SequentialCommandGroup(
             frc2::InstantCommand(
                 [this]() {
-                    
                     state.scoringState = Scorer::SCORE_STATE::INTAKING;
                 }
             )
@@ -119,7 +120,6 @@ Scorer::Scorer(frc::TimedRobot *_robot, Drivetrain *_drivetrain, Climber *_climb
         frc2::SequentialCommandGroup(
             frc2::InstantCommand(
                 [this]() {
-                    
                     state.scoringState = Scorer::SCORE_STATE::SCORING;
                 }
             )
@@ -281,7 +281,6 @@ Scorer::Scorer(frc::TimedRobot *_robot, Drivetrain *_drivetrain, Climber *_climb
                     state.gamePiece = GAME_PIECE::CORAL;
                     state.scopedState = SCOPED_STATE::SCOPED;
                     state.elevState = ELEVATOR_STATE::FOUR;
-                    
                 },
                 [&]{ // on execute
                     drivetrain->state.alignToTarget = true;
@@ -434,7 +433,7 @@ Scorer::Scorer(frc::TimedRobot *_robot, Drivetrain *_drivetrain, Climber *_climb
     
     table->PutNumber("Viable Elevator Distance (m)", VIABLE_ELEVATOR_DISTANCE.value());
 
-    init();
+    init(); // NOLINT
 
     visualizerStage1 = nt::NetworkTableInstance::GetDefault().GetStructTopic<frc::Pose3d>("LiveWindow/BaseSubsystem/Scorer/Stage1Height").Publish();
     visualizerStage2 = nt::NetworkTableInstance::GetDefault().GetStructTopic<frc::Pose3d>("LiveWindow/BaseSubsystem/Scorer/Stage2Height").Publish();
@@ -476,7 +475,7 @@ frc2::CommandPtr Scorer::scorerPitSequenceStage(GAME_PIECE gamePiece, ELEVATOR_S
                 elevatorPositionFail.Set(false);
                 elevatorPositionSuccess.Set(false);
             },
-            [this] { return false; }
+            [] { return false; }
         }.ToPtr()
     );
 }
@@ -670,7 +669,7 @@ void Scorer::init()
     });
     coralCurrentSensor.setCacheSize(CORAL_CACHE_SIZE);
 
-    resetState();
+    resetState(); // NOLINT
     table->PutBoolean("Auto Dunk Disabled", false);
     
     // Must be at the end of init() because the CANdi has to be setup before reading   
@@ -741,7 +740,6 @@ void Scorer::assessInputs()
 
 void Scorer::analyzeDashboard()
 {
-
     auto cancoder = elevatorMotor->getCANCoder();
     leds->setLED(LEDConstants::LED_POS_ELEVATOR, valor::CANdleSensor::cancoderMagnetHealthGetter(cancoder));
     int elevatorHealthLED = std::abs(absSensorCorrect.value()) < ELEVATOR_HEALTH_LIMIT.value() ? valor::CANdleSensor::GREEN : valor::CANdleSensor::RED;
@@ -772,8 +770,8 @@ void Scorer::analyzeDashboard()
 
     units::meter_t elevatorSetpoint = positionMap[state.gamePiece][state.elevState];
 
-    bool isStopped = drivetrain->isSpeedStopped();
-    units::meter_t distanceFromReef = drivetrain->lidarDistance();
+    // bool isStopped = drivetrain->isSpeedStopped();
+    // units::meter_t distanceFromReef = drivetrain->lidarDistance();
     state.shootOverCoral = false; // isStopped && (MIN_DUNK_DISTANCE_OVER_CORAL<= distanceFromReef && distanceFromReef <= MAX_DUNK_DISTANCE_OVER_CORAL);
     if (state.shootOverCoral) {
         elevatorSetpoint += DUNK_OFFSET_OVER_CORAL;
@@ -975,7 +973,6 @@ void Scorer::assignOutputs()
 
 void Scorer::InitSendable(wpi::SendableBuilder& builder)
 {
-
     builder.SetSmartDashboardType("Subsystem");
     builder.AddDoubleProperty(
         "Desired Position: Elevator (in)",

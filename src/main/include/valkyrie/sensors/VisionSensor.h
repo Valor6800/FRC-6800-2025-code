@@ -45,7 +45,7 @@ class VisionSensor : public valor::BaseSensor<frc::Pose3d> {
         
         units::velocity::meters_per_second_t getError(int pipe, double kPLimeLight=0.7);
 
-        virtual void InitSendable(wpi::SendableBuilder& builder) override = 0;
+        void InitSendable(wpi::SendableBuilder& builder) override = 0;
 
         const char* getName();
 

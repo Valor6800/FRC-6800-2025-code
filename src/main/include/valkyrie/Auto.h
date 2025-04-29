@@ -6,6 +6,9 @@
 #include <frc2/command/Commands.h>
 #include <frc/smartdashboard/SendableChooser.h>
 #include <networktables/NetworkTable.h>
+#include <vector>
+#include <memory>
+#include <string>
 
 namespace valor {
 

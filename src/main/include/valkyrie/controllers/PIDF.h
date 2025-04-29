@@ -21,7 +21,6 @@ enum FeedForwardType
  */
 struct PIDF
 {
-
     void setMaxVelocity(units::turns_per_second_t _maxVelocity)
     {
         maxVelocity = _maxVelocity;

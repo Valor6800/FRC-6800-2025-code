@@ -4,6 +4,9 @@
 #include <frc/smartdashboard/SmartDashboard.h>
 #include <networktables/NetworkTable.h>
 #include <networktables/NetworkTableInstance.h>
+#include <memory>
+#include <unordered_map>
+#include <string>
 
 #include <map>
 

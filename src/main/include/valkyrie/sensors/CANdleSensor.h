@@ -3,6 +3,7 @@
 #include "valkyrie/sensors/BaseSensor.h"
 #include <ctre/phoenix6/CANcoder.hpp>
 #include <frc/TimedRobot.h>
+#include <string>
 
 #include "ctre/phoenix/led/CANdle.h"
 
@@ -190,7 +191,7 @@ public:
     /**
      * @brief Resets the CANdle and its' configuration
      */
-    void reset();
+    void reset() override;
 
     void InitSendable(wpi::SendableBuilder& builder) override;
 
@@ -220,7 +221,7 @@ private:
     std::unordered_map<int, SegmentSettings> segmentMap;
     SegmentSettings allSegments;
 
-    void calculate();
+    void calculate() override;
 
 };
 }

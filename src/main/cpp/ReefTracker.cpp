@@ -1,4 +1,7 @@
 #include "ReefTracker.h"
+#include <iostream>
+#include <string>
+#include <vector>
 
 ReefTracker::ReefTracker()
 {

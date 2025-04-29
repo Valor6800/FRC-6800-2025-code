@@ -2,7 +2,6 @@
 #include <iostream>
 #include "frc2/command/Commands.h"
 #include "pathplanner/lib/auto/AutoBuilder.h"
-// #include <frc/Filesystem.h>
 #include <networktables/NetworkTableInstance.h>
 #include <networktables/NetworkTable.h>
 #include <frc/smartdashboard/SmartDashboard.h>
@@ -11,9 +10,10 @@
 #include <frc2/command/SequentialCommandGroup.h>
 #include <frc2/command/InstantCommand.h>
 #include <frc2/command/WaitCommand.h>
-// 
 #include <filesystem>
 #include <string>
+#include <vector>
+#include <utility>
 using namespace valor; using namespace pathplanner;
 
 #define AUTOS_PATH (std::string)"/home/lvuser/deploy/pathplanner/autos/"

@@ -11,7 +11,7 @@ CurrentSensor::CurrentSensor(frc::TimedRobot *_robot, const char *_name) :
     cacheSize(DEFAULT_CACHE_SIZE / 20.0)
 {
     wpi::SendableRegistry::AddLW(this, "CurrentSensor", sensorName);
-    reset();
+    reset(); // NOLINT
 }
 
 void CurrentSensor::setSpikeSetpoint(double _setpoint)

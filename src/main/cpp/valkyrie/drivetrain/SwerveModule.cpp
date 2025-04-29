@@ -7,7 +7,7 @@
 #include <cmath>
 #include <iostream>
 #include <string>
-
+#include <vector>
 #include <frc/RobotController.h>
 
 const units::meters_per_second_t DRIVE_DEADBAND(0.05);

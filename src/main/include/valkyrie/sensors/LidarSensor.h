@@ -29,7 +29,7 @@ public:
      */
     LidarSensor(frc::TimedRobot *_robot, const char* name);
     
-    virtual void reset();
+    void reset() override;
 
     virtual void setGetter(std::function<T()> _lambda);
 
@@ -40,7 +40,7 @@ public:
     void setMaxDistance(T);
 
 private:
-    void calculate();
+    void calculate() override;
     T maxDistance;
     T filteredDistance;
     frc::LinearFilter<T> filter = frc::LinearFilter<T>::SinglePoleIIR(0.1, 0.02_s);

@@ -12,7 +12,7 @@ CANdleSensor::CANdleSensor(frc::TimedRobot *_robot, int _ledCount, int _segments
 {
     wpi::SendableRegistry::AddLW(this, "CANdleSensor", sensorName);
 
-    reset();
+    reset(); // NOLINT
 
     ctre::phoenix::led::CANdleConfiguration config;
     // Should match the type of LED strip connected to the CANdle
@@ -59,7 +59,7 @@ CANdleSensor::CANdleSensor(frc::TimedRobot *_robot, int _ledCount, int _segments
     allSegments.currentColor = toRGB(OFF);
     allSegments.recentlyChanged = false;
     allSegments.activeAnimationType = AnimationType::None;
-    setGetter([this] { return 0; });
+    setGetter([] { return 0; });
 }
 
 int CANdleSensor::cancoderMagnetHealthGetter(ctre::phoenix6::hardware::CANcoder* cancoder) {

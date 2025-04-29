@@ -1,4 +1,5 @@
 #include "valkyrie/controllers/NeoController.h"
+#include <string>
 
 #define NEO_PIDF_KP 10.0f
 #define NEO_PIDF_KI 0.0f
@@ -6,14 +7,11 @@
 
 const units::turns_per_second_t NEO_PIDF_KV(6); // RPS cruise velocity
 const units::turns_per_second_squared_t NEO_PIDF_KA(130.0); // RPS/S acceleration (6.5/130 = 0.05 seconds to max speed)
-const units::turns_per_second_cubed_t NEO_PIDF_KJ(650.0); // RPS/S^2 jerk (4000/40000 = 0.1 seconds to max acceleration)
 
 const units::ampere_t SUPPLY_CURRENT_THRESHOLD(60);
 const units::ampere_t STATOR_CURRENT_LIMIT(80);
 const units::ampere_t SUPPLY_CURRENT_LIMIT(45);
 const units::millisecond_t SUPPLY_TIME_THRESHOLD(500);
-
-const units::turn_t DEADBAND(0.01);
 
 using namespace valor;
 
@@ -27,7 +25,7 @@ NeoController::NeoController(valor::NeoControllerType controllerType,
     cancoder(nullptr),
     pidController(motor->GetClosedLoopController())
 {
-    init();
+    init(); // NOLINT
 }
 
 void NeoController::init()
@@ -40,10 +38,12 @@ void NeoController::init()
     motionPIDF.maxVelocity = NEO_PIDF_KV;
     motionPIDF.maxAcceleration = NEO_PIDF_KA;
 
+    // NOLINTBEGIN
     setNeutralMode(neutralMode);
     setCurrentLimits(STATOR_CURRENT_LIMIT, SUPPLY_CURRENT_LIMIT, SUPPLY_CURRENT_THRESHOLD, SUPPLY_TIME_THRESHOLD);
     setGearRatios(rotorToSensor, sensorToMech);
     setPIDF(pidf, 0);
+    // NOLINTEND
 
     wpi::SendableRegistry::AddLW(this, "NeoController", "ID " + std::to_string(0));
 }

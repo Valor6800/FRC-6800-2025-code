@@ -56,7 +56,8 @@ public:
         inverted(_inverted),
         neutralMode(_neutralMode),
         rotorToSensor(1),
-        sensorToMech(1) {}
+        sensorToMech(1),
+        followerMotor{nullptr} {}
 
     /**
      * @brief Destroy the Valor Controller object
@@ -70,11 +71,11 @@ public:
         if (motor) {
             delete motor;
             motor = nullptr;
-        };
+        }
         if (followerMotor) {
             delete followerMotor;
             followerMotor = nullptr;
-        };
+        }
     }
 
     virtual void applyConfig() = 0;

@@ -23,7 +23,7 @@ public:
      * 
      * @param id USB ID that shows up on the driver station. Between 0 and 3
      */
-    Gamepad(int id);
+    explicit Gamepad(int id);
 
     /**
      * @brief Set the X deadband value

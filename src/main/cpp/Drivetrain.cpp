@@ -33,6 +33,9 @@
 #include <units/math.h>
 #include <frc/Alert.h>
 #include "AprilTagPositions.h"
+#include <vector>
+#include <unordered_map>
+#include <memory>
 
 using namespace pathplanner;
 
@@ -631,9 +634,7 @@ frc2::FunctionalCommand* Drivetrain::getResetOdom() {
                 }
             }
         },
-        [&](bool){ // onEnd
-                
-        },
+        [&](bool){},
         [&]{ // isFinished
             return (frc::Timer::GetFPGATimestamp() - state.startTimestamp) > 1.0_s;
         },
@@ -828,7 +829,6 @@ bool Drivetrain::isSpeedStopped() {
 #define SCORER_OFFSET 2_in
 
 void Drivetrain::choosePoleDirection(Direction dir, Constants::AprilTag tag){
-    
     std::unordered_map<Constants::AprilTag, Constants::DirectionalOffSet> poleOffset = frc::DriverStation::GetAlliance() == frc::DriverStation::kRed ? Constants::redPoleOffsets : Constants::bluePoleOffsets;
     units::inch_t offset = poleOffset.find(tag) != poleOffset.end() ? poleOffset.at(tag).at(dir) : 0.0_in;
     switch (dir) {

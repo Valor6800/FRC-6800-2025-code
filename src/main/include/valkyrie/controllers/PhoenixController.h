@@ -39,7 +39,7 @@ public:
         res_position(getMotor()->GetPosition()),
         res_velocity{getMotor()->GetVelocity()}
     {
-        init();
+        init(); // NOLINT
     };
 
     static units::revolutions_per_minute_t getPhoenixControllerMotorSpeed(PhoenixControllerType controllerType)
@@ -77,10 +77,12 @@ public:
         req_vel_out.UpdateFreqHz = 0_Hz;
         req_raw_out.UpdateFreqHz = 0_Hz;
 
+        // NOLINTBEGIN
         setNeutralMode(neutralMode);
         setCurrentLimits(STATOR_CURRENT_LIMIT, SUPPLY_CURRENT_LIMIT, SUPPLY_CURRENT_THRESHOLD, SUPPLY_TIME_THRESHOLD);
         setGearRatios(rotorToSensor, sensorToMech);
         setPIDF(pidf, 0);
+        // NOLINTEND
 
         wpi::SendableRegistry::AddLW(this, "PhoenixController", "ID " + std::to_string(getMotor()->GetDeviceID()));
     }
@@ -257,7 +259,7 @@ public:
         return cancoder->GetMagnetHealth().GetValue();
     }
 
-    units::turn_t getAbsEncoderPosition() {
+    units::turn_t getAbsEncoderPosition() override {
         if (cancoder == nullptr) return 0_tr;
         return cancoder->GetAbsolutePosition().GetValue();
     }

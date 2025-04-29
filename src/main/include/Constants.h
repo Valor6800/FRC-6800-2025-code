@@ -6,6 +6,7 @@
 
 #pragma once
 
+#include <unordered_map>
 #include "Eigen/Core"
 #include "frc/DriverStation.h"
 #include "frc/RobotController.h"
@@ -129,8 +130,8 @@ namespace Constants {
         };
 
         static std::string getSerialNumber() {
-            std::string env = std::getenv("serialnum");
-            if (!env.empty()) return env;
+            char *env = std::getenv("serialnum");
+            if (env != NULL) return env;
             char buffer[8];
             std::ifstream{"/sys/firmware/devicetree/base/serial-number"}.read(buffer, 8);
             return std::string{buffer, 8};

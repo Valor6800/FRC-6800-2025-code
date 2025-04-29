@@ -37,7 +37,7 @@ Climber::Climber(frc::TimedRobot *_robot, valor::CANdleSensor* _leds) : valor::B
     leds(_leds)
 {
     frc2::CommandScheduler::GetInstance().RegisterSubsystem(this);
-    init();
+    init(); // NOLINT
 }
 
 Climber::~Climber()
@@ -58,7 +58,6 @@ void Climber::init()
 {
     valor::PIDF climbPID = Constants::Climber::getClimberPIDF();
     valor::PIDF climbRetractPID = Constants::Climber::getClimberRetractPIDF();
-    valor::PIDF stabbyPID;
 
     climbMotors = new valor::PhoenixController(
         valor::PhoenixControllerType::KRAKEN_X44_FOC,
@@ -121,7 +120,7 @@ void Climber::init()
     table->PutNumber("Spike Current", state.spikeCurrent);
     table->PutNumber("Cache Size", state.cacheSize);
 
-    resetState();
+    resetState(); // NOLINT
 
     climbMotors->setEncoderPosition(climbCancoder->GetAbsolutePosition().GetValue());
 }
@@ -160,7 +159,6 @@ void Climber::analyzeDashboard()
 
 void Climber::assignOutputs()
 {
-
     if(climbCancoder->GetAbsolutePosition().GetValue()<= LOCK_OUT_POS || state.hasClimbed){
         climbMotors->setPower(0_V);
         state.hasClimbed = true;
@@ -200,7 +198,7 @@ frc2::CommandPtr Climber::pitSequenceStage(CLIMB_STATE climbState) {
                 climberPosFail.Set(false);
                 state.climbState = climbState;
             },
-            [this, climbPos] {
+            [] {
             },
             [](bool) {},
             [] { return false; },

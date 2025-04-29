@@ -126,7 +126,6 @@ int AprilTagsSensor::getTagID(){
 }
 
 frc::Pose3d AprilTagsSensor::getMegaTagPose2(AprilTagsSensor::Orientation orient) {
-
     if (!hasTarget()) return frc::Pose3d();
 
     limeTable->PutNumberArray(

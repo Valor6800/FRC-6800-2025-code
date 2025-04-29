@@ -5,7 +5,7 @@ using namespace valor;
 DebounceSensor::DebounceSensor(frc::TimedRobot *_robot, const char *_name) : BaseSensor(_robot, _name)
 {
     wpi::SendableRegistry::AddLW(this, "DebounceSensor", sensorName);
-    reset();
+    reset(); // NOLINT
 }
 
 void DebounceSensor::reset()

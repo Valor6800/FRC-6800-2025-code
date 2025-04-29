@@ -1,3 +1,4 @@
+#pragma once
 #include "Eigen/Core"
 #include "frc/DriverStation.h"
 #include "frc/geometry/Pose2d.h"
@@ -7,6 +8,7 @@
 #include "gcem_incl/abs.hpp"
 #include <algorithm>
 #include <unordered_map>
+#include <utility>
 
 #include "frc/geometry/Translation3d.h"
 #include "gcem_incl/abs.hpp"
@@ -145,8 +147,6 @@ static const std::unordered_map<int, frc::Pose3d> aprilTagPoses{
          {1.0000000000000002, -2.220446049250313e-16, 0, -4.0298099999999994},
          {0, 0, 1, 1.30175},
          {0, 0, 0, 1}})},
-
-    
 };
 
 inline bool isReefTag(int tagID) {
