@@ -151,7 +151,7 @@ tasks.register("lint") {
 
     doLast {
         injected.execOps.exec {
-            commandLine 'git', 'add', '.'
+            commandLine 'git', 'add', '-u'
         }
         injected.execOps.exec {
             commandLine 'git', 'commit', '--allow-empty', '-m', '"TMP: Formatting changes"'
