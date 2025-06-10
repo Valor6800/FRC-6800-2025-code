@@ -93,14 +93,23 @@ void Robot::AutonomousInit() {
     scorer.state.autoDunkEnabled = true;
     drivetrain.dumbAutoAlign = true;
     autoCommands = valorAuto.getSelectedAuto();
-    autoCommands.Schedule();
+    for (std::size_t i = 0; i < autoCommands.size(); i++){
+        if(i == 0) autoCommands[i].Schedule();
+        else if(autoCommands[i-1].get()->IsFinished()){
+            autoCommands[i].Schedule();
+        }
+        else {
+            i--;
+        }
+    }
     // autoCommands.clear();
     // autoCommands.push_back(valorAuto.getSelectedAuto());
     // autoCommands.back().Schedule();
 }
 
 void Robot::AutonomousExit() {
-    autoCommands.Cancel();
+    frc2::CommandScheduler::GetInstance().CancelAll();
+    // autoCommands.Cancel();
 }
 
 void Robot::AutonomousPeriodic() {

@@ -26,14 +26,14 @@ class Auto
          * @param filename Filename of the pathplanner auto to get
          * @returns The generated auto
          */
-        frc2::CommandPtr getAuto(std::string filename);
+        std::vector<frc2::CommandPtr> getAuto(std::string filename);
 
         /**
          * Loads the auto with the filename selected in the SendableChooser.
          *
          * @returns The generated auto.
          */
-        frc2::CommandPtr getSelectedAuto();
+        std::vector<frc2::CommandPtr> getSelectedAuto();
 
         /**
          * Loads and stores an auto to be retrieved with getAuto. This cuts out the delay that would normally happen if the auto 
@@ -57,8 +57,8 @@ class Auto
         void clearAutos();
 
     private:
-        std::vector<std::pair<std::string, frc2::CommandPtr>> loadedAutos;
-        frc2::CommandPtr makeAuto(std::string autoName);
+        std::vector<std::pair<std::string, std::vector<frc2::CommandPtr>>> loadedAutos;
+        std::vector<frc2::CommandPtr> makeAuto(std::string autoName);
         std::shared_ptr<nt::NetworkTable> table;
         frc::SendableChooser<std::string> m_chooser;
 };

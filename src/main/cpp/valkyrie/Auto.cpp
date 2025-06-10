@@ -24,17 +24,23 @@ Auto::Auto(){
     m_chooser.SetDefaultOption("NONE", "NONE");
 }
 
-frc2::CommandPtr Auto::makeAuto(std::string autoName){
-    return pathplanner::PathPlannerAuto(autoName).ToPtr();
+std::vector<frc2::CommandPtr> Auto::makeAuto(std::string autoName){
+    auto paths = pathplanner::PathPlannerAuto::getPathGroupFromAutoFile(autoName);
+    std::vector<frc2::CommandPtr> pathfollowingCommands;
+    for (auto path : paths){
+        pathfollowingCommands.push_back(pathplanner::AutoBuilder::followPath(path));
+    }
+    return pathfollowingCommands;
+    // return pathplanner::PathPlannerAuto(autoName).ToPtr();
 }
 
-frc2::CommandPtr Auto::getSelectedAuto(){
+std::vector<frc2::CommandPtr> Auto::getSelectedAuto(){
     std::string selection = m_chooser.GetSelected(); 
     return getAuto(selection);
 }
 
-frc2::CommandPtr Auto::getAuto(std::string selection) {
-    if (selection == "NONE") return frc2::cmd::None();
+std::vector<frc2::CommandPtr> Auto::getAuto(std::string selection) {
+    if (selection == "NONE") return std::vector<frc2::CommandPtr>();
     for (uint i = 0; i < loadedAutos.size(); i++) {
         if (loadedAutos[i].first == selection)
             return std::move(loadedAutos[i].second);
