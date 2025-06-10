@@ -2,7 +2,7 @@
 
 using namespace valor;
 
-BranchingAutoCommand::BranchingAutoCommand(pathplanner::PathPlannerPath p1, pathplanner::PathPlannerPath p2, std::function<bool()> l) : path1(p1), path2(p2), lambda(l), command(pathplanner::AutoBuilder::followPath(std::make_shared<pathplanner::PathPlannerPath>(path1)))
+BranchingAutoCommand::BranchingAutoCommand(pathplanner::PathPlannerPath p1, pathplanner::PathPlannerPath p2, std::function<bool()> l) : path1(p1), path2(p2), lambda(l), command(frc2::cmd::None())
 {
 }
 
@@ -18,5 +18,5 @@ void BranchingAutoCommand::Initialize(){
 }
 
 bool BranchingAutoCommand::IsFinished(){
-    return command.IsScheduled();
+    return command.get()->IsFinished();
 }
