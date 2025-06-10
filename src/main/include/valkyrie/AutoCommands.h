@@ -2,6 +2,7 @@
 
 #include <frc2/command/Command.h>
 #include <frc2/command/CommandHelper.h>
+#include <frc2/command/CommandPtr.h>
 
 #include <pathplanner/lib/auto/AutoBuilder.h>
 #include <pathplanner/lib/path/PathPlannerPath.h>
@@ -18,6 +19,7 @@ class BranchingAutoCommand : public frc2::CommandHelper<frc2::Command, Branching
         pathplanner::PathPlannerPath path1;
         pathplanner::PathPlannerPath path2;
         std::function<bool()> lambda;
+        frc2::CommandPtr command;
 };
 
 }
