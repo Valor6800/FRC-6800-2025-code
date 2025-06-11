@@ -1,6 +1,7 @@
 #include "valkyrie/drivetrain/Swerve.h"
 #include "Eigen/Core"
 #include "frc/Timer.h"
+#include "frc/geometry/Rotation2d.h"
 #include "frc/kinematics/ChassisSpeeds.h"
 #include "gcem_incl/inv_sqrt.hpp"
 #include "gcem_incl/max.hpp"
@@ -554,6 +555,7 @@ void Swerve<AzimuthMotor, DriveMotor>::setupGyro(
             .WithMountPoseYaw(mountYaw)
         )
     );
+    pigeon->GetYaw().SetUpdateFrequency(250_Hz);
 }
 
 template<class AzimuthMotor, class DriveMotor>
@@ -568,7 +570,7 @@ void Swerve<AzimuthMotor, DriveMotor>::resetGyro(){
 template<class AzimuthMotor, class DriveMotor>
 frc::Rotation2d Swerve<AzimuthMotor, DriveMotor>::getGyro() {
     if (pigeon)
-        return pigeon->GetRotation2d();
+        return frc::Rotation2d(pigeon->GetYaw().GetValue());
     return frc::Rotation2d();
 }
 
