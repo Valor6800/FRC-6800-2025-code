@@ -434,37 +434,37 @@ namespace Constants {
                 {
                     {LEFT, 0.5_in},
                     {RIGHT, 0.5_in},
-                    {NONE, 2_in}
+                    {NONE, 0_in}
                 }},
             {18,
                 {
                     {LEFT, 0.5_in},
                     {RIGHT, 0.5_in},
-                    {NONE, 2_in}
+                    {NONE, 0_in}
                 }},
             {19,
                 {
                     {LEFT, 0.5_in},
                     {RIGHT, 0.5_in},
-                    {NONE, 2_in}
+                    {NONE, 0_in}
                 }},
             {20,
                 {
                     {LEFT, 0.5_in},
                     {RIGHT, 0.5_in},
-                    {NONE, 2_in}
+                    {NONE, 0_in}
                 }},
             {21,
                 {
                     {LEFT, 0.5_in},
                     {RIGHT, 0.5_in},
-                    {NONE, 2_in}
+                    {NONE, 0_in}
                 }},
             {22,
                 {
                     {LEFT, 0.5_in},
                     {RIGHT, 0.5_in},
-                    {NONE, 2_in}
+                    {NONE, 0_in}
                 }}
         };
 
@@ -473,37 +473,37 @@ namespace Constants {
                 {
                     {LEFT, 0.5_in},
                     {RIGHT, 0.5_in},
-                    {NONE, 2_in}
+                    {NONE, 0_in}
                 }},
             {7,
                 {
                     {LEFT, 0.5_in},
                     {RIGHT, 0.5_in},
-                    {NONE, 2_in}
+                    {NONE, 0_in}
                 }},
             {8,
                 {
                     {LEFT, 0.5_in},
                     {RIGHT, 0.5_in},
-                    {NONE, 2_in}
+                    {NONE, 0_in}
                 }},
             {9,
                 {
                     {LEFT, 0.5_in},
                     {RIGHT, 0.5_in},
-                    {NONE, 2_in}
+                    {NONE, 0_in}
                 }},
             {10,
                 {
                     {LEFT, 0.5_in},
                     {RIGHT, 0.5_in},
-                    {NONE, 2_in}
+                    {NONE, 0_in}
                 }},
             {11,
                 {
                     {LEFT, 0.5_in},
                     {RIGHT, 0.5_in},
-                    {NONE, 2_in}
+                    {NONE, 0_in}
                 }},
         };
 
@@ -543,7 +543,7 @@ namespace Constants {
             static units::meters_per_second_t getAutoDunkSpeedLimitation(bool autoDunking) { switch (robot) {
                 case Robot::Alpha: return autoDunking ? 0.25_mps : 0.6_mps ;
                 case Robot::Gold: return autoDunking ? 0.35_mps : 0.6_mps ;
-                default: return autoDunking ? 0.25_mps : 0.6_mps;
+                default: return autoDunking ? 0.35_mps : 0.6_mps;
             }}
 
             static ScoringSpeedMap getScoringSpeedMap() { switch (robot) {
@@ -685,23 +685,6 @@ namespace Constants {
                 default: return false;
             }}
 
-            static bool scorerPivotInverted() { switch (robot) {
-                case Robot::Alpha: return true;
-                case Robot::Gold: return false;
-                default: return false;
-            }}
-
-            static bool funnelInverted() { switch (robot) {
-                case Robot::Alpha: return true;
-                case Robot::Gold: return true;
-                default: return true;
-            }}
-
-            static units::angle::turn_t scorerPivotMagnetOffset() { switch (robot) {
-                case Robot::Alpha: return 1.37_tr;
-                case Robot::Gold: return -0.846435125_tr; //setPoint - currentPos +/"-" currentOffset
-                default: return -0.7521969219_tr;
-            }}
 
             /// Amount of rotations needed for after detecting coral intake
             static units::angle::turn_t getIntakeTurns() { switch (robot) {
