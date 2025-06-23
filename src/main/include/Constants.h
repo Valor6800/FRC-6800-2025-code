@@ -266,7 +266,7 @@ namespace Constants {
         static units::angle::turn_t getElevatorMagnetOffset() { switch (robot) {
             case Robot::Alpha: return 0.10327_tr;
             case Robot::Gold: return 0.48486328125_tr; //  0.989014_tr;
-            default: return -0.303710_tr;
+            default: return -0.1279296875_tr;
         }};
 
         static frc::Pose3d mintCameraPosition(){ switch (robot) {
@@ -522,10 +522,10 @@ namespace Constants {
                     {ELEVATOR_STATE::FOUR, 28_tps} // 25
                 };
                 default: return {
-                    {ELEVATOR_STATE::ONE, 6_tps},
-                    {ELEVATOR_STATE::TWO, 12_tps},
-                    {ELEVATOR_STATE::THREE, 12_tps},
-                    {ELEVATOR_STATE::FOUR, 12_tps} // 25
+                    {ELEVATOR_STATE::ONE, 12_tps},
+                    {ELEVATOR_STATE::TWO, 16_tps},
+                    {ELEVATOR_STATE::THREE, 16_tps},
+                    {ELEVATOR_STATE::FOUR, 28_tps} // 25
                 };
             }}
 
@@ -586,11 +586,11 @@ namespace Constants {
                             GAME_PIECE::CORAL,
                             {
                                 { ELEVATOR_STATE::STOWED, 10_in },
-                                { ELEVATOR_STATE::HP, 3.25_in },
+                                { ELEVATOR_STATE::HP, 3.1_in },
                                 { ELEVATOR_STATE::ONE, 10.2_in },
-                                { ELEVATOR_STATE::TWO, 14.2_in },
-                                { ELEVATOR_STATE::THREE, 19.25_in },
-                                { ELEVATOR_STATE::FOUR, 27_in }
+                                { ELEVATOR_STATE::TWO, 14.06_in }, //Tomball: 14.1
+                                { ELEVATOR_STATE::THREE, 19.1_in }, //Tomball: 19.5
+                                { ELEVATOR_STATE::FOUR, 26.75_in } //Tomball: 27.25
                             }
                         },
                         {
@@ -598,7 +598,7 @@ namespace Constants {
                             {
                                 { ELEVATOR_STATE::STOWED, 6.39_in},
                                 { ELEVATOR_STATE::HP, 6.39_in + 1_in},
-                                { ELEVATOR_STATE::ONE, 3.90_in },
+                                { ELEVATOR_STATE::ONE, 3.5_in },
                                 { ELEVATOR_STATE::TWO, 10.38_in}, //Tomball: 11.21
                                 { ELEVATOR_STATE::THREE, 15.89_in}, //Tomball: 16.72
                                 { ELEVATOR_STATE::FOUR, 29.9_in }
@@ -616,7 +616,7 @@ namespace Constants {
             static bool scorerMotorInverted() { switch (robot) {
                 case Robot::Alpha: return true;
                 case Robot::Gold: return false;
-                default: return true;
+                default: return false;
             }}
 
             /// Amount of rotations needed for after detecting coral intake
@@ -630,13 +630,13 @@ namespace Constants {
             static units::second_t getElevMaxVelRampTime() { switch (robot) {
                 case Robot::Alpha: return 1.0_s / 5;
                 case Robot::Gold: return 12.6_s/60.0;
-                default: return 12.6_s/16.0;
+                default: return 12.6_s/60.0;
             }}
 
             static double getScorerSensorToMech() { switch (robot) {
                 case Robot::Alpha: return 2;
                 case Robot::Gold: return 5 / 3;
-                default: return 5;
+                default: return 5 / 3;
             }}
 
             static bool isElevatorClockwise() { switch (robot) {
@@ -669,8 +669,8 @@ namespace Constants {
                 default: {
                     valor::PIDF pidf;
                     pidf.P = 10;
-                    pidf.aFF = 0.72;
-                    pidf.maxJerk = 100_tr_per_s_cu;
+                    pidf.aFF = 0.65;
+                    pidf.maxJerk = 150_tr_per_s_cu;
                     return pidf;
                 }
             }}
@@ -692,7 +692,8 @@ namespace Constants {
                 default: {
                     valor::PIDF pidf;
                     pidf.P = 0.5;
-                    pidf.S = 0.45;
+                    pidf.S = 0.58;
+                    pidf.kV = 0.11;
                     return pidf;
                 }
             }}
@@ -700,7 +701,7 @@ namespace Constants {
             static units::second_t getScorerMaxVelRampTime() { switch (robot) {
                 case Robot::Alpha: return 1.0_s / 2;
                 case Robot::Gold: return 1.0_s / 2;
-                default: return 1.0_s / 5;
+                default: return 1.0_s / 2;
             }}
         }
 
@@ -708,7 +709,7 @@ namespace Constants {
             static units::turn_t magnetOffset() { switch (robot) {
                 case Robot::Alpha: return 0_tr;
                 case Robot::Gold: return 0.0875_tr;
-                default: return 0.0875_tr;
+                default: return 0.495703_tr;
             }}
 
             static bool climbMotorInverted() { switch (robot) {
