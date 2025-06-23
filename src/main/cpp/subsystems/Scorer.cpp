@@ -550,22 +550,22 @@ void Scorer::assessInputs()
     if (operatorGamepad == nullptr || !operatorGamepad->IsConnected())
         return;
 
-    if(operatorGamepad->leftTriggerActive()) {
+    if(operatorGamepad->leftTriggerActive() || driverGamepad->GetXButton()) {
         state.gamePiece = ALGEE;
-    } else if(operatorGamepad->rightTriggerActive()) {
+    } else if(operatorGamepad->rightTriggerActive() || driverGamepad->GetBButton()) {
         state.gamePiece = CORAL;
     }
 
     if (operatorGamepad->leftStickYActive()) {
         state.elevState = MANUAL;
         state.manualSpeed = operatorGamepad->leftStickY(3) * 12_V * 0.75;
-    } else if (operatorGamepad->GetYButton()) {
+    } else if (operatorGamepad->GetYButton() || driverGamepad->DPadUp()) {
          state.elevState = ELEVATOR_STATE::FOUR;
-    } else if (operatorGamepad->GetBButton()) {
+    } else if (operatorGamepad->GetBButton() || driverGamepad->DPadRight()) {
         state.elevState = ELEVATOR_STATE::THREE;
-    } else if (operatorGamepad->GetAButton()) {
+    } else if (operatorGamepad->GetAButton() || driverGamepad->DPadDown()) {
         state.elevState = ELEVATOR_STATE::TWO;
-    } else if (operatorGamepad->GetXButton()) {
+    } else if (operatorGamepad->GetXButton() || driverGamepad->DPadLeft()) {
         state.elevState = ELEVATOR_STATE::ONE;
     } else if (operatorGamepad->DPadRight()) {
         state.elevState = ELEVATOR_STATE::HP;

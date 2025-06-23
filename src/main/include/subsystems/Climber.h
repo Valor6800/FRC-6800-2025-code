@@ -57,6 +57,7 @@ public:
         double spikeCurrent;
         double cacheSize;
         units::volt_t manualSpeed;
+        bool lockout;
 
     } state;
 

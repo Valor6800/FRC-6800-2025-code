@@ -51,6 +51,7 @@ void Climber::resetState()
     // state.stabState = STABBY_STATE::NO_CRAB;
     currentSensor.reset();
     state.hasClimbed = false;
+    state.lockout = false;
 }
 
 void Climber::init()
@@ -134,9 +135,11 @@ void Climber::assessInputs()
         state.manualSpeed = operatorGamepad->rightStickY(2) * 12_V;
     }
 
-    if(driverGamepad->GetYButton() && driverGamepad->GetBButton()){
+    if (driverGamepad->GetStartButton()) state.lockout = true;
+
+    if(driverGamepad->GetYButton() && state.lockout){
         state.climbState = CLIMB_STATE::DEPLOYED;
-    } else if(driverGamepad->GetAButton()){
+    } else if(driverGamepad->GetAButton() && state.lockout){
         state.climbState = CLIMB_STATE::RETRACTED;
     }
 }
