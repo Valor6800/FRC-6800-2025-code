@@ -447,7 +447,7 @@ void Drivetrain::analyzeDashboard()
             Swerve::rotAlign = true;
         }
     } else if (state.alignToTarget) {
-        Swerve::yAlign = hasYReset && state.elevState != Constants::Scorer::ELEVATOR_STATE::ONE;
+        Swerve::yAlign = hasYReset;
         Swerve::rotAlign = true;
         Swerve::xAlign = state.worldAlign || (
             Swerve::yAlign &&

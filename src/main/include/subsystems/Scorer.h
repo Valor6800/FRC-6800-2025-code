@@ -94,13 +94,13 @@ private:
 
     valor::PhoenixController<> *elevatorMotor;
     valor::PhoenixController<> *scorerMotor;
-    valor::PhoenixController<> *scorerPivotMotor;
-    valor::PhoenixController<> *funnelMotor;
+    // valor::PhoenixController<> *scorerPivotMotor;
+    // valor::PhoenixController<> *funnelMotor;
 
 
     valor::CANrangeSensor scorerStagingSensor;
     valor::CurrentSensor currentSensor;
-    valor::CurrentSensor coralCurrentSensor;
+    // valor::CurrentSensor coralCurrentSensor;
 
     Constants::Scorer::PositionMap positionMap;
     Constants::Scorer::ScoringSpeedMap scoringSpeedMap;
