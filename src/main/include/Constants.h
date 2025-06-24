@@ -737,7 +737,7 @@ namespace Constants {
                 default: {
                     valor::PIDF pidf;
                     pidf.P = 10;
-                    pidf.aFF = 0.65;
+                    pidf.aFF = 0.62;
                     pidf.maxJerk = 150_tr_per_s_cu;
                     return pidf;
                 }
