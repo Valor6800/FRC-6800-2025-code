@@ -657,7 +657,7 @@ namespace Constants {
             static PositionAngleMap getPivotPositionMap() { switch (robot) {
                 case Robot::Gold:
                     return {
-                        { PIVOT_STATE::CORAL_STOW, 0.1250_tr },
+                        { PIVOT_STATE::CORAL_STOW, 0.1200_tr },
                         { PIVOT_STATE::CORAL_GROUND, 0.637_tr },
                         { PIVOT_STATE::GROUND, 0.637_tr },
                         { PIVOT_STATE::PICK, 0.4_tr },
