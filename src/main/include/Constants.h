@@ -563,7 +563,7 @@ namespace Constants {
                 };
                 default: return {
                     {ELEVATOR_STATE::ONE, 12_tps},
-                    {ELEVATOR_STATE::TWO, 16_tps},
+                    {ELEVATOR_STATE::TWO, 12_tps},
                     {ELEVATOR_STATE::THREE, 16_tps},
                     {ELEVATOR_STATE::FOUR, 28_tps} // 25
                 };
