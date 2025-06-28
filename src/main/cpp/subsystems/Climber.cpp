@@ -18,7 +18,7 @@
 
 #define DEPLOYED_POS units::angle::turn_t (1.5) // (1.6
 #define RETRACTED_POS units::angle::turn_t (3.61)// (0.36
-#define LOCK_OUT_POS units::angle::turn_t (0.34) // (2.7)
+#define LOCK_OUT_POS units::angle::turn_t (0.33) // (2.7)
 #define STOW_POS units::angle::turn_t (0.5)
 //enocder climb value at .3
 
