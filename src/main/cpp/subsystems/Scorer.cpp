@@ -708,22 +708,20 @@ void Scorer::assessInputs()
         state.elevState = ELEVATOR_STATE::THREE;
     } else if (operatorGamepad->GetAButton() || driverGamepad->DPadDown()) {
         state.elevState = ELEVATOR_STATE::TWO;
-    } else if (operatorGamepad->GetXButton() || driverGamepad->DPadLeft()) {
+    } else if (operatorGamepad->GetXButton() || driverGamepad->DPadLeft() || driverGamepad->GetLeftBumperButton()) {
         state.elevState = ELEVATOR_STATE::ONE;
     } else if (operatorGamepad->DPadRight()) {
         state.elevState = ELEVATOR_STATE::HP;
     }
 
-    if (state.elevState == ELEVATOR_STATE::ONE && driverGamepad->leftTriggerActive()) {
+    if (state.elevState == ELEVATOR_STATE::ONE && driverGamepad->GetLeftBumperButton()) {
         state.intaking = true;
         state.scopedState = UNSCOPED;
         drivetrain->state.intaking = true;
     } else {
         state.intaking = false;
         drivetrain->state.intaking = false;
-        if (driverGamepad->GetLeftBumperButton()) {
-            state.scopedState = MANUAL_SCOPE;
-        } else if (driverGamepad->leftTriggerActive() || driverGamepad->rightTriggerActive()) {
+        if (driverGamepad->leftTriggerActive() || driverGamepad->rightTriggerActive()) {
             state.scopedState = SCOPED;
         } else {
             state.scopedState = UNSCOPED;

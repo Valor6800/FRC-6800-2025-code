@@ -434,7 +434,7 @@ void Drivetrain::analyzeDashboard()
         Swerve::yAlign = false;
         Swerve::xAlign = false;
         Swerve::rotAlign = true;
-    } else if (
+    /*} else if (
         state.alignToTarget &&
         state.elevState == Constants::Scorer::ELEVATOR_STATE::FOUR &&
         state.gamePiece == Constants::Scorer::GAME_PIECE::ALGEE
@@ -445,7 +445,7 @@ void Drivetrain::analyzeDashboard()
             Swerve::yAlign = false;
             Swerve::xAlign = false;
             Swerve::rotAlign = true;
-        }
+        }*/
     } else if (state.alignToTarget) {
         Swerve::yAlign = hasYReset && state.elevState != Constants::Scorer::ELEVATOR_STATE::ONE;
         Swerve::rotAlign = true;
