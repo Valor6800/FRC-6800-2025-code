@@ -857,7 +857,7 @@ void Scorer::assignOutputs()
                 }  
             } else if (state.elevState == ELEVATOR_STATE::FOUR && state.gamePiece == GAME_PIECE::ALGEE) {
                 if (units::math::fabs(convertToMechSpace(elevatorMotor->getPosition()) - positionMap[state.gamePiece][state.elevState]) < 0.1_m){
-                    scorerPivotMotor->setPosition(getPivotPositionMap()[PIVOT_STATE::PICK]);
+                    scorerPivotMotor->setPosition(getPivotPositionMap()[PIVOT_STATE::L4SCORE]);
                 } else {
                     scorerPivotMotor->setPosition(getPivotPositionMap()[PIVOT_STATE::CARRY]);
                 }   

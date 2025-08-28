@@ -528,6 +528,7 @@ namespace Constants {
                 PICK,
                 PRESCORE,
                 CARRY,
+                L4SCORE,
             };
 
             enum GAME_PIECE
@@ -621,7 +622,7 @@ namespace Constants {
                                 { ELEVATOR_STATE::ONE, 3.15_in },
                                 { ELEVATOR_STATE::TWO, 7.24_in},
                                 { ELEVATOR_STATE::THREE, 12.43_in},
-                                { ELEVATOR_STATE::FOUR, 29.9_in }
+                                { ELEVATOR_STATE::FOUR, 26_in }
                             }
                         }
                     };
@@ -663,6 +664,7 @@ namespace Constants {
                         { PIVOT_STATE::PICK, 0.4_tr },
                         { PIVOT_STATE::PRESCORE, 0.4625_tr },
                         { PIVOT_STATE::CARRY, 0.27_tr },
+                        { PIVOT_STATE::L4SCORE, 0.3_tr },
                     };
                 default:
                     return {
@@ -672,6 +674,7 @@ namespace Constants {
                         { PIVOT_STATE::PICK, 0.4_tr },
                         { PIVOT_STATE::PRESCORE, 0.4625_tr },
                         { PIVOT_STATE::CARRY, 0.27_tr },
+                        { PIVOT_STATE::L4SCORE, 0.3_tr },
                     };
             }}
 
