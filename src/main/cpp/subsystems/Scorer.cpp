@@ -721,7 +721,9 @@ void Scorer::assessInputs()
     } else {
         state.intaking = false;
         drivetrain->state.intaking = false;
-        if (driverGamepad->leftTriggerActive() || driverGamepad->rightTriggerActive()) {
+        if (driverGamepad->leftTriggerActive() && driverGamepad->rightTriggerActive()) {
+            state.scopedState = MANUAL_SCOPE;
+        } else if (driverGamepad->leftTriggerActive() || driverGamepad->rightTriggerActive()) {
             state.scopedState = SCOPED;
         } else {
             state.scopedState = UNSCOPED;

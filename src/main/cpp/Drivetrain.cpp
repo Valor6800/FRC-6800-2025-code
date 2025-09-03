@@ -352,7 +352,8 @@ void Drivetrain::assessInputs()
         state.dir = LEFT;
     }
 
-    state.alignToTarget = (driverGamepad->leftTriggerActive() || driverGamepad->rightTriggerActive()) && !state.intaking;
+    state.alignToTarget = ((driverGamepad->leftTriggerActive() && !driverGamepad->rightTriggerActive()) 
+    || (!driverGamepad->leftTriggerActive() && driverGamepad->rightTriggerActive())) && !state.intaking;
 
     state.climberAlign = driverGamepad->GetYButton();
 
