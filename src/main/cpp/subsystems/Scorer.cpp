@@ -48,7 +48,7 @@
 //1-50 motor - sensor
 //21-9 gear to encoder
 
-#define ALGAE_CACHE_SIZE 2000
+#define ALGAE_CACHE_SIZE 2500
 #define CORAL_CACHE_SIZE 500
 
 #define VIABLE_ELEVATOR_THRESHOLD 0.02_m
