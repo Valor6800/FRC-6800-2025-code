@@ -287,7 +287,7 @@ namespace Constants {
         */
         static units::angle::turn_t getElevatorMagnetOffset() { switch (robot) {
             case Robot::Alpha: return 0.10327_tr;
-            case Robot::Gold: return .1818847_tr; // Phoenix Tuner: -.218017578125
+            case Robot::Gold: return .2419433_tr; // Phoenix Tuner: -.218017578125
             default: return 0.764893_tr;
         }};
 
